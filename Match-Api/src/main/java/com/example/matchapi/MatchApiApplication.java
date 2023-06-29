@@ -17,5 +17,6 @@ public class MatchApiApplication {
         SpringApplication.run(MatchApiApplication.class, args);
         long heapSize = Runtime.getRuntime().totalMemory();
         System.out.println("MATCH API Server - HEAP Size(M) : "+ heapSize / (1024*1024) + " MB");
+        //
     }
 }
