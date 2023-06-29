@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(basePackages = {"com.example.matchapi","com.example.matchdomain"})
 @EntityScan(basePackages = {"com.example.matchdomain"})
 @EnableJpaRepositories(basePackages = {"com.example.matchdomain"})
-
+//
 public class MatchApiApplication {
     public static void main(String[] args) {
         SpringApplication.run(MatchApiApplication.class, args);
