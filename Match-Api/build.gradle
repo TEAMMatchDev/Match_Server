@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group 'com.example'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+jar {
+    archivesBaseName = 'match-api'
+}
+
+dependencies {
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation group: 'org.json', name: 'json', version: '20090211'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation project(':Match-Common')
+    implementation project(':Match-Domain')
+
+}
+test {
+    useJUnitPlatform()
+}

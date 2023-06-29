@@ -1,0 +1,6 @@
+rootProject.name = 'Match-Multimodules'
+include 'Match-Api'
+include 'Match-Common'
+include 'Match-Batch'
+include 'Admin-Api'
+include 'Match-Domain'
