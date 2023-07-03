@@ -15,10 +15,11 @@ jobs:
       - name: Checkout source code # 단계별 이름, 구분자로 소스를 가져옴
         uses: actions/checkout@v2
 
-      - name: Set up JDK 1.11
-          uses: actions/setup-java@v2
-          with:
-            java-version: 11
+      - name: Setup JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
 
       - name: Grant execute permission for gradlew
         working-directory: ./server-app
