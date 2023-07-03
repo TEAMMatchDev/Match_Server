@@ -8,6 +8,8 @@ on:
   workflow_dispatch: # 수동 실행 옵션 (생략)
 
 jobs:
+  release-ios:
+
   build:
     runs-on: ubuntu-latest # action 스크립트가 작동될 OS
 
@@ -26,18 +28,17 @@ jobs:
         with:
           files: ./Match-Domain/src/main/resources/application-domain.yml
         env:
-          spring.datasource.DEV_DB_URL_HOST: ${{ secrets.DEV_DB_URL_HOST }}
-          spring.datasource.AWS_DB_USER_NAME: ${{ secrets.AWS_DB_USER_NAME }}
-          spring.datasource.AWS_DB_PASSWORD: ${{ secrets.AWS_DB_PASSWORD }}
-          spring.datasource.PROD_DB_URL_HOST: ${{ secrets.PROD_DB_URL_HOST }}
+          spring.datasource.url;: ${{ secrets.DEV_DB_URL_HOST }}
+          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
 
       - name: set Environment - Api Yml
         uses: microsoft/variable-substitution@v1
         with:
           files: ./Match-Domain/src/main/resources/application-domain.yml
         env:
-          jwt.JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-          jwt.JWT_REFRESH_KEY: ${{ secrets.JWT_REFRESH_KEY }}
+          jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
+          jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
 
 
       - name: Grant execute permission for gradlew
