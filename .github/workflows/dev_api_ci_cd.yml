@@ -8,8 +8,6 @@ on:
   workflow_dispatch: # 수동 실행 옵션 (생략)
 
 jobs:
-  release-ios:
-
   build:
     runs-on: ubuntu-latest # action 스크립트가 작동될 OS
 
