@@ -1,4 +1,4 @@
-package com.example.matchapi.common.response;
+package com.example.matchcommon.reponse;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

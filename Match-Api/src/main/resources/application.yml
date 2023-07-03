@@ -1,4 +1,13 @@
+server:
+  port: 9000
 spring:
+  profiles:
+    include:
+      - domain
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 300MB
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
