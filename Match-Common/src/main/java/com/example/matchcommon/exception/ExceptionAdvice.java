@@ -1,13 +1,23 @@
 package com.example.matchcommon.exception;
 
+import com.example.matchcommon.reponse.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 @Slf4j
 @RestControllerAdvice
 public class ExceptionAdvice {
 
-    /*
+
     private void getExceptionStackTrace(Exception e, @AuthenticationPrincipal User user,
                                         HttpServletRequest request) {
         StringWriter sw = new StringWriter();
@@ -16,7 +26,7 @@ public class ExceptionAdvice {
         pw.append("\n==========================!!!ERROR TRACE!!!==========================\n");
         pw.append("uri: " + request.getRequestURI() + " " + request.getMethod() + "\n");
         if (user != null) {
-            pw.append("uid: " + user.getId() + "\n");
+            pw.append("uid: " + user.getUsername() + "\n");
         }
         pw.append(e.getMessage());
         pw.append("\n==================================================================\n");
@@ -41,6 +51,6 @@ public class ExceptionAdvice {
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-     */
+
 
 }
