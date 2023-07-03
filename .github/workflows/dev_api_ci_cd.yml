@@ -24,7 +24,7 @@ jobs:
       - name: set Environment - Api Yml
         uses: microsoft/variable-substitution@v1
         with:
-          files: ./Match-Api/src/main/resources/application-api.yml
+          files: ./Match-Api/src/main/resources/application.yml
         env:
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
           jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
