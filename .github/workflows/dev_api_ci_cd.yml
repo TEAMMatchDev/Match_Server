@@ -21,7 +21,15 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name : set Environment - Domain Yml
+      - name: set Environment - Api Yml
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ./Match-Api/src/main/resources/application-api.yml
+        env:
+          jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
+          jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
+
+      - name: set Environment - Domain Yml
         uses: microsoft/variable-substitution@v1
         with:
           files: ./Match-Domain/src/main/resources/application-domain.yml
@@ -30,15 +38,6 @@ jobs:
           spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
           spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
 
-      - name: set Environment - Api Yml
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ./Match-Domain/src/main/resources/application-api.yml
-        env:
-          jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
-          jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
-
-
       - name: Grant execute permission for gradlew
         working-directory: ./server-app
         run: chmod +x ./gradlew
@@ -46,7 +45,7 @@ jobs:
 
       - name: Build with Gradle
         working-directory: ./server-app
-        run: ./gradlewb Match-Api:bootJar
+        run: ./gradlew Match-Api:bootJar
         shell: bash
 
       - name: Get current time
