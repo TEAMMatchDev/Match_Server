@@ -56,7 +56,7 @@ jobs:
       - name: Generate deployment packagez
         run: |
           mkdir -p deploy
-          cp Match-Api/build/libs/*.jar deploy/match-api.jar
+          cp Match-Api/build/libs/*.jar deploy/match-dev-api.jar
           cp Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
@@ -72,3 +72,4 @@ jobs:
           version_label: match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
           region: ap-northeast-2
           deployment_package: deploy/match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
+          wait_for_deployment: false
