@@ -1,8 +1,9 @@
 name: dev MATCH API Server CI/CD
 
 on:
-  pull_request:
-    on: Prod-Api-v*.*.*
+  push:
+    tags:
+      - Prod-Api-v*.*.*
   workflow_dispatch: # 수동 실행 옵션 (생략)
 
 jobs:
