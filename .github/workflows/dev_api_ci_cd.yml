@@ -29,10 +29,10 @@ jobs:
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
           jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
 
-      - name: set Environment - Domain Yml
+      - name: set Environment - Domain DEV Yml
         uses: microsoft/variable-substitution@v1
         with:
-          files: ./Match-Domain/src/main/resources/application-domain.yml
+          files: ./Match-Domain/src/main/resources/application-domain-dev.yml
         env:
           spring.datasource.url: ${{ secrets.DEV_DB_URL_HOST }}
           spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
@@ -55,7 +55,7 @@ jobs:
           format: YYYYMMDDTHHmm
           utcOffset: "+09:00"
 
-      - name: Generate deployment package
+      - name: Generate deployment packagez
         run: |
           mkdir -p deploy
           cp Match-Api/build/libs/*.jar deploy/match-api.jar
