@@ -60,7 +60,7 @@ jobs:
           cp Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
-          cd deploy && zip -r deploy.zip  match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
+          cd deploy && zip -r match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
 
       - name: Deploy Consumer to EB
         uses: einaregilsson/beanstalk-deploy@v19
