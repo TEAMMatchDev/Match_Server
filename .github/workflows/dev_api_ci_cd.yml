@@ -39,12 +39,10 @@ jobs:
           spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
 
       - name: Grant execute permission for gradlew
-        working-directory: ./server-app
         run: chmod +x ./gradlew
         shell: bash
 
       - name: Build with Gradle
-        working-directory: ./server-app
         run: ./gradlew Match-Api:bootJar
         shell: bash
 
