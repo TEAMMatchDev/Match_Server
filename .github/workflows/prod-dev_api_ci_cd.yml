@@ -2,9 +2,7 @@ name: dev MATCH API Server CI/CD
 
 on:
   pull_request:
-    on: deployTest
-      #tags:
-    # - Dev-Api-v*.*.*
+    on: Prod-Api-v*.*.*
   workflow_dispatch: # 수동 실행 옵션 (생략)
 
 jobs:
@@ -58,7 +56,7 @@ jobs:
           mkdir -p deploy
           cp Match-Api/build/libs/*.jar deploy/match-dev-api.jar
           cp Procfile deploy/Procfile
-          cp -r .ebextensions deploy/.ebextensions-dev
+          cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
           cd deploy && zip -r match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
 
