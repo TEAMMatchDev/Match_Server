@@ -27,10 +27,10 @@ jobs:
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
           jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
 
-      - name: set Environment - Domain DEV Yml
+      - name: set Environment - Domain Prod Yml
         uses: microsoft/variable-substitution@v1
         with:
-          files: ./Match-Domain/src/main/resources/application-domain-dev.yml
+          files: ./Match-Domain/src/main/resources/application-domain-prod.yml
         env:
           spring.datasource.url: ${{ secrets.DEV_DB_URL_HOST }}
           spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
@@ -54,9 +54,9 @@ jobs:
       - name: Generate deployment packagez
         run: |
           mkdir -p deploy
-          cp Match-Api/build/libs/*.jar deploy/match-dev-api.jar
+          cp Match-Api/build/libs/*.jar deploy/match-prod-api.jar
           cp Procfile deploy/Procfile
-          cp -r .ebextensions deploy/.ebextensions
+          cp -r .ebextensions-prod deploy/.ebextensions
           cp -r .platform deploy/.platform
           cd deploy && zip -r match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
 
