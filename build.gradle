@@ -38,6 +38,7 @@ subprojects{
         implementation "io.springfox:springfox-swagger-ui:3.0.0"
         implementation 'io.springfox:springfox-swagger-ui:3.0.0'
 
+        implementation 'org.springframework.boot:spring-boot-starter-tomcat'
         implementation 'org.springframework.boot:spring-boot-starter'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
