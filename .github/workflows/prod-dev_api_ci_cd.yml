@@ -66,8 +66,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: match
-          environment_name: Match-env
+          application_name: Match-Api
+          environment_name: Match-Api-env
           version_label: match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
           region: ap-northeast-2
           deployment_package: deploy/match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
