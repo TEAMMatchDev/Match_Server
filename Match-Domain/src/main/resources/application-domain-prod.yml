@@ -3,22 +3,22 @@ spring:
     init:
       platform: mysql
   datasource:
-    url: ${DB_URL_HOST}
-    username: ${DB_USER_NAME}
-    password: ${DB_PASSWORD}
+    url: ${PROD_DB_URL_HOST}
+    username: ${AWS_DB_USER_NAME}
+    password: ${AWS_DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   config:
     activate:
-      on-profile: "local"
+      on-profile: "prod"
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-    # create, update, create-drop, none 등의 옵션이 있습니다.
-    # create: 기존테이블 삭제 후 다시 생성
-    # update: 변경된 부분만 반영
-    # create-drop: create와 같으나 종료 시점에 테이블 DROP
-    # none: 사용하지 않음
     hibernate:
       ddl-auto: none
+      # create, update, create-drop, none 등의 옵션이 있습니다.
+      # create: 기존테이블 삭제 후 다시 생성
+      # update: 변경된 부분만 반영
+      # create-drop: create와 같으나 종료 시점에 테이블 DROP
+      # none: 사용하지 않음
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
@@ -28,4 +28,4 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
