@@ -1,4 +1,4 @@
-name: dev MATCH API Server CI/CD
+name: prod MATCH API Server CI/CD
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         with:
           files: ./Match-Domain/src/main/resources/application-domain-prod.yml
         env:
-          spring.datasource.url: ${{ secrets.PROD_DB_URL_HOST }}
+          spring.datasource.url: ${{ secrets.DB_URL_HOST }}
           spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
           spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
 
