@@ -21,7 +21,6 @@ public class MatchApiApplication implements ApplicationListener<ApplicationReady
     private final Environment environment;
 
     public static void main(String[] args) {
-        System.setProperty("spring.config.name", "application, application-domain, application-common");
         SpringApplication.run(MatchApiApplication.class, args);
         long heapSize = Runtime.getRuntime().totalMemory();
         log.info("MATCH API Server - HEAP Size(M) : "+ heapSize / (1024*1024) + " MB");
