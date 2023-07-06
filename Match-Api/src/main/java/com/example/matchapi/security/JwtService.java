@@ -1,10 +1,12 @@
 package com.example.matchapi.security;
 
+import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +20,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.Optional;
@@ -25,64 +28,50 @@ import java.util.Optional;
 import static com.example.matchapi.security.JwtFilter.AUTHORIZATION_HEADER;
 import static com.example.matchapi.security.JwtFilter.REFRESH_TOKEN_HEADER;
 
-
+@RequiredArgsConstructor
 @Component
 @Slf4j
-public class JwtService implements InitializingBean {
+public class JwtService {
 
 
     private final UserRepository userRepository;
-
-    private final String secret;
-    private final String refreshSecret;
-    //private final RedisService redisService;
-    private final long accessTime;
-    private final long refreshTime;
-    private Key key;
+    private final JwtProperties jwtProperties;
 
 
-
-
-    public JwtService(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.refresh}") String refreshSecret,
-            UserRepository userRepository,
-            @Value("${jwt.access-token-seconds}") long accessTime,
-            @Value("${jwt.refresh-token-seconds}")long refreshTime) {
-        this.secret = secret;
-        this.userRepository = userRepository;
-        this.refreshSecret=refreshSecret;
-        this.accessTime = accessTime*1000;
-        this.refreshTime = refreshTime*1000;
+    private Key getSecretKey() {
+        return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
     }
 
-    @Override
-    public void afterPropertiesSet() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+    private Key getRefreshKey() {
+        return Keys.hmacShaKeyFor(jwtProperties.getRefresh().getBytes(StandardCharsets.UTF_8));
     }
+
 
     public String createToken(Long userId) {
         Date now =new Date();
+
+        final Key encodedKey = getSecretKey();
 
         return Jwts.builder()
                 .setHeaderParam("type","jwt")
                 .claim("userId",userId)
                 .setIssuedAt(now)
-                .setExpiration(new Date(System.currentTimeMillis()+accessTime))
-                .signWith(SignatureAlgorithm.HS256,secret)
+                .setExpiration(new Date(System.currentTimeMillis()+jwtProperties.getAccessTokenSeconds()))
+                .signWith(encodedKey)
                 .compact();
     }
 
     public String createRefreshToken(Long userId){
         Date now=new Date();
+        final Key encodedKey = getRefreshKey();
+
 
         return Jwts.builder()
-                .setHeaderParam("type","jwt")
+                .setHeaderParam("type","refresh")
                 .claim("userId",userId)
                 .setIssuedAt(now)
-                .setExpiration(new Date(System.currentTimeMillis()+refreshTime))
-                .signWith(SignatureAlgorithm.HS256,refreshSecret)
+                .setExpiration(new Date(System.currentTimeMillis()+jwtProperties.getRefreshTokenSeconds()))
+                .signWith(encodedKey)
                 .compact();
 
     }
@@ -91,7 +80,7 @@ public class JwtService implements InitializingBean {
         Jws<Claims> claims;
 
         claims = Jwts.parser()
-                .setSigningKey(secret)
+                .setSigningKey(getSecretKey())
                 .parseClaimsJws(token);
 
 
@@ -107,7 +96,7 @@ public class JwtService implements InitializingBean {
         try {
             Jws<Claims> claims;
             claims = Jwts.parser()
-                    .setSigningKey(secret)
+                    .setSigningKey(getSecretKey())
                     .parseClaimsJws(token);
 
             Long userId = claims.getBody().get("userId",Long.class);
@@ -156,13 +145,13 @@ public class JwtService implements InitializingBean {
 
     public Date getExpiredTime(String token){
         //받은 토큰의 유효 시간을 받아오기
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getExpiration();
+        return Jwts.parser().setSigningKey(getSecretKey()).parseClaimsJws(token).getBody().getExpiration();
     }
 
     public Long getUserIdByRefreshToken(String refreshToken) {
         Jws<Claims> claims;
         claims = Jwts.parser()
-                .setSigningKey(refreshSecret)
+                .setSigningKey(getRefreshKey())
                 .parseClaimsJws(refreshToken);
 
         return claims.getBody().get("userId",Long.class);
