@@ -21,13 +21,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: set Environment - Api Yml
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ./Match-Api/src/main/resources/application.yml
-        env:
-          jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
-          jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
+
 
       - name: set Environment - Domain DEV Yml
         uses: microsoft/variable-substitution@v1
@@ -49,6 +43,8 @@ jobs:
           oauth.kakao.redirect-url: ${{ secrets.KAKAO_REDIRECT }}
           oauth.kakao.app-id: ${{ secrets.KAKAO_APP_ID }}
           oauth.kakao.admin-key: ${{ secrets.KAKAO_ADMIN_KEY }}
+          jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
+          jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
 
 
       - name: Grant execute permission for gradlew
