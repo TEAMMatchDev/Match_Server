@@ -38,7 +38,7 @@ jobs:
       - name: Set Environment - Domain DEV Yml
         uses: microsoft/variable-substitution@v1
         with:
-          files: ./Match-Domain/src/main/resources/application-domain.yml
+          files: ./Match-Domain/src/main/resources/application-domain-dev.yml
         env:
           spring.datasource.url: ${{ secrets.DB_URL_HOST }}
           spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}

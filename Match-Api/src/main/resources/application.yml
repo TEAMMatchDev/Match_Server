@@ -5,8 +5,11 @@ spring:
   profiles:
     include:
       - infrastructure
-      - domain
       - common
+    group:
+      dev: dev, domain-dev
+      prod: prod, domain-prod
+      local: local, domain
   servlet:
     multipart:
       max-file-size: 30MB
@@ -18,18 +21,21 @@ spring:
 
 ---
 spring:
-  profiles:
-    active:
-      - dev
+  config:
+    activate:
+      on-profile: "prod"
+
+
 
 ---
 spring:
-  profiles:
-    active:
-      - prod
+  config:
+    activate:
+      on-profile: "dev"
 
 ---
 spring:
-  profiles:
-    active:
-      - local
+  config:
+    activate:
+      on-profile: "local"
+
