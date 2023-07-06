@@ -39,6 +39,8 @@ subprojects{
         implementation 'io.springfox:springfox-swagger-ui:3.0.0'
 
         implementation 'org.springframework.boot:spring-boot-starter-tomcat'
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
         implementation 'org.springframework.boot:spring-boot-starter'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
@@ -51,33 +53,3 @@ subprojects{
         useJUnitPlatform()
     }
 }
-
-/*
-project(':Match-Api'){
-    dependencies {
-
-    }
-}
-
-
-project(':Match-Batch'){
-    dependencies {
-        implementation project(':Match-Common')
-    }
-}
-
-project(':Match-Common'){
-    dependencies {
-    }
-}
-project(':Admin-Api'){
-    dependencies {
-        implementation project(':Match-Common')
-    }
-}
-project(':Match-Domain'){
-    dependencies {
-    }
-}
-
- */

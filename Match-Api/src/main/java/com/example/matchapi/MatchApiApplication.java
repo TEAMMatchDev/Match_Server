@@ -3,6 +3,7 @@ package com.example.matchapi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -13,14 +14,14 @@ import org.springframework.core.env.Environment;
 import java.util.Arrays;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
-@ComponentScan(basePackages = {"com.example.matchapi","com.example.matchdomain","com.example.matchcommon"})
+@ComponentScan(basePackages = {"com.example.matchapi","com.example.matchdomain","com.example.matchinfrastructure", "com.example.matchcommon"})
 @RequiredArgsConstructor
 @Slf4j
 public class MatchApiApplication implements ApplicationListener<ApplicationReadyEvent>  {
     private final Environment environment;
 
     public static void main(String[] args) {
-        System.setProperty("spring.config.name", "application,application-domain,application-domain-prod,application-domain-dev");
+        System.setProperty("spring.config.name", "application, application-domain, application-common");
         SpringApplication.run(MatchApiApplication.class, args);
         long heapSize = Runtime.getRuntime().totalMemory();
         log.info("MATCH API Server - HEAP Size(M) : "+ heapSize / (1024*1024) + " MB");
@@ -28,6 +29,10 @@ public class MatchApiApplication implements ApplicationListener<ApplicationReady
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event){
+        log.info(environment.getProperty("spring.jpa.hibernate.ddl-auto"));
+        log.info(environment.getProperty("oauth.kakao.base-url"));
+        log.info(environment.getProperty("jwt.secret"));
         log.info("applicationReady status Active Profiles =" + Arrays.toString(environment.getActiveProfiles()));
     }
+
 }
