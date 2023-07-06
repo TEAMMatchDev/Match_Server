@@ -29,9 +29,6 @@ public class MatchApiApplication implements ApplicationListener<ApplicationReady
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event){
-        log.info(environment.getProperty("spring.jpa.hibernate.ddl-auto"));
-        log.info(environment.getProperty("oauth.kakao.base-url"));
-        log.info(environment.getProperty("jwt.secret"));
         log.info("applicationReady status Active Profiles =" + Arrays.toString(environment.getActiveProfiles()));
     }
 
