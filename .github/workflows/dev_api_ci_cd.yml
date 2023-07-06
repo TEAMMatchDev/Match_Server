@@ -34,15 +34,18 @@ jobs:
           oauth.kakao.admin-key: ${{ secrets.KAKAO_ADMIN_KEY }}
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
           jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
+          spring.datasource.url: ${{ secrets.DB_URL_HOST }}
+          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
 
-      - name: Set Environment - Domain DEV Yml
+      - name: Set Environment
         uses: microsoft/variable-substitution@v1
         with:
-          files: ./Match-Domain/src/main/resources/application-domain.yml
+          files: ./Match-Api/src/main/resources/application.yml
         env:
-          DB_URL_HOST: ${{ secrets.DB_URL_HOST }}
-          AWS_DB_USER_NAME: ${{ secrets.AWS_DB_USER_NAME }}
-          AWS_DB_PASSWORD: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.datasource.url: ${{ secrets.DB_URL_HOST }}
+          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
