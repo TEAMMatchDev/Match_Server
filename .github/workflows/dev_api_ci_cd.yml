@@ -21,8 +21,6 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-
-
       - name: set Environment - Common Yml
         uses: microsoft/variable-substitution@v1
         with:
