@@ -22,11 +22,11 @@ public class Workaround implements WebMvcOpenApiTransformationFilter {
 
         Server testServer = new Server();
         testServer.setDescription("test");
-        testServer.setUrl("https://dev.matchserver.shop");
+        testServer.setUrl("https://www.match-api-server.com");
 
         Server prodServer = new Server();
         prodServer.setDescription("prod");
-        prodServer.setUrl("https://prod.matchserver.shop");
+        prodServer.setUrl("https://www.prod.match-api-server.com");
         openApi.setServers(Arrays.asList(localServer, testServer, prodServer));
 
 

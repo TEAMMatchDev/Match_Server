@@ -1,4 +1,4 @@
-package com.example.matchapi.service;
+package com.example.matchapi.user.service;
 
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;

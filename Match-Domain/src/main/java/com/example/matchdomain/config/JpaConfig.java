@@ -1,4 +1,4 @@
-package com.example.matchdomain.user.config;
+package com.example.matchdomain.config;
 
 import com.example.matchdomain.DomainPackageLocation;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

@@ -4,12 +4,9 @@ spring:
       platform: mysql
   datasource:
     url: ${DB_URL_HOST}
-    username: ${DB_USER_NAME}
-    password: ${DB_PASSWORD}
+    username: ${AWS_DB_USER_NAME}
+    password: ${AWS_DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  config:
-    activate:
-      on-profile: "local"
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     # create, update, create-drop, none 등의 옵션이 있습니다.
@@ -29,3 +26,23 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "local"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+
