@@ -1,5 +1,6 @@
 package com.example.matchdomain.user.entity;
 
+import com.example.matchdomain.common.model.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -21,7 +22,7 @@ import java.util.Set;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-public class User implements UserDetails {
+public class User extends BaseEntity implements UserDetails {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +34,18 @@ public class User implements UserDetails {
     @Column(name="password")
     private String password;
 
-    @Column(name = "activated")
-    private boolean activate;
+    @Column(name = "profileImgUrl")
+    private String profileImgUrl;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "socialId")
+    private String socialId;
+
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType=SocialType.normal;
+
 
     @ManyToMany
     @JoinTable(
@@ -77,7 +88,4 @@ public class User implements UserDetails {
         return false;
     }
 
-    public boolean isActivated() {
-        return activate;
-    }
 }
