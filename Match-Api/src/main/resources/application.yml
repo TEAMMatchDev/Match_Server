@@ -1,19 +1,35 @@
 server:
   port: 9000
+
 spring:
   profiles:
     include:
+      - infrastructure
       - domain
+      - common
   servlet:
     multipart:
       max-file-size: 30MB
       max-request-size: 300MB
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
-jwt:
-  header: X-AUTH-TOKEN
-  secret: ${JWT_SECRET_KEY}
-  refresh: ${JWT_REFRESH_KEY}
-  access-token-seconds: 31536000
-  refresh-token-seconds: 31536000
+    mvc:
+      pathmatch:
+        matching-strategy: ant_path_matcher
+
+
+---
+spring:
+  profiles:
+    active:
+      - dev
+
+---
+spring:
+  profiles:
+    active:
+      - prod
+
+---
+spring:
+  profiles:
+    active:
+      - local
