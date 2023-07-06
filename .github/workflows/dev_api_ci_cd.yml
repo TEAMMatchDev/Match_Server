@@ -21,7 +21,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: set Environment - Common Yml
+      - name: Set Environment - Common Yml
         uses: microsoft/variable-substitution@v1
         with:
           files: ./Match-Common/src/main/resources/application-common.yml
@@ -35,21 +35,14 @@ jobs:
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
           jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
 
-
-      - name: set Environment Variabes
-        run: |
-          echo "DB_URL_HOST=${{ secrets.DEV_DB_URL_HOST }}" >> $GITHUB_ENV
-          echo "AWS_DB_USER_NAME=${{ secrets.AWS_DB_USER_NAME }}" >> $GITHUB_ENV
-          echo "AWS_DB_PASSWORD=${{ secrets.AWS_DB_PASSWORD }}" >> $GITHUB_ENV
-
-#      - name: set Environment - Domain DEV Yml
-#        uses: microsoft/variable-substitution@v1
-#        with:
-#          files: ./Match-Domain/src/main/resources/application-domain.yml
-#        env:
-#          spring.datasource.url: ${{ secrets.DEV_DB_URL_HOST }}
-#          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
-#          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
+      - name: Set Environment - Domain DEV Yml
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ./Match-Domain/src/main/resources/application-domain.yml
+        env:
+          spring.datasource.url: ${{ secrets.DEV_DB_URL_HOST }}
+          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
