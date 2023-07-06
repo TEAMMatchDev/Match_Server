@@ -2,11 +2,6 @@ server:
   port: 9000
 
 spring:
-  datasource:
-    url: ${DB_URL_HOST}
-    username: ${AWS_DB_USER_NAME}
-    password: ${AWS_DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
   profiles:
     include:
       - infrastructure
