@@ -34,6 +34,9 @@ jobs:
           oauth.kakao.admin-key: ${{ secrets.KAKAO_ADMIN_KEY }}
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
           jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
+          oauth.naver.secret: ${{ secrets.NAVER_SECRET }}
+          oauth.naver.client: ${{ secrets.NAVER_CLIENT }}
+          oauth.naver.redirect-url: ${{ secrets.NAVER_REDIRECT}}
 
       - name: Set Environment - Domain DEV Yml
         uses: microsoft/variable-substitution@v1

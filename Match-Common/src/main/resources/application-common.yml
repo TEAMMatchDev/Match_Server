@@ -6,6 +6,10 @@ oauth:
     redirect-url: ${KAKAO_REDIRECT}
     app-id: ${KAKAO_APP_ID}
     admin-key: ${KAKAO_ADMIN_KEY}
+  naver:
+    secret: ${NAVER_SECRET}
+    client: ${NAVER_CLIENT}
+    redirect-url: ${NAVER_REDIRECT}
 
 jwt:
   header: X-AUTH-TOKEN
