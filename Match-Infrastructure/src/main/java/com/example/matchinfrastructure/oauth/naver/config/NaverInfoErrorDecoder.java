@@ -1,5 +1,4 @@
-package com.example.matchinfrastructure.oauth.config;
-
+package com.example.matchinfrastructure.oauth.naver.config;
 
 import com.example.matchcommon.exception.OtherServerBadRequestException;
 import com.example.matchcommon.exception.OtherServerExpiredTokenException;
@@ -9,8 +8,7 @@ import feign.FeignException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 
-public class KakaoInfoErrorDecoder implements ErrorDecoder {
-
+public class NaverInfoErrorDecoder implements ErrorDecoder {
     @Override
     public Exception decode(String methodKey, Response response) {
         if (response.status() >= 400) {

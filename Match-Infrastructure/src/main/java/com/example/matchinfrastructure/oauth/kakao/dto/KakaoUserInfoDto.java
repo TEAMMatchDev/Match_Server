@@ -1,16 +1,14 @@
-package com.example.matchinfrastructure.oauth.dto;
+package com.example.matchinfrastructure.oauth.kakao.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class KakaoTokenInfoRes {
+public class KakaoUserInfoDto {
 
     private Properties properties;
     private String id;

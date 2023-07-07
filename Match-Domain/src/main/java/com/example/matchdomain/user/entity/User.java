@@ -9,9 +9,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 
 @Entity
 @Table(name = "`User`")
@@ -28,10 +27,11 @@ public class User extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="username")
+    //유저 아이디
+    @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name="password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "profileImgUrl")
@@ -40,11 +40,23 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "email")
+    private String email;
+
+
     @Column(name = "socialId")
     private String socialId;
 
+    @Column(name = "birth")
+    private LocalDate birth;
+
     @Enumerated(EnumType.STRING)
-    private SocialType socialType=SocialType.normal;
+    private SocialType socialType = SocialType.normal;
+
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "userId")
+    private List<UserAddress> userAddresses = new ArrayList<>();
 
 
     @ManyToMany
@@ -58,6 +70,7 @@ public class User extends BaseEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
     }
+
     @Override
     public String getPassword() {
         return password;
