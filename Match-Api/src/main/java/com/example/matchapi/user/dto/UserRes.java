@@ -2,10 +2,7 @@ package com.example.matchapi.user.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 public class UserRes {
 
@@ -19,5 +16,14 @@ public class UserRes {
 
         @ApiModelProperty(notes = "리프레쉬 토큰", required = true, example = "asdkjanwjkldnjk----")
         private String refreshToken;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserAddress {
+        private Long id;
+        private Long userId;
     }
 }
