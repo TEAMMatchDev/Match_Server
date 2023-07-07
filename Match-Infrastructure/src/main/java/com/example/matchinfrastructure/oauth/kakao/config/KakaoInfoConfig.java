@@ -1,4 +1,4 @@
-package com.example.matchinfrastructure.oauth.config;
+package com.example.matchinfrastructure.oauth.kakao.config;
 
 
 import feign.codec.Encoder;

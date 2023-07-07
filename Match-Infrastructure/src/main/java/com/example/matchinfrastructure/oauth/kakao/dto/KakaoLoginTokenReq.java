@@ -1,6 +1,6 @@
-package com.example.matchinfrastructure.oauth.dto;
+package com.example.matchinfrastructure.oauth.kakao.dto;
 
-import com.example.matchcommon.properties.OauthProperties;
+import com.example.matchcommon.properties.KakaoProperties;
 import lombok.*;
 
 @Getter
@@ -15,7 +15,7 @@ public class KakaoLoginTokenReq {
     private String redirect_uri;
     private final String grant_type = "authorization_code";
 
-    public static KakaoLoginTokenReq newInstance(OauthProperties kakaoInfo, String code){
+    public static KakaoLoginTokenReq newInstance(KakaoProperties kakaoInfo, String code){
         return KakaoLoginTokenReq.builder()
                 .client_id(kakaoInfo.getKakaoClientId())
                 .client_secret(kakaoInfo.getKakaoClientSecret())

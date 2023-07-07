@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @AllArgsConstructor
 @ConstructorBinding
 @ConfigurationProperties("oauth")
-public class OauthProperties {
+public class KakaoProperties {
 
     private OAuthSecret kakao;
 

@@ -1,7 +1,7 @@
-package com.example.matchinfrastructure.oauth.client;
+package com.example.matchinfrastructure.oauth.kakao.client;
 
-import com.example.matchinfrastructure.oauth.config.KakaoInfoConfig;
-import com.example.matchinfrastructure.oauth.dto.KakaoUserInfoDto;
+import com.example.matchinfrastructure.oauth.kakao.config.KakaoInfoConfig;
+import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
