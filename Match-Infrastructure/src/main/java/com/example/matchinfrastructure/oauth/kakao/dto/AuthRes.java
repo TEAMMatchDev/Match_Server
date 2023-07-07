@@ -1,4 +1,4 @@
-package com.example.matchinfrastructure.oauth.dto;
+package com.example.matchinfrastructure.oauth.kakao.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

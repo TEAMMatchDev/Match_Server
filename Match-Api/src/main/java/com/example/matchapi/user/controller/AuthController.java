@@ -3,8 +3,8 @@ package com.example.matchapi.user.controller;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.service.AuthService;
 import com.example.matchcommon.reponse.CommonResponse;
-import com.example.matchinfrastructure.oauth.dto.KakaoLoginTokenRes;
-import com.example.matchinfrastructure.oauth.dto.KakaoUserInfoDto;
+import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
+import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +31,19 @@ public class AuthController {
     }
 
 
+    /*
+    네이버 로그인 토큰 발급용
+     */
+    @GetMapping(value="/naver")
+    public String naverOauthRedirect(@RequestParam String code){
+        return authService.getNaverOauthToken(code);
+    }
+
+    @ApiOperation(value= "01-03🔑 네이버,카카오 로그인" , notes = "네이버버 액세 토큰 보내주기")
+    @PostMapping(value="/naver")
+    public CommonResponse<NaverUserInfoDto> naverLogIn(@RequestBody UserReq.SocialLoginToken socialLoginToken){
+        return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
+    }
 
 
 
