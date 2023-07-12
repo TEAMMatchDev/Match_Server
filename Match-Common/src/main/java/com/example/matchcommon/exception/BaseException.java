@@ -1,11 +1,14 @@
 package com.example.matchcommon.exception;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.util.Map;
 
 @Getter
+@RequiredArgsConstructor
 public class BaseException extends RuntimeException {
 
     HttpStatus httpStatus;
