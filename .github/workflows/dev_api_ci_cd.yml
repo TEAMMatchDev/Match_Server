@@ -1,7 +1,7 @@
 name: dev MATCH API Server CI/CD
 
 on:
-  pull_request:
+  push:
     branches: [dev]
       #tags:
     # - Dev-Api-v*.*.*
