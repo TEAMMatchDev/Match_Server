@@ -1,7 +1,9 @@
 package com.example.matchapi.user.controller;
 
 import com.example.matchapi.user.dto.UserReq;
+import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.service.AuthService;
+import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
@@ -9,6 +11,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+import static com.example.matchcommon.exception.CommonResponseStatus.NOT_EMPTY_TOKEN;
 
 @RestController
 @RequestMapping("/auth")
@@ -26,7 +32,7 @@ public class AuthController {
 
     @ApiOperation(value= "01-02🔑 카카오 로그인" , notes = "카카오 액세스 토큰 보내주기")
     @PostMapping(value="/kakao")
-    public CommonResponse<KakaoUserInfoDto> kakaoLogIn(@RequestBody UserReq.SocialLoginToken socialLoginToken){
+    public CommonResponse<UserRes.UserToken> kakaoLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         return CommonResponse.onSuccess(authService.kakaoLogIn(socialLoginToken));
     }
 
@@ -41,7 +47,7 @@ public class AuthController {
 
     @ApiOperation(value= "01-03🔑 네이버,카카오 로그인" , notes = "네이버버 액세 토큰 보내주기")
     @PostMapping(value="/naver")
-    public CommonResponse<NaverUserInfoDto> naverLogIn(@RequestBody UserReq.SocialLoginToken socialLoginToken){
+    public CommonResponse<UserRes.UserToken> naverLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
     }
 

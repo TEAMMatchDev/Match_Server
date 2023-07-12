@@ -30,6 +30,12 @@ public class KakaoUserInfoDto {
         private Profile profile;
         private String email;
         private String phoneNumber;
+        private Boolean genderNeedsAgreement;
+        private String gender;
+        private Boolean birthyearNeedsAgreement;
+        private String birthyear;
+        private Boolean birthdayNeedsAgreement;
+        private String birthday;
         private String name;
 
         @Getter
@@ -42,10 +48,21 @@ public class KakaoUserInfoDto {
         public String getProfileImageUrl() {
             return profile.getProfileImageUrl();
         }
+
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getGender(){
+        return kakaoAccount.getGender();
+    }
+    public String getBirthYear(){
+        return kakaoAccount.getBirthyear();
+    }
+    public String getBirthDay(){
+        return kakaoAccount.getBirthday();
     }
 
     public String getEmail() {

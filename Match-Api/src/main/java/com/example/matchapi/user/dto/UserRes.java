@@ -5,7 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 public class UserRes {
-
+    @Getter
+    @Setter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
