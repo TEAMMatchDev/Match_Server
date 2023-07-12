@@ -1,6 +1,7 @@
-package com.example.matchdomain.user.entity;
+package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.user.entity.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -8,7 +9,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "UserAddress")
+@Table(name = "DonationUser")
 @Getter
 @Setter
 @Builder
@@ -16,8 +17,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-public class UserAddress extends BaseEntity {
-
+public class DonationUser extends BaseEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,5 +30,11 @@ public class UserAddress extends BaseEntity {
     @Column(name="userId")
     private Long userId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projectId",nullable = false, insertable=false, updatable=false)
+    private DonationProject donationProject;
+
+    @Column(name="projectId")
+    private Long projectId;
 
 }
