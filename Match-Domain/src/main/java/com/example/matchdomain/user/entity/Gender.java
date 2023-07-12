@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum SocialType {
-    KAKAO("kakao"),
-    NAVER("naver"),
-    NORMAL("normal");
+public enum Gender {
+    FEMALE("여자"),
+    MALE("남자"),
+    UNKNOWN("알 수 없음");
 
     private final String value;
 

@@ -18,6 +18,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 @Slf4j
 public class MatchApiApplication implements ApplicationListener<ApplicationReadyEvent>  {
+
     private final Environment environment;
 
     public static void main(String[] args) {

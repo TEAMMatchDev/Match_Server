@@ -1,5 +1,6 @@
 package com.example.matchdomain.user.repository;
 
+import com.example.matchdomain.user.entity.SocialType;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -16,4 +17,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
 
     Optional<User> findById(Long id);
+
+    Optional<User> findBySocialIdAndSocialType(String id, SocialType kakao);
 }

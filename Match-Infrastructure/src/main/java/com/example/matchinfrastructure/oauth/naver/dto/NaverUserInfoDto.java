@@ -19,6 +19,7 @@ public class NaverUserInfoDto {
     @NoArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Response{
+
         private String id;
         private String nickname;
         private String name;
@@ -30,4 +31,47 @@ public class NaverUserInfoDto {
         private String birthyear;
         private String mobile;
     }
+
+
+    public String getId() {
+        return response.getId();
+    }
+
+    public String getNickname() {
+        return response.getNickname();
+    }
+
+    public String getName() {
+        return response.getName();
+    }
+
+    public String getEmail() {
+        return response.getEmail();
+    }
+
+    public String getGender() {
+        return response.getGender();
+    }
+
+    public String getAge() {
+        return response.getAge();
+    }
+
+    public String getBirthday() {
+        return response.getBirthday();
+    }
+
+    public String getProfileImage() {
+        return response.getProfile_image();
+    }
+
+    public String getBirthyear() {
+        return response.getBirthyear();
+    }
+
+    public String getMobile() {
+        return response.getMobile();
+    }
+
+
 }

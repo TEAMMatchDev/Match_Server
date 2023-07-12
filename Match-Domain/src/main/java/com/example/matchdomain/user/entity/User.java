@@ -1,6 +1,7 @@
 package com.example.matchdomain.user.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.donation.entity.DonationUser;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -26,7 +27,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     //유저 아이디
     @Column(name = "username", nullable = false)
     private String username;
@@ -43,7 +43,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "email")
     private String email;
 
-
     @Column(name = "socialId")
     private String socialId;
 
@@ -51,13 +50,21 @@ public class User extends BaseEntity implements UserDetails {
     private LocalDate birth;
 
     @Enumerated(EnumType.STRING)
-    private SocialType socialType = SocialType.normal;
+    private SocialType socialType = SocialType.NORMAL;
 
+    @Enumerated(EnumType.STRING)
+    private UserStatus status = UserStatus.ACTIVE;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "userId")
     private List<UserAddress> userAddresses = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "userId")
+    private List<DonationUser> donationUser = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -100,5 +107,7 @@ public class User extends BaseEntity implements UserDetails {
     public boolean isEnabled() {
         return false;
     }
+
+
 
 }

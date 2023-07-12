@@ -1,14 +1,19 @@
 package com.example.matchapi.config;
 
+import com.example.matchapi.security.JwtAccessDeniedHandler;
+import com.example.matchapi.security.JwtAuthenticationEntryPoint;
 import com.example.matchapi.security.JwtSecurityConfig;
 import com.example.matchapi.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -16,6 +21,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtService jwtService;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -47,6 +59,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler)
+
 
                 .and()
                 .authorizeRequests()
