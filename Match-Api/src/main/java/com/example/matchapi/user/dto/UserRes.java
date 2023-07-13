@@ -12,9 +12,10 @@ public class UserRes {
     @NoArgsConstructor
     @ApiModel(value = "01-02,03🔑 로그인 후 토큰 발급 API Response")
     public static class UserToken{
+        @ApiModelProperty(notes = "userId 값", required = true, example = "1")
+        private Long userId;
         @ApiModelProperty(notes = "액세스 토큰", required = true, example = "asdkjanwjkldnjk----")
         private String accessToken;
-
         @ApiModelProperty(notes = "리프레쉬 토큰", required = true, example = "asdkjanwjkldnjk----")
         private String refreshToken;
     }

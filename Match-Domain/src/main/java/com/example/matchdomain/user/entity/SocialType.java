@@ -11,5 +11,8 @@ public enum SocialType {
     NORMAL("normal");
 
     private final String value;
-
+    public String getValue() {
+        return value;
     }
+
+}

@@ -1,9 +1,8 @@
 name: prod MATCH API Server CI/CD
 
 on:
-  push:
-    tags:
-      - Prod-Api-v*.*.*
+  pull_request:
+    branches: [prod]
   workflow_dispatch: # 수동 실행 옵션 (생략)
 
 jobs:

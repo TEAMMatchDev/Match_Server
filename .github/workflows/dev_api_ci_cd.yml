@@ -1,7 +1,7 @@
 name: dev MATCH API Server CI/CD
 
 on:
-  pull_request:
+  push:
     branches: [dev]
       #tags:
     # - Dev-Api-v*.*.*
@@ -38,7 +38,7 @@ jobs:
           oauth.naver.client: ${{ secrets.NAVER_CLIENT }}
           oauth.naver.redirect-url: ${{ secrets.NAVER_REDIRECT}}
 
-      - name: Set Environment - Domain DEV Yml
+      - name: Set Environment Domain - Domain DEV Yml
         uses: microsoft/variable-substitution@v1
         with:
           files: ./Match-Domain/src/main/resources/application-domain-dev.yml

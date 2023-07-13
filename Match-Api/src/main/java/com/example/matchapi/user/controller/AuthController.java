@@ -45,7 +45,7 @@ public class AuthController {
         return authService.getNaverOauthToken(code);
     }
 
-    @ApiOperation(value= "01-03🔑 네이버,카카오 로그인" , notes = "네이버버 액세 토큰 보내주기")
+    @ApiOperation(value= "01-03🔑 네이버 로그인" , notes = "네이버 액세스 토큰 보내주기")
     @PostMapping(value="/naver")
     public CommonResponse<UserRes.UserToken> naverLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
