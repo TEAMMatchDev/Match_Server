@@ -5,6 +5,7 @@ import com.example.matchapi.user.convertor.UserConvertor;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.utils.AuthHelper;
+import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
 import com.example.matchdomain.user.entity.Authority;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
@@ -49,13 +51,18 @@ public class AuthService {
         Long userId;
 
         Optional<User> user = userRepository.findBySocialIdAndSocialType(kakaoUserInfoDto.getId(), KAKAO);
+        authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
 
+        //카카오 전화번호로 이미 다른 소셜로그인 이나 기본가입을 했던 사람.
+
+
+        //소셜 로그인 정보가 없을 시
         if (user.isEmpty()) userId = kakaoSignUp(kakaoUserInfoDto);
-
+        //소셜 로그인 정보가 있을 시
         else userId = user.get().getId();
 
 
-        return new UserRes.UserToken(jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
     }
 
 
@@ -64,21 +71,20 @@ public class AuthService {
         Authority authority = userConvertor.PostAuthroity();
         String password = authHelper.createRandomPassword();
         Gender gender = authHelper.genderConversion(kakaoUserInfoDto.getGender());
-        LocalDate birth = authHelper.birthConversion(kakaoUserInfoDto.getBirthYear(), kakaoUserInfoDto.getBirthDay(),kakaoUserInfoDto.getKakaoAccount().getBirthdayNeedsAgreement());
+        LocalDate birth = authHelper.birthConversion(kakaoUserInfoDto.getBirthYear(), kakaoUserInfoDto.getBirthDay());
         User user = userConvertor.KakaoSignUpUser(kakaoUserInfoDto, KAKAO, password, gender, birth, authority);
+
+        System.out.println(kakaoUserInfoDto.getPhoneNumber());
 
         return userRepository.save(user).getId();
     }
 
     public KakaoLoginTokenRes getOauthToken(String code, String referer) {
-        KakaoLoginTokenRes kakaoTokenResponse = kakaoLoginFeignClient.kakaoAuth(
+        return kakaoLoginFeignClient.kakaoAuth(
                 kakaoProperties.getKakaoClientId(),
                 kakaoProperties.getKakaoRedirectUrl(),
                 kakaoProperties.getKakaoClientSecret(),
                 code);
-
-
-        return kakaoTokenResponse;
 
     }
 
@@ -96,6 +102,7 @@ public class AuthService {
     public UserRes.UserToken naverLogIn(UserReq.SocialLoginToken socialLoginToken) {
         NaverUserInfoDto naverUserInfoDto = naverFeignClient.getInfo(BEARER + socialLoginToken.getAccessToken());
         Long userId;
+        authHelper.checkUserExists(naverUserInfoDto.getMobile(), NAVER);
 
         Optional<User> user = userRepository.findBySocialIdAndSocialType(naverUserInfoDto.getResponse().getId(), NAVER);
 
@@ -103,14 +110,14 @@ public class AuthService {
 
         else userId = user.get().getId();
 
-        return new UserRes.UserToken(jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
     }
 
     private Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
         Authority authority = userConvertor.PostAuthroity();
         String password = authHelper.createRandomPassword();
         Gender gender = authHelper.genderConversion(naverUserInfoDto.getGender());
-        LocalDate birth = authHelper.birthConversion(naverUserInfoDto.getBirthyear(), naverUserInfoDto.getBirthday().replace("-",""),true);
+        LocalDate birth = authHelper.birthConversion(naverUserInfoDto.getBirthyear(), naverUserInfoDto.getBirthday());
         User user = userConvertor.NaverSignUpUser(naverUserInfoDto, NAVER, password, gender, birth, authority);
 
         return userRepository.save(user).getId();

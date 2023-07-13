@@ -19,4 +19,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findById(Long id);
 
     Optional<User> findBySocialIdAndSocialType(String id, SocialType kakao);
+
+
+    Optional<User> findByPhoneNumberAndSocialTypeNot(String phoneNumber, SocialType socialType);
 }
