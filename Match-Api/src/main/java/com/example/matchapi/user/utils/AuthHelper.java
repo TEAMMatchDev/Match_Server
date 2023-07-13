@@ -20,7 +20,7 @@ public class AuthHelper {
     public Gender genderConversion(String authGender){
 
         GenderResolver resolver = gender -> {
-            if (gender.isEmpty()){
+            if (gender==null){
                 return Gender.UNKNOWN;
             } else if (gender.equalsIgnoreCase("female")||gender.equalsIgnoreCase("F")) {
                 return Gender.FEMALE;
