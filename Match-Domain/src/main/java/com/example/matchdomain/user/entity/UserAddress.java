@@ -30,5 +30,35 @@ public class UserAddress extends BaseEntity {
     @Column(name="userId")
     private Long userId;
 
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "isDefault")
+    private Boolean isDefault;
+
+    @Enumerated(EnumType.STRING)
+    private AddresslType addresslType;
+
+    @Column(name = "baseAddress")
+    private String baseAddress;
+
+    @Column(name = "detailAddress")
+    private String detailAddress;
+
+    @Column(name = "receiverAddress")
+    private String receiverAddress;
+
+    @Column(name = "receiverAddressPhoneNumber1")
+    private String receiverAddressPhoneNumber1;
+
+    @Column(name = "receiverAddressPhoneNumber2")
+    private String receiverAddressPhoneNumber2;
+
+    @Column(name = "zoneNumber")
+    private String zoneNumber;
+
+    @Column(name = "zipCode")
+    private String zipCode;
+
 
 }
