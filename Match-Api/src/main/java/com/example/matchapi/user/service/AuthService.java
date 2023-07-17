@@ -80,6 +80,7 @@ public class AuthService {
     }
 
     public KakaoLoginTokenRes getOauthToken(String code, String referer) {
+        System.out.println(kakaoProperties.getKakaoRedirectUrl());
         return kakaoLoginFeignClient.kakaoAuth(
                 kakaoProperties.getKakaoClientId(),
                 kakaoProperties.getKakaoRedirectUrl(),
