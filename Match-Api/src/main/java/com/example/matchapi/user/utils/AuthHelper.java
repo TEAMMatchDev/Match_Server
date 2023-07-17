@@ -1,18 +1,23 @@
 package com.example.matchapi.user.utils;
 
 import com.example.matchcommon.annotation.Helper;
-import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.BaseException;
+import com.example.matchcommon.properties.CoolSmsProperties;
 import com.example.matchdomain.user.entity.Gender;
 import com.example.matchdomain.user.entity.SocialType;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import net.nurigo.java_sdk.Coolsms;
+import net.nurigo.java_sdk.api.Message;
+import net.nurigo.java_sdk.exceptions.CoolsmsException;
+import org.json.JSONObject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import static com.example.matchcommon.exception.CommonResponseStatus.EXIST_USER_PHONENUMBER;
@@ -23,6 +28,7 @@ import static com.example.matchdomain.user.entity.SocialType.*;
 public class AuthHelper {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final CoolSmsProperties coolSmsProperties;
 
     public String createRandomPassword() {
         return passwordEncoder.encode(UUID.randomUUID().toString());
@@ -50,6 +56,33 @@ public class AuthHelper {
             errorType.put("signUpType",socialTypeConversion(user.get().getSocialType()));
             throw new BaseException(EXIST_USER_PHONENUMBER, errorType);
         }
+    }
+
+    public String createRandomNumber() {
+        Random rand  = new Random();
+        String numStr = "";
+        for(int i=0; i<6; i++) {
+            String ran = Integer.toString(rand.nextInt(10));
+            numStr+=ran;
+        }
+
+        return numStr;
+    }
+
+    public void sendSms(String phone, String number) throws CoolsmsException {
+        String api_key = coolSmsProperties.getApi(); // 발급받은 api_key
+        String api_secret = coolSmsProperties.getSecret(); // 발급받은 api_secret
+        Message coolsms = new Message(api_key, api_secret);
+
+
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("to",phone);    // 수신전화번호 (ajax로 view 화면에서 받아온 값으로 넘김)
+        params.put("from", coolSmsProperties.getSender());    // 발신전화번호. 테스트시에는 발신,수신 둘다 본인 번호로 하면 됨
+        params.put("type", "sms");
+        params.put("text", "인증번호는 [" + number + "] 입니다.");
+
+        coolsms.send(params); // 메시지 전송
     }
 
     @FunctionalInterface

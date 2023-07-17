@@ -28,4 +28,13 @@ public class UserRes {
         private Long id;
         private Long userId;
     }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ApiModel("01-04🔑 문자인증 API Response")
+    public static class Sms {
+        private String number;
+    }
 }

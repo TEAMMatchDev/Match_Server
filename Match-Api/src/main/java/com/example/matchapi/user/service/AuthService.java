@@ -5,7 +5,6 @@ import com.example.matchapi.user.convertor.UserConvertor;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.utils.AuthHelper;
-import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
 import com.example.matchdomain.user.entity.Authority;
@@ -22,6 +21,7 @@ import com.example.matchinfrastructure.oauth.naver.dto.NaverTokenRes;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import net.nurigo.java_sdk.exceptions.CoolsmsException;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -121,5 +121,11 @@ public class AuthService {
         User user = userConvertor.NaverSignUpUser(naverUserInfoDto, NAVER, password, gender, birth, authority);
 
         return userRepository.save(user).getId();
+    }
+
+    public String checkSms(String phone) throws CoolsmsException {
+        String number = authHelper.createRandomNumber();
+        authHelper.sendSms(phone,number);
+        return number;
     }
 }
