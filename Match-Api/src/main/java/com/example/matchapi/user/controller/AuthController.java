@@ -58,6 +58,11 @@ public class AuthController {
         return CommonResponse.onSuccess(new UserRes.Sms(number));
     }
 
+    @ApiOperation(value="01-05🔑 유저 회원가입", notes= "회원가입 용 API 입니다.")
+    public CommonResponse<UserRes.UserToken> signUpUser(@RequestBody @Valid UserReq.SignUpUser signUpUser){
+        return CommonResponse.onSuccess(authService.signUpUser(signUpUser));
+    }
+
 
 
 
