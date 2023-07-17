@@ -20,7 +20,7 @@ dependencies {
     implementation project(':Match-Domain')
     implementation project(':Match-Infrastructure')
 
-    compileOnly group: 'net.nurigo', name: 'javaSDK', version: '2.2'
+    implementation group: 'net.nurigo', name: 'javaSDK', version: '2.2'
 
 }
 test {
