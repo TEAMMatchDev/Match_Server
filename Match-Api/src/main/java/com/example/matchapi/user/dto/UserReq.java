@@ -20,4 +20,14 @@ public class UserReq {
         @NotEmpty(message = "토큰을 입력해주세요")
         private String accessToken;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ApiModel("01-04🔑 문자인증 API Request")
+    public static class Sms {
+        private String phone;
+    }
 }

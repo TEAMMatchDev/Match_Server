@@ -5,10 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum SocialType {
-    KAKAO("kakao"),
-    NAVER("naver"),
-    NORMAL("normal");
+public enum AddresslType {
+    OLD("old"),
+    NEW("new");
 
     private final String value;
     public String getValue() {

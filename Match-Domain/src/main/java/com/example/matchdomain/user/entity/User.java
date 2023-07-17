@@ -46,6 +46,11 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "socialId")
     private String socialId;
 
+    @Column(name = "phoneNumber")
+    private String phoneNumber;
+
+
+
     @Column(name = "birth")
     private LocalDate birth;
 

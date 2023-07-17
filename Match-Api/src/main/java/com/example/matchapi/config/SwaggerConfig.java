@@ -28,8 +28,8 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         Server serverLocal = new Server("local", "http://localhost:9000", "for local usages", Collections.emptyList(), Collections.emptyList());
-        Server UbuntuServer = new Server("server", "https://www.match-api-server.com", "for prod server", Collections.emptyList(), Collections.emptyList());
-        Server ProdServer = new Server("server", "https:/www.prod.match-api-server.com", "for dev server", Collections.emptyList(), Collections.emptyList());
+        Server UbuntuServer = new Server("dev", "https://www.match-api-server.com", "for dev server", Collections.emptyList(), Collections.emptyList());
+        Server ProdServer = new Server("server", "https:/www.prod.match-api-server.com", "for prod server", Collections.emptyList(), Collections.emptyList());
         return new Docket(DocumentationType.OAS_30)
                 .servers(serverLocal,UbuntuServer,ProdServer)
                 .consumes(getConsumeContentTypes())
