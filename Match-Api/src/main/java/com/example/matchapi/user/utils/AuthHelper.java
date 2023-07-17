@@ -8,10 +8,6 @@ import com.example.matchdomain.user.entity.SocialType;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import net.nurigo.java_sdk.Coolsms;
-import net.nurigo.java_sdk.api.Message;
-import net.nurigo.java_sdk.exceptions.CoolsmsException;
-import org.json.JSONObject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
@@ -69,6 +65,7 @@ public class AuthHelper {
         return numStr;
     }
 
+    /*
     public void sendSms(String phone, String number) throws CoolsmsException {
         String api_key = coolSmsProperties.getApi(); // 발급받은 api_key
         String api_secret = coolSmsProperties.getSecret(); // 발급받은 api_secret
@@ -83,7 +80,10 @@ public class AuthHelper {
         params.put("text", "인증번호는 [" + number + "] 입니다.");
 
         coolsms.send(params); // 메시지 전송
+
     }
+
+     */
 
     @FunctionalInterface
     private interface GenderResolver {

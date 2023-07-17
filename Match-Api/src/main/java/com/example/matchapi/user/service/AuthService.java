@@ -21,10 +21,8 @@ import com.example.matchinfrastructure.oauth.naver.dto.NaverTokenRes;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import net.nurigo.java_sdk.exceptions.CoolsmsException;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
@@ -124,9 +122,12 @@ public class AuthService {
         return userRepository.save(user).getId();
     }
 
+    /*
     public String checkSms(String phone) throws CoolsmsException {
         String number = authHelper.createRandomNumber();
         authHelper.sendSms(phone,number);
         return number;
     }
+
+     */
 }

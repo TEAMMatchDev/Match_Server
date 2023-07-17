@@ -5,17 +5,13 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.service.AuthService;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.CommonResponse;
-import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
-import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static com.example.matchcommon.exception.CommonResponseStatus.NOT_EMPTY_TOKEN;
 
 @RestController
 @RequestMapping("/auth")
@@ -52,6 +48,7 @@ public class AuthController {
         return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
     }
 
+    /*
     @ApiOperation(value= "01-04🔑 회원 문자인증 요청", notes = "회원 문자인증 용 API 입니다.")
     @PostMapping(value="/sms")
     public CommonResponse<UserRes.Sms> checkSms(@RequestBody UserReq.Sms sms) throws CoolsmsException {
@@ -59,6 +56,8 @@ public class AuthController {
 
         return CommonResponse.onSuccess(new UserRes.Sms(number));
     }
+
+     */
 
 
 
