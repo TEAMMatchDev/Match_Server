@@ -17,6 +17,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,12 +43,21 @@ public class ExceptionAdvice{
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        Map<String, String> errors = e.getBindingResult().getFieldErrors().stream()
-                .collect(Collectors.toMap(
-                        FieldError::getField,
-                        fieldError -> Optional.ofNullable(fieldError.getDefaultMessage()).orElse("")
-                ));
-        return new ResponseEntity<>(CommonResponse.onFailure("REQUEST_ERROR", "요청 형식 에러", errors), null, HttpStatus.BAD_REQUEST);
+        Map<String, String> errors = new LinkedHashMap<>(); // Use a LinkedHashMap to preserve the order of errors
+
+        for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
+
+            String fieldName = fieldError.getField();
+            String errorMessage = Optional.ofNullable(fieldError.getDefaultMessage()).orElse("");
+            if (errors.containsKey(fieldName)) {
+                String existingErrorMessage = errors.get(fieldName);
+                errorMessage = existingErrorMessage + ", " + errorMessage;
+            }
+
+            errors.put(fieldName, errorMessage);
+        }
+
+        return new ResponseEntity<>(CommonResponse.onFailure("REQUEST_ERROR", "Error in request format", errors), null, HttpStatus.BAD_REQUEST);
     }
 
 

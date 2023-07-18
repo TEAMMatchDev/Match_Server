@@ -18,3 +18,8 @@ jwt:
   access-token-seconds: 31536000
   refresh-token-seconds: 31536000
 
+sms:
+  secret: ${SMS_SECRET_KEY}
+  api: ${SMS_API_KEY}
+  sender: ${SMS_SENDER}
+

@@ -16,7 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         // 모든 경로에 앞으로 만들 모든 CORS 정보를 적용한다
-        registry.addMapping("/**") 
+        registry.addMapping("/**")
                 // Header의 Origin에 들어있는 주소가 http://localhost:3000인 경우를 허용한다
                 .allowedOrigins(
                         "http://localhost:3000",
