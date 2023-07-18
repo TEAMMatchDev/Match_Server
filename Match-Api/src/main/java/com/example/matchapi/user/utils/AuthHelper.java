@@ -24,7 +24,6 @@ import static com.example.matchdomain.user.entity.SocialType.*;
 public class AuthHelper {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final CoolSmsProperties coolSmsProperties;
 
     public String createRandomPassword() {
         return passwordEncoder.encode(UUID.randomUUID().toString());
