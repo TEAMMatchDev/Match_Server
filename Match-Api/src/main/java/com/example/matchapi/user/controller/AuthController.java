@@ -79,6 +79,12 @@ public class AuthController {
         return CommonResponse.onSuccess("핸드폰 사용가능");
     }
 
+    @ApiOperation(value="01-05-03🔑 유저 회원가입 비밀번호 인증용", notes= "회원가입 용 API 입니다.")
+    @PostMapping(value="/logIn")
+    public CommonResponse<UserRes.UserToken> logIn(@RequestBody @Valid UserReq.LogIn logIn){
+        return CommonResponse.onSuccess(authService.logIn(logIn));
+    }
+
 
 
 

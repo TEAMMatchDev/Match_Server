@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -49,8 +50,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "phoneNumber")
     private String phoneNumber;
 
-
-
     @Column(name = "birth")
     private LocalDate birth;
 
@@ -70,6 +69,9 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "userId")
     private List<DonationUser> donationUser = new ArrayList<>();
+
+    @Column(name = "logInAt")
+    private LocalDateTime logInAt;
 
     @ManyToMany
     @JoinTable(
@@ -111,6 +113,10 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+    public void updateLogInDate(LocalDateTime now){
+        this.logInAt=now;
     }
 
 
