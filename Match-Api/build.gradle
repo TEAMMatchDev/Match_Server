@@ -20,6 +20,8 @@ dependencies {
     implementation project(':Match-Domain')
     implementation project(':Match-Infrastructure')
 
+    implementation 'net.nurigo:sdk:4.3.0'
+
 }
 test {
     useJUnitPlatform()

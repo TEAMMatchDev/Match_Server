@@ -3,6 +3,7 @@ package com.example.matchapi.user.controller;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.service.AuthService;
+import com.example.matchapi.user.utils.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.CommonResponse;
 import io.swagger.annotations.Api;
@@ -19,6 +20,7 @@ import javax.validation.Valid;
 @Api(tags = "01-Auth🔑")
 public class AuthController {
     private final AuthService authService;
+    private final SmsHelper smsHelper;
 
     @ApiOperation(value = "kakao 코드 발급 후 토큰 생성용 개발용 API 입니다", notes = "kakao 코드를 발급 할 수 있음")
     @GetMapping(value = "/kakao")
@@ -48,16 +50,15 @@ public class AuthController {
         return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
     }
 
-    /*
+
     @ApiOperation(value= "01-04🔑 회원 문자인증 요청", notes = "회원 문자인증 용 API 입니다.")
     @PostMapping(value="/sms")
-    public CommonResponse<UserRes.Sms> checkSms(@RequestBody UserReq.Sms sms) throws CoolsmsException {
-        String number = authService.checkSms(sms.getPhone());
-
+    public CommonResponse<UserRes.Sms> checkSms(@RequestBody UserReq.Sms sms){
+        String number = smsHelper.sendSms(sms.getPhone());
         return CommonResponse.onSuccess(new UserRes.Sms(number));
     }
 
-     */
+
 
 
 

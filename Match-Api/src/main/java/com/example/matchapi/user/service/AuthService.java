@@ -5,6 +5,7 @@ import com.example.matchapi.user.convertor.UserConvertor;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.utils.AuthHelper;
+import com.example.matchapi.user.utils.SmsHelper;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
 import com.example.matchdomain.user.entity.Authority;
@@ -42,6 +43,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthHelper authHelper;
     private final UserConvertor userConvertor;
+    private final SmsHelper smsHelper;
 
 
     public UserRes.UserToken kakaoLogIn(UserReq.SocialLoginToken socialLoginToken) {
@@ -122,12 +124,8 @@ public class AuthService {
         return userRepository.save(user).getId();
     }
 
-    /*
-    public String checkSms(String phone) throws CoolsmsException {
-        String number = authHelper.createRandomNumber();
-        authHelper.sendSms(phone,number);
-        return number;
-    }
 
-     */
+
+
+
 }
