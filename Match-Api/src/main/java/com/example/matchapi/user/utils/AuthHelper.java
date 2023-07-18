@@ -86,9 +86,9 @@ public class AuthHelper {
         GenderResolver resolver = gender -> {
             if (gender==null){
                 return Gender.UNKNOWN;
-            } else if (gender.equalsIgnoreCase("female")||gender.equalsIgnoreCase("F")) {
+            } else if (gender.equalsIgnoreCase("female")||gender.equalsIgnoreCase("F")||gender.equalsIgnoreCase("여자")) {
                 return Gender.FEMALE;
-            } else if (gender.equalsIgnoreCase("male")||gender.equalsIgnoreCase("M")) {
+            } else if (gender.equalsIgnoreCase("male")||gender.equalsIgnoreCase("M")||gender.equalsIgnoreCase("남자")) {
                 return Gender.MALE;
             }else{
                 return Gender.UNKNOWN;

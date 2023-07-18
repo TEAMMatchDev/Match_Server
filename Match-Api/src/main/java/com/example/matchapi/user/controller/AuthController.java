@@ -21,6 +21,7 @@ import javax.validation.Valid;
 public class AuthController {
     private final AuthService authService;
     private final SmsHelper smsHelper;
+    private UserReq.UserEmail signUpUser;
 
     @ApiOperation(value = "kakao 코드 발급 후 토큰 생성용 개발용 API 입니다", notes = "kakao 코드를 발급 할 수 있음")
     @GetMapping(value = "/kakao")
@@ -59,9 +60,28 @@ public class AuthController {
     }
 
     @ApiOperation(value="01-05🔑 유저 회원가입", notes= "회원가입 용 API 입니다.")
+    @PostMapping(value="/user")
     public CommonResponse<UserRes.UserToken> signUpUser(@RequestBody @Valid UserReq.SignUpUser signUpUser){
         return CommonResponse.onSuccess(authService.signUpUser(signUpUser));
     }
+
+    @ApiOperation(value="01-05-01🔑 유저 회원가입 이메일 검증용", notes= "회원가입 용 API 입니다.")
+    @PostMapping(value="/email")
+    public CommonResponse<String> checkUserEmail(@RequestBody @Valid UserReq.UserEmail userEmail){
+        authService.checkUserEmail(userEmail);
+        return CommonResponse.onSuccess("이메일 사용 가능");
+    }
+
+    @ApiOperation(value="01-05-02🔑 유저 회원가입 전화번호 인증용", notes= "회원가입 용 API 입니다.")
+    @PostMapping(value="/phone")
+    public CommonResponse<String> checkUserPhone(@RequestBody @Valid UserReq.UserPhone userPhone){
+        authService.checkUserPhone(userPhone);
+        return CommonResponse.onSuccess("핸드폰 사용가능");
+    }
+
+
+
+
 
 
 

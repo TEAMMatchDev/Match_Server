@@ -6,10 +6,10 @@ import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.utils.AuthHelper;
 import com.example.matchapi.user.utils.SmsHelper;
+import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
 import com.example.matchdomain.user.entity.Authority;
-import com.example.matchdomain.user.entity.Gender;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoFeignClient;
@@ -23,10 +23,10 @@ import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
+import static com.example.matchcommon.exception.CommonResponseStatus.*;
 import static com.example.matchdomain.user.entity.SocialType.KAKAO;
 import static com.example.matchdomain.user.entity.SocialType.NAVER;
 
@@ -68,17 +68,20 @@ public class AuthService {
 
     private Long kakaoSignUp(KakaoUserInfoDto kakaoUserInfoDto) {
 
-        Authority authority = userConvertor.PostAuthroity();
-        String password = authHelper.createRandomPassword();
-        Gender gender = authHelper.genderConversion(kakaoUserInfoDto.getGender());
-        LocalDate birth = authHelper.birthConversion(kakaoUserInfoDto.getBirthYear(), kakaoUserInfoDto.getBirthDay());
-        User user = userConvertor.KakaoSignUpUser(kakaoUserInfoDto, KAKAO, password, gender, birth, authority);
+        Authority authority = userConvertor.PostAuthority();
+        User user = userConvertor.KakaoSignUpUser(kakaoUserInfoDto, KAKAO, authority);
 
         System.out.println(kakaoUserInfoDto.getPhoneNumber());
 
         return userRepository.save(user).getId();
     }
 
+    private Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
+        Authority authority = userConvertor.PostAuthority();
+        User user = userConvertor.NaverSignUpUser(naverUserInfoDto, NAVER, authority);
+
+        return userRepository.save(user).getId();
+    }
     public KakaoLoginTokenRes getOauthToken(String code, String referer) {
         return kakaoLoginFeignClient.kakaoAuth(
                 kakaoProperties.getKakaoClientId(),
@@ -89,7 +92,6 @@ public class AuthService {
     }
 
     public String getNaverOauthToken(String code) {
-        System.out.println(code);
         NaverTokenRes naverTokenRes = naverLoginFeignClient.naverAuth(
                 naverProperties.getNaverClientId(),
                 naverProperties.getNaverClientSecret(),
@@ -113,17 +115,24 @@ public class AuthService {
         return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
     }
 
-    private Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
-        Authority authority = userConvertor.PostAuthroity();
-        String password = authHelper.createRandomPassword();
-        Gender gender = authHelper.genderConversion(naverUserInfoDto.getGender());
-        LocalDate birth = authHelper.birthConversion(naverUserInfoDto.getBirthyear(), naverUserInfoDto.getBirthday());
-        User user = userConvertor.NaverSignUpUser(naverUserInfoDto, NAVER, password, gender, birth, authority);
 
-        return userRepository.save(user).getId();
-    }
 
     public UserRes.UserToken signUpUser(UserReq.SignUpUser signUpUser) {
-        return null;
+        if(userRepository.existsByPhoneNumber(signUpUser.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
+        if(userRepository.existsByEmail(signUpUser.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+
+        Authority authority = userConvertor.PostAuthority();
+
+        Long userId = userRepository.save(userConvertor.SignUpUser(signUpUser,authority)).getId();
+
+        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+    }
+
+    public void checkUserPhone(UserReq.UserPhone userPhone) {
+        if(userRepository.existsByPhoneNumber(userPhone.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
+    }
+
+    public void checkUserEmail(UserReq.UserEmail userEmail) {
+        if(userRepository.existsByEmail(userEmail.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
     }
 }

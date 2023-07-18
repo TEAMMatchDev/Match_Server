@@ -66,11 +66,10 @@ public enum CommonResponseStatus {
 
     FAILED_TO_SIGN_UP(FORBIDDEN, "U004", "회원가입에 실패하였습니다."),
 
-    USERS_EXISTS_ID(FORBIDDEN,"U005","중복된 전화번호입니다."),
+    USERS_EXISTS_PHONE(FORBIDDEN,"U005","중복된 전화번호입니다."),
 
-    USERS_EXISTS_NICKNAME(FORBIDDEN,"U006","중복된 닉네임입니다."),
+    USERS_EXISTS_EMAIL(FORBIDDEN,"U007","중복된 이메일입니다."),
 
-    POST_USERS_EMPTY_NICKNAME(BAD_REQUEST,"U007","닉네임을 입력해주세요."),
 
     FAILED_TO_LOGIN(BAD_REQUEST, "U008", "로그인에 실패하였습니다."),
     NOT_EXIST_USER(BAD_REQUEST,"U009" , "해당 유저가 존재하지 않습니다."),
