@@ -1,8 +1,8 @@
 package com.example.matchapi.user.utils;
 
 import com.example.matchcommon.annotation.Helper;
-import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.BaseException;
+import com.example.matchcommon.properties.CoolSmsProperties;
 import com.example.matchdomain.user.entity.Gender;
 import com.example.matchdomain.user.entity.SocialType;
 import com.example.matchdomain.user.entity.User;
@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import static com.example.matchcommon.exception.CommonResponseStatus.EXIST_USER_PHONENUMBER;
@@ -23,6 +24,7 @@ import static com.example.matchdomain.user.entity.SocialType.*;
 public class AuthHelper {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final CoolSmsProperties coolSmsProperties;
 
     public String createRandomPassword() {
         return passwordEncoder.encode(UUID.randomUUID().toString());
@@ -84,9 +86,9 @@ public class AuthHelper {
         GenderResolver resolver = gender -> {
             if (gender==null){
                 return Gender.UNKNOWN;
-            } else if (gender.equalsIgnoreCase("female")||gender.equalsIgnoreCase("F")) {
+            } else if (gender.equalsIgnoreCase("female")||gender.equalsIgnoreCase("F")||gender.equalsIgnoreCase("여자")) {
                 return Gender.FEMALE;
-            } else if (gender.equalsIgnoreCase("male")||gender.equalsIgnoreCase("M")) {
+            } else if (gender.equalsIgnoreCase("male")||gender.equalsIgnoreCase("M")||gender.equalsIgnoreCase("남자")) {
                 return Gender.MALE;
             }else{
                 return Gender.UNKNOWN;

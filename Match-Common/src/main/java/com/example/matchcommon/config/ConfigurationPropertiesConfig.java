@@ -1,5 +1,6 @@
 package com.example.matchcommon.config;
 
+import com.example.matchcommon.properties.CoolSmsProperties;
 import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
@@ -10,7 +11,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties({
         KakaoProperties.class,
         JwtProperties.class,
-        NaverProperties.class
+        NaverProperties.class,
+        CoolSmsProperties.class
 })
 @Configuration
 public class ConfigurationPropertiesConfig {}
