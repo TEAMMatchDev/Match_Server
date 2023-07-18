@@ -54,7 +54,7 @@ public class AuthController {
 
     @ApiOperation(value= "01-04🔑 회원 문자인증 요청", notes = "회원 문자인증 용 API 입니다.")
     @PostMapping(value="/sms")
-    public CommonResponse<UserRes.Sms> checkSms(@RequestBody UserReq.Sms sms){
+    public CommonResponse<UserRes.Sms> checkSms(@RequestBody @Valid UserReq.Sms sms){
         String number = smsHelper.sendSms(sms.getPhone());
         return CommonResponse.onSuccess(new UserRes.Sms(number));
     }
