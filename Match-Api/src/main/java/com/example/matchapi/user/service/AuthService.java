@@ -7,6 +7,8 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.utils.AuthHelper;
 import com.example.matchapi.user.utils.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.BaseException;
+import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
 import com.example.matchdomain.user.entity.Authority;
@@ -21,8 +23,10 @@ import com.example.matchinfrastructure.oauth.naver.client.NaverLoginFeignClient;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverTokenRes;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
@@ -43,6 +47,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthHelper authHelper;
     private final UserConvertor userConvertor;
+    private final PasswordEncoder passwordEncoder;
     private final SmsHelper smsHelper;
 
 
@@ -134,5 +139,16 @@ public class AuthService {
 
     public void checkUserEmail(UserReq.UserEmail userEmail) {
         if(userRepository.existsByEmail(userEmail.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+    }
+
+    public UserRes.UserToken logIn(UserReq.LogIn logIn) {
+        User user=userRepository.findByUsername(logIn.getEmail()).orElseThrow(() -> new BadRequestException(NOT_EXIST_USER));
+
+        if(!passwordEncoder.matches(logIn.getPassword(),user.getPassword())) throw new BadRequestException(NOT_CORRECT_PASSWORD);
+
+        Long userId = user.getId();
+
+        //반환 값 아이디 추가
+        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
     }
 }
