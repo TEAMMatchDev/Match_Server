@@ -45,14 +45,11 @@ public class UserAddress extends BaseEntity {
     @Column(name = "detailAddress")
     private String detailAddress;
 
-    @Column(name = "receiverAddress")
-    private String receiverAddress;
+    @Column(name = "receiverName")
+    private String receiverName;
 
-    @Column(name = "receiverAddressPhoneNumber1")
-    private String receiverAddressPhoneNumber1;
-
-    @Column(name = "receiverAddressPhoneNumber2")
-    private String receiverAddressPhoneNumber2;
+    @Column(name = "addressPhoneNumber")
+    private String addressPhoneNumber;
 
     @Column(name = "zoneNumber")
     private String zoneNumber;

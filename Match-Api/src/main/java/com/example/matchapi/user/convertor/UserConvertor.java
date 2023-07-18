@@ -4,6 +4,7 @@ import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.utils.AuthHelper;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.user.entity.*;
+import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
@@ -70,6 +71,21 @@ public class UserConvertor {
                .birth(LocalDate.parse(signUpUser.getBirthDate()))
                .gender(authHelper.genderConversion(signUpUser.getGender()))
                 .authorities(Collections.singleton(authority))
+                .build();
+    }
+
+    public UserAddress AddUserAddress(Long userId, KakaoUserAddressDto.ShippingAddresses shippingAddresses) {
+        return UserAddress.builder()
+                .userId(userId)
+                .name(shippingAddresses.getName())
+                .isDefault(shippingAddresses.isDefault())
+                .addresslType(AddresslType.valueOf(shippingAddresses.getType()))
+                .baseAddress(shippingAddresses.getBaseAddress())
+                .detailAddress(shippingAddresses.getDetailAddress())
+                .receiverName(shippingAddresses.getReceiverName())
+                .addressPhoneNumber(shippingAddresses.getReceiverPhoneNumber1())
+                .zoneNumber(shippingAddresses.getZoneNumber())
+                .zipCode(shippingAddresses.getZipCode())
                 .build();
     }
 }

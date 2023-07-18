@@ -6,6 +6,8 @@ import com.example.matchapi.user.service.AuthService;
 import com.example.matchapi.user.utils.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.CommonResponse;
+import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
+import com.example.matchinfrastructure.oauth.naver.dto.NaverAddressDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +52,16 @@ public class AuthController {
     @PostMapping(value="/naver")
     public CommonResponse<UserRes.UserToken> naverLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
+    }
+
+    @PostMapping("/kakao/address")
+    CommonResponse<KakaoUserAddressDto> getKakaoAddress(@RequestBody UserReq.SocialLoginToken socialLoginToken){
+        return CommonResponse.onSuccess(authService.getKakaoAddress(socialLoginToken.getAccessToken()));
+    }
+
+    @PostMapping("/naver/address")
+    CommonResponse<NaverAddressDto> getNaverAddress(@RequestBody UserReq.SocialLoginToken socialLoginToken){
+        return CommonResponse.onSuccess(authService.getNaverAddress(socialLoginToken.getAccessToken()));
     }
 
 

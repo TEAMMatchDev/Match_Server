@@ -11,17 +11,24 @@ import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
 import com.example.matchdomain.user.entity.Authority;
 import com.example.matchdomain.user.entity.User;
+import com.example.matchdomain.user.entity.UserAddress;
+import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoLoginFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoLoginTokenRes;
+import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.client.NaverFeignClient;
 import com.example.matchinfrastructure.oauth.naver.client.NaverLoginFeignClient;
+import com.example.matchinfrastructure.oauth.naver.dto.NaverAddressDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverTokenRes;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Optional;
 
@@ -40,6 +47,7 @@ public class AuthService {
     private final KakaoProperties kakaoProperties;
     private final NaverProperties naverProperties;
     private final UserRepository userRepository;
+    private final UserAddressRepository userAddressRepository;
     private final JwtService jwtService;
     private final AuthHelper authHelper;
     private final UserConvertor userConvertor;
@@ -48,8 +56,8 @@ public class AuthService {
 
     public UserRes.UserToken kakaoLogIn(UserReq.SocialLoginToken socialLoginToken) {
         KakaoUserInfoDto kakaoUserInfoDto = kakaoFeignClient.getInfo(BEARER + socialLoginToken.getAccessToken());
-        Long userId;
 
+        Long userId;
         Optional<User> user = userRepository.findBySocialIdAndSocialType(kakaoUserInfoDto.getId(), KAKAO);
         authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
 
@@ -57,10 +65,23 @@ public class AuthService {
 
 
         //소셜 로그인 정보가 없을 시
-        if (user.isEmpty()) userId = kakaoSignUp(kakaoUserInfoDto);
+        if (user.isEmpty()){
+            userId = kakaoSignUp(kakaoUserInfoDto);
+            KakaoUserAddressDto kakaoUserAddressDto = kakaoFeignClient.getUserAddress(BEARER+socialLoginToken.getAccessToken());
+            if(!kakaoUserAddressDto.isShippingAddressesNeedsAgreement()){
+                List<UserAddress> userAddressList = new ArrayList<>();
+                for(KakaoUserAddressDto.ShippingAddresses shippingAddresses : kakaoUserAddressDto.getShippingAddresses()){
+                    UserAddress userAddress = userConvertor.AddUserAddress(userId,shippingAddresses);
+                    userAddressList.add(userAddress);
+                }
+                userAddressRepository.saveAll(userAddressList);
+            }
+        }
         //소셜 로그인 정보가 있을 시
-        else userId = user.get().getId();
-
+        else {
+            authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
+            userId = user.get().getId();
+        }
 
         return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
     }
@@ -135,4 +156,15 @@ public class AuthService {
     public void checkUserEmail(UserReq.UserEmail userEmail) {
         if(userRepository.existsByEmail(userEmail.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
     }
+
+    public KakaoUserAddressDto getKakaoAddress(String accessToken) {
+        return kakaoFeignClient.getUserAddress(BEARER + accessToken);
+    }
+
+
+    public NaverAddressDto getNaverAddress(String accessToken) {
+        return naverFeignClient.getUserAddress(BEARER + accessToken);
+    }
+
+
 }
