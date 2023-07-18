@@ -57,6 +57,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             setResponse(response,errorCode);
             return;
         }
+        else if(exception.equals("NoSuchElementException")){
+            errorCode = CommonResponseStatus.NOT_EXISTS_USER_HAVE_TOKEN;
+            setResponse(response,errorCode);
+        }
     }
 
     private void setResponse(HttpServletResponse response, CommonResponseStatus errorCode) throws IOException {

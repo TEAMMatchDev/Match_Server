@@ -67,7 +67,7 @@ public class AuthController {
 
     @ApiOperation(value= "01-04🔑 회원 문자인증 요청", notes = "회원 문자인증 용 API 입니다.")
     @PostMapping(value="/sms")
-    public CommonResponse<UserRes.Sms> checkSms(@RequestBody UserReq.Sms sms){
+    public CommonResponse<UserRes.Sms> checkSms(@RequestBody @Valid UserReq.Sms sms){
         String number = smsHelper.sendSms(sms.getPhone());
         return CommonResponse.onSuccess(new UserRes.Sms(number));
     }
@@ -90,6 +90,12 @@ public class AuthController {
     public CommonResponse<String> checkUserPhone(@RequestBody @Valid UserReq.UserPhone userPhone){
         authService.checkUserPhone(userPhone);
         return CommonResponse.onSuccess("핸드폰 사용가능");
+    }
+
+    @ApiOperation(value="01-05-03🔑 유저 회원가입 비밀번호 인증용", notes= "회원가입 용 API 입니다.")
+    @PostMapping(value="/logIn")
+    public CommonResponse<UserRes.UserToken> logIn(@RequestBody @Valid UserReq.LogIn logIn){
+        return CommonResponse.onSuccess(authService.logIn(logIn));
     }
 
 

@@ -32,6 +32,7 @@ public enum CommonResponseStatus {
     HIJACK_JWT_TOKEN_EXCEPTION(UNAUTHORIZED,"AUTH007","탈취된(로그아웃 된) 토큰입니다 다시 로그인 해주세요."),
     INVALID_REFRESH_TOKEN(BAD_REQUEST,"AUTH009","리프레쉬 토큰이 유효하지 않습니다. 다시 로그인 해주세요"),
     NOT_EMPTY_TOKEN(BAD_REQUEST,"AUTH010","토큰이 비어있습니다 토큰을 보내주세요"),
+    NOT_EXISTS_USER_HAVE_TOKEN(BAD_REQUEST,"AUTH011", "해당 토큰을 가진 유저가 존재하지 않습니다."),
 
 
 
@@ -61,7 +62,7 @@ public enum CommonResponseStatus {
 
     USER_STATUS_UNACTIVATED(BAD_REQUEST,"U000","유저가 비활성화 상태입니다."),
     USERS_EMPTY_USER_ID(BAD_REQUEST, "U001", "유저 아이디 값을 입력해주세요."),
-    USERS_EMPTY_USER_PASSWORD(BAD_REQUEST, "U002", "유저 비밀번호를 입력해주세요."),
+    NOT_CORRECT_PASSWORD(BAD_REQUEST, "U002", "유저 비밀번호를 확인해주세요."),
     TOO_SHORT_PASSWORD(BAD_REQUEST, "U003", "비밀번호의 길이를 8자 이상을 설정해주세요."),
 
     FAILED_TO_SIGN_UP(FORBIDDEN, "U004", "회원가입에 실패하였습니다."),
