@@ -1,7 +1,9 @@
 package com.example.matchapi.user.convertor;
 
 import com.example.matchapi.user.dto.UserReq;
+import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.utils.AuthHelper;
+import com.example.matchapi.user.utils.UserHelper;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.user.entity.*;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
@@ -16,6 +18,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class UserConvertor {
     private final AuthHelper authHelper;
+    private final UserHelper userHelper;
     private final PasswordEncoder passwordEncoder;
 
     public User KakaoSignUpUser(KakaoUserInfoDto kakaoUserInfoDto, SocialType authType, Authority authority) {
@@ -60,16 +63,27 @@ public class UserConvertor {
 
     public User SignUpUser(UserReq.SignUpUser signUpUser, Authority authority) {
         return User.builder()
-               .username(signUpUser.getEmail())
-               .password(passwordEncoder.encode(signUpUser.getPassword()))
-               .name(signUpUser.getName())
-               .email(signUpUser.getEmail())
-               .socialType(SocialType.NORMAL)
-               .phoneNumber(signUpUser.getPhone())
-               .status(UserStatus.ACTIVE)
-               .birth(LocalDate.parse(signUpUser.getBirthDate()))
-               .gender(authHelper.genderConversion(signUpUser.getGender()))
+                .username(signUpUser.getEmail())
+                .password(passwordEncoder.encode(signUpUser.getPassword()))
+                .name(signUpUser.getName())
+                .email(signUpUser.getEmail())
+                .socialType(SocialType.NORMAL)
+                .phoneNumber(signUpUser.getPhone())
+                .status(UserStatus.ACTIVE)
+                .birth(authHelper.birthConversionToLocalDate(signUpUser.getBirthDate()))
+                .gender(authHelper.genderConversion(signUpUser.getGender()))
                 .authorities(Collections.singleton(authority))
+                .build();
+    }
+
+    public UserRes.MyPage toMyPage(User user) {
+        return UserRes.MyPage.builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .phone(user.getPhoneNumber())
+                .gender(user.getGender().getValue())
+                .birthDate(userHelper.birthConversion(user.getBirth()))
                 .build();
     }
 }
