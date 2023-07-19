@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class NaverUserInfoDto {
-    private String result_code;
+    private String resultcode;
     private String message;
     private Response response;
 

@@ -63,7 +63,7 @@ public class UserReq {
         @ApiModelProperty(notes="성별",required = true,example = "남자는 남자 여자는 여자")
         private String gender;
         @NotEmpty (message = "생년월일을 입력해주세요")
-        @ApiModelProperty(notes="생일",required = true,example = "2020-01-01")
+        @ApiModelProperty(notes="생일",required = true,example = "20200101")
         private String birthDate;
     }
 

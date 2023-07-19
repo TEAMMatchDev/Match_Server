@@ -6,6 +6,8 @@ import com.example.matchapi.user.service.AuthService;
 import com.example.matchapi.user.utils.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.CommonResponse;
+import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
+import com.example.matchinfrastructure.oauth.naver.dto.NaverAddressDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,7 @@ public class AuthController {
     네이버 로그인 토큰 발급용
      */
     @GetMapping(value="/naver")
+    @ApiOperation(value = "naver 코드 발급 후 토큰 생성용 개발용 API 입니다", notes = "naver 코드를 발급 할 수 있음")
     public String naverOauthRedirect(@RequestParam String code){
         return authService.getNaverOauthToken(code);
     }
@@ -49,6 +52,16 @@ public class AuthController {
     @PostMapping(value="/naver")
     public CommonResponse<UserRes.UserToken> naverLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
+    }
+
+    @PostMapping("/kakao/address")
+    CommonResponse<KakaoUserAddressDto> getKakaoAddress(@RequestBody UserReq.SocialLoginToken socialLoginToken){
+        return CommonResponse.onSuccess(authService.getKakaoAddress(socialLoginToken.getAccessToken()));
+    }
+
+    @PostMapping("/naver/address")
+    CommonResponse<NaverAddressDto> getNaverAddress(@RequestBody UserReq.SocialLoginToken socialLoginToken){
+        return CommonResponse.onSuccess(authService.getNaverAddress(socialLoginToken.getAccessToken()));
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.matchinfrastructure.oauth.kakao.client;
 
 import com.example.matchinfrastructure.oauth.kakao.config.KakaoInfoConfig;
+import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
@@ -16,4 +17,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface KakaoFeignClient {
     @GetMapping("/v2/user/me")
     KakaoUserInfoDto getInfo(@RequestHeader(name = "Authorization") String Authorization);
+
+    @GetMapping("/v1/user/shipping_address")
+    KakaoUserAddressDto getUserAddress(@RequestHeader(name = "Authorization") String Authorization);
 }

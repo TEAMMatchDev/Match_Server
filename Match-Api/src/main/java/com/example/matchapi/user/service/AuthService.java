@@ -7,26 +7,29 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.utils.AuthHelper;
 import com.example.matchapi.user.utils.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
-import com.example.matchcommon.exception.BaseException;
-import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
 import com.example.matchdomain.user.entity.Authority;
 import com.example.matchdomain.user.entity.User;
+import com.example.matchdomain.user.entity.UserAddress;
+import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoLoginFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoLoginTokenRes;
+import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.client.NaverFeignClient;
 import com.example.matchinfrastructure.oauth.naver.client.NaverLoginFeignClient;
+import com.example.matchinfrastructure.oauth.naver.dto.NaverAddressDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverTokenRes;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
@@ -44,6 +47,7 @@ public class AuthService {
     private final KakaoProperties kakaoProperties;
     private final NaverProperties naverProperties;
     private final UserRepository userRepository;
+    private final UserAddressRepository userAddressRepository;
     private final JwtService jwtService;
     private final AuthHelper authHelper;
     private final UserConvertor userConvertor;
@@ -53,19 +57,29 @@ public class AuthService {
 
     public UserRes.UserToken kakaoLogIn(UserReq.SocialLoginToken socialLoginToken) {
         KakaoUserInfoDto kakaoUserInfoDto = kakaoFeignClient.getInfo(BEARER + socialLoginToken.getAccessToken());
-        Long userId;
 
+        Long userId;
         Optional<User> user = userRepository.findBySocialIdAndSocialType(kakaoUserInfoDto.getId(), KAKAO);
         authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
 
-        //카카오 전화번호로 이미 다른 소셜로그인 이나 기본가입을 했던 사람.
-
-
         //소셜 로그인 정보가 없을 시
-        if (user.isEmpty()) userId = kakaoSignUp(kakaoUserInfoDto);
+        if (user.isEmpty()){
+            userId = kakaoSignUp(kakaoUserInfoDto);
+            KakaoUserAddressDto kakaoUserAddressDto = kakaoFeignClient.getUserAddress(BEARER+socialLoginToken.getAccessToken());
+            if(!kakaoUserAddressDto.isShippingAddressesNeedsAgreement()){
+                List<UserAddress> userAddressList = new ArrayList<>();
+                for(KakaoUserAddressDto.ShippingAddresses shippingAddresses : kakaoUserAddressDto.getShippingAddresses()){
+                    UserAddress userAddress = userConvertor.AddUserAddress(userId,shippingAddresses);
+                    userAddressList.add(userAddress);
+                }
+                userAddressRepository.saveAll(userAddressList);
+            }
+        }
         //소셜 로그인 정보가 있을 시
-        else userId = user.get().getId();
-
+        else {
+            authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
+            userId = user.get().getId();
+        }
 
         return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
     }
@@ -82,10 +96,7 @@ public class AuthService {
     }
 
     private Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
-        Authority authority = userConvertor.PostAuthority();
-        User user = userConvertor.NaverSignUpUser(naverUserInfoDto, NAVER, authority);
-
-        return userRepository.save(user).getId();
+        return userRepository.save(userConvertor.NaverSignUpUser(naverUserInfoDto, NAVER, userConvertor.PostAuthority())).getId();
     }
     public KakaoLoginTokenRes getOauthToken(String code, String referer) {
         return kakaoLoginFeignClient.kakaoAuth(
@@ -151,4 +162,15 @@ public class AuthService {
         //반환 값 아이디 추가
         return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
     }
+
+    public KakaoUserAddressDto getKakaoAddress(String accessToken) {
+        return kakaoFeignClient.getUserAddress(BEARER + accessToken);
+    }
+
+
+    public NaverAddressDto getNaverAddress(String accessToken) {
+        return naverFeignClient.getUserAddress(BEARER + accessToken);
+    }
+
+
 }

@@ -4,12 +4,9 @@ import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static com.example.matchapi.security.JwtFilter.AUTHORIZATION_HEADER;
@@ -76,20 +74,25 @@ public class JwtService {
 
     }
 
-    public Authentication getAuthentication(String token)  {
-        Jws<Claims> claims;
+    public Authentication getAuthentication(String token, ServletRequest servletRequest)  {
+        try {
+            Jws<Claims> claims;
 
-        claims = Jwts.parser()
-                .setSigningKey(getSecretKey())
-                .parseClaimsJws(token);
+            claims = Jwts.parser()
+                    .setSigningKey(getSecretKey())
+                    .parseClaimsJws(token);
 
+            Long userId=claims.getBody().get("userId",Long.class);
+            Optional<User> users = userRepository.findById(userId);
 
-        Long userId=claims.getBody().get("userId",Long.class);
-
-        Optional<User> users=userRepository.findById(userId);
-
-        return new UsernamePasswordAuthenticationToken(users.get(),"",users.get().getAuthorities());
+            return new UsernamePasswordAuthenticationToken(users.get(),"",users.get().getAuthorities());
+        }catch(NoSuchElementException e){
+            servletRequest.setAttribute("exception","NoSuchElementException");
+            log.info("유저가 존재하지 않습니다.");
+        }
+        return null;
     }
+
 
 
     public boolean validateToken(ServletRequest servletRequest, String token) {
