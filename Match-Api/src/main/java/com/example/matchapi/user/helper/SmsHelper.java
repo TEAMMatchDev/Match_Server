@@ -1,4 +1,4 @@
-package com.example.matchapi.user.utils;
+package com.example.matchapi.user.helper;
 
 import com.example.matchcommon.annotation.Helper;
 import com.example.matchcommon.properties.CoolSmsProperties;
