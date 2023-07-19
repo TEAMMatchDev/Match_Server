@@ -7,8 +7,6 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.utils.AuthHelper;
 import com.example.matchapi.user.utils.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
-import com.example.matchcommon.exception.BaseException;
-import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
 import com.example.matchdomain.user.entity.Authority;
@@ -28,12 +26,10 @@ import com.example.matchinfrastructure.oauth.naver.dto.NaverTokenRes;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.json.JSONObject;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
@@ -65,9 +61,6 @@ public class AuthService {
         Long userId;
         Optional<User> user = userRepository.findBySocialIdAndSocialType(kakaoUserInfoDto.getId(), KAKAO);
         authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
-
-        //카카오 전화번호로 이미 다른 소셜로그인 이나 기본가입을 했던 사람.
-
 
         //소셜 로그인 정보가 없을 시
         if (user.isEmpty()){
@@ -103,10 +96,7 @@ public class AuthService {
     }
 
     private Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
-        Authority authority = userConvertor.PostAuthority();
-        User user = userConvertor.NaverSignUpUser(naverUserInfoDto, NAVER, authority);
-
-        return userRepository.save(user).getId();
+        return userRepository.save(userConvertor.NaverSignUpUser(naverUserInfoDto, NAVER, userConvertor.PostAuthority())).getId();
     }
     public KakaoLoginTokenRes getOauthToken(String code, String referer) {
         return kakaoLoginFeignClient.kakaoAuth(
