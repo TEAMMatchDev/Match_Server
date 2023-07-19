@@ -3,8 +3,7 @@ package com.example.matchapi.user.controller;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.service.AuthService;
-import com.example.matchapi.user.utils.SmsHelper;
-import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchapi.user.helper.SmsHelper;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverAddressDto;
@@ -92,7 +91,7 @@ public class AuthController {
         return CommonResponse.onSuccess("핸드폰 사용가능");
     }
 
-    @ApiOperation(value="01-05-03🔑 유저 회원가입 비밀번호 인증용", notes= "회원가입 용 API 입니다.")
+    @ApiOperation(value="01-06 유저 로그인", notes= "회원가입 용 API 입니다.")
     @PostMapping(value="/logIn")
     public CommonResponse<UserRes.UserToken> logIn(@RequestBody @Valid UserReq.LogIn logIn){
         return CommonResponse.onSuccess(authService.logIn(logIn));
