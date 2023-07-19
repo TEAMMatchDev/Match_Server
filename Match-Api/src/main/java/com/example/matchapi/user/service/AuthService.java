@@ -9,6 +9,7 @@ import com.example.matchapi.user.utils.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
+import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchdomain.user.entity.Authority;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
@@ -107,14 +108,14 @@ public class AuthService {
 
     }
 
-    public String getNaverOauthToken(String code) {
+    public UserRes.UserToken getNaverOauthToken(String code) {
         NaverTokenRes naverTokenRes = naverLoginFeignClient.naverAuth(
                 naverProperties.getNaverClientId(),
                 naverProperties.getNaverClientSecret(),
                 code
         );
 
-        return naverTokenRes.getAccess_token();
+        return naverLogIn(new UserReq.SocialLoginToken(naverTokenRes.getAccess_token()));
     }
 
     public UserRes.UserToken naverLogIn(UserReq.SocialLoginToken socialLoginToken) {
