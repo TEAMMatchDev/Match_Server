@@ -1,7 +1,8 @@
-package com.example.matchdomain.donation.entity;
+package com.example.matchdomain.project.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
-import com.example.matchdomain.user.entity.UserAddress;
+import com.example.matchdomain.donation.entity.DonationStatus;
+import com.example.matchdomain.donation.entity.DonationUser;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -10,9 +11,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 @Entity
-@Table(name = "DonationProject")
+@Table(name = "Project")
 @Getter
 @Setter
 @Builder
@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-public class DonationProject extends BaseEntity {
+public class Project extends BaseEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,8 +32,12 @@ public class DonationProject extends BaseEntity {
     @Column(name="projectExplanation")
     private String projectExplanation;
 
-    @Column(name = "contents",columnDefinition = "기부금 사용처")
-    private String contents;
+    @Column(name = "viewCnt")
+    private int viewCnt;
+
+    //사용처
+    @Column(name = "usages")
+    private String usages;
 
     @Column(name = "startedAt")
     private LocalDateTime startedAt;
@@ -48,4 +52,7 @@ public class DonationProject extends BaseEntity {
     @JoinColumn(name = "projectId")
     private List<DonationUser> donationUser = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "projectId")
+    private List<ProjectImage> projectImage = new ArrayList<>();
 }
