@@ -42,9 +42,9 @@ public class AuthController {
     네이버 로그인 토큰 발급용
      */
     @GetMapping(value="/naver")
-    @ApiOperation(value = "naver 코드 발급 후 토큰 생성용 개발용 API 입니다", notes = "naver 코드를 발급 할 수 있음")
-    public String naverOauthRedirect(@RequestParam String code){
-        return authService.getNaverOauthToken(code);
+    @ApiOperation(value = "naver 코드 발급 후 회원가입", notes = "naver 코드를 발급 할 수 있음")
+    public CommonResponse<UserRes.UserToken>  naverOauthRedirect(@RequestParam String code){
+        return CommonResponse.onSuccess(authService.getNaverOauthToken(code));
     }
 
     @ApiOperation(value= "01-03🔑 네이버 로그인" , notes = "네이버 액세스 토큰 보내주기")
