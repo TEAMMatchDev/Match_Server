@@ -53,6 +53,7 @@ public class AuthController {
         return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
     }
 
+    /*
     @PostMapping("/kakao/address")
     CommonResponse<KakaoUserAddressDto> getKakaoAddress(@RequestBody UserReq.SocialLoginToken socialLoginToken){
         return CommonResponse.onSuccess(authService.getKakaoAddress(socialLoginToken.getAccessToken()));
@@ -62,6 +63,8 @@ public class AuthController {
     CommonResponse<NaverAddressDto> getNaverAddress(@RequestBody UserReq.SocialLoginToken socialLoginToken){
         return CommonResponse.onSuccess(authService.getNaverAddress(socialLoginToken.getAccessToken()));
     }
+
+     */
 
 
     @Operation(summary= "01-04🔑 회원 문자인증 요청", description = "회원 문자인증 용 API 입니다.")

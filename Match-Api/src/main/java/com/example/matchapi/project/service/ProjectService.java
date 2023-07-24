@@ -1,11 +1,13 @@
 package com.example.matchapi.project.service;
 
+import com.example.matchapi.project.convertor.ProjectConvertor;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchcommon.reponse.PageResponse;
-import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.entity.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.Project;
-import com.example.matchdomain.project.entity.RegularStatus;
+import com.example.matchdomain.project.entity.ProjectImage;
+import com.example.matchdomain.project.exception.ProjectException;
+import com.example.matchdomain.project.repository.ProjectImageRepository;
 import com.example.matchdomain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,12 +17,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.example.matchcommon.exception.error.ProjectErrorCode.PROJECT_NOT_EXIST;
+
 
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
     private final ProjectRepository projectRepository;
+    private final ProjectConvertor projectConvertor;
+    private final ProjectImageRepository projectImageRepository;
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
@@ -44,4 +50,9 @@ public class ProjectService {
         return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectLists);
     }
 
+    public ProjectRes.ProjectDetail getProjectDetail(Long projectId) {
+        List<ProjectImage> projectImage = projectImageRepository.findByProjectId(projectId);
+        if(projectImage.isEmpty()) throw new ProjectException(PROJECT_NOT_EXIST);
+        return projectConvertor.projectImgList(projectImage);
+    }
 }
