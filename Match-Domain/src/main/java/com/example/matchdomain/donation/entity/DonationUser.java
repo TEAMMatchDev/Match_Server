@@ -38,4 +38,6 @@ public class DonationUser extends BaseEntity {
     @Column(name="projectId")
     private Long projectId;
 
+    @Column(name="price")
+    private int price;
 }

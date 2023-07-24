@@ -1,11 +1,11 @@
-package com.example.matchdomain.donation.entity;
+package com.example.matchdomain.project.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum DonationStatus {
+public enum ProjectStatus {
     //진행중
     PROCEEDING("PROCEEDING"),
     //시작 전
