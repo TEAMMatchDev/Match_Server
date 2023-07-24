@@ -9,7 +9,6 @@ import com.example.matchapi.user.helper.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
-import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchdomain.user.entity.Authority;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
@@ -34,7 +33,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
-import static com.example.matchcommon.exception.CommonResponseStatus.*;
+import static com.example.matchcommon.exception.error.CommonResponseStatus.*;
 import static com.example.matchdomain.user.entity.SocialType.KAKAO;
 import static com.example.matchdomain.user.entity.SocialType.NAVER;
 

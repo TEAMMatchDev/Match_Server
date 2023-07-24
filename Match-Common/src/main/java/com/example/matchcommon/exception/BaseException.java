@@ -1,14 +1,15 @@
 package com.example.matchcommon.exception;
 
-import lombok.Builder;
+import com.example.matchcommon.dto.ErrorReason;
+import com.example.matchcommon.exception.error.CommonResponseStatus;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.util.Map;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class BaseException extends RuntimeException {
 
     HttpStatus httpStatus;
@@ -32,7 +33,6 @@ public class BaseException extends RuntimeException {
         this.httpStatus=status.getHttpStatus();
         this.data = data;
     }
-
 
 
 }
