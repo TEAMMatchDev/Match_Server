@@ -1,5 +1,6 @@
 package com.example.matchcommon.config;
 
+import com.example.matchcommon.exception.BaseDynamicException;
 import com.example.matchcommon.exception.BaseException;
 import com.example.matchcommon.reponse.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import java.util.stream.StreamSupport;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionAdvice{
+
 
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -84,8 +86,17 @@ public class ExceptionAdvice{
     public ResponseEntity onKnownException(BaseException baseException,
                                            @AuthenticationPrincipal User user, HttpServletRequest request) {
         getExceptionStackTrace(baseException, user, request);
-        return new ResponseEntity<>(CommonResponse.onFailure(baseException.getStatus().getCode(), baseException.getResponseMessage(), baseException.getData()),
-                null, baseException.getHttpStatus());
+
+        return new ResponseEntity<>(CommonResponse.onFailure(baseException.getErrorReason().getCode(), baseException.getErrorReason().getMessage(), baseException.getErrorReason().getData()),
+                null, baseException.getErrorReason().getStatus());
+    }
+
+    @ExceptionHandler(value = BaseDynamicException.class)
+    public ResponseEntity onKnownDynamicException(BaseDynamicException baseDynamicException, @AuthenticationPrincipal User user,
+                                      HttpServletRequest request) {
+        getExceptionStackTrace(baseDynamicException, user, request);
+        return new ResponseEntity<>(CommonResponse.onFailure(baseDynamicException.getStatus().getCode(), baseDynamicException.getStatus().getMessage(), baseDynamicException.getData()), null,
+                baseDynamicException.getStatus().getHttpStatus());
     }
 
 

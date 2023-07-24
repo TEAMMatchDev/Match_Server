@@ -1,6 +1,7 @@
 package com.example.matchapi.user.helper;
 
 import com.example.matchcommon.annotation.Helper;
+import com.example.matchcommon.exception.BaseDynamicException;
 import com.example.matchcommon.exception.BaseException;
 import com.example.matchdomain.user.entity.Gender;
 import com.example.matchdomain.user.entity.SocialType;
@@ -50,7 +51,7 @@ public class AuthHelper {
 
         if (user.isPresent()) {
             errorType.put("signUpType", socialTypeConversion(user.get().getSocialType()));
-            throw new BaseException(EXIST_USER_PHONENUMBER, errorType);
+            throw new BaseDynamicException(EXIST_USER_PHONENUMBER, errorType);
         }
     }
 

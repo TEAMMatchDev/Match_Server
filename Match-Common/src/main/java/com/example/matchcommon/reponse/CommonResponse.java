@@ -40,5 +40,6 @@ public class CommonResponse<T> {
         return new CommonResponse<>(false, message, code, data);
     }
 
+
 }
 

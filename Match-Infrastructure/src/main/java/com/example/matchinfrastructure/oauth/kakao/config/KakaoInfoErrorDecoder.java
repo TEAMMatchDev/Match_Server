@@ -9,6 +9,8 @@ import feign.FeignException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 
+import static com.example.matchcommon.exception.error.CommonResponseStatus.*;
+
 public class KakaoInfoErrorDecoder implements ErrorDecoder {
 
     @Override
@@ -16,13 +18,13 @@ public class KakaoInfoErrorDecoder implements ErrorDecoder {
         if (response.status() >= 400) {
             switch (response.status()) {
                 case 401:
-                    throw OtherServerUnauthorizedException.EXCEPTION;
+                    throw new OtherServerUnauthorizedException(OTHER_SERVER_UNAUTHORIZED);
                 case 403:
-                    throw OtherServerForbiddenException.EXCEPTION;
+                    throw new OtherServerForbiddenException(OTHER_SERVER_FORBIDDEN);
                 case 419:
-                    throw OtherServerExpiredTokenException.EXCEPTION;
+                    throw new OtherServerExpiredTokenException(OTHER_SERVER_EXPIRED_TOKEN);
                 default:
-                    throw OtherServerBadRequestException.EXCEPTION;
+                    throw new OtherServerBadRequestException(OTHER_SERVER_BAD_REQUEST);
             }
         }
 

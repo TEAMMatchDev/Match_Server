@@ -1,5 +1,7 @@
 package com.example.matchapi;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
@@ -15,6 +17,7 @@ import java.util.Arrays;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @ComponentScan(basePackages = {"com.example.matchapi","com.example.matchdomain","com.example.matchinfrastructure", "com.example.matchcommon"})
+@OpenAPIDefinition(servers = {@Server(url = "${server.servlet.context-path}", description = "Default Server URL")})
 @RequiredArgsConstructor
 @Slf4j
 public class MatchApiApplication implements ApplicationListener<ApplicationReadyEvent>  {
