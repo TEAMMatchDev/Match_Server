@@ -22,6 +22,9 @@ public class ProjectImage extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "sequence")
+    private int sequence;
+
     @Enumerated(EnumType.STRING)
     private ImageRepresentStatus imageRepresentStatus;
 
