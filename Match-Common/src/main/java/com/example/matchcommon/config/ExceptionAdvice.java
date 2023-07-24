@@ -1,5 +1,6 @@
-package com.example.matchcommon.exception;
+package com.example.matchcommon.config;
 
+import com.example.matchcommon.exception.BaseException;
 import com.example.matchcommon.reponse.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import java.util.stream.StreamSupport;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionAdvice{
+
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -94,5 +96,7 @@ public class ExceptionAdvice{
         return new ResponseEntity<>(CommonResponse.onFailure("500", exception.getMessage(), null), null,
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
 
 }
