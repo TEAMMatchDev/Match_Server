@@ -1,8 +1,9 @@
 package com.example.matchcommon.exception;
 
+import com.example.matchcommon.exception.error.CommonResponseStatus;
 import lombok.Getter;
 
-import static com.example.matchcommon.exception.CommonResponseStatus._BAD_REQUEST;
+import static com.example.matchcommon.exception.error.CommonResponseStatus._BAD_REQUEST;
 
 
 @Getter

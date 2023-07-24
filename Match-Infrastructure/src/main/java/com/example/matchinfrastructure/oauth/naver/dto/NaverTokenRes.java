@@ -16,6 +16,6 @@ public class NaverTokenRes {
     private String error_description;
 
     public String getAccess_token() {
-        return "Bearer "+access_token;
+        return access_token;
     }
 }

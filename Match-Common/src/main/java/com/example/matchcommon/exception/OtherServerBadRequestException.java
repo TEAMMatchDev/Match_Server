@@ -1,5 +1,7 @@
 package com.example.matchcommon.exception;
 
+import com.example.matchcommon.exception.error.CommonResponseStatus;
+
 public class OtherServerBadRequestException extends BaseException {
 
     public static final BaseException EXCEPTION = new OtherServerBadRequestException();

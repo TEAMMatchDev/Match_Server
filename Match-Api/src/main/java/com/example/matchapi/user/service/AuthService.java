@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
-import static com.example.matchcommon.exception.CommonResponseStatus.*;
+import static com.example.matchcommon.exception.error.CommonResponseStatus.*;
 import static com.example.matchdomain.user.entity.SocialType.KAKAO;
 import static com.example.matchdomain.user.entity.SocialType.NAVER;
 
@@ -107,14 +107,14 @@ public class AuthService {
 
     }
 
-    public String getNaverOauthToken(String code) {
+    public UserRes.UserToken getNaverOauthToken(String code) {
         NaverTokenRes naverTokenRes = naverLoginFeignClient.naverAuth(
                 naverProperties.getNaverClientId(),
                 naverProperties.getNaverClientSecret(),
                 code
         );
 
-        return naverTokenRes.getAccess_token();
+        return naverLogIn(new UserReq.SocialLoginToken(naverTokenRes.getAccess_token()));
     }
 
     public UserRes.UserToken naverLogIn(UserReq.SocialLoginToken socialLoginToken) {

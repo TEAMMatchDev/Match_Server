@@ -1,6 +1,6 @@
 package com.example.matchapi.security;
 
-import com.example.matchcommon.exception.CommonResponseStatus;
+import com.example.matchcommon.exception.error.CommonResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.security.core.AuthenticationException;

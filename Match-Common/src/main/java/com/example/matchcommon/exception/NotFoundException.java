@@ -1,4 +1,5 @@
 package com.example.matchcommon.exception;
+import com.example.matchcommon.exception.error.CommonResponseStatus;
 import lombok.Getter;
 
 @Getter
