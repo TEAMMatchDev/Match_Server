@@ -76,8 +76,8 @@ public class UserConvertor {
                 .build();
     }
 
-    public UserRes.MyPage toMyPage(User user) {
-        return UserRes.MyPage.builder()
+    public UserRes.EditMyPage toMyPage(User user) {
+        return UserRes.EditMyPage.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
