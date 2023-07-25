@@ -1,7 +1,6 @@
 package com.example.matchapi.security;
 
-import com.example.matchcommon.exception.errorcode.CommonResponseStatus;
-import com.example.matchcommon.exception.errorcode.UserAuthErrorCode;
+import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.security.access.AccessDeniedException;

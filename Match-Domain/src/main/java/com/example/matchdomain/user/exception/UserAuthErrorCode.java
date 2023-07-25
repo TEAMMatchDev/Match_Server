@@ -1,6 +1,7 @@
-package com.example.matchcommon.exception.errorcode;
+package com.example.matchdomain.user.exception;
 
 import com.example.matchcommon.dto.ErrorReason;
+import com.example.matchcommon.exception.errorcode.BaseErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

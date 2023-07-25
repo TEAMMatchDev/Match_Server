@@ -1,7 +1,8 @@
-package com.example.matchcommon.exception.errorcode;
+package com.example.matchdomain.user.exception;
 
 import com.example.matchcommon.annotation.ExplainError;
 import com.example.matchcommon.dto.ErrorReason;
+import com.example.matchcommon.exception.errorcode.BaseErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -9,29 +10,21 @@ import org.springframework.http.HttpStatus;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
-/**
- * 에러 코드 관리
- */
 @Getter
 @AllArgsConstructor
-public enum CommonResponseStatus implements BaseErrorCode {
-
-    /**
-     * 잘못된 요청
-     */
-    _INTERNAL_SERVER_ERROR(INTERNAL_SERVER_ERROR, "COMMON000", "서버 에러, 관리자에게 문의 바랍니다."),
-    _BAD_REQUEST(BAD_REQUEST,"COMMON001","잘못된 요청입니다."),
-    _UNAUTHORIZED(UNAUTHORIZED,"COMMON002","권한이 잘못되었습니다"),
-    _METHOD_NOT_ALLOWED(METHOD_NOT_ALLOWED, "COMMON003", "지원하지 않는 Http Method 입니다.");
-
+public enum UserNormalSignUpErrorCode implements BaseErrorCode {
+    @ExplainError("유저가 이미 가입된 전화번호로 가입을 요청하는 경우")
+    USERS_EXISTS_PHONE(FORBIDDEN,"U005","중복된 전화번호입니다."),
+    @ExplainError("유저가 이미 가입된 이메일로 가입을 요청하는 경우")
+    USERS_EXISTS_EMAIL(FORBIDDEN,"U007","중복된 이메일입니다.");
 
 
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
-
 
     @Override
     public ErrorReason getErrorReason() {

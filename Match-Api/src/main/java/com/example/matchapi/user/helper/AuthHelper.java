@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.example.matchcommon.exception.errorcode.UserSignUpErrorCode.EXIST_USER_PHONENUMBER;
+import static com.example.matchdomain.user.exception.UserSignUpErrorCode.EXIST_USER_PHONENUMBER;
 import static com.example.matchdomain.user.entity.SocialType.*;
 
 @Helper

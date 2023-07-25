@@ -2,11 +2,11 @@ package com.example.matchapi.project.service;
 
 import com.example.matchapi.project.convertor.ProjectConvertor;
 import com.example.matchapi.project.dto.ProjectRes;
+import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.project.entity.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.entity.ProjectImage;
-import com.example.matchcommon.exception.ProjectException;
 import com.example.matchdomain.project.repository.ProjectImageRepository;
 import com.example.matchdomain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.matchcommon.exception.errorcode.ProjectErrorCode.PROJECT_NOT_EXIST;
+import static com.example.matchdomain.project.exception.ProjectErrorCode.PROJECT_NOT_EXIST;
 
 
 @Service
@@ -52,7 +52,7 @@ public class ProjectService {
 
     public ProjectRes.ProjectDetail getProjectDetail(Long projectId) {
         List<ProjectImage> projectImage = projectImageRepository.findByProjectId(projectId);
-        if(projectImage.isEmpty()) throw new ProjectException(PROJECT_NOT_EXIST);
+        if(projectImage.isEmpty()) throw new BadRequestException(PROJECT_NOT_EXIST);
         return projectConvertor.projectImgList(projectImage);
     }
 }

@@ -13,7 +13,7 @@ public class ErrorReason {
     private final boolean isSuccess;
     private final String code;
     private final String message;
-    private final Map<String, String> data;
+    private final Map<String, String> result;
 
     public boolean getIsSuccess(){
         return isSuccess;

@@ -2,28 +2,34 @@ package com.example.matchcommon.exception.errorcode;
 
 import com.example.matchcommon.annotation.ExplainError;
 import com.example.matchcommon.dto.ErrorReason;
+import com.example.matchcommon.dto.RequestErrorDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Getter
 @AllArgsConstructor
-public enum ProjectErrorCode implements BaseErrorCode {
+public enum RequestErrorCode implements BaseErrorCode{
 
-    @ExplainError("해당 프로젝트가 존재하지 않습니다.")
-    PROJECT_NOT_EXIST(HttpStatus.BAD_REQUEST,false,"PROJECT001","해당 프로젝트가 존재하지 않습니다.");
+    BAD_REQUEST_ERROR(HttpStatus.BAD_REQUEST,"REQUEST_ERROR","요청 형식 에러 result 확인해주세요");
+
     private final HttpStatus httpStatus;
-    private final boolean isSuccess;
     private final String code;
     private final String message;
 
+
     @Override
     public ErrorReason getErrorReason() {
-        return ErrorReason.builder().message(message).code(code).isSuccess(false).build();
+        HashMap<String,String> data = new HashMap<>();
+        data.put("field 에러가 나는 필드","필드에 대한 요청 형식에 대한 에러가 표시됩니다.");
+        return ErrorReason.builder().message(message).code(code).isSuccess(false).result(data).build();
     }
+
     @Override
     public String getExplainError() throws NoSuchFieldException {
         Field field = this.getClass().getField(this.name());

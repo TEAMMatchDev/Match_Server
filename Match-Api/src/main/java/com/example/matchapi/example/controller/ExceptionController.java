@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/examples")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "access-token")
-@Tag(name = "xx. 에러코드 문서화")
+@Tag(name = "에러코드 문서화")
 public class ExceptionController {
 
     @GetMapping("/global")
