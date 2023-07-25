@@ -4,6 +4,8 @@ import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.service.AuthService;
 import com.example.matchapi.user.helper.SmsHelper;
+import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchcommon.exception.errorcode.UserSignUpErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverAddressDto;
@@ -31,6 +33,7 @@ public class AuthController {
 
     }
 
+    @ApiErrorCodeExample(UserSignUpErrorCode.class)
     @Operation(summary= "01-02🔑 카카오 로그인" , description = "카카오 액세스 토큰 보내주기")
     @PostMapping(value="/kakao")
     public CommonResponse<UserRes.UserToken> kakaoLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
@@ -42,12 +45,14 @@ public class AuthController {
     네이버 로그인 토큰 발급용
      */
     @GetMapping(value="/naver")
+    @ApiErrorCodeExample(UserSignUpErrorCode.class)
     @Operation(summary = "01-03-01🔑 web version API  naver 코드 발급 후 회원가입", description = "naver 코드를 발급 할 수 있음")
     public CommonResponse<UserRes.UserToken>  naverOauthRedirect(@RequestParam String code){
         return CommonResponse.onSuccess(authService.getNaverOauthToken(code));
     }
 
     @Operation(summary= "01-03🔑 네이버 로그인" , description = "네이버 액세스 토큰 보내주기")
+    @ApiErrorCodeExample(UserSignUpErrorCode.class)
     @PostMapping(value="/naver")
     public CommonResponse<UserRes.UserToken> naverLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));

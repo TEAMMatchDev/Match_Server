@@ -1,6 +1,6 @@
 package com.example.matchcommon.exception;
 
-import com.example.matchcommon.exception.error.CommonResponseStatus;
+import com.example.matchcommon.exception.errorcode.CommonResponseStatus;
 
 public class OtherServerInternalSeverErrorException extends BaseException {
 

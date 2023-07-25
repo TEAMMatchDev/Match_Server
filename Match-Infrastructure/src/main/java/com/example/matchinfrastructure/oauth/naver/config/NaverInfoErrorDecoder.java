@@ -8,8 +8,8 @@ import feign.FeignException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 
-import static com.example.matchcommon.exception.error.CommonResponseStatus.*;
-import static com.example.matchcommon.exception.error.CommonResponseStatus.OTHER_SERVER_EXPIRED_TOKEN;
+import static com.example.matchcommon.exception.errorcode.CommonResponseStatus.*;
+import static com.example.matchcommon.exception.errorcode.CommonResponseStatus.OTHER_SERVER_EXPIRED_TOKEN;
 
 public class NaverInfoErrorDecoder implements ErrorDecoder {
     @Override

@@ -3,7 +3,8 @@ package com.example.matchapi.project.controller;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
-import com.example.matchcommon.exception.error.ProjectErrorCode;
+import com.example.matchcommon.exception.errorcode.ProjectErrorCode;
+import com.example.matchcommon.exception.errorcode.UserAuthErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,10 +28,9 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}")
-    @ApiErrorCodeExample(ProjectErrorCode.class)
+    @ApiErrorCodeExample({ProjectErrorCode.class,UserAuthErrorCode.class})
     public CommonResponse<ProjectRes.ProjectDetail> getProject(@Parameter(description = "프로젝트 ID", example = "1")
                                                      @PathVariable(required = true) Long projectId) {
-
         return CommonResponse.onSuccess(projectService.getProjectDetail(projectId));
     }
 }

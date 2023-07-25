@@ -9,7 +9,7 @@ import feign.FeignException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 
-import static com.example.matchcommon.exception.error.CommonResponseStatus.*;
+import static com.example.matchcommon.exception.errorcode.CommonResponseStatus.*;
 
 public class KakaoInfoErrorDecoder implements ErrorDecoder {
 

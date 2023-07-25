@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
-import static com.example.matchcommon.exception.error.CommonResponseStatus.*;
+import static com.example.matchcommon.exception.errorcode.CommonResponseStatus.*;
 import static com.example.matchdomain.user.entity.SocialType.KAKAO;
 import static com.example.matchdomain.user.entity.SocialType.NAVER;
 

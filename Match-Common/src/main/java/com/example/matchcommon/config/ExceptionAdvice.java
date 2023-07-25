@@ -31,6 +31,7 @@ public class ExceptionAdvice{
 
 
 
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity onConstraintValidationException(ConstraintViolationException e) {
@@ -87,8 +88,8 @@ public class ExceptionAdvice{
                                            @AuthenticationPrincipal User user, HttpServletRequest request) {
         getExceptionStackTrace(baseException, user, request);
 
-        return new ResponseEntity<>(CommonResponse.onFailure(baseException.getErrorReason().getCode(), baseException.getErrorReason().getMessage(), baseException.getErrorReason().getData()),
-                null, baseException.getErrorReason().getStatus());
+        return new ResponseEntity<>(CommonResponse.onFailure(baseException.getErrorReasonHttpStatus().getCode(), baseException.getErrorReasonHttpStatus().getMessage(), baseException.getErrorReasonHttpStatus().getData()),
+                null, baseException.getErrorReasonHttpStatus().getHttpStatus());
     }
 
     @ExceptionHandler(value = BaseDynamicException.class)

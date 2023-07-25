@@ -1,7 +1,7 @@
 package com.example.matchapi.example.controller;
 
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
-import com.example.matchcommon.exception.error.CommonResponseStatus;
+import com.example.matchcommon.exception.errorcode.CommonResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

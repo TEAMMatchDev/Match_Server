@@ -1,7 +1,6 @@
-package com.example.matchdomain.project.exception;
+package com.example.matchcommon.exception;
 
-import com.example.matchcommon.exception.BaseException;
-import com.example.matchcommon.exception.error.ProjectErrorCode;
+import com.example.matchcommon.exception.errorcode.ProjectErrorCode;
 import lombok.Getter;
 
 @Getter

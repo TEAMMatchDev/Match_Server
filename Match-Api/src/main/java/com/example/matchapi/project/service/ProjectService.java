@@ -6,7 +6,7 @@ import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.project.entity.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.entity.ProjectImage;
-import com.example.matchdomain.project.exception.ProjectException;
+import com.example.matchcommon.exception.ProjectException;
 import com.example.matchdomain.project.repository.ProjectImageRepository;
 import com.example.matchdomain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.matchcommon.exception.error.ProjectErrorCode.PROJECT_NOT_EXIST;
+import static com.example.matchcommon.exception.errorcode.ProjectErrorCode.PROJECT_NOT_EXIST;
 
 
 @Service

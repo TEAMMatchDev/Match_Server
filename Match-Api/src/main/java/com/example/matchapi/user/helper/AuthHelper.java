@@ -2,7 +2,6 @@ package com.example.matchapi.user.helper;
 
 import com.example.matchcommon.annotation.Helper;
 import com.example.matchcommon.exception.BaseDynamicException;
-import com.example.matchcommon.exception.BaseException;
 import com.example.matchdomain.user.entity.Gender;
 import com.example.matchdomain.user.entity.SocialType;
 import com.example.matchdomain.user.entity.User;
@@ -18,7 +17,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.example.matchcommon.exception.error.CommonResponseStatus.EXIST_USER_PHONENUMBER;
+import static com.example.matchcommon.exception.errorcode.UserSignUpErrorCode.EXIST_USER_PHONENUMBER;
 import static com.example.matchdomain.user.entity.SocialType.*;
 
 @Helper

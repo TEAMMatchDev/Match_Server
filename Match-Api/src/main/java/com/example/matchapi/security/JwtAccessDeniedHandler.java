@@ -1,6 +1,7 @@
 package com.example.matchapi.security;
 
-import com.example.matchcommon.exception.error.CommonResponseStatus;
+import com.example.matchcommon.exception.errorcode.CommonResponseStatus;
+import com.example.matchcommon.exception.errorcode.UserAuthErrorCode;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,7 +18,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
         //필요한 권한이 없이 접근하려 할때 403
-        CommonResponseStatus errorCode = CommonResponseStatus.ForbiddenException;
+        UserAuthErrorCode errorCode = UserAuthErrorCode.ForbiddenException;
 
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("utf-8");
