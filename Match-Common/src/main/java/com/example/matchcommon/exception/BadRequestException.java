@@ -1,19 +1,14 @@
 package com.example.matchcommon.exception;
 
-import com.example.matchcommon.dto.ErrorReason;
-import com.example.matchcommon.exception.error.CommonResponseStatus;
-import com.example.matchcommon.exception.error.ProjectErrorCode;
+import com.example.matchcommon.exception.errorcode.BaseErrorCode;
+import com.example.matchcommon.exception.errorcode.CommonResponseStatus;
 import lombok.Getter;
-
-import static com.example.matchcommon.exception.error.CommonResponseStatus._BAD_REQUEST;
 
 
 @Getter
 public class BadRequestException extends BaseException {
-    private String message;
 
-    public BadRequestException(CommonResponseStatus errorCode) {
+    public BadRequestException(BaseErrorCode errorCode) {
         super(errorCode);
     }
-
 }

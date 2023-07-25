@@ -1,6 +1,6 @@
 package com.example.matchcommon.exception;
 
-import com.example.matchcommon.exception.error.CommonResponseStatus;
+import com.example.matchcommon.exception.errorcode.BaseErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,11 +10,13 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public class BaseDynamicException extends RuntimeException {
-    CommonResponseStatus status;
+    BaseErrorCode status;
     Map<String,String> data;
 
-    public BaseDynamicException(CommonResponseStatus errorReason, HashMap<String, String> data) {
+    public BaseDynamicException(BaseErrorCode errorReason, HashMap<String, String> data) {
         this.status = errorReason;
         this.data = data;
     }
+
+
 }

@@ -3,7 +3,7 @@ package com.example.matchapi.config;
 
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.dto.ErrorReason;
-import com.example.matchcommon.exception.error.BaseErrorCode;
+import com.example.matchcommon.exception.errorcode.BaseErrorCode;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.examples.Example;
@@ -24,6 +24,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springdoc.core.customizers.OperationCustomizer;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.groupingBy;
@@ -77,7 +78,9 @@ public class SwaggerConfig {
                     handlerMethod.getMethodAnnotation(ApiErrorCodeExample.class);
             // ApiErrorCodeExample 어노테이션 단 메소드 적용
             if (apiErrorCodeExample != null) {
-                generateErrorCodeResponseExample(operation, apiErrorCodeExample.value());
+                Class<? extends BaseErrorCode>[] errorCodes = apiErrorCodeExample.value();
+                generateErrorCodeResponseExample(operation, errorCodes);
+
             }
             return operation;
         };
@@ -85,31 +88,41 @@ public class SwaggerConfig {
     }
 
     private void generateErrorCodeResponseExample(
-            Operation operation, Class<? extends BaseErrorCode> type) {
+            Operation operation, Class<? extends BaseErrorCode>[] errorCodeList) {
         ApiResponses responses = operation.getResponses();
-        // 해당 이넘에 선언된 에러코드들의 목록을 가져옵니다.
-        BaseErrorCode[] errorCodes = type.getEnumConstants();
-        // 400, 401, 404 등 에러코드의 상태코드들로 리스트로 모읍니다.
-        // 400 같은 상태코드에 여러 에러코드들이 있을 수 있습니다.
-        Map<Integer, List<ExampleHolder>> statusWithExampleHolders =
-                Arrays.stream(errorCodes)
-                        .map(
-                                baseErrorCode -> {
-                                    try {
-                                        ErrorReason errorReason = baseErrorCode.getErrorReason();
-                                        return ExampleHolder.builder()
-                                                .holder(
-                                                        getSwaggerExample(
-                                                                baseErrorCode.getExplainError(),
-                                                                errorReason))
-                                                .code(errorReason.getStatus().value())
-                                                .name(errorReason.getCode())
-                                                .build();
-                                    } catch (NoSuchFieldException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                })
-                        .collect(groupingBy(ExampleHolder::getCode));
+        Map<Integer, List<ExampleHolder>> statusWithExampleHolders = new HashMap<>();
+
+        for (Class<? extends BaseErrorCode> type : errorCodeList) {
+            BaseErrorCode[] errorCodes = type.getEnumConstants();
+            // 400, 401, 404 등 에러코드의 상태코드들로 리스트로 모읍니다.
+            // 400 같은 상태코드에 여러 에러코드들이 있을 수 있습니다.
+            List<ExampleHolder> exampleHolders =
+                    Arrays.stream(errorCodes)
+                            .map(
+                                    baseErrorCode -> {
+                                        try {
+                                            ErrorReason errorReason = baseErrorCode.getErrorReasonHttpStatus();
+                                            ErrorReason errorReasonToView = baseErrorCode.getErrorReason();
+                                            return ExampleHolder.builder()
+                                                    .holder(
+                                                            getSwaggerExample(
+                                                                    baseErrorCode.getExplainError(), errorReasonToView))
+                                                    .code(errorReason.getHttpStatus().value())
+                                                    .name(errorReason.getCode())
+                                                    .build();
+                                        } catch (NoSuchFieldException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    })
+                            .collect(Collectors.toList());
+
+            // statusWithExampleHolders에 현재 루프의 결과를 추가합니다.
+            exampleHolders.forEach(
+                    exampleHolder ->
+                            statusWithExampleHolders
+                                    .computeIfAbsent(exampleHolder.getCode(), k -> new ArrayList<>())
+                                    .add(exampleHolder));
+        }
 
         addExamplesToResponses(responses, statusWithExampleHolders);
     }

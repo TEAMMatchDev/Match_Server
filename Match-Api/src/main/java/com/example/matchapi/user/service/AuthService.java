@@ -7,6 +7,7 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.UnauthorizedException;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
 import com.example.matchdomain.user.entity.Authority;
@@ -33,9 +34,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
-import static com.example.matchcommon.exception.error.CommonResponseStatus.*;
+import static com.example.matchcommon.exception.errorcode.CommonResponseStatus.*;
 import static com.example.matchdomain.user.entity.SocialType.KAKAO;
 import static com.example.matchdomain.user.entity.SocialType.NAVER;
+import static com.example.matchdomain.user.exception.UserAuthErrorCode.NOT_EXIST_USER;
+import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_CORRECT_PASSWORD;
+import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_EMAIL;
+import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_PHONE;
 
 @Service
 @RequiredArgsConstructor
@@ -153,7 +158,7 @@ public class AuthService {
     }
 
     public UserRes.UserToken logIn(UserReq.LogIn logIn) {
-        User user=userRepository.findByUsername(logIn.getEmail()).orElseThrow(() -> new BadRequestException(NOT_EXIST_USER));
+        User user=userRepository.findByUsername(logIn.getEmail()).orElseThrow(() -> new UnauthorizedException(NOT_EXIST_USER));
 
         if(!passwordEncoder.matches(logIn.getPassword(),user.getPassword())) throw new BadRequestException(NOT_CORRECT_PASSWORD);
 

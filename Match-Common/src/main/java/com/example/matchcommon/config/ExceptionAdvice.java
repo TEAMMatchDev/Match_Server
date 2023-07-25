@@ -31,6 +31,7 @@ public class ExceptionAdvice{
 
 
 
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity onConstraintValidationException(ConstraintViolationException e) {
@@ -41,13 +42,13 @@ public class ExceptionAdvice{
                                 .get().toString(),
                         ConstraintViolation::getMessage
                 ));
-        return new ResponseEntity<>(CommonResponse.onFailure("REQUEST_ERROR", "요청 형식 에러", errors), null, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(CommonResponse.onFailure("REQUEST_ERROR", "요청 형식 에러 result 확인해주세요", errors), null, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        Map<String, String> errors = new LinkedHashMap<>(); // Use a LinkedHashMap to preserve the order of errors
+        Map<String, String> errors = new LinkedHashMap<>();
 
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
 
@@ -61,7 +62,7 @@ public class ExceptionAdvice{
             errors.put(fieldName, errorMessage);
         }
 
-        return new ResponseEntity<>(CommonResponse.onFailure("REQUEST_ERROR", "Error in request format", errors), null, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(CommonResponse.onFailure("REQUEST_ERROR", "요청 형식 에러 result 확인해주세요", errors), null, HttpStatus.BAD_REQUEST);
     }
 
 
@@ -77,7 +78,7 @@ public class ExceptionAdvice{
             pw.append("uid: " + user.getUsername() + "\n");
         }
         pw.append(e.getMessage());
-        pw.append("\n==================================================================\n");
+        pw.append("\n=====================================================================");
         log.error(sw.toString());
     }
 
@@ -87,16 +88,16 @@ public class ExceptionAdvice{
                                            @AuthenticationPrincipal User user, HttpServletRequest request) {
         getExceptionStackTrace(baseException, user, request);
 
-        return new ResponseEntity<>(CommonResponse.onFailure(baseException.getErrorReason().getCode(), baseException.getErrorReason().getMessage(), baseException.getErrorReason().getData()),
-                null, baseException.getErrorReason().getStatus());
+        return new ResponseEntity<>(CommonResponse.onFailure(baseException.getErrorReasonHttpStatus().getCode(), baseException.getErrorReasonHttpStatus().getMessage(), baseException.getErrorReasonHttpStatus().getResult()),
+                null, baseException.getErrorReasonHttpStatus().getHttpStatus());
     }
 
     @ExceptionHandler(value = BaseDynamicException.class)
     public ResponseEntity onKnownDynamicException(BaseDynamicException baseDynamicException, @AuthenticationPrincipal User user,
                                       HttpServletRequest request) {
         getExceptionStackTrace(baseDynamicException, user, request);
-        return new ResponseEntity<>(CommonResponse.onFailure(baseDynamicException.getStatus().getCode(), baseDynamicException.getStatus().getMessage(), baseDynamicException.getData()), null,
-                baseDynamicException.getStatus().getHttpStatus());
+        return new ResponseEntity<>(CommonResponse.onFailure(baseDynamicException.getStatus().getErrorReason().getCode(), baseDynamicException.getStatus().getErrorReason().getMessage(), baseDynamicException.getData()), null,
+                baseDynamicException.getStatus().getErrorReasonHttpStatus().getHttpStatus());
     }
 
 
