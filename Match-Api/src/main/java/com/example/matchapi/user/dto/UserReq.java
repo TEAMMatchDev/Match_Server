@@ -1,12 +1,13 @@
 package com.example.matchapi.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
+import com.example.matchdomain.user.entity.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.example.matchcommon.annotation.Enum;
 import lombok.*;
 
-import javax.validation.Valid;
+
 import javax.validation.constraints.*;
-import java.time.LocalDate;
 
 public class UserReq {
 
@@ -58,9 +59,9 @@ public class UserReq {
         @Pattern(regexp = "^01(?:0|1|[6-9])[0-9]{7,8}$", message = "전화번호 형식에 맞지 않습니다. 01012345678 '-' 를 제외하고 입력해주세요. ")
         @Schema(description ="전화번호",required = true,example = "0101234567")
         private String phone;
-        @NotEmpty (message = "성별을 입력해주세요")
         @Schema(description ="성별",required = true,example = "남자는 남자 여자는 여자")
-        private String gender;
+        @Enum(message="남성, 여성에 맞춰서 입력해주세요")
+        private Gender gender;
         @NotEmpty (message = "생년월일을 입력해주세요")
         @Schema(description ="생일",required = true,example = "20200101")
         private String birthDate;

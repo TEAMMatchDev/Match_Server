@@ -71,7 +71,7 @@ public class UserConvertor {
                 .phoneNumber(signUpUser.getPhone())
                 .status(UserStatus.ACTIVE)
                 .birth(authHelper.birthConversionToLocalDate(signUpUser.getBirthDate()))
-                .gender(authHelper.genderConversion(signUpUser.getGender()))
+                .gender(signUpUser.getGender())
                 .authorities(Collections.singleton(authority))
                 .build();
     }
@@ -92,7 +92,7 @@ public class UserConvertor {
                 .userId(userId)
                 .name(shippingAddresses.getName())
                 .isDefault(shippingAddresses.isDefault())
-                .addresslType(AddresslType.valueOf(shippingAddresses.getType()))
+                .addressType(AddressType.valueOf(shippingAddresses.getType()))
                 .baseAddress(shippingAddresses.getBaseAddress())
                 .detailAddress(shippingAddresses.getDetailAddress())
                 .receiverName(shippingAddresses.getReceiverName())
