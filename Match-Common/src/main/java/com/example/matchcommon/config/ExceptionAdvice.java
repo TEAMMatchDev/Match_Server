@@ -101,6 +101,7 @@ public class ExceptionAdvice{
     }
 
 
+
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity onException(Exception exception, @AuthenticationPrincipal User user,
                                       HttpServletRequest request) {

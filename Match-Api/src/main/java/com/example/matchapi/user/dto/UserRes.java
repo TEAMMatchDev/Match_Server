@@ -1,10 +1,12 @@
 package com.example.matchapi.user.dto;
 
+import com.example.matchapi.project.dto.ProjectRes;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class UserRes {
     @Getter
@@ -45,8 +47,8 @@ public class UserRes {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    @Schema(description ="02-01👤 문자인증 API Response")
-    public static class MyPage {
+    @Schema(description ="02-02👤 유저 정보 편집 API Response")
+    public static class EditMyPage {
         @Schema(description = "userId", required = true, example = "userId 값")
         private Long userId;
         @Schema(description = "유저 이메일", required = true, example = "match123@gmail.com")
@@ -61,4 +63,25 @@ public class UserRes {
         @Schema(description = "유저 생일", required = true, example = "19990413")
         private String birthDate;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Schema(description ="02-01👤 유저 정보 조회 API Response")
+    public static class MyPage {
+        @Schema(description = "후원 집행 전 갯수", required = true, example = "후원 집행 전 갯수")
+        private int beforeCnt;
+
+        @Schema(description = "후원 집행 진행 중 갯수", required = true, example = "후원 집행 진행 중 갯수")
+        private int underCnt;
+
+        @Schema(description = "후원 집행 진행 중 갯수", required = true, example = "후원 집행 진행 중 갯수")
+        private int successCnt;
+
+        @Schema(description = "관심있는 프로젝트 리스트", required = true, example = "프로젝트 리스트")
+        private List<ProjectRes.ProjectList> projectList;
+    }
+
 }

@@ -21,14 +21,14 @@ import java.util.List;
 @Tag(name = "03-Project💻", description = "프로젝트 모아보기 용 API 입니다.")
 public class ProjectController {
     private final ProjectService projectService;
-    @Operation(summary = "프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
+    @Operation(summary = "03-01💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
     @GetMapping("")
     public CommonResponse<PageResponse<List<ProjectRes.ProjectList>>> getProjectList(@Parameter(description = "페이지", example = "0") @RequestParam(required = true) @Min(value = 0) int page,
                                                                                      @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true) int size) {
         return CommonResponse.onSuccess(projectService.getProjectList(page, size));
     }
 
-    @Operation(summary = "프로젝트 상세조회 API.",description = "프로젝트 상세조회 API 입니다.")
+    @Operation(summary = "03-02💻 프로젝트 상세조회 API.",description = "프로젝트 상세조회 API 입니다.")
     @GetMapping("/{projectId}")
     @ApiErrorCodeExample({ProjectErrorCode.class})
     public CommonResponse<ProjectRes.ProjectDetail> getProject(@Parameter(description = "프로젝트 ID", example = "1")

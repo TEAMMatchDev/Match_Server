@@ -2,6 +2,7 @@ package com.example.matchdomain.project.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
 import com.example.matchdomain.user.entity.SocialType;
 import com.example.matchdomain.user.entity.UserStatus;
 import lombok.*;
@@ -61,8 +62,9 @@ public class Project extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "projectId")
-    @Fetch(FetchMode.JOIN) // Use @Fetch to fetch the projectImage entities eagerly
+    @Fetch(FetchMode.JOIN)
     private List<ProjectImage> projectImage = new ArrayList<>();
+
 
     public Project(Long id, String projectName, String usages, List<ProjectImage> projectImage) {
         this.id = id;

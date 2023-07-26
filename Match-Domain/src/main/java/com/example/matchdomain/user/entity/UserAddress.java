@@ -37,7 +37,7 @@ public class UserAddress extends BaseEntity {
     private Boolean isDefault;
 
     @Enumerated(EnumType.STRING)
-    private AddresslType addresslType;
+    private AddressType addressType;
 
     @Column(name = "baseAddress")
     private String baseAddress;

@@ -40,4 +40,7 @@ public class DonationUser extends BaseEntity {
 
     @Column(name="price")
     private int price;
+
+    @Enumerated(EnumType.STRING)
+    private DonationStatus donationStatus;
 }

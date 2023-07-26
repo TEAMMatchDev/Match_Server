@@ -22,11 +22,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
 
-    @ApiErrorCodeExample(UserAuthErrorCode.class)
-    @Operation(summary = "02-01👤 MYPage 조회", description = "마이페이지 편집을 위한 조회 화면입니다.")
-    @GetMapping(value = "/my-page")
-    public CommonResponse< UserRes.MyPage> getMyPage(@Parameter(hidden = true)
-                                                         @AuthenticationPrincipal User user){
+    @Operation(summary= "02-01👤 마이페이지 전체 조회",description = "마이페이지 전체 조회입니다.")
+    @GetMapping("")
+    public CommonResponse<UserRes.MyPage> getMyPage(@Parameter(hidden = true)
+                                                        @AuthenticationPrincipal User user){
         return CommonResponse.onSuccess(userService.getMyPage(user));
+    }
+
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    @Operation(summary = "02-02👤 MYPage 편집화면 내 정보 조회", description = "마이페이지 편집을 위한 조회 화면입니다.")
+    @GetMapping(value = "/my-page/edit")
+    public CommonResponse<UserRes.EditMyPage> getEditMyPage(@Parameter(hidden = true)
+                                                         @AuthenticationPrincipal User user){
+        return CommonResponse.onSuccess(userService.getEditMyPage(user));
     }
 }
