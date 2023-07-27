@@ -20,7 +20,8 @@ public enum OtherServerErrorCode implements BaseErrorCode{
     OTHER_SERVER_FORBIDDEN(BAD_REQUEST, "FEIGN_400_3", "Other server forbidden"),
     OTHER_SERVER_EXPIRED_TOKEN(BAD_REQUEST, "FEIGN_400_4", "Other server expired token"),
     OTHER_SERVER_NOT_FOUND(BAD_REQUEST, "FEIGN_400_5", "Other server not found error"),
-    OTHER_SERVER_INTERNAL_SERVER_ERROR(BAD_REQUEST, "FEIGN_400_6", "Other server internal server error");
+    OTHER_SERVER_INTERNAL_SERVER_ERROR(BAD_REQUEST, "FEIGN_400_6", "Other server internal server error"),
+    OTHER_SERVER_METHOD_NOT_ALLOWED(BAD_REQUEST,"FEIGN_400_7" , "Other server method not allowed"),;
 
     private final HttpStatus httpStatus;
     private final String code;
