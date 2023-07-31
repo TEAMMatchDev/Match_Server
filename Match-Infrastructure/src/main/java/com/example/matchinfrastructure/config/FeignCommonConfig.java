@@ -1,7 +1,10 @@
 package com.example.matchinfrastructure.config;
 
 
+import com.example.matchcommon.properties.NicePayProperties;
 import com.example.matchinfrastructure.oauth.BaseFeignClientPackage;
+import com.example.matchinfrastructure.pay.BasePayFeignClientPackage;
+import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -9,13 +12,16 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.Logger.Level;
 import feign.codec.Decoder;
 import feign.jackson.JacksonDecoder;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableFeignClients(basePackageClasses = BaseFeignClientPackage.class)
+@EnableFeignClients(basePackageClasses = {BaseFeignClientPackage.class, BasePayFeignClientPackage.class})
 public class FeignCommonConfig {
+
     @Bean
     public Decoder feignDecoder() {
         return new JacksonDecoder(customObjectMapper());
@@ -39,4 +45,6 @@ public class FeignCommonConfig {
     Level feignLoggerLevel() {
         return Level.FULL;
     }
+
+
 }

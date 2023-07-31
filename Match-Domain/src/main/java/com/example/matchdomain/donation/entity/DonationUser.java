@@ -41,6 +41,21 @@ public class DonationUser extends BaseEntity {
     @Column(name="price")
     private int price;
 
+    private String tid;
+
+    private String orderId;
+
+    private String inherenceNumber;
+
+    private String inherenceName;
+
     @Enumerated(EnumType.STRING)
     private DonationStatus donationStatus;
+
+    @Enumerated(EnumType.STRING)
+    private PayMethod payMethod;
+
+    public void updateInherenceNumber(String inherenceNumber) {
+        this.inherenceNumber = inherenceNumber;
+    }
 }

@@ -23,3 +23,8 @@ sms:
   api: ${SMS_API_KEY}
   sender: ${SMS_SENDER}
 
+##배포시 prod, dev 구분
+nice:
+  secret: ${NICE_SECRET_KEY}
+  client: ${NICE_CLIENT_KEY}
+  url: ${NICE_URL}

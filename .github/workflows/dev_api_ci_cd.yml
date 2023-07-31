@@ -40,6 +40,10 @@ jobs:
           sms.secret: ${{ secrets.SMS_SECRET_KEY }}
           sms.api: ${{ secrets.SMS_API_KEY }}
           sms.sender: ${{ secrets.SMS_SENDER }}
+          nice.secret: ${{ secrets.NICE_SECRET}}
+          nice.client: ${{ secrets.NICE_CLIENT }}
+          nice.url: ${{ secrets.NICE_DEV_URL}}
+
 
       - name: Set Environment Domain - Domain DEV Yml
         uses: microsoft/variable-substitution@v1
@@ -65,7 +69,7 @@ jobs:
           format: YYYYMMDDTHHmm
           utcOffset: "+09:00"
 
-      - name: Generate deployment packagez
+      - name: Generate deployment package
         run: |
           mkdir -p deploy
           cp Match-Api/build/libs/*.jar deploy/match-dev-api.jar

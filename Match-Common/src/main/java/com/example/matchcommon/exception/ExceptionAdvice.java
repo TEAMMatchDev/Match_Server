@@ -1,4 +1,4 @@
-package com.example.matchcommon.config;
+package com.example.matchcommon.exception;
 
 import com.example.matchcommon.exception.BaseDynamicException;
 import com.example.matchcommon.exception.BaseException;
