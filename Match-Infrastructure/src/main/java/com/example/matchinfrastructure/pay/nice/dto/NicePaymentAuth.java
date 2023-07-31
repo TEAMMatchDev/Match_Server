@@ -8,11 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class NicePaymentAuth {
 
     private String resultCode;
@@ -67,15 +69,34 @@ public class NicePaymentAuth {
 
     private boolean issuedCashReceipt;
 
-    private String coupon;
-
     private Card card;
+    private Bank bank;
+    private Vbank vbank;
+    private List<Coupon> coupon;
+
+    private List<Cancels> cancels;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class Cancels{
+        private String tid;
+
+        private int amount;
+
+        private String cancelledAt;
+
+        private String reason;
+
+        private String receiptUrl;
+
+        private int couponAmt;
+    }
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Card {
         private String cardCode;
 
@@ -97,9 +118,62 @@ public class NicePaymentAuth {
 
     }
 
-    private String vbank;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Coupon {
+        private int couponAmt;
+    }
 
-    private String cancels;
 
-    private String cashReceipts;
+    private CashReceipts cashReceipts;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CashReceipts{
+        private String receiptTid;
+
+        private String orgTid;
+
+        private String status;
+
+        private int amount;
+
+        private int taxFreeAmt;
+
+        private String receiptType;
+
+        private String issueNo;
+
+        private String receiptUrl;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Bank{
+        private String bankCode;
+
+        private String bankName;
+    }
+
+
+
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Vbank{
+        private String vbankCode;
+        private String vbankName;
+        private String vbankNumber;
+        private String vbankExpDate;
+        private String vbankHolder;
+
+    }
 }
