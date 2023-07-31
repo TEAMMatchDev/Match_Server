@@ -59,8 +59,8 @@ public class UserReq {
         @Pattern(regexp = "^01(?:0|1|[6-9])[0-9]{7,8}$", message = "전화번호 형식에 맞지 않습니다. 01012345678 '-' 를 제외하고 입력해주세요. ")
         @Schema(description ="전화번호",required = true,example = "0101234567")
         private String phone;
-        @Schema(description ="성별",required = true,example = "남자는 남자 여자는 여자")
-        @Enum(message="남성, 여성에 맞춰서 입력해주세요")
+        @Schema(description ="성별",required = true,example = "남성은 남성 여성은 여성 선택 안함 ")
+        @Enum(message="남성, 여성, 선택 안함에 맞춰서 입력해주세요")
         private Gender gender;
         @NotEmpty (message = "생년월일을 입력해주세요")
         @Schema(description ="생일",required = true,example = "20200101")
