@@ -65,7 +65,7 @@ jobs:
           format: YYYYMMDDTHHmm
           utcOffset: "+09:00"
 
-      - name: Generate deployment packagez
+      - name: Generate deployment package
         run: |
           mkdir -p deploy
           cp Match-Api/build/libs/*.jar deploy/match-dev-api.jar
