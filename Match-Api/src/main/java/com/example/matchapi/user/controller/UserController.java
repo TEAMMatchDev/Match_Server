@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "02-User👤",description = "유저 관련 API 입니다.")
 public class UserController {
     private final UserService userService;
@@ -26,6 +28,7 @@ public class UserController {
     @GetMapping("")
     public CommonResponse<UserRes.MyPage> getMyPage(@Parameter(hidden = true)
                                                         @AuthenticationPrincipal User user){
+        log.info("02-01 마이페이지 전체조회 userId : " + user.getId());
         return CommonResponse.onSuccess(userService.getMyPage(user));
     }
 
@@ -34,6 +37,7 @@ public class UserController {
     @GetMapping(value = "/my-page/edit")
     public CommonResponse<UserRes.EditMyPage> getEditMyPage(@Parameter(hidden = true)
                                                          @AuthenticationPrincipal User user){
+        log.info("02-02 마이페이지 편집화면 조회 userId : " + user.getId());
         return CommonResponse.onSuccess(userService.getEditMyPage(user));
     }
 }

@@ -14,6 +14,7 @@ import com.example.matchcommon.reponse.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,6 +23,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "01-Auth🔑", description = "회원가입, 로그인 토큰이 필요 없는 API 입니다.")
 public class AuthController {
     private final AuthService authService;
@@ -31,6 +33,7 @@ public class AuthController {
     @Operation(summary = "kakao 코드 발급 후 토큰 생성용 개발용 API 입니다",description = "kakao 코드를 발급 할 수 있음")
     @GetMapping(value = "/kakao")
     public String kakaoOauthRedirect(@RequestParam String code) {
+        log.info("카카오 로그인 액세스 토큰 발급");
         return "카카오 로그인 액세스 토큰 발급 완료, 액세스 토큰 :" + authService.getOauthToken(code,"").getAccess_token();
 
     }
@@ -39,6 +42,7 @@ public class AuthController {
     @Operation(summary= "01-02🔑 카카오 로그인" , description = "카카오 액세스 토큰 보내주기")
     @PostMapping(value="/kakao")
     public CommonResponse<UserRes.UserToken> kakaoLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
+        log.info("01-02 카카오 로그인");
         return CommonResponse.onSuccess(authService.kakaoLogIn(socialLoginToken));
     }
 
@@ -50,6 +54,7 @@ public class AuthController {
     @GetMapping(value="/naver")
     @Operation(summary = "01-03-01🔑 web version API  naver 코드 발급 후 회원가입", description = "naver 코드를 발급 할 수 있음")
     public CommonResponse<UserRes.UserToken>  naverOauthRedirect(@RequestParam String code){
+        log.info("01-03-01 웹 버전 naver 로그인,회원가입");
         return CommonResponse.onSuccess(authService.getNaverOauthToken(code));
     }
 
@@ -57,6 +62,7 @@ public class AuthController {
     @Operation(summary= "01-03🔑 네이버 로그인" , description = "네이버 액세스 토큰 보내주기")
     @PostMapping(value="/naver")
     public CommonResponse<UserRes.UserToken> naverLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
+        log.info("01-03 네이버 로그인,회원가입 API");
         return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
     }
 
@@ -78,6 +84,7 @@ public class AuthController {
     @Operation(summary= "01-04🔑 회원 문자인증 요청", description = "회원 문자인증 용 API 입니다.")
     @PostMapping(value="/sms")
     public CommonResponse<UserRes.Sms> checkSms(@RequestBody @Valid UserReq.Sms sms){
+        log.info("01-04 비회원 문자인증 = " +sms.getPhone());
         String number = smsHelper.sendSms(sms.getPhone());
         return CommonResponse.onSuccess(new UserRes.Sms(number));
     }
@@ -85,6 +92,7 @@ public class AuthController {
     @Operation(summary="01-05🔑 유저 회원가입", description= "회원가입 용 API 입니다.")
     @PostMapping(value="/user")
     public CommonResponse<UserRes.UserToken> signUpUser(@RequestBody @Valid UserReq.SignUpUser signUpUser){
+        log.info("01-05 유저 회원가입 API");
         return CommonResponse.onSuccess(authService.signUpUser(signUpUser));
     }
 
@@ -92,6 +100,7 @@ public class AuthController {
     @Operation(summary="01-05-01🔑 유저 회원가입 이메일 검증용", description= "회원가입 용 API 입니다.")
     @PostMapping(value="/email")
     public CommonResponse<String> checkUserEmail(@RequestBody @Valid UserReq.UserEmail userEmail){
+        log.info("01-05-01 유저 회원가입 이메일 검증"+userEmail.getEmail());
         authService.checkUserEmail(userEmail);
         return CommonResponse.onSuccess("이메일 사용 가능");
     }
@@ -100,6 +109,7 @@ public class AuthController {
     @Operation(summary="01-05-02🔑 유저 회원가입 전화번호 인증용", description= "회원가입 용 API 입니다.")
     @PostMapping(value="/phone")
     public CommonResponse<String> checkUserPhone(@RequestBody @Valid UserReq.UserPhone userPhone){
+        log.info("01-05-01 유저 회원가입 전화번호 검증"+userPhone.getPhone());
         authService.checkUserPhone(userPhone);
         return CommonResponse.onSuccess("핸드폰 사용가능");
     }
@@ -108,6 +118,7 @@ public class AuthController {
     @Operation(summary="01-06🔑 유저 로그인", description= "회원가입 용 API 입니다.")
     @PostMapping(value="/logIn")
     public CommonResponse<UserRes.UserToken> logIn(@RequestBody @Valid UserReq.LogIn logIn){
+        log.info("01-06 유저 로그인 회원가입 API "+logIn.getEmail());
         return CommonResponse.onSuccess(authService.logIn(logIn));
     }
 
