@@ -14,7 +14,7 @@ import static java.lang.Integer.parseInt;
 @RequiredArgsConstructor
 public class OrderConvertor {
     private final OrderHelper orderHelper;
-    public DonationUser donationUser(NicePaymentAuth nicePaymentAuth, Long id, OrderReq.OrderDetail orderDetail) {
+    public DonationUser donationUser(NicePaymentAuth nicePaymentAuth, Long id, OrderReq.OrderDetail orderDetail, String inherenceNumber, String flameName) {
         return DonationUser.builder()
                 .userId(id)
                 .projectId(orderDetail.getProjectId())
@@ -23,6 +23,8 @@ public class OrderConvertor {
                 .orderId(nicePaymentAuth.getOrderId())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
                 .payMethod(orderHelper.getPayMethod(nicePaymentAuth.getPayMethod()))
+                .inherenceNumber(inherenceNumber)
+                .inherenceName(flameName)
                 .build();
     }
 }

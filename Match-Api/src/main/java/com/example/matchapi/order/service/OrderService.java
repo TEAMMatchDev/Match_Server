@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
@@ -61,22 +62,13 @@ public class OrderService {
 
         orderHelper.checkNicePaymentsResult(nicePaymentAuth);
 
-
-        DonationUser donationUser = orderConvertor.donationUser(nicePaymentAuth,user.getId() , orderDetail);
-
-        donationUser = donationUserRepository.save(donationUser);
-
-
-        String inherenceNumber =
-                        donationUser.getCreatedAt().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm"))
-                        +"."+ UUID.randomUUID();
+        String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) +"."+ UUID.randomUUID();
 
         String flameName = orderHelper.createFlameName(user.getName());
 
+        donationUserRepository.save(orderConvertor.donationUser(nicePaymentAuth,user.getId() , orderDetail, inherenceNumber, flameName));
 
-        donationUser.updateInherenceNumber(inherenceNumber,flameName);
 
-        donationUserRepository.save(donationUser);
 
 
         return flameName;
