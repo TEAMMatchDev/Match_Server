@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ import javax.validation.Valid;
 @RequestMapping("/order")
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @Tag(name = "04-Order💸",description = "NicePayment 결제 API")
 public class OrderController {
     private final OrderService orderService;
@@ -31,6 +33,7 @@ public class OrderController {
     @Operation(summary= "04-00 Order💸 결제 인증용 API 사용 X 테스트용",description = "결제 인증용 API 입니다 테스트 용")
     public CommonResponse<NicePaymentAuth> requestPayment(@RequestParam String tid,
                                                           @RequestParam Long amount){
+        log.info("04-00 Order 결제 인증 테스트용 API 결제 ID: " + tid + " 결제 금액 " +amount);
         return CommonResponse.onSuccess(orderService.authPayment(tid, amount));
     }
 
@@ -39,16 +42,17 @@ public class OrderController {
     @Operation(summary= "04-00 Order💸 결제 취소용 API 사용 X 테스트용",description = "결제 인증용 API 입니다 테스트 용")
     public CommonResponse<NicePaymentAuth> cancelPayment(@RequestParam String tid,
                                                           @RequestParam String orderId){
+        log.info("04-00 Order 결제 취소 테스트용 API 결제 ID: " + tid + " 주문 번호 " +orderId);
         return CommonResponse.onSuccess(orderService.cancelPayment(tid, orderId));
     }
+
     @PostMapping("/pay")
     @ApiErrorCodeExample({OtherServerErrorCode.class, UserAuthErrorCode.class, RequestErrorCode.class})
     @Operation(summary= "04-01 Order💸 결제 API 사용",description = "결제 API 입니다")
     public CommonResponse<String> requestPayment(
-            @Parameter(hidden = true) @AuthenticationPrincipal User user,
-            @Valid @RequestBody OrderReq.OrderDetail orderDetail){
-        orderService.requestPayment(user.getId(), orderDetail);
-        return CommonResponse.onSuccess("결제 성공");
+            @Parameter(hidden = true) @AuthenticationPrincipal User user, @Valid @RequestBody OrderReq.OrderDetail orderDetail){
+        log.info("04-03 Order 결제 인증용 API 결제 ID: " + orderDetail.getTid() + " 결제 금액 " + orderDetail.getAmount() +" 기부 프로젝트 ID : " + orderDetail.getProjectId());
+        return CommonResponse.onSuccess(orderService.requestPayment(user , orderDetail));
     }
 
 }
