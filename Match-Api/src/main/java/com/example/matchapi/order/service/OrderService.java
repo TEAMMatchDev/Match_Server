@@ -6,20 +6,17 @@ import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.properties.NicePayProperties;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
+import com.example.matchdomain.user.entity.User;
 import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
 import com.example.matchinfrastructure.pay.nice.dto.NicePayCancelRequest;
 import com.example.matchinfrastructure.pay.nice.dto.NicePayRequest;
 import com.example.matchinfrastructure.pay.nice.dto.NicePaymentAuth;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.UUID;
-
-import static com.example.matchcommon.constants.MatchStatic.BASIC;
 
 @RequiredArgsConstructor
 @Service
@@ -59,28 +56,29 @@ public class OrderService {
     }
 
     @Transactional
-    public void requestPayment(Long id, OrderReq.OrderDetail orderDetail) {
+    public String requestPayment(User user, OrderReq.OrderDetail orderDetail) {
         NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.paymentAuth(orderHelper.getNicePaymentAuthorizationHeader(), orderDetail.getTid(),new NicePayRequest(String.valueOf(orderDetail.getAmount())));
 
         orderHelper.checkNicePaymentsResult(nicePaymentAuth);
 
 
-        DonationUser donationUser = orderConvertor.donationUser(nicePaymentAuth,id,orderDetail);
+        DonationUser donationUser = orderConvertor.donationUser(nicePaymentAuth,user.getId() , orderDetail);
 
         donationUser = donationUserRepository.save(donationUser);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm");
-
 
         String inherenceNumber =
-                        donationUser.getCreatedAt().format(formatter)
+                        donationUser.getCreatedAt().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm"))
                         +"."+ UUID.randomUUID();
 
-        donationUser.updateInherenceNumber(inherenceNumber);
+        String flameName = orderHelper.createFlameName(user.getName());
+
+
+        donationUser.updateInherenceNumber(inherenceNumber,flameName);
 
         donationUserRepository.save(donationUser);
 
 
-
+        return flameName;
     }
 }

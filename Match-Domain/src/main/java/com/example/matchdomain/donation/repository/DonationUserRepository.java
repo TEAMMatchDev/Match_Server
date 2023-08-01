@@ -12,4 +12,5 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
     @EntityGraph(attributePaths = {"user"})
     List<DonationUser> findByUser(User user);
 
+    boolean existsByInherenceName(String randomName);
 }
