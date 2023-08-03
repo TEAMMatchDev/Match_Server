@@ -17,4 +17,5 @@ public class Authority {
     @Id
     @Column(name = "authorityName", length = 50)
     private String authorityName;
+
 }
