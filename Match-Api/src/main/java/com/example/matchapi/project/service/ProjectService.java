@@ -52,7 +52,6 @@ public class ProjectService {
 
     public ProjectRes.ProjectDetail getProjectDetail(Long projectId) {
         List<ProjectImage> projectImage = projectImageRepository.findByProjectId(projectId);
-        if(projectImage.isEmpty()) throw new BadRequestException(PROJECT_NOT_EXIST);
         return projectConvertor.projectImgList(projectImage);
     }
 }

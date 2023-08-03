@@ -1,5 +1,6 @@
 package com.example.matchapi.project.controller;
 
+import com.example.matchapi.config.aop.project.CheckProjectIdExist;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
@@ -33,10 +34,12 @@ public class ProjectController {
 
     @Operation(summary = "03-02💻 프로젝트 상세조회 API.",description = "프로젝트 상세조회 API 입니다.")
     @GetMapping("/{projectId}")
+    @CheckProjectIdExist
     @ApiErrorCodeExample({ProjectErrorCode.class})
     public CommonResponse<ProjectRes.ProjectDetail> getProject(@Parameter(description = "프로젝트 ID", example = "1")
-                                                     @PathVariable(required = true) Long projectId) {
+                                                                   @PathVariable(required = true)Long projectId) {
         log.info("03-02 프로젝트 상세 조회 projectId : "+projectId);
         return CommonResponse.onSuccess(projectService.getProjectDetail(projectId));
     }
+
 }
