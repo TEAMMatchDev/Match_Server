@@ -35,6 +35,7 @@ public class UserConvertor {
                 .birth(authHelper.birthConversion(kakaoUserInfoDto.getBirthYear(), kakaoUserInfoDto.getBirthDay()))
                 .gender(authHelper.genderConversion(kakaoUserInfoDto.getGender()))
                 .authorities(Collections.singleton(authority))
+                .role(AuthorityEnum.ROLE_USER)
                 .build();
     }
 
@@ -58,6 +59,7 @@ public class UserConvertor {
                 .birth(authHelper.birthConversion(naverUserInfoDto.getBirthyear(), naverUserInfoDto.getBirthday()))
                 .gender(authHelper.genderConversion(naverUserInfoDto.getGender()))
                 .authorities(Collections.singleton(authority))
+                .role(AuthorityEnum.ROLE_USER)
                 .build();
     }
 
@@ -73,6 +75,7 @@ public class UserConvertor {
                 .birth(authHelper.birthConversionToLocalDate(signUpUser.getBirthDate()))
                 .gender(signUpUser.getGender())
                 .authorities(Collections.singleton(authority))
+                .role(AuthorityEnum.ROLE_USER)
                 .build();
     }
 

@@ -1,6 +1,7 @@
-package com.example.matchapi.security;
+package com.example.adminapi.security;
 
 import com.example.matchcommon.properties.JwtProperties;
+import com.example.matchdomain.user.entity.AuthorityEnum;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import io.jsonwebtoken.*;
@@ -22,10 +23,9 @@ import java.security.Key;
 import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 
-import static com.example.matchapi.security.JwtFilter.AUTHORIZATION_HEADER;
-import static com.example.matchapi.security.JwtFilter.REFRESH_TOKEN_HEADER;
+import static com.example.adminapi.security.JwtFilter.AUTHORIZATION_HEADER;
+import static com.example.adminapi.security.JwtFilter.REFRESH_TOKEN_HEADER;
 
 @RequiredArgsConstructor
 @Component
@@ -85,6 +85,11 @@ public class JwtService {
 
             Long userId=claims.getBody().get("userId",Long.class);
             Optional<User> users = userRepository.findById(userId);
+
+            if(!users.get().getRole().equals(AuthorityEnum.ROLE_ADMIN)){
+                servletRequest.setAttribute("exception","NotAllowedAccess");
+                return null;
+            }
             return new UsernamePasswordAuthenticationToken(users.get(),"",users.get().getAuthorities());
         }catch(NoSuchElementException e){
             servletRequest.setAttribute("exception","NoSuchElementException");
@@ -118,7 +123,6 @@ public class JwtService {
             }
 
              */
-
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             servletRequest.setAttribute("exception","MalformedJwtException");
