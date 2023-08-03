@@ -28,3 +28,10 @@ nice:
   secret: ${NICE_SECRET_KEY}
   client: ${NICE_CLIENT_KEY}
   url: ${NICE_URL}
+
+aws:
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
+  s3:
+    bucket: ${AWS_S3_BUCKET}
+    base-url: ${AWS_S3_BASE_URL}
