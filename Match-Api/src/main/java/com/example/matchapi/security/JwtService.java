@@ -22,6 +22,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.example.matchapi.security.JwtFilter.AUTHORIZATION_HEADER;
 import static com.example.matchapi.security.JwtFilter.REFRESH_TOKEN_HEADER;
@@ -84,7 +85,6 @@ public class JwtService {
 
             Long userId=claims.getBody().get("userId",Long.class);
             Optional<User> users = userRepository.findById(userId);
-
             return new UsernamePasswordAuthenticationToken(users.get(),"",users.get().getAuthorities());
         }catch(NoSuchElementException e){
             servletRequest.setAttribute("exception","NoSuchElementException");
