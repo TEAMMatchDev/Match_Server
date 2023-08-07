@@ -14,17 +14,25 @@ import static java.lang.Integer.parseInt;
 @RequiredArgsConstructor
 public class OrderConvertor {
     private final OrderHelper orderHelper;
-    public DonationUser donationUser(NicePaymentAuth nicePaymentAuth, Long id, OrderReq.OrderDetail orderDetail, String inherenceNumber, String flameName) {
+    public DonationUser donationUser(NicePaymentAuth nicePaymentAuth, Long id, OrderReq.OrderDetail orderDetail, Long projectId, String flameName, String inherenceNumber) {
         return DonationUser.builder()
                 .userId(id)
-                .projectId(orderDetail.getProjectId())
+                .projectId(projectId)
                 .price(parseInt(String.valueOf(orderDetail.getAmount())))
                 .tid(nicePaymentAuth.getTid())
                 .orderId(nicePaymentAuth.getOrderId())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
                 .payMethod(orderHelper.getPayMethod(nicePaymentAuth.getPayMethod()))
-                .inherenceNumber(inherenceNumber)
                 .inherenceName(flameName)
+                .inherenceNumber(inherenceNumber)
                 .build();
+    }
+
+    public String createPlainText(OrderReq.RegistrationCard registrationCard) {
+        return "cardNo=" + registrationCard.getCardNo() + "&"
+                + "expYear=" + registrationCard.getExpYear() + "&"
+                + "expMonth=" + registrationCard.getExpMonth() + "&"
+                + "idNo=" + registrationCard.getIdNo() + "&"
+                + "cardPw=" + registrationCard.getCardPw();
     }
 }

@@ -84,7 +84,6 @@ public class JwtService {
 
             Long userId=claims.getBody().get("userId",Long.class);
             Optional<User> users = userRepository.findById(userId);
-
             return new UsernamePasswordAuthenticationToken(users.get(),"",users.get().getAuthorities());
         }catch(NoSuchElementException e){
             servletRequest.setAttribute("exception","NoSuchElementException");
@@ -105,10 +104,7 @@ public class JwtService {
             Long userId = claims.getBody().get("userId",Long.class);
 
             /*
-
             String expiredAt= redisService.getValues(token);
-
-
 
             if(expiredAt==null) return true;
 

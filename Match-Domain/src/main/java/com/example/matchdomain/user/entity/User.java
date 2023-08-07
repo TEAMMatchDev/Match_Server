@@ -71,9 +71,13 @@ public class User extends BaseEntity implements UserDetails {
     @JoinColumn(name = "userId")
     private List<DonationUser> donationUser = new ArrayList<>();
 
-
     @Column(name = "logInAt")
     private LocalDateTime logInAt;
+
+
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private AuthorityEnum role;
 
     @ManyToMany
     @JoinTable(
@@ -81,6 +85,7 @@ public class User extends BaseEntity implements UserDetails {
             joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "authorityName", referencedColumnName = "authorityName")})
     private Set<Authority> authorities;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

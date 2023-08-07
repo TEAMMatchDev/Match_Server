@@ -51,8 +51,7 @@ public class ProjectService {
     }
 
     public ProjectRes.ProjectDetail getProjectDetail(Long projectId) {
-        List<ProjectImage> projectImage = projectImageRepository.findByProjectId(projectId);
-        if(projectImage.isEmpty()) throw new BadRequestException(PROJECT_NOT_EXIST);
+        List<ProjectImage> projectImage = projectImageRepository.findByProjectIdAndImageRepresentStatusOrderBySequenceAsc(projectId, ImageRepresentStatus.NORMAL);
         return projectConvertor.projectImgList(projectImage);
     }
 }

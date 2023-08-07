@@ -3,9 +3,7 @@ package com.example.matchinfrastructure.pay.nice.client;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.config.NaverInfoConfig;
 import com.example.matchinfrastructure.pay.nice.config.NiceFeignConfiguration;
-import com.example.matchinfrastructure.pay.nice.dto.NicePayCancelRequest;
-import com.example.matchinfrastructure.pay.nice.dto.NicePayRequest;
-import com.example.matchinfrastructure.pay.nice.dto.NicePaymentAuth;
+import com.example.matchinfrastructure.pay.nice.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,4 +23,8 @@ public interface NiceAuthFeignClient {
                                   @PathVariable("tid") String tid,
                                   @RequestBody NicePayCancelRequest nicePayCancelRequest
                                   );
+
+    @PostMapping("/v1/subscribe/regist")
+    NicePayBillkeyResponse registrationCard(@RequestHeader(name = "Authorization") String Authorization,
+                                            @RequestBody NicePayRegistrationCardRequest nicePayRegistrationCardRequest);
 }
