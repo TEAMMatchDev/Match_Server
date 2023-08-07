@@ -38,7 +38,8 @@ public class ProjectController {
             @Valid @RequestPart("project") ProjectReq.Project project,
             @RequestPart("presentFile") MultipartFile presentFile,
             @RequestPart("multipartFiles") List<MultipartFile> multipartFiles){
-        if(!presentFile.isEmpty()||!multipartFiles.isEmpty()) throw new BadRequestException(FILE_UPLOAD_NOT_EMPTY);
+        if(presentFile.isEmpty()) throw new BadRequestException(FILE_UPLOAD_NOT_EMPTY);
+        if(multipartFiles.isEmpty()) throw new BadRequestException(FILE_UPLOAD_NOT_EMPTY);
         projectService.postProject(project, presentFile, multipartFiles);
         return CommonResponse.onSuccess("프로젝트 업로드 성공");
     }
