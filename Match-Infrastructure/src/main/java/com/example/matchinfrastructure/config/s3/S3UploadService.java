@@ -78,7 +78,7 @@ public class S3UploadService {
                 + fileExtension;
     }
 
-    public List<String> listUploadProjectFiles(List<MultipartFile> multipartFiles, Long projectId){
+    public List<String> listUploadProjectFiles(Long projectId,List<MultipartFile> multipartFiles){
         List<String> imgUrlList = new ArrayList<>();
 
         for (MultipartFile file : multipartFiles) {

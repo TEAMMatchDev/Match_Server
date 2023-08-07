@@ -22,6 +22,7 @@ public class CheckIdExistAspect {
     public void checkIdsExist(JoinPoint joinPoint) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         String[] parameterNames = methodSignature.getParameterNames();
+        System.out.println(Arrays.toString(parameterNames));
         Object[] args = joinPoint.getArgs();
 
         for (int i = 0; i < parameterNames.length; i++) {

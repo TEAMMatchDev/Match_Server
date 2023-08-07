@@ -22,7 +22,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 
 import static com.example.matchapi.security.JwtFilter.AUTHORIZATION_HEADER;
 import static com.example.matchapi.security.JwtFilter.REFRESH_TOKEN_HEADER;
@@ -105,10 +104,7 @@ public class JwtService {
             Long userId = claims.getBody().get("userId",Long.class);
 
             /*
-
             String expiredAt= redisService.getValues(token);
-
-
 
             if(expiredAt==null) return true;
 

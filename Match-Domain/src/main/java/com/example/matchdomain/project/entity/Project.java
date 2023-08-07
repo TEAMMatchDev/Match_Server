@@ -30,7 +30,7 @@ public class Project extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "projectName", nullable = false)
+    @Column(name = "projectName")
     private String projectName;
 
     @Column(name="projectExplanation")
