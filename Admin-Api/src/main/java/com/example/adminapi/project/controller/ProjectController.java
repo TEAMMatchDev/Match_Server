@@ -20,7 +20,7 @@ import java.util.List;
 public class ProjectController {
     private final ProjectService projectService;
     @Operation(summary = "03-01💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
-    @PostMapping(value = "/{projectId}", consumes = {"multipart/form-data"})
+    @PostMapping(value = "", consumes = {"multipart/form-data"})
     public CommonResponse<String> postProject(
             @ModelAttribute("project") ProjectReq.Project project,
             @ModelAttribute("presentFile") MultipartFile presentFile,
