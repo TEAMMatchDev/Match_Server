@@ -13,5 +13,4 @@ public class NicePayCancelRequest {
     private String reason;
 
     private String orderId;
-
 }

@@ -67,8 +67,7 @@ public class OrderController {
     @Operation(summary = "04-02 Order💸 정기 결제용 카드 등록 api",description = "정기 결제를 위한 카드 등록 API 입니다.")
     public CommonResponse<NicePayBillkeyResponse> registrationCard(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
-            @Valid @RequestBody OrderReq.RegistrationCard registrationCard
-            ){
+            @Valid @RequestBody OrderReq.RegistrationCard registrationCard){
 
         return CommonResponse.onSuccess(orderService.registrationCard(user,registrationCard));
     }

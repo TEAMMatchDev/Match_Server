@@ -8,6 +8,7 @@ import com.example.matchdomain.donation.entity.flameEnum.Adjective;
 import com.example.matchdomain.donation.entity.flameEnum.AdjectiveFlame;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
+import com.example.matchinfrastructure.pay.nice.dto.NicePayCancelRequest;
 import com.example.matchinfrastructure.pay.nice.dto.NicePaymentAuth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,15 +39,15 @@ public class OrderHelper {
         return BASIC + Base64.getEncoder().encodeToString((nicePayProperties.getClient() + ":" + nicePayProperties.getSecret()).getBytes());
     }
 
-    public void checkNicePaymentsResult(NicePaymentAuth nicePaymentAuth){
-        switch(nicePaymentAuth.getResultCode()){
+    public void checkNicePaymentsResult(String resultCode, String resultMessage) {
+        switch(resultCode){
             case "0000":
                 break;
             default:
                 throw new BaseException(HttpStatus.BAD_REQUEST,
                         false,
-                        nicePaymentAuth.getResultCode(),
-                        nicePaymentAuth.getResultMsg());
+                        resultCode,
+                        resultMessage);
         }
     }
 
@@ -64,5 +65,18 @@ public class OrderHelper {
         Random random = new Random();
         T[] values = enumClass.getEnumConstants();
         return values[random.nextInt(values.length)];
+    }
+
+    public void checkBillResult(String resultCode, String resultMsg, String tid, String orderId) {
+        switch(resultCode){
+            case "0000":
+                break;
+            default:
+                niceAuthFeignClient.cancelPayment(getNicePaymentAuthorizationHeader(), tid, new NicePayCancelRequest("결재 확인 완료 취소",orderId));
+                throw new BaseException(HttpStatus.BAD_REQUEST,
+                        false,
+                        resultCode,
+                        resultMsg);
+        }
     }
 }
