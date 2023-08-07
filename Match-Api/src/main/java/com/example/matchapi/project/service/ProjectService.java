@@ -39,9 +39,9 @@ public class ProjectService {
                     String imageUrl = result.getProjectImage().isEmpty() ? null : result.getProjectImage().get(0).getUrl();
                     projectLists.add(new ProjectRes.ProjectList(
                             result.getId(),
+                            imageUrl,
                             result.getProjectName(),
-                            result.getUsages(),
-                            imageUrl
+                            result.getUsages()
                     ));
                 }
         );
