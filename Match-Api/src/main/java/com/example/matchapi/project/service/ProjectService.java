@@ -51,7 +51,7 @@ public class ProjectService {
     }
 
     public ProjectRes.ProjectDetail getProjectDetail(Long projectId) {
-        List<ProjectImage> projectImage = projectImageRepository.findByProjectId(projectId);
+        List<ProjectImage> projectImage = projectImageRepository.findByProjectIdAndImageRepresentStatusOrderBySequenceAsc(projectId, ImageRepresentStatus.NORMAL);
         return projectConvertor.projectImgList(projectImage);
     }
 }

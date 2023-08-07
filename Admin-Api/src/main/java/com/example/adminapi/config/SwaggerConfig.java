@@ -16,24 +16,19 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import lombok.RequiredArgsConstructor;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.HandlerMethod;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Configuration
-@RequiredArgsConstructor
 public class SwaggerConfig {
     //jwt 토큰 인증을 위한 버튼까지 포함
-
-
-    private final ApplicationContext applicationContext;
-
     @Bean
     public OpenAPI openAPI() {
         Info info = new Info()
@@ -61,11 +56,6 @@ public class SwaggerConfig {
                 .addSecurityItem(addSecurityItem)
                 .info(info);
     }
-
-
-
-
-
 
 
     @Bean
