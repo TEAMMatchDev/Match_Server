@@ -60,10 +60,9 @@ public class ProjectConvertor {
                     projectList.add(
                             new ProjectRes.ProjectList(
                                     result.getProject().getId(),
+                                    imageUrl,
                                     result.getProject().getProjectName(),
-                                    result.getProject().getUsages(),
-                                    imageUrl
-                            )
+                                    result.getProject().getUsages())
                     );
                 }
 
