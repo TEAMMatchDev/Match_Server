@@ -8,6 +8,7 @@ import com.example.matchcommon.exception.InternalServerException;
 import com.example.matchcommon.properties.NicePayProperties;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
+import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.order.entity.UserBillingCard;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
@@ -35,12 +36,13 @@ public class OrderService {
     private final DonationUserRepository donationUserRepository;
     private final OrderConvertor orderConvertor;
     private final OrderHelper orderHelper;
+    private final RegularPaymentRepository regularPaymentRepository;
 
     public NicePaymentAuth authPayment(String tid, Long amount) {
         String authorizationHeader = orderHelper.getNicePaymentAuthorizationHeader();
         NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.paymentAuth(authorizationHeader, tid, new NicePayRequest(String.valueOf(amount)));
 
-        orderHelper.checkNicePaymentsResult(nicePaymentAuth);
+        orderHelper.checkNicePaymentsResult(nicePaymentAuth.getResultCode() , nicePaymentAuth.getResultMsg());
         return nicePaymentAuth;
     }
 
@@ -48,7 +50,7 @@ public class OrderService {
         String authorizationHeader = orderHelper.getNicePaymentAuthorizationHeader();
         NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.paymentAuth(authorizationHeader,orderDetail.getTid(), new NicePayRequest(String.valueOf(orderDetail.getAmount())));
 
-        orderHelper.checkNicePaymentsResult(nicePaymentAuth);
+        orderHelper.checkNicePaymentsResult(nicePaymentAuth.getResultCode() , nicePaymentAuth.getResultMsg());
 
         return null;
     }
@@ -59,7 +61,7 @@ public class OrderService {
     public NicePaymentAuth cancelPayment(String tid, String orderId) {
         NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.cancelPayment(orderHelper.getNicePaymentAuthorizationHeader(), tid, new NicePayCancelRequest("단순취소",orderId));
 
-        orderHelper.checkNicePaymentsResult(nicePaymentAuth);
+        orderHelper.checkNicePaymentsResult(nicePaymentAuth.getResultCode() , nicePaymentAuth.getResultMsg());
 
         return nicePaymentAuth;
     }
@@ -71,7 +73,7 @@ public class OrderService {
                 orderDetail.getTid(),
                 new NicePayRequest(String.valueOf(orderDetail.getAmount())));
 
-        orderHelper.checkNicePaymentsResult(nicePaymentAuth);
+        orderHelper.checkNicePaymentsResult(nicePaymentAuth.getResultCode() , nicePaymentAuth.getResultMsg());
 
         String flameName = orderHelper.createFlameName(user.getName());
 
@@ -82,6 +84,7 @@ public class OrderService {
         return flameName;
     }
 
+    @Transactional
     public NicePayBillkeyResponse registrationCard(User user, OrderReq.RegistrationCard registrationCard) {
         String encrypt = encrypt(orderConvertor.createPlainText(registrationCard), nicePayProperties.getSecret().substring(0, 32), nicePayProperties.getSecret().substring(0, 16));
         String orderId = createRandomUUID();
@@ -90,6 +93,13 @@ public class OrderService {
         NicePayBillkeyResponse nicePayBillkeyResponse = niceAuthFeignClient.registrationCard(
                 orderHelper.getNicePaymentAuthorizationHeader(),
                 new NicePayRegistrationCardRequest(encrypt,orderId,"A2"));
+
+        //나이스 카드 확인용
+        NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(),nicePayBillkeyResponse.getBid(), orderConvertor.niceBillOk(nicePayBillkeyResponse));
+
+        orderHelper.checkBillResult(niceBillOkResponse.getResultCode(), niceBillOkResponse.getResultMsg(), niceBillOkResponse.getTid(), niceBillOkResponse.getOrderId());
+
+        regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(),registrationCard,niceBillOkResponse,nicePayBillkeyResponse));
 
         return nicePayBillkeyResponse;
     }

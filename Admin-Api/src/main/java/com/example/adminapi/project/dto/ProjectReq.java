@@ -35,6 +35,8 @@ public class ProjectReq {
         @Enum(message = "ONE_TIME, REGULAR 둘 중 하나를 입력해 주세요 ONE_TIME = 일회성 후원, REGULAR = 정기 후원")
         @Schema(description = "프로젝트 기부 모금 종류 ONE_TIME, REGULAR 둘 중 하나를 입력해 주세요", required = true, example = "ONE_TIME")
         private RegularStatus regularStatus;
+
+        /*
         @Schema(description = "프로젝트 기부 시작 날짜입니다. pattern = yyyyMMddHHmmsss", required = true, example = "ONE_TIME")
         @NotNull(message = "기부 시작 날짜입니다.")
         @DateTimeFormat(pattern="yyyyMMddHHmmss")
@@ -43,6 +45,8 @@ public class ProjectReq {
         @NotNull(message = "기부 프로젝트 종류 날자를 입력해주세요")
         @DateTimeFormat(pattern="yyyyMMddHHmmss")
         private LocalDateTime endDate;
+
+         */
     }
 
     public static class ModifyProjectStatus {

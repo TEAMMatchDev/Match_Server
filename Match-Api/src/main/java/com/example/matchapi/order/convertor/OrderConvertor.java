@@ -5,7 +5,8 @@ import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchinfrastructure.pay.nice.dto.NicePaymentAuth;
+import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchinfrastructure.pay.nice.dto.*;
 import lombok.RequiredArgsConstructor;
 
 import static java.lang.Integer.parseInt;
@@ -34,5 +35,31 @@ public class OrderConvertor {
                 + "expMonth=" + registrationCard.getExpMonth() + "&"
                 + "idNo=" + registrationCard.getIdNo() + "&"
                 + "cardPw=" + registrationCard.getCardPw();
+    }
+
+    public NiceBillOkRequest niceBillOk(NicePayBillkeyResponse nicePayBillkeyResponse) {
+        return NiceBillOkRequest.builder()
+                .cardQuota(0)
+                .amount(10)
+                .goodsName("카드 확인 용 결제")
+                .useShopInterest(false)
+                .orderId(nicePayBillkeyResponse.getOrderId())
+                .build();
+    }
+
+    public RegularPayment RegularPayment(Long id, OrderReq.RegistrationCard registrationCard, NiceBillOkResponse niceBillOkResponse, NicePayBillkeyResponse nicePayBillkeyResponse) {
+        return RegularPayment.builder()
+                .userId(id)
+                .payDate(registrationCard.getPayDate())
+                .amount(registrationCard.getAmount())
+                .orderId(nicePayBillkeyResponse.getOrderId())
+                .bid(nicePayBillkeyResponse.getBid())
+                .cardNo(registrationCard.getCardNo())
+                .expYear(registrationCard.getExpYear())
+                .expMonth(registrationCard.getExpMonth())
+                .idNo(registrationCard.getIdNo())
+                .cardCode(nicePayBillkeyResponse.getCardCode())
+                .cardName(nicePayBillkeyResponse.getCardName())
+                .build();
     }
 }

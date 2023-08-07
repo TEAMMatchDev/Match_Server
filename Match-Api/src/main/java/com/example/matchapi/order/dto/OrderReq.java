@@ -29,6 +29,15 @@ public class OrderReq {
     @NoArgsConstructor
     @Schema(description = "04-02💸 정기 결제용 카드 등록 API Request")
     public static class RegistrationCard {
+
+        @NotEmpty(message = "정기 후원 금액을 입력해주세요")
+        @Schema(description = "1000",example = "결제 금액")
+        private int amount;
+
+        @NotEmpty(message = "정기 후원 날짜를 입력해주세요")
+        @Schema(description = "15", example = "결제 예정 날")
+        private String payDate;
+
         @NotEmpty(message = "카드 번호를 입력해주세요")
         @Schema(description = "카드 번호",example = "1234567890123456")
         private String cardNo;

@@ -27,4 +27,9 @@ public interface NiceAuthFeignClient {
     @PostMapping("/v1/subscribe/regist")
     NicePayBillkeyResponse registrationCard(@RequestHeader(name = "Authorization") String Authorization,
                                             @RequestBody NicePayRegistrationCardRequest nicePayRegistrationCardRequest);
+
+    @PostMapping("/v1/subscribe/{bid}/payments")
+    NiceBillOkResponse billOkRequest(@RequestHeader(name = "Authorization") String Authorization,
+                                     @PathVariable("bid") String bid,
+                                     @RequestBody NiceBillOkRequest niceBillOkRequest);
 }
