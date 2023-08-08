@@ -30,7 +30,7 @@ public class OrderReq {
     @Schema(description = "04-02💸 정기 결제용 카드 등록 API Request")
     public static class RegistrationCard {
 
-        @NotEmpty(message = "정기 후원 금액을 입력해주세요")
+        @NotNull(message = "정기 후원 금액을 입력해주세요")
         @Schema(description = "1000",example = "결제 금액")
         private int amount;
 

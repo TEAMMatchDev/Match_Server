@@ -14,12 +14,8 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @Getter
 @AllArgsConstructor
 public enum RegistrationCardErrorCode implements BaseErrorCode {
-    /*
-       인증 관련 에러코드
-    */
-
     @ExplainError("유저 권한이 없는 경우")
-    FAILED_ERROR_ENCRYPT(INTERNAL_SERVER_ERROR,"AUTH002", "해당 요청에 대한 권한이 없습니다.");
+    FAILED_ERROR_ENCRYPT(INTERNAL_SERVER_ERROR,"BILL001", "암호화에 실패했습니다.");
 
 
     private final HttpStatus httpStatus;

@@ -1,4 +1,4 @@
-package com.example.matchdomain.project.entity;
+package com.example.matchdomain.donation.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;

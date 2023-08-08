@@ -2,6 +2,7 @@ package com.example.matchdomain.user.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.UserCard;
 import com.example.matchdomain.project.entity.ProjectUserAttention;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -70,6 +71,11 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "userId")
     private List<DonationUser> donationUser = new ArrayList<>();
+
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "userId")
+    private List<UserCard> userCard = new ArrayList<>();
 
     @Column(name = "logInAt")
     private LocalDateTime logInAt;

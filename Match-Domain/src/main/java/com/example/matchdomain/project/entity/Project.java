@@ -2,9 +2,7 @@ package com.example.matchdomain.project.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
-import com.example.matchdomain.user.entity.SocialType;
-import com.example.matchdomain.user.entity.UserStatus;
+import com.example.matchdomain.donation.entity.RegularStatus;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -50,11 +48,6 @@ public class Project extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ProjectStatus projectStatus;
-
-    //정기 휴원 유무
-    @Enumerated(EnumType.STRING)
-    private RegularStatus regularStatus;
-
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "projectId")

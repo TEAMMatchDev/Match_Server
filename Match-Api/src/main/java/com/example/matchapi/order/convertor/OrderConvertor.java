@@ -3,9 +3,7 @@ package com.example.matchapi.order.convertor;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.annotation.Convertor;
-import com.example.matchdomain.donation.entity.DonationStatus;
-import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchdomain.donation.entity.*;
 import com.example.matchinfrastructure.pay.nice.dto.*;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +24,7 @@ public class OrderConvertor {
                 .payMethod(orderHelper.getPayMethod(nicePaymentAuth.getPayMethod()))
                 .inherenceName(flameName)
                 .inherenceNumber(inherenceNumber)
+                .regularStatus(RegularStatus.ONE_TIME)
                 .build();
     }
 
@@ -37,29 +36,47 @@ public class OrderConvertor {
                 + "cardPw=" + registrationCard.getCardPw();
     }
 
-    public NiceBillOkRequest niceBillOk(NicePayBillkeyResponse nicePayBillkeyResponse) {
+    public NiceBillOkRequest niceBillOk(NicePayBillkeyResponse nicePayBillkeyResponse, String orderId) {
         return NiceBillOkRequest.builder()
                 .cardQuota(0)
                 .amount(10)
                 .goodsName("카드 확인 용 결제")
                 .useShopInterest(false)
-                .orderId(nicePayBillkeyResponse.getOrderId())
+                .orderId(orderId)
                 .build();
     }
 
-    public RegularPayment RegularPayment(Long id, OrderReq.RegistrationCard registrationCard, NiceBillOkResponse niceBillOkResponse, NicePayBillkeyResponse nicePayBillkeyResponse) {
+    public RegularPayment RegularPayment(Long id, OrderReq.RegistrationCard registrationCard, Long userCardId) {
         return RegularPayment.builder()
                 .userId(id)
                 .payDate(registrationCard.getPayDate())
                 .amount(registrationCard.getAmount())
-                .orderId(nicePayBillkeyResponse.getOrderId())
+                .userCardId(userCardId)
+                .build();
+    }
+
+    public UserCard UserCard(Long id, OrderReq.RegistrationCard registrationCard, NicePayBillkeyResponse nicePayBillkeyResponse){
+        return UserCard.builder()
+                .userId(id)
                 .bid(nicePayBillkeyResponse.getBid())
                 .cardNo(registrationCard.getCardNo())
                 .expYear(registrationCard.getExpYear())
                 .expMonth(registrationCard.getExpMonth())
                 .idNo(registrationCard.getIdNo())
+                .cardPw(registrationCard.getCardPw())
                 .cardCode(nicePayBillkeyResponse.getCardCode())
                 .cardName(nicePayBillkeyResponse.getCardName())
+                .orderId(nicePayBillkeyResponse.getOrderId())
+                .build();
+    }
+
+    public RequestPaymentHistory recordHistory(Long userId, String orderId, String tid, int amount, String reason) {
+        return RequestPaymentHistory.builder()
+                .userId(userId)
+                .tid(tid)
+                .orderId(orderId)
+                .amount(amount)
+                .reason(reason)
                 .build();
     }
 }

@@ -1,19 +1,12 @@
 package com.example.adminapi.project.dto;
 
 import com.example.matchcommon.annotation.Enum;
-import com.example.matchdomain.project.entity.ImageRepresentStatus;
-import com.example.matchdomain.project.entity.RegularStatus;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
+import com.example.matchdomain.donation.entity.RegularStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.joda.time.LocalDateTime;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 public class ProjectReq {
     @Getter
