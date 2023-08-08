@@ -7,9 +7,11 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "RegularPayment")
+@Table(name = "UserCard")
 @Getter
 @Setter
 @Builder
@@ -17,7 +19,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-public class RegularPayment extends BaseEntity {
+public class UserCard extends BaseEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,15 +32,26 @@ public class RegularPayment extends BaseEntity {
     @Column(name="userId")
     private Long userId;
 
-    private String payDate;
+    @OneToMany(mappedBy = "userCard" ,fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<RegularPayment> regularPayment = new ArrayList<>();
 
-    //정기 결제 금액
-    private int amount;
+    //주문번호
+    private String orderId;
+    //빌키 번호
+    private String bid;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userCardId",nullable = false, insertable=false, updatable=false)
-    private UserCard userCard;
+    private String cardNo;
 
-    @Column(name="userCardId")
-    private Long userCardId;
+    private String expYear;
+
+    private String expMonth;
+
+    private String idNo;
+
+    private String cardPw;
+
+    private String cardCode;
+
+    private String cardName;
+
 }

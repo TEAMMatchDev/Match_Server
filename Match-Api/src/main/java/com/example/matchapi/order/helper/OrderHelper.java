@@ -25,7 +25,6 @@ public class OrderHelper {
     private final NiceAuthFeignClient niceAuthFeignClient;
     private final DonationUserRepository donationUserRepository;
 
-
     public PayMethod getPayMethod(String value) {
         for (PayMethod payMethod : PayMethod.values()) {
             if(payMethod.getValue().equalsIgnoreCase(value)){
@@ -70,13 +69,21 @@ public class OrderHelper {
     public void checkBillResult(String resultCode, String resultMsg, String tid, String orderId) {
         switch(resultCode){
             case "0000":
+                niceAuthFeignClient.cancelPayment(getNicePaymentAuthorizationHeader(), tid, new NicePayCancelRequest("결재 확인 완료 취소", orderId));
                 break;
             default:
-                niceAuthFeignClient.cancelPayment(getNicePaymentAuthorizationHeader(), tid, new NicePayCancelRequest("결재 확인 완료 취소",orderId));
                 throw new BaseException(HttpStatus.BAD_REQUEST,
                         false,
                         resultCode,
                         resultMsg);
         }
+    }
+
+    public String maskMiddleNum(String cardNo) {
+        String firstFourDigits = cardNo.substring(0, 4);
+        String lastFourDigits = cardNo.substring(12);
+        String middleDigitsMasked = "********";
+
+        return firstFourDigits + middleDigitsMasked + lastFourDigits;
     }
 }

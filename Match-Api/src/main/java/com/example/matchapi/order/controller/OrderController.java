@@ -1,16 +1,18 @@
 package com.example.matchapi.order.controller;
 
-import com.example.matchapi.config.aop.project.CheckProjectIdExist;
+import com.example.matchapi.config.aop.project.CheckIdExist;
 import com.example.matchapi.order.dto.OrderReq;
+import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
+import com.example.matchdomain.donation.exception.DeleteCardErrorCode;
+import com.example.matchdomain.order.exception.RegistrationCardErrorCode;
 import com.example.matchdomain.project.exception.ProjectErrorCode;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
-import com.example.matchinfrastructure.pay.nice.dto.NicePayBillkeyResponse;
 import com.example.matchinfrastructure.pay.nice.dto.NicePaymentAuth;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @RequestMapping("/order")
@@ -52,7 +55,7 @@ public class OrderController {
     @PostMapping("/pay/{projectId}")
     @ApiErrorCodeExample({OtherServerErrorCode.class, UserAuthErrorCode.class, RequestErrorCode.class, ProjectErrorCode.class})
     @Operation(summary= "04-01 Order💸 결제 API 사용",description = "결제 API 입니다")
-    @CheckProjectIdExist
+    @CheckIdExist
     public CommonResponse<String> requestPayment(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "프로젝트 ID", example = "1") @PathVariable("projectId") Long projectId,
@@ -63,14 +66,30 @@ public class OrderController {
 
 
     @PostMapping("/pay/card")
-    @ApiErrorCodeExample({UserAuthErrorCode.class, OtherServerErrorCode.class})
+    @ApiErrorCodeExample({UserAuthErrorCode.class, OtherServerErrorCode.class, RegistrationCardErrorCode.class})
     @Operation(summary = "04-02 Order💸 정기 결제용 카드 등록 api",description = "정기 결제를 위한 카드 등록 API 입니다.")
-    public CommonResponse<NicePayBillkeyResponse> registrationCard(
+    public CommonResponse<String> registrationCard(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Valid @RequestBody OrderReq.RegistrationCard registrationCard){
-
-        return CommonResponse.onSuccess(orderService.registrationCard(user,registrationCard));
+        orderService.registrationCard(user, registrationCard);
+        return CommonResponse.onSuccess("카드 등록 성공");
     }
 
+    @GetMapping("/pay/card")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    @Operation(summary = "04-03 Order💸 정기 결제용 카드 조회 api",description = "정기 결제를 위한 카드 조회 API 입니다..")
+    public CommonResponse<List<OrderRes.UserBillCard>> getUserBillCard(@Parameter(hidden = true) @AuthenticationPrincipal User user){
+        return CommonResponse.onSuccess(orderService.getUserBillCard(user));
+    }
+
+    @DeleteMapping("/pay/card/{cardId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, DeleteCardErrorCode.class})
+    @Operation(summary = "04-04 Order💸 정기 결제용 카드 삭제 api",description = "정기 결제를 위한 카드 삭제 API 입니다..")
+    @CheckIdExist
+    public CommonResponse<String> deleteBillCard(@Parameter(hidden = true) @AuthenticationPrincipal User user,
+                                                                      @Parameter(description = "카드 ID", example = "1") @PathVariable("cardId") Long cardId){
+        orderService.deleteBillCard(cardId);
+        return CommonResponse.onSuccess("삭제 성공");
+    }
 
 }

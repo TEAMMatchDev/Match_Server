@@ -55,6 +55,9 @@ public class DonationUser extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PayMethod payMethod;
 
+    @Enumerated(EnumType.STRING)
+    private RegularStatus regularStatus;
+
     public void updateInherenceNumber(String inherenceNumber, String flameName) {
         this.inherenceNumber = inherenceNumber;
         this.inherenceName = flameName;

@@ -1,5 +1,6 @@
 package com.example.matchapi.common;
 
+import com.example.matchapi.config.aop.project.CheckIdExist;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,5 +32,11 @@ public class TestController {
         String flameName = orderHelper.createFlameName(user.getName());
         System.out.println(flameName);
         return CommonResponse.onSuccess(flameName);
+    }
+
+    @CheckIdExist
+    @GetMapping("/{projectId}/{userId}/{donationId}")
+    public CommonResponse<String> getTest(@PathVariable Long projectId, @PathVariable Long userId, @PathVariable Long donationId){
+        return CommonResponse.onSuccess("성공");
     }
 }

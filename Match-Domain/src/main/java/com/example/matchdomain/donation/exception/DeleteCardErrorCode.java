@@ -1,4 +1,4 @@
-package com.example.matchdomain.order.exception;
+package com.example.matchdomain.donation.exception;
 
 import com.example.matchcommon.annotation.ExplainError;
 import com.example.matchcommon.dto.ErrorReason;
@@ -10,12 +10,15 @@ import org.springframework.http.HttpStatus;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.*;
+
 @Getter
 @AllArgsConstructor
-public enum RegistrationCardErrorCode implements BaseErrorCode {
-    @ExplainError("유저 권한이 없는 경우")
-    FAILED_ERROR_ENCRYPT(INTERNAL_SERVER_ERROR,"BILL001", "암호화에 실패했습니다.");
+public enum DeleteCardErrorCode implements BaseErrorCode {
+    @ExplainError("카드 아이디가 존재하지 않습니다")
+    CARD_NOT_EXIST(NOT_FOUND,"CARD001", "카드 ID 가 존재하지 않습니다."),
+    @ExplainError("카드 삭제 권한이 없습니다.")
+    CARD_NOT_CORRECT_USER(BAD_REQUEST,"CARD002","카드 소유자와 일치하지 않습니다. 삭제권한이 없습니다.");
 
 
     private final HttpStatus httpStatus;

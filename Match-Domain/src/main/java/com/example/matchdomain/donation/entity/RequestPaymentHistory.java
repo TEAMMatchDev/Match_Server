@@ -9,7 +9,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "RegularPaymentHistory")
+@Table(name = "RequestPaymentHistory")
 @Getter
 @Setter
 @Builder
@@ -17,7 +17,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-public class RegularPaymentHistory extends BaseEntity {
+//정기 결제 시도 내역 과 성공, 실패, 취소 저장 -> 실패 시 계속 시도해야 하므로
+public class RequestPaymentHistory extends BaseEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,18 +31,14 @@ public class RegularPaymentHistory extends BaseEntity {
     @Column(name="userId")
     private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requestPaymentId",nullable = false, insertable=false, updatable=false)
-    private RegularPayment requestPayment;
-
-    @Column(name="requestPaymentId")
-    private Long requestPaymentId;
-
-
     private String tid;
-
-    private int amount;
 
     private String orderId;
 
+    private int amount;
+
+    private String reason;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 }
