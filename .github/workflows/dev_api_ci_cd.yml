@@ -44,7 +44,7 @@ jobs:
           nice.client: ${{ secrets.NICE_CLIENT_KEY }}
           nice.url: ${{ secrets.NICE_DEV_URL}}
           aws.access-key: ${{ secrets.AWS_S3_ACCESS_KEY }}
-          aws.secret-key: ${{ secretes.AWS_S3_SECRET_KEY }}
+          aws.secret-key: ${{ secrets.AWS_S3_SECRET_KEY }}
           aws.s3.bucket: ${{ secretes.AWS_S3_BUCKET }}
           aws.s3.bucket-url: ${{ secrets.AWS_S3_BASE_URL }}
 
