@@ -1,16 +1,16 @@
 package com.example.matchinfrastructure.pay.nice.client;
 
-import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
-import com.example.matchinfrastructure.oauth.naver.config.NaverInfoConfig;
 import com.example.matchinfrastructure.pay.nice.config.NiceFeignConfiguration;
 import com.example.matchinfrastructure.pay.nice.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 @FeignClient(
         name = "NiceAuthFeignClient",
         url = "${nice.url}",
         configuration = NiceFeignConfiguration.class)
+@Component
 public interface NiceAuthFeignClient {
 
     @PostMapping("/v1/payments/{tid}")
