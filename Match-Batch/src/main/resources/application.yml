@@ -1,0 +1,49 @@
+server:
+  port: 9002
+  servlet:
+    context-path: /
+
+spring:
+  profiles:
+    include:
+      - infrastructure
+      - common
+    group:
+      dev: dev, domain-dev
+      prod: prod, domain-prod
+      local: local, domain
+      localDev: localDev, domain-localDev
+    mvc:
+      pathmatch:
+        matching-strategy: ant_path_matcher
+  batch:
+    job:
+      enabled: false
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "local"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "localDev"
+
