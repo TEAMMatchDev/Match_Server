@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +61,7 @@ public class AuthService {
     private final SmsHelper smsHelper;
 
 
+    @Transactional
     public UserRes.UserToken kakaoLogIn(UserReq.SocialLoginToken socialLoginToken) {
         KakaoUserInfoDto kakaoUserInfoDto = kakaoFeignClient.getInfo(BEARER + socialLoginToken.getAccessToken());
 
@@ -100,7 +102,8 @@ public class AuthService {
         return userRepository.save(user).getId();
     }
 
-    private Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
+    @Transactional
+    public Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
         return userRepository.save(userConvertor.NaverSignUpUser(naverUserInfoDto, NAVER, userConvertor.PostAuthority())).getId();
     }
     public KakaoLoginTokenRes getOauthToken(String code, String referer) {

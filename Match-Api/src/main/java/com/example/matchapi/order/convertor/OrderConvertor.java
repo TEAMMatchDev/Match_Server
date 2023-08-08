@@ -46,11 +46,11 @@ public class OrderConvertor {
                 .build();
     }
 
-    public RegularPayment RegularPayment(Long id, OrderReq.RegistrationCard registrationCard, Long userCardId) {
+    public RegularPayment RegularPayment(Long id, OrderReq.RegularDonation regularDonation, Long userCardId) {
         return RegularPayment.builder()
                 .userId(id)
-                .payDate(registrationCard.getPayDate())
-                .amount(registrationCard.getAmount())
+                .payDate(regularDonation.getPayDate())
+                .amount(regularDonation.getAmount())
                 .userCardId(userCardId)
                 .build();
     }

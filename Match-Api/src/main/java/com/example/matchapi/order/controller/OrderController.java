@@ -1,6 +1,6 @@
 package com.example.matchapi.order.controller;
 
-import com.example.matchapi.config.aop.project.CheckIdExist;
+import com.example.matchapi.common.project.CheckIdExist;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
@@ -90,6 +90,18 @@ public class OrderController {
                                                                       @Parameter(description = "카드 ID", example = "1") @PathVariable("cardId") Long cardId){
         orderService.deleteBillCard(cardId);
         return CommonResponse.onSuccess("삭제 성공");
+    }
+
+    @PostMapping("/pay/card/{cardId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, OtherServerErrorCode.class})
+    @Operation(summary = "04-05 Order💸 정기 결제 등록 api",description = "정기 결제 신청하기 API 입니다.")
+    @CheckIdExist
+    public CommonResponse<String> regularDonation(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "카드 id",example = "1") @PathVariable Long cardId,
+            @Valid @RequestBody OrderReq.RegularDonation regularDonation){
+        orderService.regularDonation(user, regularDonation, cardId);
+        return CommonResponse.onSuccess("정기 결제 등록 성공");
     }
 
 }

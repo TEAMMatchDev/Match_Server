@@ -32,7 +32,8 @@ public class UserCard extends BaseEntity {
     @Column(name="userId")
     private Long userId;
 
-    @OneToMany(mappedBy = "userCard" ,fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "userCardId")
     private List<RegularPayment> regularPayment = new ArrayList<>();
 
     //주문번호
