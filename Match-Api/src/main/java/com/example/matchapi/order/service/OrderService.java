@@ -16,7 +16,6 @@ import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
 import com.example.matchinfrastructure.pay.nice.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.binary.Hex;
-import org.hibernate.criterion.Order;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.example.matchcommon.constants.MatchStatic.BILL_TEST;
 import static com.example.matchdomain.order.exception.RegistrationCardErrorCode.FAILED_ERROR_ENCRYPT;
 
 @RequiredArgsConstructor
@@ -111,8 +109,6 @@ public class OrderService {
         //Billing Key 카드 저장
         UserCard userCard = userCardRepository.save(orderConvertor.UserCard(userId, registrationCard, nicePayBillkeyResponse));
 
-        //빌키 저장 후 정기 결제 내역 저장 bid orderId 저장 필요한가? 아니다. orderId 는 결제 시에 항상 새로 만들어줘야함
-        regularPaymentRepository.save(orderConvertor.RegularPayment(userId, registrationCard, userCard.getId()));
     }
 
 
@@ -153,7 +149,16 @@ public class OrderService {
         return userBillCards;
     }
 
+    @Transactional
     public void deleteBillCard(Long cardId) {
         userCardRepository.deleteById(cardId);
+    }
+
+
+    @Transactional
+    public void regularDonation(User user, OrderReq.RegularDonation regularDonation, Long cardId) {
+        //빌키 저장 후 정기 결제 내역 저장 bid orderId 저장 필요한가? 아니다. orderId 는 결제 시에 항상 새로 만들어줘야함
+        System.out.println(cardId);
+        regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId));
     }
 }

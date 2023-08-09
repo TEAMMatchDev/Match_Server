@@ -1,4 +1,4 @@
-package com.example.matchapi.config.aop.project;
+package com.example.matchapi.common.project;
 
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
@@ -26,7 +26,7 @@ import static com.example.matchdomain.project.exception.ProjectErrorCode.PROJECT
 public class CheckIdExistAspect {
     private final ProjectRepository projectRepository;
     private final UserCardRepository userCardRepository;
-    @Before("@annotation(com.example.matchapi.config.aop.project.CheckIdExist)")
+    @Before("@annotation(com.example.matchapi.common.project.CheckIdExist)")
     public void checkIdsExist(JoinPoint joinPoint) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         String[] parameterNames = methodSignature.getParameterNames();

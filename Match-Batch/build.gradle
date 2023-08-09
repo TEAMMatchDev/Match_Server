@@ -5,19 +5,22 @@ plugins {
 group 'com.example'
 version '0.0.1-SNAPSHOT'
 
-bootJar {
-    enabled = false
-}
-
-jar {
-    enabled = true
-}
-
 repositories {
     mavenCentral()
 }
 
+jar {
+    archivesBaseName = 'match-batch'
+}
+
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+
+    implementation project(':Match-Common')
+    implementation project(':Match-Domain')
+    implementation project(':Match-Infrastructure')
+
 }
 
 test {

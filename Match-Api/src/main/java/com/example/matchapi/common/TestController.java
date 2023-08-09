@@ -1,6 +1,6 @@
 package com.example.matchapi.common;
 
-import com.example.matchapi.config.aop.project.CheckIdExist;
+import com.example.matchapi.common.project.CheckIdExist;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
