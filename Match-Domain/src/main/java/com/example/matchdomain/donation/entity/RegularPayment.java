@@ -30,7 +30,7 @@ public class RegularPayment extends BaseEntity {
     @Column(name="userId")
     private Long userId;
 
-    private String payDate;
+    private int payDate;
 
     //정기 결제 금액
     private int amount;
