@@ -13,12 +13,9 @@ jar {
     archivesBaseName = 'match-batch'
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-batch'
+
 
     implementation project(':Match-Common')
     implementation project(':Match-Domain')
