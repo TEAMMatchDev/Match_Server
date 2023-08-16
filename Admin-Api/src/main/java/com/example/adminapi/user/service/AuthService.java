@@ -27,7 +27,7 @@ public class AuthService {
         User user=userRepository.findByUsername(logIn.getEmail()).orElseThrow(() -> new UnauthorizedException(NOT_EXIST_USER));
 
         if(!passwordEncoder.matches(logIn.getPassword(),user.getPassword())) throw new BadRequestException(NOT_CORRECT_PASSWORD);
-        if(user.getRole()!= AuthorityEnum.ROLE_ADMIN) throw new BadRequestException(NOT_AUTHORITY_USER);
+        //if(user.getRole()!= AuthorityEnum.ROLE_ADMIN) throw new BadRequestException(NOT_AUTHORITY_USER);
 
         Long userId = user.getId();
 
