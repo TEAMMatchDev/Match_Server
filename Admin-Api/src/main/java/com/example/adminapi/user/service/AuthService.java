@@ -31,6 +31,6 @@ public class AuthService {
 
         Long userId = user.getId();
 
-        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
     }
 }

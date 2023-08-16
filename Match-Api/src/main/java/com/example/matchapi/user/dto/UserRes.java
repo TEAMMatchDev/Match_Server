@@ -28,6 +28,16 @@ public class UserRes {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    public static class Token{
+        private String accessToken;
+
+        private String refreshToken;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class UserAddress {
         private Long id;
         private Long userId;
@@ -83,5 +93,12 @@ public class UserRes {
         @Schema(description = "관심있는 프로젝트 리스트", required = true, example = "프로젝트 리스트")
         private List<ProjectRes.ProjectList> projectList;
     }
-
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReIssueToken {
+        private String accessToken;
+    }
 }

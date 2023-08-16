@@ -8,8 +8,10 @@ import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.UnauthorizedException;
+import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
+import com.example.matchdomain.redis.repository.RefreshTokenRepository;
 import com.example.matchdomain.user.entity.Authority;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
@@ -59,6 +61,8 @@ public class AuthService {
     private final UserConvertor userConvertor;
     private final PasswordEncoder passwordEncoder;
     private final SmsHelper smsHelper;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtProperties jwtProperties;
 
 
     @Transactional
@@ -87,8 +91,17 @@ public class AuthService {
             authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
             userId = user.get().getId();
         }
+        
+        UserRes.Token token = createToken(userId);
+        
 
-        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
+    }
+
+    private UserRes.Token createToken(Long userId) {
+        UserRes.Token token =  jwtService.createTokens(userId);
+        refreshTokenRepository.save(userConvertor.RefreshToken(userId,token.getRefreshToken(),jwtProperties.getRefreshTokenSeconds()));
+        return token;
     }
 
 
@@ -136,7 +149,9 @@ public class AuthService {
 
         else userId = user.get().getId();
 
-        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+        UserRes.Token token = createToken(userId);
+        
+        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
     }
 
 
@@ -149,7 +164,10 @@ public class AuthService {
 
         Long userId = userRepository.save(userConvertor.SignUpUser(signUpUser,authority)).getId();
 
-        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+        UserRes.Token token = createToken(userId);
+
+
+        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
     }
 
     public void checkUserPhone(UserReq.UserPhone userPhone) {
@@ -167,8 +185,10 @@ public class AuthService {
 
         Long userId = user.getId();
 
+        UserRes.Token token = createToken(userId);
+
         //반환 값 아이디 추가
-        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
     }
 
     public KakaoUserAddressDto getKakaoAddress(String accessToken) {
