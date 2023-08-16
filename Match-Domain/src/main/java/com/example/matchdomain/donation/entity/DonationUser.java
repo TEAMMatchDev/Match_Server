@@ -62,4 +62,8 @@ public class DonationUser extends BaseEntity {
         this.inherenceNumber = inherenceNumber;
         this.inherenceName = flameName;
     }
+
+    public void updateDonationStatus(DonationStatus donationStatus) {
+        this.donationStatus = donationStatus;
+    }
 }

@@ -26,7 +26,7 @@ import static com.example.matchcommon.exception.errorcode.FileUploadException.FI
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/projects")
-@Tag(name = "03-Project💻", description = "프로젝트 관리r API 입니다.")
+@Tag(name = "03-Project💻", description = "프로젝트 관리 API 입니다.")
 public class ProjectController {
     private final ProjectService projectService;
     @Operation(summary = "03-01💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")

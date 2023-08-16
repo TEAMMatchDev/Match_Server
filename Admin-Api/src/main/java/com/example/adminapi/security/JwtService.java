@@ -85,11 +85,14 @@ public class JwtService {
 
             Long userId=claims.getBody().get("userId",Long.class);
             Optional<User> users = userRepository.findById(userId);
+            /*
 
             if(!users.get().getRole().equals(AuthorityEnum.ROLE_ADMIN)){
                 servletRequest.setAttribute("exception","NotAllowedAccess");
                 return null;
             }
+
+             */
             return new UsernamePasswordAuthenticationToken(users.get(),"",users.get().getAuthorities());
         }catch(NoSuchElementException e){
             servletRequest.setAttribute("exception","NoSuchElementException");

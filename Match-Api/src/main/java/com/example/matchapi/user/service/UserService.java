@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.matchdomain.donation.entity.DonationStatus.EXECUTION_REFUND;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -48,7 +50,7 @@ public class UserService {
     }
 
     public UserRes.MyPage getMyPage(User user) {
-        List<DonationUser> donationUser = donationUserRepository.findByUser(user);
+        List<DonationUser> donationUser = donationUserRepository.findByUserAndDonationStatusNot(user, EXECUTION_REFUND);
         List<ProjectUserAttention> projectList = projectUserAttentionRepository.findById_userIdAndProject_ProjectImage_imageRepresentStatusOrderByCreatedAt(user.getId(),ImageRepresentStatus.REPRESENT);
 
         return projectConvertor.getMyPage(donationUser,projectList);

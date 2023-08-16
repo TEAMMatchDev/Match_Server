@@ -32,4 +32,10 @@ public interface NiceAuthFeignClient {
     NiceBillOkResponse billOkRequest(@RequestHeader(name = "Authorization") String Authorization,
                                      @PathVariable("bid") String bid,
                                      @RequestBody NiceBillOkRequest niceBillOkRequest);
+
+    @PostMapping("/v1/subscribe/{bid}/expire")
+    NiceBillExpireResponse billKeyExpire(
+            @RequestHeader(name = "Authorization") String Authorization,
+            @PathVariable("bid") String bid,
+            @RequestBody NiceBillExpireRequest niceBillExpireRequest);
 }

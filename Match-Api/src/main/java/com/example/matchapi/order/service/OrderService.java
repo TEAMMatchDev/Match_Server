@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.matchdomain.order.exception.RegistrationCardErrorCode.FAILED_ERROR_ENCRYPT;
@@ -151,6 +152,9 @@ public class OrderService {
 
     @Transactional
     public void deleteBillCard(Long cardId) {
+        Optional<UserCard> userCard = userCardRepository.findById(cardId);
+        NiceBillExpireResponse niceBillExpireResponse = niceAuthFeignClient.billKeyExpire(orderHelper.getNicePaymentAuthorizationHeader(), userCard.get().getBid(), new NiceBillExpireRequest(createRandomUUID()));
+        System.out.println(niceBillExpireResponse.getResultCode() + niceBillExpireResponse.getResultMsg());
         userCardRepository.deleteById(cardId);
     }
 

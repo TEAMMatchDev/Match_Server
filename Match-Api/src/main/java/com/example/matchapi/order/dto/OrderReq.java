@@ -63,7 +63,7 @@ public class OrderReq {
         @Schema(description = "1000",example = "결제 금액")
         private int amount;
 
-        @NotEmpty(message = "정기 후원 날짜를 입력해주세요")
+        @NotNull(message = "정기 후원 날짜를 입력해주세요")
         @Schema(description = "15", example = "결제 예정 날")
         private int payDate;
 
