@@ -82,21 +82,17 @@ public class User extends BaseEntity implements UserDetails {
 
 
     @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private AuthorityEnum role;
-
-    @ManyToMany
-    @JoinTable(
-            name = "UserAuthority",
-            joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "authorityName", referencedColumnName = "authorityName")})
-    private Set<Authority> authorities;
+    private String role;
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        for(String role : role.split(","))
+            authorities.add(new SimpleGrantedAuthority(role));
+        return authorities;
     }
+
 
     @Override
     public String getPassword() {

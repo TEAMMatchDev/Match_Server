@@ -1,6 +1,6 @@
 package com.example.matchapi.order.controller;
 
-import com.example.matchapi.common.project.CheckIdExist;
+import com.example.matchapi.common.aop.CheckIdExist;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;

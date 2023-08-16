@@ -1,6 +1,6 @@
 package com.example.matchapi.project.controller;
 
-import com.example.matchapi.common.project.CheckIdExist;
+import com.example.matchapi.common.aop.CheckIdExist;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;

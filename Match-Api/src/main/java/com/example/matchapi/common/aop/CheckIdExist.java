@@ -1,4 +1,4 @@
-package com.example.matchapi.common.project;
+package com.example.matchapi.common.aop;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

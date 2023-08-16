@@ -16,7 +16,6 @@ public class ProjectConvertor {
                 .projectExplanation(projects.getDetail())
                 .usages(projects.getUsages())
                 .projectStatus(BEFORE_START)
-                .regularStatus(projects.getRegularStatus())
                 .viewCnt(0)
                 .build();
     }
