@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -26,8 +27,8 @@ public class ProjectController {
     private final ProjectService projectService;
     @Operation(summary = "03-01💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
     @GetMapping("")
-    public CommonResponse<PageResponse<List<ProjectRes.ProjectList>>> getProjectList(@Parameter(description = "페이지", example = "0") @RequestParam(required = true) @Min(value = 0) int page,
-                                                                                     @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true) int size) {
+    public CommonResponse<PageResponse<List<ProjectRes.ProjectList>>> getProjectList(@Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
+                                                                                     @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size) {
         log.info("03-01 프로젝트 리스트 조회");
         return CommonResponse.onSuccess(projectService.getProjectList(page, size));
     }
@@ -40,6 +41,18 @@ public class ProjectController {
                                                                    @PathVariable(required = true)Long projectId) {
         log.info("03-02 프로젝트 상세 조회 projectId : "+projectId);
         return CommonResponse.onSuccess(projectService.getProjectDetail(projectId));
+    }
+
+
+    @Operation(summary = "03-03💻 프로젝트 검색 조회",description = "프로젝트 검색 조회 API 입니다.")
+    @GetMapping("/search")
+    public CommonResponse<PageResponse<List<ProjectRes.ProjectList>>> searchProjectList(
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size,
+            @Parameter(description = "검색어")  @RequestParam("content") String content
+            ){
+        log.info("03-03 프로젝트 검색 조회 projectId : "+ content);
+        return CommonResponse.onSuccess(projectService.searchProjectList(content, page, size));
     }
 
 }

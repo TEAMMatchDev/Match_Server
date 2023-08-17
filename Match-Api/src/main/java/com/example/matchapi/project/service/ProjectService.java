@@ -2,11 +2,11 @@ package com.example.matchapi.project.service;
 
 import com.example.matchapi.project.convertor.ProjectConvertor;
 import com.example.matchapi.project.dto.ProjectRes;
-import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.project.entity.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.entity.ProjectImage;
+import com.example.matchdomain.project.entity.ProjectStatus;
 import com.example.matchdomain.project.repository.ProjectImageRepository;
 import com.example.matchdomain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.matchdomain.project.exception.ProjectErrorCode.PROJECT_NOT_EXIST;
-
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +28,7 @@ public class ProjectService {
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Project> projects = projectRepository.findByProjectImage_ImageRepresentStatusOrderByViewCnt(ImageRepresentStatus.REPRESENT,pageable);
+        Page<Project> projects = projectRepository.findByProjectStatusAndProjectImage_ImageRepresentStatusOrderByViewCnt(ProjectStatus.PROCEEDING , ImageRepresentStatus.REPRESENT,pageable);
 
         List<ProjectRes.ProjectList> projectLists = new ArrayList<>();
 
@@ -53,5 +51,28 @@ public class ProjectService {
     public ProjectRes.ProjectDetail getProjectDetail(Long projectId) {
         List<ProjectImage> projectImage = projectImageRepository.findByProjectIdAndImageRepresentStatusOrderBySequenceAsc(projectId, ImageRepresentStatus.NORMAL);
         return projectConvertor.projectImgList(projectImage);
+    }
+
+    public PageResponse<List<ProjectRes.ProjectList>> searchProjectList(String content, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Project> projects = projectRepository.findByProjectStatusOrProjectNameContainingOrUsagesContainingOrProjectExplanationContainingAndProjectImage_ImageRepresentStatusOrderByViewCnt(ProjectStatus.PROCEEDING,content,content,content,ImageRepresentStatus.REPRESENT,pageable);
+
+        List<ProjectRes.ProjectList> projectLists = new ArrayList<>();
+
+        projects.getContent().forEach(
+                result -> {
+                    String imageUrl = result.getProjectImage().isEmpty() ? null : result.getProjectImage().get(0).getUrl();
+                    projectLists.add(new ProjectRes.ProjectList(
+                            result.getId(),
+                            imageUrl,
+                            result.getProjectName(),
+                            result.getUsages()
+                    ));
+                }
+        );
+
+
+        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectLists);
     }
 }
