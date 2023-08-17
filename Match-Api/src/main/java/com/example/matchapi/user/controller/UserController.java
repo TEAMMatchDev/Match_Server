@@ -57,7 +57,7 @@ public class UserController {
     public CommonResponse<String> logOut(@Parameter(hidden = true) @AuthenticationPrincipal User user){
 
         log.info("logout");
-        log.info("api = logout 02-02");
+        log.info("api = logout 02-03");
 
         Long userId = user.getId();
 
@@ -74,13 +74,11 @@ public class UserController {
             @Parameter(description = "리프레쉬 토큰", required = true, in = ParameterIn.HEADER, name = "X-REFRESH-TOKEN", schema = @Schema(type = "string")) @RequestHeader("X-REFRESH-TOKEN") String refreshToken
     ){
         log.info("reIssue-token : "+refreshToken);
-        log.info("api = reIssue-token 02-01");
+        log.info("api = reIssue-token 02-04");
         Long userId=jwtService.getUserIdByRefreshToken(refreshToken);
         RefreshToken redisRefreshToken= refreshTokenRepository.findById(String.valueOf(userId)).orElseThrow(()-> new BadRequestException(INVALID_REFRESH_TOKEN));
 
         if(!redisRefreshToken.getToken().equals(refreshToken)) throw new BadRequestException(INVALID_REFRESH_TOKEN);
-
-
 
         UserRes.ReIssueToken tokenRes=new UserRes.ReIssueToken(jwtService.createToken(userId));
 

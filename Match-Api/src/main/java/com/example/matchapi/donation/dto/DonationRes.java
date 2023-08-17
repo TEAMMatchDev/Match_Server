@@ -2,6 +2,9 @@ package com.example.matchapi.donation.dto;
 
 import com.example.matchdomain.donation.entity.DonationStatus;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 public class DonationRes {
     @Getter
@@ -17,5 +20,22 @@ public class DonationRes {
         private String flameName;
 
         private String regularStatus;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class FlameList {
+        private Long donationId;
+
+        private String flameName;
+
+        private String donationStatus;
+
+        private int amount;
+
+        private String createdAt;
     }
 }
