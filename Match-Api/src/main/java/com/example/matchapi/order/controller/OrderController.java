@@ -54,6 +54,8 @@ public class OrderController {
     }
 
     @GetMapping("/serverAuth")
+    @Operation(summary= "04-01 Order💸 결제 인증용",description = "결제 요청용 API 입니다")
+
     public CommonResponse<String> requestPaymentAuth(
             @RequestParam String tid,
             @RequestParam Long amount){
