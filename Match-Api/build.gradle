@@ -18,6 +18,8 @@ dependencies {
     implementation project(':Match-Common')
     implementation project(':Match-Domain')
     implementation project(':Match-Infrastructure')
+    implementation 'org.springframework.boot:spring-boot-starter-mustache'
+
 
     implementation 'net.nurigo:sdk:4.3.0'
 

@@ -11,7 +11,10 @@ import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.donation.repository.RequestPaymentHistoryRepository;
 import com.example.matchdomain.donation.repository.UserCardRepository;
+import com.example.matchdomain.redis.entity.OrderRequest;
+import com.example.matchdomain.redis.repository.OrderRequestRepository;
 import com.example.matchdomain.user.entity.User;
+import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
 import com.example.matchinfrastructure.pay.nice.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +46,8 @@ public class OrderService {
     private final RegularPaymentRepository regularPaymentRepository;
     private final UserCardRepository userCardRepository;
     private final RequestPaymentHistoryRepository requestPaymentHistoryRepository;
+    private final OrderRequestRepository orderRequestRepository;
+    private final UserRepository userRepository;
 
     public NicePaymentAuth authPayment(String tid, Long amount) {
         String authorizationHeader = orderHelper.getNicePaymentAuthorizationHeader();
@@ -164,5 +169,38 @@ public class OrderService {
         //빌키 저장 후 정기 결제 내역 저장 bid orderId 저장 필요한가? 아니다. orderId 는 결제 시에 항상 새로 만들어줘야함
         System.out.println(cardId);
         regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId));
+    }
+
+    public String saveRequest(User user, Long projectId, String method) {
+        String orderId = createRandomUUID();
+
+        orderRequestRepository.save(orderConvertor.CreateRequest(user.getId(), projectId, orderId,method));
+
+        return orderId;
+    }
+
+    public OrderRequest getOrderRequest(String orderId) {
+        Optional<OrderRequest> orderRequest = orderRequestRepository.findById(orderId);
+        return orderRequest.get();
+
+    }
+
+    public void requestPaymentAuth(String tid, Long amount) {
+        NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.
+                paymentAuth(orderHelper.getNicePaymentAuthorizationHeader(),
+                        tid,
+                        new NicePayRequest(String.valueOf(amount)));
+
+        orderHelper.checkNicePaymentsResult(nicePaymentAuth.getResultCode(), nicePaymentAuth.getResultMsg());
+
+        Optional<OrderRequest> orderRequest = orderRequestRepository.findById(nicePaymentAuth.getOrderId());
+
+        Optional<User> user = userRepository.findById(Long.valueOf(orderRequest.get().getUserId()));
+
+        String flameName = orderHelper.createFlameName(user.get().getName());
+
+        String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
+
+        donationUserRepository.save(orderConvertor.donationUserV2(nicePaymentAuth, user.get().getId(), Math.toIntExact(amount), orderRequest.get().getProjectId(), flameName, inherenceNumber));
     }
 }

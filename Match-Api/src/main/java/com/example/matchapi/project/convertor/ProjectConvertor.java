@@ -42,6 +42,7 @@ public class ProjectConvertor {
                 .usages(projectImage.get(0).getProject().getUsages())
                 .projectImgList(projectImgList)
                 .donationAble(donationAble)
+                .kind(projectImage.get(0).getProject().getProjectKind().getValue())
                 .build();
     }
 
@@ -70,8 +71,9 @@ public class ProjectConvertor {
                                     result.getProject().getId(),
                                     imageUrl,
                                     result.getProject().getProjectName() ,
-                                    result.getProject().getUsages())
-                    );
+                                    result.getProject().getUsages(),
+                                    result.getProject().getProjectKind().getValue()
+                    ));
                 }
 
         );
