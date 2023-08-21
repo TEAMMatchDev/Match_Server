@@ -59,6 +59,10 @@ public class AuthHelper {
         return LocalDate.parse(birthDate, sourceFormatter);
     }
 
+    public boolean checkGuest(User user) {
+        return user != null;
+    }
+
     @FunctionalInterface
     private interface GenderResolver {
         Gender resolveGender(String gender);
