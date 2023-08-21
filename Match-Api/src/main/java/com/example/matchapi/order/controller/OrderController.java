@@ -43,6 +43,7 @@ public class OrderController {
 
     @PostMapping("/{projectId}")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
+    @Operation(summary= "04-00 Order💸 결제 요청용",description = "결제 요청용 API 입니다")
     @CheckIdExist
     public CommonResponse<String> requestPay(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
@@ -52,7 +53,14 @@ public class OrderController {
         return CommonResponse.onSuccess(orderId);
     }
 
-
+    @GetMapping("/serverAuth")
+    public CommonResponse<String> requestPaymentAuth(
+            @RequestParam String tid,
+            @RequestParam Long amount){
+        log.info("04-03 Order 결제 인증용 API 결제 ID: " + tid + " 결제 금액 " + amount);
+        orderService.requestPaymentAuth(tid, amount);
+        return CommonResponse.onSuccess("성공");
+    }
 
 
     @PostMapping("/test/pay")
