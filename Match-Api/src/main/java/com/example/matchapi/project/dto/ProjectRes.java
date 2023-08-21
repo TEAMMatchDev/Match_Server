@@ -20,6 +20,11 @@ public class ProjectRes {
         private String title;
         @Schema(description = "프로젝트 사용처", required = true, example = "프로젝트 사용처")
         private String usages;
+        /*
+        @Schema(description = "프로젝트 후원 분야",required = true, example = "kind")
+        private String kind;
+
+         */
     }
 
     @Getter
@@ -36,6 +41,8 @@ public class ProjectRes {
         private String title;
         @Schema(description = "프로젝트 사용처", required = true, example = "프로젝트 사용처")
         private String usages;
+        @Schema(description = "기부 가능 유무", required = true, example = "true")
+        private boolean donationAble;
     }
 
     @Getter
@@ -52,5 +59,14 @@ public class ProjectRes {
 
         @Schema(description = "이미지 순서", required = true, example = "1")
         private int sequence;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CommentList {
+        private Long commentId;
     }
 }
