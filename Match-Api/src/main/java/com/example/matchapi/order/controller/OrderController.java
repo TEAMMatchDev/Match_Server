@@ -8,10 +8,12 @@ import com.example.matchapi.order.service.OrderService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
+import com.example.matchcommon.properties.NicePayProperties;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchdomain.donation.exception.DeleteCardErrorCode;
 import com.example.matchdomain.order.exception.RegistrationCardErrorCode;
 import com.example.matchdomain.project.exception.ProjectErrorCode;
+import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import com.example.matchinfrastructure.pay.nice.dto.NicePaymentAuth;
@@ -21,10 +23,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 
 
 @RequestMapping("/order")
@@ -34,6 +38,22 @@ import java.util.List;
 @Tag(name = "04-Order💸",description = "NicePayment 결제 API")
 public class OrderController {
     private final OrderService orderService;
+    private final NicePayProperties nicePayProperties;
+
+
+    @PostMapping("/{projectId}")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    @CheckIdExist
+    public CommonResponse<String> requestPay(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "프로젝트 ID", example = "1") @PathVariable("projectId") Long projectId,
+            @Parameter @RequestParam("method") String method){
+        String orderId = orderService.saveRequest(user, projectId,method);
+        return CommonResponse.onSuccess(orderId);
+    }
+
+
+
 
     @PostMapping("/test/pay")
     @ApiErrorCodeExample(OtherServerErrorCode.class)
