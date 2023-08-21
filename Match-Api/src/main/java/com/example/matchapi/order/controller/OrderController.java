@@ -1,6 +1,7 @@
 package com.example.matchapi.order.controller;
 
 import com.example.matchapi.common.aop.CheckIdExist;
+import com.example.matchapi.common.aop.CheckProject;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
@@ -55,7 +56,7 @@ public class OrderController {
     @PostMapping("/pay/{projectId}")
     @ApiErrorCodeExample({OtherServerErrorCode.class, UserAuthErrorCode.class, RequestErrorCode.class, ProjectErrorCode.class})
     @Operation(summary= "04-01 Order💸 결제 API 사용",description = "결제 API 입니다")
-    @CheckIdExist
+    @CheckProject
     public CommonResponse<String> requestPayment(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "프로젝트 ID", example = "1") @PathVariable("projectId") Long projectId,
@@ -103,5 +104,4 @@ public class OrderController {
         orderService.regularDonation(user, regularDonation, cardId);
         return CommonResponse.onSuccess("정기 결제 등록 성공");
     }
-
 }

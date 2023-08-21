@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,8 @@ public class ProjectService {
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Project> projects = projectRepository.findByProjectStatusAndProjectImage_ImageRepresentStatusOrderByViewCnt(ProjectStatus.PROCEEDING , ImageRepresentStatus.REPRESENT,pageable);
+
+        Page<Project> projects = projectRepository.findByProjectStatusAndFinishedAtGreaterThanEqualAndProjectImage_ImageRepresentStatusOrderByViewCnt(ProjectStatus.PROCEEDING, LocalDateTime.now(), ImageRepresentStatus.REPRESENT, pageable);
 
         List<ProjectRes.ProjectList> projectLists = new ArrayList<>();
 
@@ -56,7 +58,7 @@ public class ProjectService {
     public PageResponse<List<ProjectRes.ProjectList>> searchProjectList(String content, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Project> projects = projectRepository.findByProjectStatusOrProjectNameContainingOrUsagesContainingOrProjectExplanationContainingAndProjectImage_ImageRepresentStatusOrderByViewCnt(ProjectStatus.PROCEEDING,content,content,content,ImageRepresentStatus.REPRESENT,pageable);
+        Page<Project> projects = projectRepository.findByProjectStatusAndFinishedAtGreaterThanOrProjectNameContainingOrUsagesContainingOrProjectExplanationContainingAndProjectImage_ImageRepresentStatusOrderByViewCnt(ProjectStatus.PROCEEDING,LocalDateTime.now(),content,content,content,ImageRepresentStatus.REPRESENT,pageable);
 
         List<ProjectRes.ProjectList> projectLists = new ArrayList<>();
 
@@ -74,5 +76,10 @@ public class ProjectService {
 
 
         return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectLists);
+    }
+
+    public PageResponse<List<ProjectRes.CommentList>> getProjectComment(Long projectId, int page, int size) {
+
+        return null;
     }
 }
