@@ -18,4 +18,15 @@ public class UserRes {
         @Schema(description = "리프레쉬 토큰", required = true, example = "asdkjanwjkldnjk----")
         private String refreshToken;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Token{
+        private String accessToken;
+
+        private String refreshToken;
+    }
 }

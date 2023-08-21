@@ -17,6 +17,8 @@ public class ProjectConvertor {
                 .usages(projects.getUsages())
                 .projectStatus(BEFORE_START)
                 .viewCnt(0)
+                .startedAt(projects.getStartDate())
+                .finishedAt(projects.getEndDate())
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package com.example.adminapi.security;
 
+import com.example.adminapi.user.dto.UserRes;
 import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchdomain.user.entity.AuthorityEnum;
 import com.example.matchdomain.user.entity.User;
@@ -173,5 +174,28 @@ public class JwtService {
     }
 
 
+    public UserRes.Token createTokens(Long userId){
+        Date now=new Date();
+        final Key encodedAccessKey = getSecretKey();
 
+        final Key encodedRefreshKey = getRefreshKey();
+
+        String accessToken = Jwts.builder()
+                .setHeaderParam("type","jwt")
+                .claim("userId",userId)
+                .setIssuedAt(now)
+                .setExpiration(new Date(System.currentTimeMillis()+jwtProperties.getAccessTokenSeconds()))
+                .signWith(encodedAccessKey)
+                .compact();
+
+        String refreshToken= Jwts.builder()
+                .setHeaderParam("type","refresh")
+                .claim("userId",userId)
+                .setIssuedAt(now)
+                .setExpiration(new Date(System.currentTimeMillis()+jwtProperties.getRefreshTokenSeconds()))
+                .signWith(encodedRefreshKey)
+                .compact();
+
+        return new UserRes.Token(accessToken,refreshToken);
+    }
 }
