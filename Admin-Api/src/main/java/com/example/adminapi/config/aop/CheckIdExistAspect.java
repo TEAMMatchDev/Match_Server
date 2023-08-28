@@ -9,7 +9,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
-import static com.example.matchdomain.project.exception.ProjectErrorCode.PROJECT_NOT_EXIST;
+import static com.example.matchdomain.project.exception.ProjectOneTimeErrorCode.PROJECT_NOT_EXIST;
 
 @Component
 @Aspect

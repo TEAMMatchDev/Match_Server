@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Configuration;
         JwtProperties.class,
         NaverProperties.class,
         CoolSmsProperties.class,
-        NicePayProperties.class
+        NicePayProperties.class,
+        RedisProperties.class
 })
 @Configuration
 public class ConfigurationPropertiesConfig {}

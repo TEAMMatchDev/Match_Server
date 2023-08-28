@@ -68,4 +68,18 @@ public class OrderReq {
         private int payDate;
 
     }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Schema(description = "04-06💸 단기 결제용 카드 결제 API Request")
+    public static class OneTimeDonation {
+
+        @NotNull(message = "정기 후원 금액을 입력해주세요")
+        @Schema(description = "1000",example = "결제 금액")
+        private int amount;
+
+
+    }
 }

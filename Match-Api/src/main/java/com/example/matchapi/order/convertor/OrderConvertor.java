@@ -4,6 +4,7 @@ import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchinfrastructure.pay.nice.dto.*;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +19,20 @@ public class OrderConvertor {
                 .userId(id)
                 .projectId(projectId)
                 .price(parseInt(String.valueOf(orderDetail.getAmount())))
+                .tid(nicePaymentAuth.getTid())
+                .orderId(nicePaymentAuth.getOrderId())
+                .donationStatus(DonationStatus.EXECUTION_BEFORE)
+                .payMethod(orderHelper.getPayMethod(nicePaymentAuth.getPayMethod()))
+                .inherenceName(flameName)
+                .inherenceNumber(inherenceNumber)
+                .regularStatus(RegularStatus.ONE_TIME)
+                .build();
+    }
+    public DonationUser donationUserV2(NicePaymentAuth nicePaymentAuth, Long id, int amount, String projectId, String flameName, String inherenceNumber) {
+        return DonationUser.builder()
+                .userId(id)
+                .projectId(Long.valueOf(projectId))
+                .price(amount)
                 .tid(nicePaymentAuth.getTid())
                 .orderId(nicePaymentAuth.getOrderId())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
@@ -46,7 +61,7 @@ public class OrderConvertor {
                 .build();
     }
 
-    public RegularPayment RegularPayment(Long id, OrderReq.RegularDonation regularDonation, Long userCardId) {
+    public RegularPayment RegularPayment(Long id, OrderReq.RegularDonation regularDonation, Long userCardId, Long projectId) {
         return RegularPayment.builder()
                 .userId(id)
                 .payDate(regularDonation.getPayDate())
@@ -77,6 +92,40 @@ public class OrderConvertor {
                 .orderId(orderId)
                 .amount(amount)
                 .reason(reason)
+                .build();
+    }
+
+    public OrderRequest CreateRequest(Long userId, Long projectId, String orderId) {
+        return OrderRequest.builder()
+                .userId(String.valueOf(userId))
+                .projectId(String.valueOf(projectId))
+                .orderId(orderId)
+                .ttl(2000L)
+                .build();
+    }
+
+    public NiceBillOkRequest billCardOneTime(int amount, String orderId) {
+        return NiceBillOkRequest.builder()
+                .cardQuota(0)
+                .amount(amount)
+                .goodsName("매치 기부금 결제")
+                .useShopInterest(false)
+                .orderId(orderId)
+                .build();
+    }
+
+    public DonationUser donationBillUser(NiceBillOkResponse niceBillOkResponse, Long id, int amount, Long projectId, String flameName, String inherenceNumber, RegularStatus regularStatus) {
+        return DonationUser.builder()
+                .userId(id)
+                .projectId(projectId)
+                .price(amount)
+                .tid(niceBillOkResponse.getTid())
+                .orderId(niceBillOkResponse.getOrderId())
+                .donationStatus(DonationStatus.EXECUTION_BEFORE)
+                .payMethod(orderHelper.getPayMethod(niceBillOkResponse.getPayMethod()))
+                .inherenceName(flameName)
+                .inherenceNumber(inherenceNumber)
+                .regularStatus(regularStatus)
                 .build();
     }
 }

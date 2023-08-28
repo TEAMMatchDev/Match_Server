@@ -32,7 +32,7 @@ subprojects{
 
     // 공통적으로 사용하는 dependencies
     dependencies {
-
+        implementation 'org.springframework.boot:spring-boot-starter-data-redis'
         // swagger dependency
         implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
 

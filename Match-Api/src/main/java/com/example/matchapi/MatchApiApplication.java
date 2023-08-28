@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 @ComponentScan(basePackages = {"com.example.matchapi","com.example.matchdomain","com.example.matchinfrastructure", "com.example.matchcommon"})
 @OpenAPIDefinition(servers = {@Server(url = "${server.servlet.context-path}", description = "Default Server URL")})
 @RequiredArgsConstructor
+@EnableCaching
 @Slf4j
 public class MatchApiApplication implements ApplicationListener<ApplicationReadyEvent>  {
 

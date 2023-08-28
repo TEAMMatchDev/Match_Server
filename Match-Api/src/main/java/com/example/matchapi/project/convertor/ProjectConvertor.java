@@ -5,14 +5,18 @@ import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.project.entity.Project;
+import com.example.matchdomain.project.entity.ProjectComment;
 import com.example.matchdomain.project.entity.ProjectImage;
 import com.example.matchdomain.project.entity.ProjectUserAttention;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
+import static com.example.matchdomain.project.entity.ProjectStatus.PROCEEDING;
 
 @Convertor
 @RequiredArgsConstructor
@@ -20,6 +24,10 @@ public class ProjectConvertor {
     private final ProjectHelper projectHelper;
     public ProjectRes.ProjectDetail projectImgList(List<ProjectImage> projectImage) {
         List<ProjectRes.ProjectImgList> projectImgList = new ArrayList<>();
+
+        boolean donationAble = projectHelper.checkDonationAble(projectImage.get(0).getProject());
+
+
         projectImage.forEach(
                 result -> projectImgList.add(
                         new ProjectRes.ProjectImgList(
@@ -34,6 +42,9 @@ public class ProjectConvertor {
                 .title(projectImage.get(0).getProject().getProjectName())
                 .usages(projectImage.get(0).getProject().getUsages())
                 .projectImgList(projectImgList)
+                .donationAble(donationAble)
+                .kind(projectImage.get(0).getProject().getProjectKind().getValue())
+                .regularStatus(projectImage.get(0).getProject().getRegularStatus().getValue())
                 .build();
     }
 
@@ -61,9 +72,11 @@ public class ProjectConvertor {
                             new ProjectRes.ProjectList(
                                     result.getProject().getId(),
                                     imageUrl,
-                                    result.getProject().getProjectName(),
-                                    result.getProject().getUsages())
-                    );
+                                    result.getProject().getProjectName() ,
+                                    result.getProject().getUsages(),
+                                    result.getProject().getProjectKind().getValue(),
+                                    false
+                    ));
                 }
 
         );
@@ -80,4 +93,14 @@ public class ProjectConvertor {
     }
 
 
+    public ProjectRes.CommentList projectComment(Long userId, ProjectComment result) {
+        return ProjectRes.CommentList.builder()
+                .commentId(result.getId())
+                .comment(result.getComment())
+                .commentDate(result.getCreatedAt().getDayOfYear()+"."+result.getCreatedAt().getDayOfMonth()+"."+result.getCreatedAt().getDayOfYear()+". " + result.getCreatedAt().getHour()+":"+result.getCreatedAt().getMinute())
+                .nickname(result.getUser().getNickname())
+                .userId(result.getUserId())
+                .isMy(result.getUserId().equals(userId))
+                .build();
+    }
 }

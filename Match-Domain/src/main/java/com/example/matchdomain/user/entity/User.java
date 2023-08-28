@@ -43,6 +43,8 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "name")
     private String name;
 
+    private String nickname;
+
     @Column(name = "email")
     private String email;
 

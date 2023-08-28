@@ -12,10 +12,12 @@ import java.util.Objects;
 
 @Getter
 @AllArgsConstructor
-public enum ProjectErrorCode implements BaseErrorCode {
+public enum ProjectRegualrErrorCode implements BaseErrorCode {
 
     @ExplainError("해당 프로젝트가 존재하지 않습니다.")
-    PROJECT_NOT_EXIST(HttpStatus.BAD_REQUEST,false,"PROJECT001","해당 프로젝트가 존재하지 않습니다.");
+    PROJECT_NOT_EXIST(HttpStatus.BAD_REQUEST,false,"PROJECT001","해당 프로젝트가 존재하지 않습니다."),
+    PROJECT_NOT_DONATION_STATUS(HttpStatus.BAD_REQUEST,false, "PROJECT002","해당 프로젝트는 기부 기한이 지났거나 마감되어 진행할 수 없습니다."),
+    PROJECT_NOT_REGULAR_STATUS(HttpStatus.BAD_REQUEST,false, "PROJECT003","해당 프로젝트는 정기 프로젝트 입니다.");
     private final HttpStatus httpStatus;
     private final boolean isSuccess;
     private final String code;

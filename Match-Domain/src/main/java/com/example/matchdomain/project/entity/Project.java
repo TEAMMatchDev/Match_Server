@@ -49,6 +49,12 @@ public class Project extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProjectStatus projectStatus;
 
+    @Enumerated(EnumType.STRING)
+    private ProjectKind projectKind;
+
+    @Enumerated(EnumType.STRING)
+    private RegularStatus regularStatus;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "projectId")
     private List<DonationUser> donationUser = new ArrayList<>();

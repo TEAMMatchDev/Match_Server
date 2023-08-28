@@ -5,6 +5,7 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.UserHelper;
 import com.example.matchcommon.annotation.Convertor;
+import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
@@ -99,6 +100,14 @@ public class UserConvertor {
                 .addressPhoneNumber(shippingAddresses.getReceiverPhoneNumber1())
                 .zoneNumber(shippingAddresses.getZoneNumber())
                 .zipCode(shippingAddresses.getZipCode())
+                .build();
+    }
+
+    public RefreshToken RefreshToken(Long userId, String refreshToken, Long refreshTokenSeconds) {
+        return RefreshToken.builder()
+                .userId(String.valueOf(userId))
+                .token(refreshToken)
+                .ttl(refreshTokenSeconds)
                 .build();
     }
 }
