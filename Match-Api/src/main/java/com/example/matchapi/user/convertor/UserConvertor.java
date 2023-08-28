@@ -1,5 +1,6 @@
 package com.example.matchapi.user.convertor;
 
+import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.helper.AuthHelper;
@@ -111,5 +112,12 @@ public class UserConvertor {
                 .token(refreshToken)
                 .ttl(refreshTokenSeconds)
                 .build();
+    }
+
+    public OrderRes.UserDetail userInfo(User user) {
+        return OrderRes.UserDetail.builder()
+                .name(user.getName())
+                .birthDay(user.getBirth().toString())
+                .phoneNumber(user.getPhoneNumber()).build();
     }
 }

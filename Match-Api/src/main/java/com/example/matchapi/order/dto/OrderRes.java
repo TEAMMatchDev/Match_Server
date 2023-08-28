@@ -9,7 +9,7 @@ public class OrderRes {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    @Schema(description = "04-03💸 정기 결제용 카드 조회 API Request")
+    @Schema(description = "04-03💸 정기 결제용 카드 조회 API Response")
     public static class UserBillCard {
         private Long id;
 
@@ -18,5 +18,18 @@ public class OrderRes {
         private String cardName;
 
         private String cardNo;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Schema(description = "04-06💸 후원자 정보조회 API  API Response")
+    public static class UserDetail {
+        private String name;
+
+        private String birthDay;
+
+        private String phoneNumber;
     }
 }

@@ -6,6 +6,7 @@ import com.example.matchapi.common.aop.CheckRegularProject;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
+import com.example.matchapi.user.service.UserService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
@@ -37,6 +38,7 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     private final NicePayProperties nicePayProperties;
+    private final UserService userService;
 
 
     @PostMapping("/{projectId}")
@@ -147,6 +149,15 @@ public class OrderController {
             @Valid @RequestBody OrderReq.OneTimeDonation oneTimeDonation){
         orderService.oneTimeDonationCard(user, oneTimeDonation, cardId, projectId);
         return CommonResponse.onSuccess("단기 결제 성공");
+    }
+
+    @PostMapping("/user")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    @Operation(summary = "04-07 Order💸 후원자 정보조회",description = "후원자 정보조회 API 입니다..")
+    public CommonResponse<OrderRes.UserDetail> getUserInfo(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user
+            ){
+        return CommonResponse.onSuccess(userService.getUserInfo(user));
     }
 
 }
