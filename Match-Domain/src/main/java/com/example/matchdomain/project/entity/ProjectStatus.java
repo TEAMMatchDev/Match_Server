@@ -7,9 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ProjectStatus {
     //진행중
-    BEFORE_START("PROCEEDING","기부 시작 전"),
+    BEFORE_START("BEFORE_START","기부 시작 전"),
     //시작 전
-    PROCEEDING("BEFORE_START","기부 진행 중"),
+    PROCEEDING("PROCEEDING","기부 진행 중"),
     //마감
     DEADLINE("DEADLINE","기부 마감");
 

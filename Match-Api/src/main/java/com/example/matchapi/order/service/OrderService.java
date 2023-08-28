@@ -6,6 +6,7 @@ import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.exception.InternalServerException;
 import com.example.matchcommon.properties.NicePayProperties;
+import com.example.matchdomain.donation.entity.RegularStatus;
 import com.example.matchdomain.donation.entity.UserCard;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
@@ -26,6 +27,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -165,16 +167,46 @@ public class OrderService {
 
 
     @Transactional
-    public void regularDonation(User user, OrderReq.RegularDonation regularDonation, Long cardId) {
-        //빌키 저장 후 정기 결제 내역 저장 bid orderId 저장 필요한가? 아니다. orderId 는 결제 시에 항상 새로 만들어줘야함
-        System.out.println(cardId);
-        regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId));
-    }
+    public void regularDonation(User user, OrderReq.RegularDonation regularDonation, Long cardId, Long projectId) {
 
-    public String saveRequest(User user, Long projectId, String method) {
+        Optional<UserCard> card = userCardRepository.findById(cardId);
+
         String orderId = createRandomUUID();
 
-        orderRequestRepository.save(orderConvertor.CreateRequest(user.getId(), projectId, orderId,method));
+        NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(), card.get().getBid(), orderConvertor.billCardOneTime(regularDonation.getAmount(),orderId));
+
+        orderHelper.checkNicePaymentsResult(niceBillOkResponse.getResultCode(), niceBillOkResponse.getResultMsg());
+
+        String flameName = orderHelper.createFlameName(user.getName());
+
+        String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
+
+        donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR));
+
+        regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId, projectId));
+    }
+
+    @Transactional
+    public void oneTimeDonationCard(User user, OrderReq.@Valid OneTimeDonation oneTimeDonation, Long cardId, Long projectId) {
+        Optional<UserCard> card = userCardRepository.findById(cardId);
+
+        String orderId = createRandomUUID();
+
+        NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(), card.get().getBid(), orderConvertor.billCardOneTime(oneTimeDonation.getAmount(),orderId));
+
+        orderHelper.checkNicePaymentsResult(niceBillOkResponse.getResultCode(), niceBillOkResponse.getResultMsg());
+
+        String flameName = orderHelper.createFlameName(user.getName());
+
+        String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
+
+        donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME));
+    }
+
+    public String saveRequest(User user, Long projectId) {
+        String orderId = createRandomUUID();
+
+        orderRequestRepository.save(orderConvertor.CreateRequest(user.getId(), projectId, orderId));
 
         return orderId;
     }
@@ -203,4 +235,5 @@ public class OrderService {
 
         donationUserRepository.save(orderConvertor.donationUserV2(nicePaymentAuth, user.get().getId(), Math.toIntExact(amount), orderRequest.get().getProjectId(), flameName, inherenceNumber));
     }
+
 }

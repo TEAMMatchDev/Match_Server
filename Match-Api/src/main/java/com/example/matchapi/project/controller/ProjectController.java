@@ -4,7 +4,7 @@ import com.example.matchapi.common.aop.CheckIdExist;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
-import com.example.matchdomain.project.exception.ProjectErrorCode;
+import com.example.matchdomain.project.exception.ProjectOneTimeErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.user.entity.User;
@@ -17,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -40,7 +39,7 @@ public class ProjectController {
     @Operation(summary = "03-02💻 프로젝트 상세조회 API.",description = "프로젝트 상세조회 API 입니다.")
     @GetMapping("/{projectId}")
     @CheckIdExist
-    @ApiErrorCodeExample({ProjectErrorCode.class})
+    @ApiErrorCodeExample({ProjectOneTimeErrorCode.class})
     public CommonResponse<ProjectRes.ProjectDetail> getProject(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "프로젝트 ID", example = "1") @PathVariable(required = true)Long projectId) {

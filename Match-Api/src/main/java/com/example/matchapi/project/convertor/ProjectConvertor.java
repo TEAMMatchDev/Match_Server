@@ -6,6 +6,7 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.project.entity.Project;
+import com.example.matchdomain.project.entity.ProjectComment;
 import com.example.matchdomain.project.entity.ProjectImage;
 import com.example.matchdomain.project.entity.ProjectUserAttention;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,7 @@ public class ProjectConvertor {
                 .projectImgList(projectImgList)
                 .donationAble(donationAble)
                 .kind(projectImage.get(0).getProject().getProjectKind().getValue())
+                .regularStatus(projectImage.get(0).getProject().getRegularStatus().getValue())
                 .build();
     }
 
@@ -72,7 +74,8 @@ public class ProjectConvertor {
                                     imageUrl,
                                     result.getProject().getProjectName() ,
                                     result.getProject().getUsages(),
-                                    result.getProject().getProjectKind().getValue()
+                                    result.getProject().getProjectKind().getValue(),
+                                    false
                     ));
                 }
 
@@ -90,4 +93,14 @@ public class ProjectConvertor {
     }
 
 
+    public ProjectRes.CommentList projectComment(Long userId, ProjectComment result) {
+        return ProjectRes.CommentList.builder()
+                .commentId(result.getId())
+                .comment(result.getComment())
+                .commentDate(result.getCreatedAt().getDayOfYear()+"."+result.getCreatedAt().getDayOfMonth()+"."+result.getCreatedAt().getDayOfYear()+". " + result.getCreatedAt().getHour()+":"+result.getCreatedAt().getMinute())
+                .nickname(result.getUser().getNickname())
+                .userId(result.getUserId())
+                .isMy(result.getUserId().equals(userId))
+                .build();
+    }
 }

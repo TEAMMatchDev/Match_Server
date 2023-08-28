@@ -22,6 +22,8 @@ public class ProjectRes {
         private String usages;
         @Schema(description = "프로젝트 후원 분야",required = true, example = "kind")
         private String kind;
+        @Schema(description = "프로젝트 관 유무", required = true, example = "true")
+        private boolean like;
     }
 
     @Getter
@@ -42,6 +44,8 @@ public class ProjectRes {
         private boolean donationAble;
         @Schema(description = "프로젝트 후원 분야",required = true, example = "kind")
         private String kind;
+        @Schema(description = "프로젝트 정기 후원인지 아닌지", required = true, example = "REGULAR OR ONE_TIME")
+        private String regularStatus;
     }
 
     @Getter
@@ -66,6 +70,20 @@ public class ProjectRes {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CommentList {
+
         private Long commentId;
+
+        private String comment;
+
+        private String commentDate;
+
+        @Schema(description = "이미지 URL", required = true, example = "imgUrl")
+        private String profileImgUrl;
+
+        private String nickname;
+
+        private Long userId;
+
+        private boolean isMy;
     }
 }

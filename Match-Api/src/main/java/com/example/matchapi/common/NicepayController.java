@@ -33,7 +33,6 @@ public class NicepayController {
         OrderRequest orderRequest = orderService.getOrderRequest(orderId);
 
         model.addAttribute("orderId", orderId);
-        model.addAttribute("method", orderRequest.getMethod());
         model.addAttribute("clientId", nicePayProperties.getClient());
         return "/index";
     }
