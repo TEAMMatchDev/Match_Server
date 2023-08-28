@@ -1,6 +1,6 @@
 package com.example.matchapi.security;
 
-import com.example.matchcommon.exception.CommonResponseStatus;
+import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.security.core.AuthenticationException;
@@ -22,14 +22,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         // 유효한 자격증명을 제공하지 않고 접근하려 할때 401
         String exception = (String) request.getAttribute("exception");
 
-        CommonResponseStatus errorCode;
+        UserAuthErrorCode errorCode;
 
 
         /**
          * 토큰이 없는 경우 예외처리
          */
         if(exception == null) {
-            errorCode = CommonResponseStatus.UNAUTHORIZED_EXCEPTION;
+            errorCode = UserAuthErrorCode.UNAUTHORIZED_EXCEPTION;
             setResponse(response, errorCode);
             return;
         }
@@ -38,32 +38,32 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
          * 토큰이 만료된 경우 예외처리
          */
         if(exception.equals("NotExistUser")){
-            errorCode = CommonResponseStatus.NOT_EXIST_USER;
+            errorCode = UserAuthErrorCode.NOT_EXIST_USER;
             setResponse(response, errorCode);
             return;
         }
         else if(exception.equals("ExpiredJwtException")) {
-            errorCode = CommonResponseStatus.EXPIRED_JWT_EXCEPTION;
+            errorCode = UserAuthErrorCode.EXPIRED_JWT_EXCEPTION;
             setResponse(response, errorCode);
             return;
         }
         else if (exception.equals("MalformedJwtException")){
-            errorCode= CommonResponseStatus.INVALID_TOKEN_EXCEPTION;
+            errorCode= UserAuthErrorCode.INVALID_TOKEN_EXCEPTION;
             setResponse(response,errorCode);
             return;
         }
         else if(exception.equals("HijackException")){
-            errorCode =CommonResponseStatus.HIJACK_JWT_TOKEN_EXCEPTION;
+            errorCode =UserAuthErrorCode.HIJACK_JWT_TOKEN_EXCEPTION;
             setResponse(response,errorCode);
             return;
         }
         else if(exception.equals("NoSuchElementException")){
-            errorCode = CommonResponseStatus.NOT_EXISTS_USER_HAVE_TOKEN;
+            errorCode = UserAuthErrorCode.NOT_EXISTS_USER_HAVE_TOKEN;
             setResponse(response,errorCode);
         }
     }
 
-    private void setResponse(HttpServletResponse response, CommonResponseStatus errorCode) throws IOException {
+    private void setResponse(HttpServletResponse response, UserAuthErrorCode errorCode) throws IOException {
         JSONObject json = new JSONObject();
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("utf-8");

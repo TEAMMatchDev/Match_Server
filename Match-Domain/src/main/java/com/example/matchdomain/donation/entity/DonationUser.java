@@ -10,7 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "DonationUser")
+@Table(name = "DonationUser",indexes = @Index(columnList = "inherenceName"))
 @Getter
 @Setter
 @Builder
@@ -38,4 +38,32 @@ public class DonationUser extends BaseEntity {
     @Column(name="projectId")
     private Long projectId;
 
+    @Column(name="price")
+    private int price;
+
+    private String tid;
+
+    private String orderId;
+
+    private String inherenceNumber;
+
+    private String inherenceName;
+
+    @Enumerated(EnumType.STRING)
+    private DonationStatus donationStatus;
+
+    @Enumerated(EnumType.STRING)
+    private PayMethod payMethod;
+
+    @Enumerated(EnumType.STRING)
+    private RegularStatus regularStatus;
+
+    public void updateInherenceNumber(String inherenceNumber, String flameName) {
+        this.inherenceNumber = inherenceNumber;
+        this.inherenceName = flameName;
+    }
+
+    public void updateDonationStatus(DonationStatus donationStatus) {
+        this.donationStatus = donationStatus;
+    }
 }

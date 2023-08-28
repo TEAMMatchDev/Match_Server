@@ -1,38 +1,42 @@
 package com.example.matchcommon.exception;
 
-import lombok.Builder;
+import com.example.matchcommon.dto.ErrorReason;
+import com.example.matchcommon.exception.errorcode.BaseErrorCode;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-import java.util.Map;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class BaseException extends RuntimeException {
+    private BaseErrorCode errorCode;
 
-    HttpStatus httpStatus;
-    CommonResponseStatus status;
-    String responseMessage;
-    Object result;
-    Map<String, String> data;
+    public BaseException(HttpStatus httpStatus, boolean b, String resultCode, String resultMsg) {
+        this.errorCode = new BaseErrorCode() {
+            @Override
+            public ErrorReason getErrorReason() {
+                return ErrorReason.builder().message(resultMsg).code(resultCode).isSuccess(b).build();
+            }
 
+            @Override
+            public String getExplainError() throws NoSuchFieldException {
+                return null;
+            }
 
-    public BaseException(CommonResponseStatus status) {
-        super();
-        this.status = status;
-        this.responseMessage = status.getMessage();
-        this.httpStatus=status.getHttpStatus();
+            @Override
+            public ErrorReason getErrorReasonHttpStatus() {
+                return ErrorReason.builder().message(resultMsg).code(resultCode).isSuccess(b).httpStatus(httpStatus).build();
+            }
+        };
     }
 
-    public BaseException(CommonResponseStatus status, Map<String, String> data) {
-        super();
-        this.status = status;
-        this.responseMessage = status.getMessage();
-        this.httpStatus=status.getHttpStatus();
-        this.data = data;
+    public ErrorReason getErrorReason() {
+        return this.errorCode.getErrorReason();
     }
 
-
+    public ErrorReason getErrorReasonHttpStatus(){
+        return this.errorCode.getErrorReasonHttpStatus();
+    }
 
 }

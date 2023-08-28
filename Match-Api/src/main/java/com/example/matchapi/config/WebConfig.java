@@ -18,9 +18,11 @@ public class WebConfig implements WebMvcConfigurer {
         // 모든 경로에 앞으로 만들 모든 CORS 정보를 적용한다
         registry.addMapping("/**")
                 .allowedOrigins(
+                        "http://localhost:63343",
                         "http://localhost:3000",
                         "https://www.match-api-server.com",
-                        "https://localhost:3000"
+                        "https://localhost:3000",
+                        "https://match-official.vercel.app"
                 )
                 // 모든 HTTP Method를 허용한다.
                 .allowedMethods("*")

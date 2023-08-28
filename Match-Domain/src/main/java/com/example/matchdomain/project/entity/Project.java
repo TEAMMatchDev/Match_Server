@@ -1,11 +1,13 @@
 package com.example.matchdomain.project.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
-import com.example.matchdomain.donation.entity.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.RegularStatus;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -26,7 +28,7 @@ public class Project extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "projectName")
     private String projectName;
 
     @Column(name="projectExplanation")
@@ -34,7 +36,6 @@ public class Project extends BaseEntity {
 
     @Column(name = "viewCnt")
     private int viewCnt;
-
     //사용처
     @Column(name = "usages")
     private String usages;
@@ -46,7 +47,13 @@ public class Project extends BaseEntity {
     private LocalDateTime finishedAt;
 
     @Enumerated(EnumType.STRING)
-    private DonationStatus donationStatus;
+    private ProjectStatus projectStatus;
+
+    @Enumerated(EnumType.STRING)
+    private ProjectKind projectKind;
+
+    @Enumerated(EnumType.STRING)
+    private RegularStatus regularStatus;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "projectId")
@@ -54,5 +61,14 @@ public class Project extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "projectId")
+    @Fetch(FetchMode.JOIN)
     private List<ProjectImage> projectImage = new ArrayList<>();
+
+
+    public Project(Long id, String projectName, String usages, List<ProjectImage> projectImage) {
+        this.id = id;
+        this.usages = usages;
+        this.projectName = projectName;
+        this.projectImage = projectImage;
+    }
 }

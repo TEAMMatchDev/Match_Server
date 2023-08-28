@@ -7,9 +7,11 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.UnauthorizedException;
+import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
-import com.example.matchcommon.reponse.CommonResponse;
+import com.example.matchdomain.redis.repository.RefreshTokenRepository;
 import com.example.matchdomain.user.entity.Authority;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
@@ -29,14 +31,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
-import static com.example.matchcommon.exception.CommonResponseStatus.*;
+import static com.example.matchcommon.exception.errorcode.CommonResponseStatus.*;
 import static com.example.matchdomain.user.entity.SocialType.KAKAO;
 import static com.example.matchdomain.user.entity.SocialType.NAVER;
+import static com.example.matchdomain.user.exception.UserAuthErrorCode.NOT_EXIST_USER;
+import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_CORRECT_PASSWORD;
+import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_EMAIL;
+import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_PHONE;
 
 @Service
 @RequiredArgsConstructor
@@ -54,8 +61,11 @@ public class AuthService {
     private final UserConvertor userConvertor;
     private final PasswordEncoder passwordEncoder;
     private final SmsHelper smsHelper;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtProperties jwtProperties;
 
 
+    @Transactional
     public UserRes.UserToken kakaoLogIn(UserReq.SocialLoginToken socialLoginToken) {
         KakaoUserInfoDto kakaoUserInfoDto = kakaoFeignClient.getInfo(BEARER + socialLoginToken.getAccessToken());
 
@@ -81,8 +91,17 @@ public class AuthService {
             authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
             userId = user.get().getId();
         }
+        
+        UserRes.Token token = createToken(userId);
+        
 
-        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
+    }
+
+    private UserRes.Token createToken(Long userId) {
+        UserRes.Token token =  jwtService.createTokens(userId);
+        refreshTokenRepository.save(userConvertor.RefreshToken(userId,token.getRefreshToken(),jwtProperties.getRefreshTokenSeconds()));
+        return token;
     }
 
 
@@ -96,7 +115,8 @@ public class AuthService {
         return userRepository.save(user).getId();
     }
 
-    private Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
+    @Transactional
+    public Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
         return userRepository.save(userConvertor.NaverSignUpUser(naverUserInfoDto, NAVER, userConvertor.PostAuthority())).getId();
     }
     public KakaoLoginTokenRes getOauthToken(String code, String referer) {
@@ -129,7 +149,9 @@ public class AuthService {
 
         else userId = user.get().getId();
 
-        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+        UserRes.Token token = createToken(userId);
+        
+        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
     }
 
 
@@ -142,7 +164,10 @@ public class AuthService {
 
         Long userId = userRepository.save(userConvertor.SignUpUser(signUpUser,authority)).getId();
 
-        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+        UserRes.Token token = createToken(userId);
+
+
+        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
     }
 
     public void checkUserPhone(UserReq.UserPhone userPhone) {
@@ -154,14 +179,16 @@ public class AuthService {
     }
 
     public UserRes.UserToken logIn(UserReq.LogIn logIn) {
-        User user=userRepository.findByUsername(logIn.getEmail()).orElseThrow(() -> new BadRequestException(NOT_EXIST_USER));
+        User user=userRepository.findByUsername(logIn.getEmail()).orElseThrow(() -> new UnauthorizedException(NOT_EXIST_USER));
 
         if(!passwordEncoder.matches(logIn.getPassword(),user.getPassword())) throw new BadRequestException(NOT_CORRECT_PASSWORD);
 
         Long userId = user.getId();
 
+        UserRes.Token token = createToken(userId);
+
         //반환 값 아이디 추가
-        return new UserRes.UserToken(userId, jwtService.createToken(userId), jwtService.createRefreshToken(userId));
+        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
     }
 
     public KakaoUserAddressDto getKakaoAddress(String accessToken) {

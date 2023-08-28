@@ -1,6 +1,11 @@
 package com.example.matchapi.security;
 
+import com.example.matchapi.user.convertor.UserConvertor;
+import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.properties.JwtProperties;
+import com.example.matchdomain.redis.entity.AccessToken;
+import com.example.matchdomain.redis.repository.AccessTokenRepository;
+import com.example.matchdomain.redis.repository.RefreshTokenRepository;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import io.jsonwebtoken.*;
@@ -34,6 +39,8 @@ public class JwtService {
 
     private final UserRepository userRepository;
     private final JwtProperties jwtProperties;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final AccessTokenRepository accessTokenRepository;
 
 
     private Key getSecretKey() {
@@ -63,7 +70,6 @@ public class JwtService {
         Date now=new Date();
         final Key encodedKey = getRefreshKey();
 
-
         return Jwts.builder()
                 .setHeaderParam("type","refresh")
                 .claim("userId",userId)
@@ -71,7 +77,33 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis()+jwtProperties.getRefreshTokenSeconds()))
                 .signWith(encodedKey)
                 .compact();
+    }
 
+    public UserRes.Token createTokens(Long userId){
+        Date now=new Date();
+        final Key encodedAccessKey = getSecretKey();
+
+        final Key encodedRefreshKey = getRefreshKey();
+
+        String accessToken = Jwts.builder()
+                .setHeaderParam("type","jwt")
+                .claim("userId",userId)
+                .setIssuedAt(now)
+                .setExpiration(new Date(System.currentTimeMillis()+jwtProperties.getAccessTokenSeconds()))
+                .signWith(encodedAccessKey)
+                .compact();
+
+        String refreshToken= Jwts.builder()
+                .setHeaderParam("type","refresh")
+                .claim("userId",userId)
+                .setIssuedAt(now)
+                .setExpiration(new Date(System.currentTimeMillis()+jwtProperties.getRefreshTokenSeconds()))
+                .signWith(encodedRefreshKey)
+                .compact();
+
+        //refreshTokenRepository.save(userConvertor.RefreshToken(userId,refreshToken,jwtProperties.getRefreshTokenSeconds()));
+
+        return new UserRes.Token(accessToken,refreshToken);
     }
 
     public Authentication getAuthentication(String token, ServletRequest servletRequest)  {
@@ -84,7 +116,6 @@ public class JwtService {
 
             Long userId=claims.getBody().get("userId",Long.class);
             Optional<User> users = userRepository.findById(userId);
-
             return new UsernamePasswordAuthenticationToken(users.get(),"",users.get().getAuthorities());
         }catch(NoSuchElementException e){
             servletRequest.setAttribute("exception","NoSuchElementException");
@@ -104,20 +135,18 @@ public class JwtService {
 
             Long userId = claims.getBody().get("userId",Long.class);
 
-            /*
 
-            String expiredAt= redisService.getValues(token);
-
+            Optional<AccessToken> accessToken = accessTokenRepository.findById(token);
 
 
-            if(expiredAt==null) return true;
-
-            if(expiredAt.equals(String.valueOf(userId))){
-                servletRequest.setAttribute("exception","HijackException");
-                return false;
+            if(accessToken.isPresent()){
+                if(accessToken.get().getToken().equals(token)){
+                    servletRequest.setAttribute("exception","HijackException");
+                    return false;
+                }
             }
 
-             */
+
 
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
@@ -152,10 +181,12 @@ public class JwtService {
     }
 
     public Long getUserIdByRefreshToken(String refreshToken) {
-        Jws<Claims> claims;
-        claims = Jwts.parser()
-                .setSigningKey(getRefreshKey())
-                .parseClaimsJws(refreshToken);
+        Jws<Claims> claims =
+                Jwts.parser()
+                        .setSigningKey(getRefreshKey())
+                        .parseClaimsJws(refreshToken);
+
+        System.out.println(claims.getBody().get("userId",Long.class));
 
         return claims.getBody().get("userId",Long.class);
     }
@@ -166,5 +197,9 @@ public class JwtService {
     }
 
 
-
+    public void logOut(Long userId) {
+        long expiredAccessTokenTime=getExpiredTime(getJwt()).getTime() - new Date().getTime();
+        log.info(String.valueOf(expiredAccessTokenTime));
+        accessTokenRepository.save(AccessToken.builder().token(getJwt()).userId(String.valueOf(userId)).ttl(expiredAccessTokenTime).build());
+    }
 }

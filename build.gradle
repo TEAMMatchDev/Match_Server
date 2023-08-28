@@ -32,11 +32,9 @@ subprojects{
 
     // 공통적으로 사용하는 dependencies
     dependencies {
-
+        implementation 'org.springframework.boot:spring-boot-starter-data-redis'
         // swagger dependency
-        implementation "io.springfox:springfox-boot-starter:3.0.0"
-        implementation "io.springfox:springfox-swagger-ui:3.0.0"
-        implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+        implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
 
         implementation 'org.springframework.boot:spring-boot-starter-tomcat'
         annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"

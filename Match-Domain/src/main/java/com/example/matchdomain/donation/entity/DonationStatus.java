@@ -6,12 +6,13 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum DonationStatus {
-    //진행중
-    PROCEEDING("PROCEEDING"),
-    //시작 전
-    BEFORE_START("BEFORE_START"),
-    //마감
-    DEADLINE("DEADLINE");
+    EXECUTION_BEFORE("EXECUTION_BEFORE","집행 전"),
+    EXECUTION_UNDER("EXECUTION_UNDER","집행 중"),
+    EXECUTION_SUCCESS("EXECUTION_SUCCESS","집행 완료"),
+    EXECUTION_REFUND("EXECUTION_REFUND","기부금 환불");
 
     private final String value;
+    private final String name;
+
+
 }

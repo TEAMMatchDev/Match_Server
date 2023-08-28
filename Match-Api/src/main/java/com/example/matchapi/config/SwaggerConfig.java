@@ -1,105 +1,165 @@
 package com.example.matchapi.config;
 
 
-import com.example.matchdomain.user.entity.User;
+import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchcommon.dto.ErrorReason;
+import com.example.matchcommon.exception.errorcode.BaseErrorCode;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.*;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.contexts.SecurityContext;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger.web.SwaggerResourcesProvider;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import org.springframework.web.method.HandlerMethod;
+import org.springdoc.core.customizers.OperationCustomizer;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.lang.Integer.parseInt;
+import static java.util.stream.Collectors.groupingBy;
 
 @Configuration
-@EnableSwagger2
+@RequiredArgsConstructor
 public class SwaggerConfig {
     //jwt 토큰 인증을 위한 버튼까지 포함
 
 
-    private List<SwaggerResourcesProvider> resourcesProviders;
+    private final ApplicationContext applicationContext;
 
     @Bean
-    public Docket api() {
-        Server serverLocal = new Server("local", "http://localhost:9000", "for local usages", Collections.emptyList(), Collections.emptyList());
-        Server UbuntuServer = new Server("dev", "https://www.match-api-server.com", "for dev server", Collections.emptyList(), Collections.emptyList());
-        Server ProdServer = new Server("server", "https:/www.prod.match-api-server.com", "for prod server", Collections.emptyList(), Collections.emptyList());
-        return new Docket(DocumentationType.OAS_30)
-                .servers(serverLocal,UbuntuServer,ProdServer)
-                .consumes(getConsumeContentTypes())
-                .produces(getProduceContentTypes())
-                .securityContexts(Arrays.asList(securityContext())) // 추가
-                .securitySchemes(Arrays.asList(apiKey())) // 추가
-                .ignoredParameterTypes(User.class)
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
-                .build().apiInfo(apiInfo());
-    }
+    public OpenAPI openAPI() {
+        Info info = new Info()
+                .title("Match Rest API 문서") // 타이틀
+                .version("0.0.1") // 문서 버전
+                .description("잘못된 부분이나 오류 발생 시 바로 말씀해주세요.") // 문서 설명
+                .contact(new Contact() // 연락처
+                        .name("임현우")
+                        .email("gusdn8926@naver.com"));
 
-    private Set<String> getConsumeContentTypes() {
-        Set<String> consumes = new HashSet<>();
-        consumes.add("application/json;charset=UTF-8");
-        consumes.add("application/x-www-form-urlencoded");
-        return consumes;
-    }
+        // Security 스키마 설정 (Header Authentication with X-AUTH-TOKEN)
+        SecurityScheme headerAuth = new SecurityScheme()
+                .type(SecurityScheme.Type.APIKEY)
+                .name("X-AUTH-TOKEN")
+                .in(SecurityScheme.In.HEADER);
 
-    private Set<String> getProduceContentTypes() {
-        Set<String> produces;
-        produces = new HashSet<>();
-        produces.add("application/json;charset=UTF-8");
-        produces.add("application/x-www-form-urlencoded");
-        return produces;
+        // Security 요청 설정
+        SecurityRequirement addSecurityItem = new SecurityRequirement();
+        addSecurityItem.addList("X-AUTH-TOKEN");
+
+        return new OpenAPI()
+                // Security 인증 컴포넌트 설정
+                .components(new Components().addSecuritySchemes("X-AUTH-TOKEN", headerAuth))
+                // API 마다 Security 인증 컴포넌트 설정
+                .addSecurityItem(addSecurityItem)
+                .info(info);
     }
 
 
 
-    private ApiInfo apiInfo() {
-        String description = "Match";
-        return new ApiInfoBuilder()
-                .title("Match Rest API 명세서")
-                .description(description)
-                .version("1.0")
-                .build();
-    }
 
 
 
-    private SecurityContext securityContext() {
-        return SecurityContext.builder()
-                .securityReferences(defaultAuth())
-                .build();
-    }
 
-
-    private List<SecurityReference> defaultAuth() {
-        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
-        authorizationScopes[0] = authorizationScope;
-        return Arrays.asList(new SecurityReference("X-AUTH-TOKEN", authorizationScopes));
-    }
-
-
-    private ApiKey apiKey() {
-        return new ApiKey("X-AUTH-TOKEN", "Bearer", "header");
-    }
-    /*
     @Bean
-    public SwaggerConfiguration swaggerConfiguration() {
-        return new SwaggerConfiguration() {
-            public SwaggerResourcesProvider swaggerResourcesProvider() {
-                return new CompositeSwaggerResourcesProvider(resourcesProviders);
+    public OperationCustomizer customize() {
+        return (Operation operation, HandlerMethod handlerMethod) -> {
+            ApiErrorCodeExample apiErrorCodeExample =
+                    handlerMethod.getMethodAnnotation(ApiErrorCodeExample.class);
+            // ApiErrorCodeExample 어노테이션 단 메소드 적용
+            if (apiErrorCodeExample != null) {
+                Class<? extends BaseErrorCode>[] errorCodes = apiErrorCodeExample.value();
+                generateErrorCodeResponseExample(operation, errorCodes);
+
             }
+            return operation;
         };
+
     }
 
-     */
+    private void generateErrorCodeResponseExample(
+            Operation operation, Class<? extends BaseErrorCode>[] errorCodeList) {
+        ApiResponses responses = operation.getResponses();
+        Map<Integer, List<ExampleHolder>> statusWithExampleHolders = new HashMap<>();
+
+        for (Class<? extends BaseErrorCode> type : errorCodeList) {
+            BaseErrorCode[] errorCodes = type.getEnumConstants();
+            // 400, 401, 404 등 에러코드의 상태코드들로 리스트로 모읍니다.
+            // 400 같은 상태코드에 여러 에러코드들이 있을 수 있습니다.
+            List<ExampleHolder> exampleHolders =
+                    Arrays.stream(errorCodes)
+                            .map(
+                                    baseErrorCode -> {
+                                        try {
+                                            ErrorReason errorReason = baseErrorCode.getErrorReasonHttpStatus();
+                                            ErrorReason errorReasonToView = baseErrorCode.getErrorReason();
+                                            return ExampleHolder.builder()
+                                                    .holder(
+                                                            getSwaggerExample(
+                                                                    baseErrorCode.getExplainError(), errorReasonToView))
+                                                    .code(errorReason.getHttpStatus().value())
+                                                    .name(errorReason.getCode())
+                                                    .build();
+                                        } catch (NoSuchFieldException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    })
+                            .collect(Collectors.toList());
+
+            // statusWithExampleHolders에 현재 루프의 결과를 추가합니다.
+            exampleHolders.forEach(
+                    exampleHolder ->
+                            statusWithExampleHolders
+                                    .computeIfAbsent(exampleHolder.getCode(), k -> new ArrayList<>())
+                                    .add(exampleHolder));
+        }
+
+        addExamplesToResponses(responses, statusWithExampleHolders);
+    }
+
+    private Example getSwaggerExample(String value, ErrorReason errorReason) {
+        Example example = new Example();
+        example.description(value);
+        example.setValue(errorReason);
+        return example;
+    }
+
+    private void addExamplesToResponses(
+            ApiResponses responses, Map<Integer, List<ExampleHolder>> statusWithExampleHolders) {
+        statusWithExampleHolders.forEach(
+                (status, v) -> {
+                    Content content = new Content();
+                    MediaType mediaType = new MediaType();
+                    ApiResponse apiResponse = new ApiResponse();
+                    v.forEach(
+                            exampleHolder -> {
+                                mediaType.addExamples(
+                                        exampleHolder.getName(), exampleHolder.getHolder());
+                            });
+                    content.addMediaType("application/json", mediaType);
+                    apiResponse.setContent(content);
+                    responses.addApiResponse(status.toString(), apiResponse);
+                });
+    }
+
+
+
+
+
+
+
+
+
 
 
 

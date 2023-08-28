@@ -1,5 +1,7 @@
 package com.example.matchcommon.exception;
 
+import com.example.matchcommon.exception.BaseDynamicException;
+import com.example.matchcommon.exception.BaseException;
 import com.example.matchcommon.reponse.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,9 @@ import java.util.stream.StreamSupport;
 @RestControllerAdvice
 public class ExceptionAdvice{
 
+
+
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity onConstraintValidationException(ConstraintViolationException e) {
@@ -37,13 +42,13 @@ public class ExceptionAdvice{
                                 .get().toString(),
                         ConstraintViolation::getMessage
                 ));
-        return new ResponseEntity<>(CommonResponse.onFailure("REQUEST_ERROR", "요청 형식 에러", errors), null, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(CommonResponse.onFailure("REQUEST_ERROR", "요청 형식 에러 result 확인해주세요", errors), null, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        Map<String, String> errors = new LinkedHashMap<>(); // Use a LinkedHashMap to preserve the order of errors
+        Map<String, String> errors = new LinkedHashMap<>();
 
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
 
@@ -57,7 +62,7 @@ public class ExceptionAdvice{
             errors.put(fieldName, errorMessage);
         }
 
-        return new ResponseEntity<>(CommonResponse.onFailure("REQUEST_ERROR", "Error in request format", errors), null, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(CommonResponse.onFailure("REQUEST_ERROR", "요청 형식 에러 result 확인해주세요", errors), null, HttpStatus.BAD_REQUEST);
     }
 
 
@@ -73,7 +78,7 @@ public class ExceptionAdvice{
             pw.append("uid: " + user.getUsername() + "\n");
         }
         pw.append(e.getMessage());
-        pw.append("\n==================================================================\n");
+        pw.append("\n=====================================================================");
         log.error(sw.toString());
     }
 
@@ -82,11 +87,22 @@ public class ExceptionAdvice{
     public ResponseEntity onKnownException(BaseException baseException,
                                            @AuthenticationPrincipal User user, HttpServletRequest request) {
         getExceptionStackTrace(baseException, user, request);
-        return new ResponseEntity<>(CommonResponse.onFailure(baseException.getStatus().getCode(), baseException.getResponseMessage(), baseException.getData()),
-                null, baseException.getHttpStatus());
+
+        return new ResponseEntity<>(CommonResponse.onFailure(baseException.getErrorReasonHttpStatus().getCode(), baseException.getErrorReasonHttpStatus().getMessage(), baseException.getErrorReasonHttpStatus().getResult()),
+                null, baseException.getErrorReasonHttpStatus().getHttpStatus());
+    }
+
+    @ExceptionHandler(value = BaseDynamicException.class)
+    public ResponseEntity onKnownDynamicException(BaseDynamicException baseDynamicException, @AuthenticationPrincipal User user,
+                                      HttpServletRequest request) {
+        getExceptionStackTrace(baseDynamicException, user, request);
+        return new ResponseEntity<>(CommonResponse.onFailure(baseDynamicException.getStatus().getErrorReason().getCode(), baseDynamicException.getStatus().getErrorReason().getMessage(), baseDynamicException.getData()), null,
+                baseDynamicException.getStatus().getErrorReasonHttpStatus().getHttpStatus());
     }
 
 
+
+    /*
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity onException(Exception exception, @AuthenticationPrincipal User user,
                                       HttpServletRequest request) {
@@ -94,5 +110,9 @@ public class ExceptionAdvice{
         return new ResponseEntity<>(CommonResponse.onFailure("500", exception.getMessage(), null), null,
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+     */
+
+
 
 }

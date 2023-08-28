@@ -40,6 +40,14 @@ jobs:
           sms.secret: ${{ secrets.SMS_SECRET_KEY }}
           sms.api: ${{ secrets.SMS_API_KEY }}
           sms.sender: ${{ secrets.SMS_SENDER }}
+          nice.secret: ${{ secrets.NICE_SECRET_KEY}}
+          nice.client: ${{ secrets.NICE_CLIENT_KEY }}
+          nice.url: ${{ secrets.NICE_DEV_URL}}
+          aws.access-key: ${{ secrets.AWS_S3_ACCESS_KEY }}
+          aws.secret-key: ${{ secrets.AWS_S3_SECRET_KEY }}
+          aws.s3.bucket: ${{ secrets.AWS_S3_BUCKET }}
+          aws.s3.bucket-url: ${{ secrets.AWS_S3_BASE_URL }}
+
 
       - name: Set Environment Domain - Domain DEV Yml
         uses: microsoft/variable-substitution@v1
@@ -49,6 +57,7 @@ jobs:
           spring.datasource.url: ${{ secrets.DB_URL_HOST }}
           spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
           spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.redis.host : ${{ secrets.REDIS_DEV_HOST }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -65,7 +74,7 @@ jobs:
           format: YYYYMMDDTHHmm
           utcOffset: "+09:00"
 
-      - name: Generate deployment packagez
+      - name: Generate deployment package
         run: |
           mkdir -p deploy
           cp Match-Api/build/libs/*.jar deploy/match-dev-api.jar

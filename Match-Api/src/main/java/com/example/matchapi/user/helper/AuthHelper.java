@@ -1,7 +1,7 @@
 package com.example.matchapi.user.helper;
 
 import com.example.matchcommon.annotation.Helper;
-import com.example.matchcommon.exception.BaseException;
+import com.example.matchcommon.exception.BaseDynamicException;
 import com.example.matchdomain.user.entity.Gender;
 import com.example.matchdomain.user.entity.SocialType;
 import com.example.matchdomain.user.entity.User;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.example.matchcommon.exception.CommonResponseStatus.EXIST_USER_PHONENUMBER;
+import static com.example.matchdomain.user.exception.UserSignUpErrorCode.EXIST_USER_PHONENUMBER;
 import static com.example.matchdomain.user.entity.SocialType.*;
 
 @Helper
@@ -50,13 +50,17 @@ public class AuthHelper {
 
         if (user.isPresent()) {
             errorType.put("signUpType", socialTypeConversion(user.get().getSocialType()));
-            throw new BaseException(EXIST_USER_PHONENUMBER, errorType);
+            throw new BaseDynamicException(EXIST_USER_PHONENUMBER, errorType);
         }
     }
 
     public LocalDate birthConversionToLocalDate(String birthDate) {
         DateTimeFormatter sourceFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         return LocalDate.parse(birthDate, sourceFormatter);
+    }
+
+    public boolean checkGuest(User user) {
+        return user != null;
     }
 
     @FunctionalInterface

@@ -5,6 +5,7 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.UserHelper;
 import com.example.matchcommon.annotation.Convertor;
+import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
@@ -34,7 +35,7 @@ public class UserConvertor {
                 .status(UserStatus.ACTIVE)
                 .birth(authHelper.birthConversion(kakaoUserInfoDto.getBirthYear(), kakaoUserInfoDto.getBirthDay()))
                 .gender(authHelper.genderConversion(kakaoUserInfoDto.getGender()))
-                .authorities(Collections.singleton(authority))
+                .role(AuthorityEnum.ROLE_USER.getValue())
                 .build();
     }
 
@@ -57,7 +58,7 @@ public class UserConvertor {
                 .status(UserStatus.ACTIVE)
                 .birth(authHelper.birthConversion(naverUserInfoDto.getBirthyear(), naverUserInfoDto.getBirthday()))
                 .gender(authHelper.genderConversion(naverUserInfoDto.getGender()))
-                .authorities(Collections.singleton(authority))
+                .role(AuthorityEnum.ROLE_USER.getValue())
                 .build();
     }
 
@@ -71,13 +72,13 @@ public class UserConvertor {
                 .phoneNumber(signUpUser.getPhone())
                 .status(UserStatus.ACTIVE)
                 .birth(authHelper.birthConversionToLocalDate(signUpUser.getBirthDate()))
-                .gender(authHelper.genderConversion(signUpUser.getGender()))
-                .authorities(Collections.singleton(authority))
+                .gender(signUpUser.getGender())
+                .role(AuthorityEnum.ROLE_USER.getValue())
                 .build();
     }
 
-    public UserRes.MyPage toMyPage(User user) {
-        return UserRes.MyPage.builder()
+    public UserRes.EditMyPage toMyPage(User user) {
+        return UserRes.EditMyPage.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
@@ -92,13 +93,21 @@ public class UserConvertor {
                 .userId(userId)
                 .name(shippingAddresses.getName())
                 .isDefault(shippingAddresses.isDefault())
-                .addresslType(AddresslType.valueOf(shippingAddresses.getType()))
+                .addressType(AddressType.valueOf(shippingAddresses.getType()))
                 .baseAddress(shippingAddresses.getBaseAddress())
                 .detailAddress(shippingAddresses.getDetailAddress())
                 .receiverName(shippingAddresses.getReceiverName())
                 .addressPhoneNumber(shippingAddresses.getReceiverPhoneNumber1())
                 .zoneNumber(shippingAddresses.getZoneNumber())
                 .zipCode(shippingAddresses.getZipCode())
+                .build();
+    }
+
+    public RefreshToken RefreshToken(Long userId, String refreshToken, Long refreshTokenSeconds) {
+        return RefreshToken.builder()
+                .userId(String.valueOf(userId))
+                .token(refreshToken)
+                .ttl(refreshTokenSeconds)
                 .build();
     }
 }

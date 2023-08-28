@@ -2,6 +2,8 @@ package com.example.matchdomain.user.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.UserCard;
+import com.example.matchdomain.project.entity.ProjectUserAttention;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -41,6 +43,8 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "name")
     private String name;
 
+    private String nickname;
+
     @Column(name = "email")
     private String email;
 
@@ -70,20 +74,27 @@ public class User extends BaseEntity implements UserDetails {
     @JoinColumn(name = "userId")
     private List<DonationUser> donationUser = new ArrayList<>();
 
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "userId")
+    private List<UserCard> userCard = new ArrayList<>();
+
     @Column(name = "logInAt")
     private LocalDateTime logInAt;
 
-    @ManyToMany
-    @JoinTable(
-            name = "UserAuthority",
-            joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "authorityName", referencedColumnName = "authorityName")})
-    private Set<Authority> authorities;
+
+    @Column(name = "role")
+    private String role;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        for(String role : role.split(","))
+            authorities.add(new SimpleGrantedAuthority(role));
+        return authorities;
     }
+
 
     @Override
     public String getPassword() {
