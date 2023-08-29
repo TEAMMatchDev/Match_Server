@@ -2,6 +2,7 @@ package com.example.matchinfrastructure.config;
 
 
 import com.example.matchcommon.properties.NicePayProperties;
+import com.example.matchinfrastructure.discord.BaseFeignDiscordPackage;
 import com.example.matchinfrastructure.oauth.BaseFeignClientPackage;
 import com.example.matchinfrastructure.pay.BasePayFeignClientPackage;
 import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
@@ -19,7 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableFeignClients(basePackageClasses = {BaseFeignClientPackage.class, BasePayFeignClientPackage.class})
+@EnableFeignClients(basePackageClasses = {BaseFeignClientPackage.class, BasePayFeignClientPackage.class, BaseFeignDiscordPackage.class})
 public class FeignCommonConfig {
 
     @Bean
