@@ -1,6 +1,8 @@
 package com.example.matchapi.user.service;
 
+import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.project.convertor.ProjectConvertor;
+import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchapi.user.convertor.UserConvertor;
@@ -54,5 +56,9 @@ public class UserService {
         List<ProjectUserAttention> projectList = projectUserAttentionRepository.findById_userIdAndProject_ProjectImage_imageRepresentStatusOrderByCreatedAt(user.getId(),ImageRepresentStatus.REPRESENT);
 
         return projectConvertor.getMyPage(donationUser,projectList);
+    }
+
+    public OrderRes.UserDetail getUserInfo(User user) {
+        return userConvertor.userInfo(user);
     }
 }

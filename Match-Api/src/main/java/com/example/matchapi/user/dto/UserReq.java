@@ -107,4 +107,16 @@ public class UserReq {
         @Schema(description ="비밀번호",required = true,example = "1234")
         private String password;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class EditMyPage {
+        private String orgPassword;
+
+        private String newPassword;
+
+    }
 }

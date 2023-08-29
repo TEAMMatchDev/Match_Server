@@ -67,6 +67,7 @@ public class OrderConvertor {
                 .payDate(regularDonation.getPayDate())
                 .amount(regularDonation.getAmount())
                 .userCardId(userCardId)
+                .projectId(projectId)
                 .build();
     }
 

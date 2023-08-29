@@ -1,5 +1,6 @@
 package com.example.matchapi.user.convertor;
 
+import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.helper.AuthHelper;
@@ -36,6 +37,7 @@ public class UserConvertor {
                 .birth(authHelper.birthConversion(kakaoUserInfoDto.getBirthYear(), kakaoUserInfoDto.getBirthDay()))
                 .gender(authHelper.genderConversion(kakaoUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
+                .nickname(kakaoUserInfoDto.getProperties().getNickname())
                 .build();
     }
 
@@ -59,6 +61,7 @@ public class UserConvertor {
                 .birth(authHelper.birthConversion(naverUserInfoDto.getBirthyear(), naverUserInfoDto.getBirthday()))
                 .gender(authHelper.genderConversion(naverUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
+                .nickname(naverUserInfoDto.getNickname())
                 .build();
     }
 
@@ -109,5 +112,12 @@ public class UserConvertor {
                 .token(refreshToken)
                 .ttl(refreshTokenSeconds)
                 .build();
+    }
+
+    public OrderRes.UserDetail userInfo(User user) {
+        return OrderRes.UserDetail.builder()
+                .name(user.getName())
+                .birthDay(user.getBirth().toString())
+                .phoneNumber(user.getPhoneNumber()).build();
     }
 }

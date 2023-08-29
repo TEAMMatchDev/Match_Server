@@ -6,6 +6,7 @@ import com.example.matchapi.common.aop.CheckRegularProject;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
+import com.example.matchapi.user.service.UserService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
@@ -17,6 +18,7 @@ import com.example.matchdomain.project.exception.ProjectOneTimeErrorCode;
 import com.example.matchdomain.project.exception.ProjectRegualrErrorCode;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
+import com.example.matchinfrastructure.pay.nice.dto.NicePaymentAuth;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,6 +39,7 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     private final NicePayProperties nicePayProperties;
+    private final UserService userService;
 
 
     @PostMapping("/{projectId}")
@@ -60,8 +63,8 @@ public class OrderController {
         return CommonResponse.onSuccess("성공");
     }
 
+    @Deprecated
 
-    /*
     @PostMapping("/test/pay")
     @ApiErrorCodeExample(OtherServerErrorCode.class)
     @Operation(summary= "04-00 Order💸 결제 인증용 API 사용 X 테스트용",description = "결제 인증용 API 입니다 테스트 용")
@@ -71,16 +74,16 @@ public class OrderController {
         return CommonResponse.onSuccess(orderService.authPayment(tid, amount));
     }
 
+    @Deprecated
     @PostMapping("/test/cancel/pay")
     @ApiErrorCodeExample(OtherServerErrorCode.class)
     @Operation(summary= "04-00 Order💸 결제 취소용 API 사용 X 테스트용",description = "결제 인증용 API 입니다 테스트 용")
     public CommonResponse<NicePaymentAuth> cancelPayment(@RequestParam String tid,
-                                                          @RequestParam String orderId){
+                                                         @RequestParam String orderId){
         log.info("04-00 Order 결제 취소 테스트용 API 결제 ID: " + tid + " 주문 번호 " +orderId);
         return CommonResponse.onSuccess(orderService.cancelPayment(tid, orderId));
     }
 
-     */
 
     @PostMapping("/pay/{projectId}")
     @ApiErrorCodeExample({OtherServerErrorCode.class, UserAuthErrorCode.class, RequestErrorCode.class, ProjectOneTimeErrorCode.class})
@@ -106,14 +109,14 @@ public class OrderController {
 
     @GetMapping("/pay/card")
     @ApiErrorCodeExample({UserAuthErrorCode.class})
-    @Operation(summary = "04-03 Order💸 정기 결제용 카드 조회 api #FRAME 결제 화면 - 단기,정기 결제",description = "정기 결제를 위한 카드 조회 API 입니다..")
+    @Operation(summary = "04-03 Order💸 정기 결제용 카드 조회 api #FRAME 결제 화면 - 단기,정기 결제", description = "정기 결제를 위한 카드 조회 API 입니다..")
     public CommonResponse<List<OrderRes.UserBillCard>> getUserBillCard(@Parameter(hidden = true) @AuthenticationPrincipal User user){
         return CommonResponse.onSuccess(orderService.getUserBillCard(user));
     }
 
     @DeleteMapping("/pay/card/{cardId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, DeleteCardErrorCode.class})
-    @Operation(summary = "04-04 Order💸 정기,단기 결제용 카드 삭제 api #FRAME 결제 화면 - 단기,정기 결제",description = "정기 결제를 위한 카드 삭제 API 입니다..")
+    @Operation(summary = "04-04 Order💸 정기,단기 결제용 카드 삭제 api #FRAME 결제 화면 - 단기,정기 결제", description = "정기 결제를 위한 카드 삭제 API 입니다..")
     @CheckIdExist
     public CommonResponse<String> deleteBillCard(@Parameter(hidden = true) @AuthenticationPrincipal User user,
                                                                       @Parameter(description = "카드 ID", example = "1") @PathVariable("cardId") Long cardId){
@@ -147,6 +150,15 @@ public class OrderController {
             @Valid @RequestBody OrderReq.OneTimeDonation oneTimeDonation){
         orderService.oneTimeDonationCard(user, oneTimeDonation, cardId, projectId);
         return CommonResponse.onSuccess("단기 결제 성공");
+    }
+
+    @PostMapping("/user")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    @Operation(summary = "04-07 Order💸 후원자 정보조회",description = "후원자 정보조회 API 입니다.")
+    public CommonResponse<OrderRes.UserDetail> getUserInfo(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user
+            ){
+        return CommonResponse.onSuccess(userService.getUserInfo(user));
     }
 
 }

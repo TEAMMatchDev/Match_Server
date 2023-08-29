@@ -3,7 +3,6 @@ package com.example.matchbatch.convertor;
 import com.example.matchbatch.OrderHelper;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.*;
-import com.example.matchdomain.donation.repository.RequestPaymentHistoryRepository;
 import com.example.matchinfrastructure.pay.nice.dto.NiceBillOkRequest;
 import com.example.matchinfrastructure.pay.nice.dto.NiceBillOkResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,7 @@ public class OrderConvertor {
                 .build();
     }
 
-    public DonationUser donationUser(NiceBillOkResponse niceBillOkResponse, Long userId, String flameName, String inherenceNumber) {
+    public DonationUser donationUser(NiceBillOkResponse niceBillOkResponse, Long userId, String flameName, String inherenceNumber, Long projectId) {
         return DonationUser.builder()
                 .userId(userId)
                 .price(parseInt(String.valueOf(niceBillOkResponse.getAmount())))
@@ -37,10 +36,11 @@ public class OrderConvertor {
                 .inherenceName(flameName)
                 .inherenceNumber(inherenceNumber)
                 .regularStatus(RegularStatus.REGULAR)
+                .projectId(projectId)
                 .build();
     }
 
-    public RequestPaymentHistory RegularHistory(NiceBillOkResponse niceBillOkResponse, Long userId, PaymentStatus paymentStatus, String reason) {
+    public RequestPaymentHistory RegularHistory(NiceBillOkResponse niceBillOkResponse, Long userId, PaymentStatus paymentStatus, String reason, Long regularPaymentId, int payDate) {
         return RequestPaymentHistory.builder()
                 .orderId(niceBillOkResponse.getOrderId())
                 .tid(niceBillOkResponse.getTid())
@@ -48,6 +48,8 @@ public class OrderConvertor {
                 .paymentStatus(paymentStatus)
                 .reason(reason)
                 .amount(niceBillOkResponse.getAmount())
+                .regularPaymentId(regularPaymentId)
+                .payDate(payDate)
                 .build();
     }
 }
