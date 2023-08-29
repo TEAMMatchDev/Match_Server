@@ -1,6 +1,7 @@
 package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -29,6 +30,10 @@ public class RegularPayment extends BaseEntity {
 
     @Column(name="userId")
     private Long userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projectId",nullable = false, insertable=false, updatable=false)
+    private Project project;
 
     private Long projectId;
 

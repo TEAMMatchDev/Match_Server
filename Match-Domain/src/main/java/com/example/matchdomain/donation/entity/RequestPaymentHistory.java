@@ -39,6 +39,14 @@ public class RequestPaymentHistory extends BaseEntity {
 
     private String reason;
 
+    private int payDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "regularPaymentId",nullable = false, insertable=false, updatable=false)
+    private RegularPayment regularPayment;
+
+    private Long regularPaymentId;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 }
