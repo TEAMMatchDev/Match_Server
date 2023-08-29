@@ -58,7 +58,6 @@ public class DonationController {
             @Parameter(description = "정렬 필터링 0 = 최신순, 1 = 오래된 순, 2 = 기부금액 큰 순, 3 = 기부금액 작은 순", example = "0") @RequestParam(required = false, defaultValue = "0") int order,
             @Parameter(description = "검색어")  @RequestParam(required = false) String content
     ){
-
         return CommonResponse.onSuccess(donationService.getFlameList(user, page, size, flame, order, content));
     }
 
