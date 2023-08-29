@@ -5,6 +5,7 @@ import com.example.matchapi.donation.service.DonationService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
+import com.example.matchdomain.donation.exception.CancelRegularPayErrorCode;
 import com.example.matchdomain.donation.exception.DonationListErrorCode;
 import com.example.matchdomain.donation.exception.DonationRefundErrorCode;
 import com.example.matchdomain.user.entity.User;
@@ -16,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
@@ -59,6 +59,16 @@ public class DonationController {
             @Parameter(description = "검색어")  @RequestParam(required = false) String content
     ){
         return CommonResponse.onSuccess(donationService.getFlameList(user, page, size, flame, order, content));
+    }
+
+    @DeleteMapping("/{regularId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, CancelRegularPayErrorCode.class})
+    @Operation(summary = "05-04 Donation💸 정기 결제 해지 API")
+    public CommonResponse<String> cancelRegularPay(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "정기결제 id") @PathVariable Long regularId){
+        donationService.cancelRegularPay(user, regularId);
+        return CommonResponse.onSuccess("해지 성공");
     }
 
 
