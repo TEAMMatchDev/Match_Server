@@ -49,4 +49,11 @@ public class RequestPaymentHistory extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userCardId",nullable = false, insertable=false, updatable=false)
+    private UserCard userCard;
+
+    @Column(name="userCardId")
+    private Long userCardId;
 }

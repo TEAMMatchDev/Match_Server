@@ -29,7 +29,7 @@ public class PaymentScheduler {
     @Scheduled(cron = "0 30 12 * * *")
     //매 1분마다 실행
     //@Scheduled(cron = "0,20,40 * * * * *", zone = "asia/seoul")
-    //@Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 10000)
     public void RegularPayScheduler(){
         log.info("정기 결제 스케줄러 시작");
 
@@ -47,7 +47,8 @@ public class PaymentScheduler {
 
     }
 
-    @Scheduled(cron = "0 0 13/1 * * *")
+    //@Scheduled(cron = "0 0 13/1 * * *")
+    //@Scheduled(fixedDelay = 10000)
     public void RegularFailedPayScheduler(){
         log.info("정기 결제 실패 한 결제들 재시도 시작");
         Map<String, JobParameter> confMap = new HashMap<>();
@@ -57,7 +58,7 @@ public class PaymentScheduler {
 
 
         try {
-            jobLauncher.run(donationFailedRetry.regularPaymentJob(), jobParameters);
+            jobLauncher.run(donationFailedRetry.regularPaymentRetryJob(), jobParameters);
         } catch (JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException
                  | JobParametersInvalidException | org.springframework.batch.core.repository.JobRestartException e) {
             log.error(e.getMessage());
