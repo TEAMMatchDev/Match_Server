@@ -24,8 +24,8 @@ public class DonationFailedRetry {
 
 
     @Bean
-    public Job regularPaymentJob() {
-        log.info("job start");
+    public Job regularPaymentRetryJob() {
+        log.info(JOB_NAME + " job start");
 
         return jobBuilderFactory.get(JOB_NAME)
                 .start(regularPaymentRetryStep())

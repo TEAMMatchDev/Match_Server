@@ -5,6 +5,7 @@ import com.example.matchbatch.convertor.OrderConvertor;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.donation.entity.RequestPaymentHistory;
+import com.example.matchdomain.donation.entity.UserCard;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.donation.repository.RequestPaymentHistoryRepository;
@@ -61,10 +62,10 @@ public class OrderService {
 
                         donationUsers.add(orderConvertor.donationUser(niceBillOkResponse, userId, flameName, inherenceNumber, regularPayment.getProjectId()));
 
-                        requestPaymentHistories.add(orderConvertor.RegularHistory(niceBillOkResponse, userId, COMPLETE, "SUCCESS",regularPayment.getId(), regularPayment.getPayDate()));
+                        requestPaymentHistories.add(orderConvertor.RegularHistory(niceBillOkResponse, userId, COMPLETE, "SUCCESS",regularPayment.getId(), regularPayment.getPayDate(),regularPayment.getUserCardId()));
                         log.info("success Payment " + "userId :" + regularPayment.getUserId() + " orderId : " + niceBillOkResponse.getOrderId() + " bid :" + regularPayment.getUserCard().getBid() + " amount :" + regularPayment.getAmount() + "원 projectId :" + regularPayment.getProjectId());
                     } else {
-                        requestPaymentHistories.add(orderConvertor.RegularHistory(niceBillOkResponse, userId, FAIL, niceBillOkResponse.getResultMsg(), regularPayment.getId(), regularPayment.getPayDate()));
+                        requestPaymentHistories.add(orderConvertor.RegularHistory(niceBillOkResponse, userId, FAIL, niceBillOkResponse.getResultMsg(), regularPayment.getId(), regularPayment.getPayDate(), regularPayment.getUserCardId()));
 
                         log.info("fail Payment " + "userId :" + regularPayment.getUserId() + " orderId : " + niceBillOkResponse.getOrderId() + " bid :" + regularPayment.getUserCard().getBid() + " amount :" + regularPayment.getAmount());
                     }
@@ -106,32 +107,34 @@ public class OrderService {
 
     @Transactional
     public void regularPaymentRetry() {
-        List<RequestPaymentHistory> requestPaymentHistories = calculateDayRegularPayRetry();
+        List<DonationUser> donationUsers = new ArrayList<>();
 
-    }
+        List<RequestPaymentHistory> requestPaymentHistories = regularPaymentHistoryRepository.findByPaymentStatus(FAIL);
 
+        for(RequestPaymentHistory requestPaymentHistory : requestPaymentHistories){
+            RegularPayment regularPayment = requestPaymentHistory.getRegularPayment();
+            UserCard userCard = requestPaymentHistory.getUserCard();
+            NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(),
+                    userCard.getBid(),
+                    orderConvertor.niceBillRequest(requestPaymentHistory.getRegularPayment(), createRandomUUID()));
 
-    @Transactional
-    public List<RequestPaymentHistory> calculateDayRegularPayRetry() {
-        Date currentDate = new Date();
+            if (niceBillOkResponse.getResultCode().equals("0000")) {
+                String flameName = orderHelper.createFlameName(requestPaymentHistory.getUser().getName());
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(currentDate);
+                String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
-        // 이번달에 마지막 날짜
-        int lastDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                donationUsers.add(orderConvertor.donationUser(niceBillOkResponse, requestPaymentHistory.getUserId(), flameName, inherenceNumber, regularPayment.getProjectId()));
 
-        // 오늘 날짜 구하기
-        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+                requestPaymentHistory.setPaymentStatus(COMPLETE);
 
-        if (currentDay == lastDayOfMonth) {
-            //현재 날짜와 달의 마지막 날짜가 같거나 클때의 로직
-            System.out.println("현재 날짜가 같아요");
-            return regularPaymentHistoryRepository.findByPayDateGreaterThanEqualAndPaymentStatus(currentDay,FAIL);
-        } else {
-            // 현재 날짜가 같지 않을 때의 로직
-            System.out.println("현재 날짜가 달라요");
-            return regularPaymentHistoryRepository.findByPayDateAndPaymentStatus(currentDay, FAIL);
+                log.info("success Payment Retry historyId: " + requestPaymentHistory.getId()+" userId :" + regularPayment.getUserId() + " orderId : " + niceBillOkResponse.getOrderId() + " bid :" + regularPayment.getUserCard().getBid() + " amount :" + regularPayment.getAmount() + "원 projectId :" + regularPayment.getProjectId());
+            } else {
+                log.info("fail Payment Retry historyId: " + requestPaymentHistory.getId()+ " userId :" + regularPayment.getUserId() + " orderId : " + niceBillOkResponse.getOrderId() + " bid :" + regularPayment.getUserCard().getBid() + " amount :" + regularPayment.getAmount());
+            }
         }
+
+        donationUserRepository.saveAll(donationUsers);
+
     }
+
 }

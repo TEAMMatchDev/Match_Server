@@ -40,7 +40,7 @@ public class OrderConvertor {
                 .build();
     }
 
-    public RequestPaymentHistory RegularHistory(NiceBillOkResponse niceBillOkResponse, Long userId, PaymentStatus paymentStatus, String reason, Long regularPaymentId, int payDate) {
+    public RequestPaymentHistory RegularHistory(NiceBillOkResponse niceBillOkResponse, Long userId, PaymentStatus paymentStatus, String reason, Long regularPaymentId, int payDate, Long userCardId) {
         return RequestPaymentHistory.builder()
                 .orderId(niceBillOkResponse.getOrderId())
                 .tid(niceBillOkResponse.getTid())
@@ -50,6 +50,7 @@ public class OrderConvertor {
                 .amount(niceBillOkResponse.getAmount())
                 .regularPaymentId(regularPaymentId)
                 .payDate(payDate)
+                .userCardId(userCardId)
                 .build();
     }
 }
