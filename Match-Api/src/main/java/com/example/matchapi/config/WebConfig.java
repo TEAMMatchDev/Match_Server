@@ -22,7 +22,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://localhost:3000",
                         "https://www.match-api-server.com",
                         "https://localhost:3000",
-                        "https://match-official.vercel.app"
+                        "https://match-official.vercel.app",
+                        "https://prod.match-api-server.com"
                 )
                 // 모든 HTTP Method를 허용한다.
                 .allowedMethods("*")

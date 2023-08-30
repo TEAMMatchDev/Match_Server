@@ -32,7 +32,7 @@ jobs:
           oauth.kakao.base-url: ${{ secrets.KAKAO_PROD_BASE_URL }}
           oauth.kakao.client-id: ${{ secrets.KAKAO_CLIENT }}
           oauth.kakao.client-secret: ${{ secrets.KAKAO_SECRET }}
-          oauth.kakao.redirect-url: ${{ secrets.KAKAO_REDIRECT }}
+          oauth.kakao.redirect-url: ${{ secrets.KAKAO_PROD_REDIRECT }}
           oauth.kakao.app-id: ${{ secrets.KAKAO_APP_ID }}
           oauth.kakao.admin-key: ${{ secrets.KAKAO_ADMIN_KEY }}
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
@@ -82,18 +82,18 @@ jobs:
           mkdir -p deploy
           cp Match-Api/build/libs/*.jar deploy/match-prod-api.jar
           cp Procfile deploy/Procfile
-          cp -r .ebextensions-prod deploy/.ebextensions-prod
+          cp -r .ebextensions-prod deploy/.ebextensions
           cp -r .platform deploy/.platform
-          cd deploy && zip -r match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
+          cd deploy && zip -r match-prod-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
 
       - name: Deploy Consumer to EB
         uses: einaregilsson/beanstalk-deploy@v19
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: MatchProdServer
-          environment_name: match-prod-env
-          version_label: match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
+          application_name: prodapiserver
+          environment_name: Prodapiserver-env
+          version_label: match-prod-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
           region: ap-northeast-2
-          deployment_package: deploy/match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
+          deployment_package: deploy/match-prod-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
           wait_for_deployment: false
