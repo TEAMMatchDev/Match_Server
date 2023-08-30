@@ -84,7 +84,7 @@ jobs:
           cp Procfile deploy/Procfile
           cp -r .ebextensions-prod deploy/.ebextensions-prod
           cp -r .platform deploy/.platform
-          cd deploy && zip -r match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
+          cd deploy && zip -r match-prod-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
 
       - name: Deploy Consumer to EB
         uses: einaregilsson/beanstalk-deploy@v19
@@ -93,7 +93,7 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: prodapiserver
           environment_name: Prodapiserver-env
-          version_label: match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
+          version_label: match-prod-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
           region: ap-northeast-2
-          deployment_package: deploy/match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
+          deployment_package: deploy/match-prod-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
           wait_for_deployment: false
