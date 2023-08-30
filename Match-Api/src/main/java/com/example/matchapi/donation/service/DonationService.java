@@ -8,14 +8,13 @@ import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.entity.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
-import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
-import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_CORRECT_USER;
-import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationListErrorCode.FILTER_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationRefundErrorCode.*;
 
@@ -34,7 +31,6 @@ public class DonationService {
     private final DonationUserRepository donationUserRepository;
     private final OrderService orderService;
     private final DonationConvertor donationConvertor;
-    private final RegularPaymentRepository regularPaymentRepository;
 
     public PageResponse<List<DonationRes.DonationList>> getDonationList(Long userId, int filter, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -174,15 +170,5 @@ public class DonationService {
 
 
         return new PageResponse<>(donationUsers.isLast(),donationUsers.getTotalElements(),flameLists);
-    }
-
-    public void cancelRegularPay(User user, Long regularId) {
-        RegularPayment regularPayment = regularPaymentRepository.findById(regularId).orElseThrow(() -> new BadRequestException(REGULAR_PAY_NOT_EXIST));
-
-        if(!regularPayment.getUserId().equals(user.getId())) throw new BadRequestException(REGULAR_PAY_NOT_CORRECT_USER);
-
-        regularPaymentRepository.deleteById(regularId);
-
-
     }
 }

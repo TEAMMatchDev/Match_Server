@@ -8,8 +8,6 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "RegularPayment")
@@ -50,8 +48,4 @@ public class RegularPayment extends BaseEntity {
 
     @Column(name="userCardId")
     private Long userCardId;
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "regularPaymentId")
-    private List<RequestPaymentHistory> requestPaymentHistory = new ArrayList<>();
 }
