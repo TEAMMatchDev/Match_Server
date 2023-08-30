@@ -17,7 +17,7 @@ public class NiceBillOkResponse {
     private boolean useEscrow;
     private String goodsName;
     private int balanceAmt;
-    private int amount;
+    private Long amount;
     private String payMethod;
     private String cancelledAt;
     private String failedAt;

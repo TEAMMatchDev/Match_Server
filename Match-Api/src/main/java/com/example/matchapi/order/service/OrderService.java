@@ -233,7 +233,7 @@ public class OrderService {
 
         String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
-        donationUserRepository.save(orderConvertor.donationUserV2(nicePaymentAuth, user.get().getId(), Math.toIntExact(amount), orderRequest.get().getProjectId(), flameName, inherenceNumber));
+        donationUserRepository.save(orderConvertor.donationUserV2(nicePaymentAuth, user.get().getId(), amount, orderRequest.get().getProjectId(), flameName, inherenceNumber));
     }
 
 }

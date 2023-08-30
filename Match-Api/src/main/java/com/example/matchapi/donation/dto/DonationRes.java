@@ -34,7 +34,7 @@ public class DonationRes {
 
         private String donationStatus;
 
-        private int amount;
+        private Long amount;
 
         private String createdAt;
     }
