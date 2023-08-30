@@ -18,7 +18,7 @@ jobs:
     # 태그 생성
       - name: Bump version and push tag
         id: tag_version
-        uses: mathieudutour/github-tag-action@v5.5  # 가져다 쓸 auto tagging 프로그램
+        uses: mathieudutour/github-tag-action@v6.1  # 가져다 쓸 auto tagging 프로그램
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }} # secrets.GITHUB_TOKEN 는 자동생성됨
 
@@ -29,7 +29,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # secrets.GITHUB_TOKEN 는 자동생성됨
         with:
-          tag_name: Api-Release ${{ steps.tag_version.outputs.new_tag }}
+          tag_name: Api-Release.${{ steps.tag_version.outputs.new_tag }}
           release_name: Api-Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
 
