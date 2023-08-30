@@ -32,7 +32,7 @@ jobs:
           oauth.kakao.base-url: ${{ secrets.KAKAO_PROD_BASE_URL }}
           oauth.kakao.client-id: ${{ secrets.KAKAO_CLIENT }}
           oauth.kakao.client-secret: ${{ secrets.KAKAO_SECRET }}
-          oauth.kakao.redirect-url: ${{ secrets.KAKAO_REDIRECT }}
+          oauth.kakao.redirect-url: ${{ secrets.KAKAO_PROD_REDIRECT }}
           oauth.kakao.app-id: ${{ secrets.KAKAO_APP_ID }}
           oauth.kakao.admin-key: ${{ secrets.KAKAO_ADMIN_KEY }}
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
