@@ -29,8 +29,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # secrets.GITHUB_TOKEN 는 자동생성됨
         with:
-          tag_name: ${{ steps.tag_version.outputs.new_tag }}
-          release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+          tag_name: Api-Release ${{ steps.tag_version.outputs.new_tag }}
+          release_name: Api-Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
 
       - name: Setup JDK 11
