@@ -139,7 +139,7 @@ public class OrderService {
     }
 
     public List<OrderRes.UserBillCard> getUserBillCard(User user) {
-        List<UserCard> userCards = user.getUserCard();
+        List<UserCard> userCards = userCardRepository.findByUser(user);
         List<OrderRes.UserBillCard> userBillCards = new ArrayList<>();
 
         userCards.forEach(
