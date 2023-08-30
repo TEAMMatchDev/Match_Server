@@ -1,8 +1,9 @@
 name: prod MATCH API Server CI/CD
 
 on:
-  pull_request:
-    branches: [prod]
+  push:
+    tags:
+      - Release-v*.*.*
   workflow_dispatch: # 수동 실행 옵션 (생략)
 
 jobs:
@@ -20,21 +21,12 @@ jobs:
           distribution: 'temurin'
 
 
-      - name: set Environment - Domain Prod Yml
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ./Match-Domain/src/main/resources/application-domain-prod.yml
-        env:
-          spring.datasource.url: ${{ secrets.PROD_DB_URL_HOST }}
-          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
-          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
-
-      - name: set Environment - Common Prod Yml
+      - name: Set Environment - Common Prod Yml
         uses: microsoft/variable-substitution@v1
         with:
           files: ./Match-Common/src/main/resources/application-common.yml
         env:
-          oauth.kakao.base-url: ${{ secrets.PROD_KAKAO_BASE_URL }}
+          oauth.kakao.base-url: ${{ secrets.KAKAO_PROD_BASE_URL }}
           oauth.kakao.client-id: ${{ secrets.KAKAO_CLIENT }}
           oauth.kakao.client-secret: ${{ secrets.KAKAO_SECRET }}
           oauth.kakao.redirect-url: ${{ secrets.KAKAO_REDIRECT }}
@@ -42,6 +34,30 @@ jobs:
           oauth.kakao.admin-key: ${{ secrets.KAKAO_ADMIN_KEY }}
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
           jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
+          oauth.naver.secret: ${{ secrets.NAVER_SECRET }}
+          oauth.naver.client: ${{ secrets.NAVER_CLIENT }}
+          oauth.naver.redirect-url: ${{ secrets.NAVER_PROD_REDIRECT}}
+          sms.secret: ${{ secrets.SMS_SECRET_KEY }}
+          sms.api: ${{ secrets.SMS_API_KEY }}
+          sms.sender: ${{ secrets.SMS_SENDER }}
+          nice.secret: ${{ secrets.NICE_PROD_SECRET_KEY}}
+          nice.client: ${{ secrets.NICE_PROD_CLIENT_KEY }}
+          nice.url: ${{ secrets.NICE_PROD_URL}}
+          aws.access-key: ${{ secrets.AWS_S3_ACCESS_KEY }}
+          aws.secret-key: ${{ secrets.AWS_S3_SECRET_KEY }}
+          aws.s3.bucket: ${{ secrets.AWS_S3_BUCKET }}
+          aws.s3.bucket-url: ${{ secrets.AWS_S3_BASE_URL }}
+
+
+      - name: Set Environment Domain - Domain Prod Yml
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ./Match-Domain/src/main/resources/application-domain-prod.yml
+        env:
+          spring.datasource.url: ${{ secrets.PROD_DB_URL_HOST }}
+          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.redis.host : ${{ secrets.REDIS_PROD_HOST }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -63,7 +79,7 @@ jobs:
           mkdir -p deploy
           cp Match-Api/build/libs/*.jar deploy/match-prod-api.jar
           cp Procfile deploy/Procfile
-          cp -r .ebextensions-prod deploy/.ebextensions
+          cp -r .ebextensions-prod deploy/.ebextensions-prod
           cp -r .platform deploy/.platform
           cd deploy && zip -r match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
 
@@ -72,8 +88,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: Match-Api
-          environment_name: Match-Api-env
+          application_name: MatchProdServer
+          environment_name: match-prod-env
           version_label: match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
           region: ap-northeast-2
           deployment_package: deploy/match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
