@@ -14,10 +14,11 @@ jobs:
     steps: # 작업 단계
       - name: Checkout source code # 단계별 이름, 구분자로 소스를 가져옴
         uses: actions/checkout@v2
+
     # 태그 생성
       - name: Bump version and push tag
         id: tag_version
-        uses: radiculopathies/github-tag-action@v5.5  # 가져다 쓸 auto tagging 프로그램
+        uses: mathieudutour/github-tag-action@v5.5  # 가져다 쓸 auto tagging 프로그램
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }} # secrets.GITHUB_TOKEN 는 자동생성됨
 
