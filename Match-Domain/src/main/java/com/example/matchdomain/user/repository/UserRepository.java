@@ -44,7 +44,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
             "If((select exists (select * from UserCard UC where UC.userId=U.id)),'true','false')'card'," +
             "(select count(*) from DonationUser DU where DU.userId = U.id)'donationCnt'," +
             "COALESCE((SELECT SUM(DU.price) FROM DonationUser DU WHERE DU.userId = U.id), 0) AS totalAmount " +
-            "FROM User U " ,nativeQuery = true, countQuery = "select count(*) from User")
+            "FROM User U order by createdAt desc" ,nativeQuery = true, countQuery = "select count(*) from User")
     Page<UserList> getUserList(Pageable pageable);
 
     public interface UserList {
