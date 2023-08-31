@@ -5,6 +5,10 @@ import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.DonationUser;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.List;
+
+import static com.example.matchdomain.donation.entity.DonationStatus.*;
+
 @Convertor
 public class DonationConvertor {
     public DonationRes.FlameList Flame(DonationUser result) {
@@ -18,6 +22,46 @@ public class DonationConvertor {
                         +result.getCreatedAt().getDayOfMonth()+"일 "
                         +result.getCreatedAt().getHour()+"시 "
                         +result.getCreatedAt().getMinute()+"분")
+                .build();
+    }
+
+    public DonationRes.DonationCount DonationCount(List<DonationUser> donationUserList) { int beforeCnt=0;
+        int underCnt=0;
+        int successCnt=0;
+
+        for (DonationUser donationUser : donationUserList) {
+            if (donationUser.getDonationStatus() == EXECUTION_BEFORE) {
+                beforeCnt += 1;
+            } else if (donationUser.getDonationStatus() == EXECUTION_UNDER) {
+                underCnt += 1;
+            } else if (donationUser.getDonationStatus() == EXECUTION_SUCCESS) {
+                successCnt += 1;
+            }
+        }
+        return DonationRes.DonationCount.builder()
+                .beforeCnt(beforeCnt)
+                .underCnt(underCnt)
+                .successCnt(successCnt)
+                .build();
+
+
+    }
+
+    public DonationRes.DonationList DonationList(DonationUser result) {
+        String payDate="";
+        if(result.getRegularPayment()!=null) {
+            payDate = "매월 " + result.getRegularPayment().getPayDate() + "일 " + result.getRegularPayment().getAmount() + "원";
+        }else{
+            payDate = "단기 후원 " + result.getPrice() + "원";
+        }
+
+        return DonationRes.DonationList.builder()
+                .donationId(result.getId())
+                .donationDate(String.valueOf(result.getCreatedAt().getYear()).replace("20","")+"."+result.getCreatedAt().getMonthValue())
+                .donationStatus(result.getDonationStatus().getName())
+                .projectName(result.getProject().getProjectName())
+                .regularStatus(result.getRegularStatus().getName())
+                .regularDate(payDate)
                 .build();
     }
 }

@@ -60,7 +60,7 @@ public class OrderService {
 
                         String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
-                        donationUsers.add(orderConvertor.donationUser(niceBillOkResponse, userId, flameName, inherenceNumber, regularPayment.getProjectId()));
+                        donationUsers.add(orderConvertor.donationUser(niceBillOkResponse, userId, flameName, inherenceNumber, regularPayment.getProjectId(),regularPayment.getId()));
 
                         requestPaymentHistories.add(orderConvertor.RegularHistory(niceBillOkResponse, userId, COMPLETE, "SUCCESS",regularPayment.getId(), regularPayment.getPayDate(),regularPayment.getUserCardId()));
                         log.info("success Payment " + "userId :" + regularPayment.getUserId() + " orderId : " + niceBillOkResponse.getOrderId() + " bid :" + regularPayment.getUserCard().getBid() + " amount :" + regularPayment.getAmount() + "원 projectId :" + regularPayment.getProjectId());
@@ -123,7 +123,7 @@ public class OrderService {
 
                 String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
-                donationUsers.add(orderConvertor.donationUser(niceBillOkResponse, requestPaymentHistory.getUserId(), flameName, inherenceNumber, regularPayment.getProjectId()));
+                donationUsers.add(orderConvertor.donationUser(niceBillOkResponse, requestPaymentHistory.getUserId(), flameName, inherenceNumber, regularPayment.getProjectId(), regularPayment.getId()));
 
                 requestPaymentHistory.setPaymentStatus(COMPLETE);
 

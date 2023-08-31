@@ -43,16 +43,16 @@ public class DonationService {
         List<DonationRes.DonationList> donationLists = new ArrayList<>();
 
         if(filter == 0){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatusNot(userId, EXECUTION_REFUND, pageable);
+            donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrderByCreatedAtDesc(userId, EXECUTION_REFUND, pageable);
         }
         else if(filter == 1){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatus(userId, DonationStatus.EXECUTION_BEFORE, pageable);
+            donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrderByCreatedAtDesc(userId, DonationStatus.EXECUTION_BEFORE, pageable);
         }
         else if(filter == 2){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatus(userId, DonationStatus.EXECUTION_UNDER, pageable);
+            donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrderByCreatedAtDesc(userId, DonationStatus.EXECUTION_UNDER, pageable);
 
         }else if(filter == 3){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatus(userId, DonationStatus.EXECUTION_SUCCESS, pageable);
+            donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrderByCreatedAtDesc(userId, DonationStatus.EXECUTION_SUCCESS, pageable);
 
         }else{
             throw new BadRequestException(FILTER_NOT_EXIST);
@@ -61,12 +61,7 @@ public class DonationService {
         donationUsers.getContent().forEach(
                 result ->{
                     donationLists.add(
-                            new DonationRes.DonationList(
-                                    result.getId(),
-                                    result.getDonationStatus().getName(),
-                                    result.getInherenceName(),
-                                    result.getRegularStatus().getName()
-                            )
+                            donationConvertor.DonationList(result)
                     );
                 }
         );
@@ -184,5 +179,11 @@ public class DonationService {
         regularPaymentRepository.deleteById(regularId);
 
 
+    }
+
+    public DonationRes.DonationCount getDonationCount(User user) {
+        List<DonationUser> donationUser = donationUserRepository.findByUserAndDonationStatusNot(user, EXECUTION_REFUND);
+
+        return donationConvertor.DonationCount(donationUser);
     }
 }
