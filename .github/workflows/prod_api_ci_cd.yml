@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest # action 스크립트가 작동될 OS
 
     steps: # 작업 단계
-      - name: Checkout source code # 단계별 이름, 구분자로 소스를 가져옴
+      - name: Checkout source code #  단계별 이름, 구분자로 소스를 가져옴
         uses: actions/checkout@v2
 
       - name: Setup JDK 11
