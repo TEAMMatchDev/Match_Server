@@ -29,4 +29,19 @@ public class UserRes {
 
         private String refreshToken;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SignUpInfo {
+        private Long totalUserCnt;
+
+        private Long oneDayUserCnt;
+
+        private Long weekUserCnt;
+
+        private Long monthUserCnt;
+    }
 }
