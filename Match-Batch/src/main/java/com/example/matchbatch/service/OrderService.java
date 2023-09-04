@@ -2,6 +2,7 @@ package com.example.matchbatch.service;
 
 import com.example.matchbatch.OrderHelper;
 import com.example.matchbatch.convertor.OrderConvertor;
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.donation.entity.RequestPaymentHistory;
@@ -92,11 +93,11 @@ public class OrderService {
         if (currentDay == lastDayOfMonth) {
             //현재 날짜와 달의 마지막 날짜가 같거나 클때의 로직
             System.out.println("현재 날짜가 같아요");
-            return regularPaymentRepository.findByPayDateGreaterThanEqual(currentDay);
+            return regularPaymentRepository.findByPayDateGreaterThanEqualAndStatus(currentDay, Status.ACTIVE);
         } else {
             // 현재 날짜가 같지 않을 때의 로직
             System.out.println("현재 날짜가 달라요");
-            return regularPaymentRepository.findByPayDate(currentDay);
+            return regularPaymentRepository.findByPayDateAndStatus(currentDay, Status.ACTIVE);
         }
     }
 
@@ -109,7 +110,7 @@ public class OrderService {
     public void regularPaymentRetry() {
         List<DonationUser> donationUsers = new ArrayList<>();
 
-        List<RequestPaymentHistory> requestPaymentHistories = regularPaymentHistoryRepository.findByPaymentStatus(FAIL);
+        List<RequestPaymentHistory> requestPaymentHistories = regularPaymentHistoryRepository.findByPaymentStatusAndStatus(FAIL, Status.ACTIVE);
 
         for(RequestPaymentHistory requestPaymentHistory : requestPaymentHistories){
             RegularPayment regularPayment = requestPaymentHistory.getRegularPayment();

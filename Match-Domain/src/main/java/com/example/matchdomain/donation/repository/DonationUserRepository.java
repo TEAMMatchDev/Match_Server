@@ -1,6 +1,7 @@
 package com.example.matchdomain.donation.repository;
 
 
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.user.entity.User;
@@ -19,42 +20,47 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
 
     Page<DonationUser> findByUserId(Long userId, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrderByCreatedAtAsc(Long userId, DonationStatus donationStatus, Pageable pageable);
 
 
-    Page<DonationUser> findByUserIdAndDonationStatusNot(Long userId, DonationStatus donationStatus ,Pageable pageable);
 
     List<DonationUser> findByUserAndDonationStatusNot(User user, DonationStatus donationStatus);
 
-    Page<DonationUser> findByUserIdAndDonationStatus(Long userId, DonationStatus donationStatus, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrderByCreatedAtDesc(Long id, DonationStatus donationStatus, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceAsc(Long id, DonationStatus donationStatus, String content, String s, String content1, Status active, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrderByPriceDesc(Long id, DonationStatus donationStatus, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceDesc(Long id, DonationStatus donationStatus, String content, String s, String content1, Status active, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrderByPriceAsc(Long id, DonationStatus donationStatus, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(Long id, DonationStatus donationStatus, String content, String s, String content1, Status active, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByPriceAsc(Long id, DonationStatus donationStatus, String content, String s, String content1, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(Long id, DonationStatus donationStatus, String content, String s, String content1, Status active, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByPriceDesc(Long id, DonationStatus donationStatus, String content, String s, String content1, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByCreatedAtAsc(Long id, DonationStatus donationStatus, String content, String s, String content1, Pageable pageable);
+    List<DonationUser> findByUserAndDonationStatusNotAndStatus(User user, DonationStatus donationStatus, Status status);
 
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByCreatedAtDesc(Long id, DonationStatus donationStatus, String content, String s, String content1, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(Long userId,  DonationStatus donationStatus,Status status, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusOrderByCreatedAtDesc(Long id, DonationStatus donationStatus, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusOrderByCreatedAtAsc(Long id, DonationStatus donationStatus, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtAsc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusOrderByPriceDesc(Long id, DonationStatus donationStatus, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtDesc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusOrderByPriceAsc(Long id, DonationStatus donationStatus, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusNotAndStatusOrderByPriceDesc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByCreatedAtDesc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusNotAndStatusOrderByPriceAsc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByCreatedAtAsc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusAndStatusOrderByCreatedAtAsc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByPriceDesc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusAndStatusOrderByPriceDesc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
 
-    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByPriceAsc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Pageable pageable);
+    Page<DonationUser> findByUserIdAndDonationStatusAndStatusOrderByPriceAsc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
+
+    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Status status, Pageable pageable);
+
+    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Status status, Pageable pageable);
+
+    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceDesc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Status status, Pageable pageable);
+
+    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceAsc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Status status, Pageable pageable);
+
+    Page<DonationUser> findByUserIdAndStatusAndDonationStatusNotOrderByCreatedAtDesc(Long userId, Status status, DonationStatus donationStatus, Pageable pageable);
 }
