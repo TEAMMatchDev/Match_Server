@@ -9,6 +9,7 @@ import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
+import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
@@ -118,5 +119,32 @@ public class UserConvertor {
                 .name(user.getName())
                 .birthDay(user.getBirth().toString())
                 .phoneNumber(user.getPhoneNumber()).build();
+    }
+
+    public UserRes.SignUpInfo UserSignUpInfo(Long oneDayUser, Long weekUser, Long monthUser, Long totalUser) {
+        return UserRes.SignUpInfo.builder()
+                .totalUserCnt(totalUser)
+                .oneDayUserCnt(oneDayUser)
+                .weekUserCnt(weekUser)
+                .monthUserCnt(monthUser)
+                .build();
+    }
+
+    public UserRes.UserList UserList(UserRepository.UserList result) {
+        return UserRes.UserList
+                .builder()
+                .userId(result.getUserId())
+                .name(result.getName())
+                .birth(String.valueOf(result.getBirth()))
+                .socialType(result.getSocialType().getName())
+                .gender(result.getGender().getValue())
+                .email(result.getEmail())
+                .phoneNumber(result.getPhoneNumber())
+                .donationCnt(result.getDonationCnt())
+                .totalAmount(result.getTotalAmount())
+                .card(result.getCard())
+                .status(result.getStatus().getName())
+                .createdAt(result.getCreatedAt().toString())
+                .build();
     }
 }

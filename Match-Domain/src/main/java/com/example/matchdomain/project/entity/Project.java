@@ -71,4 +71,14 @@ public class Project extends BaseEntity {
         this.projectName = projectName;
         this.projectImage = projectImage;
     }
+
+    public void modifyProject(String projectName, String usages, String detail, RegularStatus regularStatus, LocalDateTime startDate, LocalDateTime endDate, ProjectKind projectKind) {
+        this.projectName = projectName;
+        this.usages = usages;
+        this.projectExplanation = detail;
+        this.regularStatus = regularStatus;
+        this.startedAt = startDate;
+        this.finishedAt = endDate;
+        this.projectKind = projectKind;
+    }
 }

@@ -1,8 +1,11 @@
 package com.example.matchapi.project.service;
 
 import com.example.matchapi.project.convertor.ProjectConvertor;
+import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
+import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.helper.AuthHelper;
+import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.project.entity.*;
@@ -11,15 +14,22 @@ import com.example.matchdomain.project.repository.ProjectImageRepository;
 import com.example.matchdomain.project.repository.ProjectRepository;
 import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
 import com.example.matchdomain.user.entity.User;
+import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.matchdomain.project.entity.ImageRepresentStatus.NORMAL;
+import static com.example.matchdomain.project.entity.ImageRepresentStatus.REPRESENT;
+import static com.example.matchdomain.project.exception.ProjectGetErrorCode.PROJECT_NOT_EXIST;
 
 
 @Service
@@ -29,8 +39,8 @@ public class ProjectService {
     private final ProjectConvertor projectConvertor;
     private final ProjectImageRepository projectImageRepository;
     private final AuthHelper authHelper;
-    private final ProjectUserAttentionRepository projectUserAttentionRepository;
     private final ProjectCommentRepository projectCommentRepository;
+    private final S3UploadService s3UploadService;
 
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -158,5 +168,77 @@ public class ProjectService {
 
 
         return null;
+    }
+
+
+    @Transactional
+    public void postProject(ProjectReq.Project projects, MultipartFile presentFile, List<MultipartFile> multipartFiles) {
+
+        System.out.println(projects.getProjectName());
+        Project project = projectRepository.save(projectConvertor.postProject(projects));
+
+        String url = s3UploadService.uploadProjectPresentFile(project.getId() ,presentFile);
+
+        List<String> imgUrlList = s3UploadService.listUploadProjectFiles(project.getId(), multipartFiles);
+
+        saveImgList(project.getId(), url, imgUrlList);
+
+        System.out.println(url);
+    }
+
+    public PageResponse<List<ProjectRes.ProjectAdminList>> getProjectList(int page, int size) {
+        Pageable pageable  = PageRequest.of(page,size);
+
+        Page<ProjectRepository.ProjectAdminList> projectAdminLists = projectRepository.getProjectAdminList(pageable, Status.ACTIVE.getValue());
+
+        List<ProjectRes.ProjectAdminList> projectLists = new ArrayList<>();
+
+        projectAdminLists.getContent().forEach(
+                result -> projectLists.add(
+                        projectConvertor.ProjectList(result)
+                )
+        );
+
+        return new PageResponse<>(projectAdminLists.isLast(), projectAdminLists.getTotalElements(), projectLists);
+    }
+
+    @Transactional
+    public void patchProjectStatus(ProjectStatus projectStatus, Long projectId) {
+        Project project = projectRepository.findById(projectId).orElseThrow(()-> new NotFoundException(PROJECT_NOT_EXIST));
+
+        project.setProjectStatus(projectStatus);
+
+        projectRepository.save(project);
+    }
+
+    public void deleteProject(Long projectId) {
+        Project project = projectRepository.findById(projectId).orElseThrow(()-> new NotFoundException(PROJECT_NOT_EXIST));
+
+        project.setStatus(Status.INACTIVE);
+
+        projectRepository.save(project);
+    }
+
+    public void patchProject(Long projectId, ProjectReq.ModifyProject modifyProject) {
+        Project project = projectRepository.findById(projectId).orElseThrow(()-> new NotFoundException(PROJECT_NOT_EXIST));
+
+        project.modifyProject(modifyProject.getProjectName(), modifyProject.getUsages(), modifyProject.getDetail(), modifyProject.getRegularStatus(), modifyProject.getStartDate(), modifyProject.getEndDate(), modifyProject.getProjectKind());
+
+        projectRepository.save(project);
+    }
+
+    public void saveImgList(Long id, String url, List<String> imgUrlList) {
+        imgUrlList.add(url);
+        List<ProjectImage> projectImages = new ArrayList<>();
+
+        for (int i=1 ; i <= imgUrlList.size(); i++) {
+            if(i==imgUrlList.size()){
+                projectImages.add(projectConvertor.postProjectImage(id,imgUrlList.get(i-1),REPRESENT,i));
+            }else {
+                projectImages.add(projectConvertor.postProjectImage(id, imgUrlList.get(i-1),NORMAL, i));
+            }
+        }
+
+        projectImageRepository.saveAll(projectImages);
     }
 }
