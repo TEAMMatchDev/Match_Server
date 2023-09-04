@@ -5,18 +5,15 @@ import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.entity.ProjectComment;
 import com.example.matchdomain.project.entity.ProjectImage;
 import com.example.matchdomain.project.entity.ProjectUserAttention;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
-import static com.example.matchdomain.project.entity.ProjectStatus.PROCEEDING;
 
 @Convertor
 @RequiredArgsConstructor

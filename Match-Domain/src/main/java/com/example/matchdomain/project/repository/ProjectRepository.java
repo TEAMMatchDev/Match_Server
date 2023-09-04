@@ -64,6 +64,16 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                                              @Param("content2") String content2, @Param("projectStatus") String projectStatus,
                                              @Param("now") LocalDateTime now, @Param("imageRepresentStatus") String imageRepresentStatus, Pageable pageable);
 
+    @Query(value = "select P.id'projectId', " +
+            "P.projectName, " +
+            "usages," +
+            "COALESCE(sum(DU.price), 0)'totalAmount' , " +
+            "count(DU.projectId)'totalDonationCnt' " +
+            "from Project P left join DonationUser DU on DU.projectId = P.id group by P.id",
+            nativeQuery = true ,
+            countQuery = "select count(*) from Project")
+    Page<ProjectAdminList> getProjectAdminList(Pageable pageable);
+
     interface ProjectList {
         Long getId();
         String getImgUrl();
@@ -71,5 +81,13 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         String getProjectName();
         String getProjectKind();
         boolean getLike();
+    }
+
+    public interface ProjectAdminList {
+        Long getProjectId();
+        String getUsages();
+        String getProjectName();
+        int getTotalDonationCnt();
+        int getTotalAmount();
     }
 }
