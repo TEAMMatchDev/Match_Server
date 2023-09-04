@@ -5,6 +5,7 @@ import com.example.adminapi.project.dto.ProjectReq;
 import com.example.adminapi.project.dto.ProjectRes;
 import com.example.adminapi.project.helper.ProjectHelper;
 import com.example.matchcommon.reponse.PageResponse;
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.repository.ProjectImageRepository;
 import com.example.matchdomain.project.repository.ProjectRepository;
@@ -51,7 +52,7 @@ public class ProjectService {
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(int page, int size) {
         Pageable pageable  = PageRequest.of(page,size);
 
-        Page<ProjectRepository.ProjectAdminList> projectAdminLists = projectRepository.getProjectAdminList(pageable);
+        Page<ProjectRepository.ProjectAdminList> projectAdminLists = projectRepository.getProjectAdminList(pageable, Status.ACTIVE.getValue());
 
         List<ProjectRes.ProjectList> projectLists = new ArrayList<>();
 

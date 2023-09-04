@@ -1,5 +1,6 @@
 package com.example.matchdomain.user.repository;
 
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.user.entity.Gender;
 import com.example.matchdomain.user.entity.SocialType;
 import com.example.matchdomain.user.entity.User;
@@ -46,6 +47,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
             "COALESCE((SELECT SUM(DU.price) FROM DonationUser DU WHERE DU.userId = U.id), 0) AS totalAmount " +
             "FROM User U order by createdAt desc" ,nativeQuery = true, countQuery = "select count(*) from User")
     Page<UserList> getUserList(Pageable pageable);
+
+    Optional<User> findByIdAndStatus(Long aLong, Status status);
 
     public interface UserList {
         Long getUserId();

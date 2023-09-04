@@ -34,6 +34,9 @@ public class JwtFilter extends GenericFilterBean{
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String jwt = jwtService.getJwt();
         String requestURI = httpServletRequest.getRequestURI();
+        logger.info("jwt: {}" , jwt);
+
+
 
         if (StringUtils.hasText(jwt)&& jwtService.validateToken(servletRequest,jwt)) {
             Authentication authentication = jwtService.getAuthentication(jwt,servletRequest);

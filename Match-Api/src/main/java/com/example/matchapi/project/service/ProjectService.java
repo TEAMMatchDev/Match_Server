@@ -4,6 +4,7 @@ import com.example.matchapi.project.convertor.ProjectConvertor;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchcommon.reponse.PageResponse;
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.repository.ProjectCommentRepository;
 import com.example.matchdomain.project.repository.ProjectImageRepository;
@@ -41,7 +42,7 @@ public class ProjectService {
         List<ProjectRes.ProjectList> projectLists = new ArrayList<>();
 
         if(!userId.equals(0L)){
-            Page<ProjectRepository.ProjectList> projects = projectRepository.findLoginUserProjectList(userId, ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable);
+            Page<ProjectRepository.ProjectList> projects = projectRepository.findLoginUserProjectList(userId, ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, Status.ACTIVE.getValue());
             projects.getContent().forEach(
                     result -> {
                         projectLists.add(new ProjectRes.ProjectList(
@@ -58,7 +59,7 @@ public class ProjectService {
         }
 
         else{
-            Page<Project> projects = projectRepository.findByProjectStatusAndFinishedAtGreaterThanEqualAndProjectImage_ImageRepresentStatusOrderByViewCnt(ProjectStatus.PROCEEDING, LocalDateTime.now(), ImageRepresentStatus.REPRESENT, pageable);
+            Page<Project> projects = projectRepository.findByStatusAndProjectStatusAndFinishedAtGreaterThanEqualAndProjectImage_ImageRepresentStatusOrderByViewCnt(Status.ACTIVE,ProjectStatus.PROCEEDING, LocalDateTime.now(), ImageRepresentStatus.REPRESENT, pageable);
             projects.getContent().forEach(
                     result -> {
                         String imageUrl = result.getProjectImage().isEmpty() ? null : result.getProjectImage().get(0).getUrl();
@@ -78,7 +79,7 @@ public class ProjectService {
     }
 
     public ProjectRes.ProjectDetail getProjectDetail(User user, Long projectId) {
-        List<ProjectImage> projectImage = projectImageRepository.findByProjectIdAndImageRepresentStatusOrderBySequenceAsc(projectId, ImageRepresentStatus.NORMAL);
+        List<ProjectImage> projectImage = projectImageRepository.findByProjectIdAndImageRepresentStatusAndProject_StatusOrderBySequenceAsc(projectId, ImageRepresentStatus.NORMAL, Status.ACTIVE);
         return projectConvertor.projectImgList(projectImage);
     }
 
@@ -93,7 +94,7 @@ public class ProjectService {
 
         if(!userId.equals(0L)){
 
-            Page<ProjectRepository.ProjectList> projects = projectRepository.searchProjectLoginUser(userId,content,content,content,ProjectStatus.PROCEEDING.getValue(),LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(),pageable);
+            Page<ProjectRepository.ProjectList> projects = projectRepository.searchProjectLoginUser(userId,content,content,content,ProjectStatus.PROCEEDING.getValue(),LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(),pageable,Status.ACTIVE.getValue());
 
             projects.getContent().forEach(
                     result -> {
@@ -113,7 +114,7 @@ public class ProjectService {
 
         }
         else{
-            Page<Project> projects = projectRepository.searchProject(content,content,content,ProjectStatus.PROCEEDING,LocalDateTime.now(),ImageRepresentStatus.REPRESENT,pageable);
+            Page<Project> projects = projectRepository.searchProject(content,content,content,ProjectStatus.PROCEEDING,LocalDateTime.now(),ImageRepresentStatus.REPRESENT,pageable, Status.ACTIVE);
 
             projects.getContent().forEach(
                     result -> {
@@ -144,7 +145,7 @@ public class ProjectService {
             userId = 0L;
         }
 
-        Page<ProjectComment> projectComments = projectCommentRepository.findByProjectIdOrderByCreatedAtDesc(projectId,pageable);
+        Page<ProjectComment> projectComments = projectCommentRepository.findByProjectIdAndStatusOrderByCreatedAtDesc(projectId,Status.ACTIVE,pageable);
 
         List<ProjectRes.CommentList> commentLists = new ArrayList<>();
         projectComments.getContent().forEach(

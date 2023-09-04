@@ -45,6 +45,7 @@ public class JwtFilter extends GenericFilterBean{
             }
 
         } else {
+            logger.info("유효하지 않은 jwt : {}",jwt);
             logger.info("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
         }
 

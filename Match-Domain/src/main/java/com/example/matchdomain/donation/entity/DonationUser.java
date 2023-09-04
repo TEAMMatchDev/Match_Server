@@ -45,7 +45,7 @@ public class DonationUser extends BaseEntity {
     private Long regularPaymentId;
 
     @Column(name="price")
-    private int price;
+    private Long price;
 
     private String tid;
 

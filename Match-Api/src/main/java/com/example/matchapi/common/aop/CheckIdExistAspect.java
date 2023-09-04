@@ -3,6 +3,7 @@ package com.example.matchapi.common.aop;
 import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.RegularStatus;
 import com.example.matchdomain.donation.entity.UserCard;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
@@ -51,14 +52,14 @@ public class CheckIdExistAspect {
         for (int i = 0; i < parameterNames.length; i++) {
             if ("projectId".equals(parameterNames[i])) {
                 Long projectId = (Long) args[i];
-                if (!projectRepository.existsById(projectId)) {
+                if (!projectRepository.existsByIdAndStatus(projectId, Status.ACTIVE)) {
                     throw new NotFoundException(PROJECT_NOT_EXIST);
                 }
                 break;
             }
             if ("cardId".equals(parameterNames[i])) {
                 Long cardId = (Long) args[i];
-                UserCard userCard = userCardRepository.findById(cardId).orElseThrow(() -> new NotFoundException(CARD_NOT_EXIST));
+                UserCard userCard = userCardRepository.findByIdAndStatus(cardId, Status.ACTIVE).orElseThrow(() -> new NotFoundException(CARD_NOT_EXIST));
                 if(!userCard.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
                 break;
             }
@@ -83,7 +84,7 @@ public class CheckIdExistAspect {
         for (int i = 0; i < parameterNames.length; i++) {
             if ("projectId".equals(parameterNames[i])) {
                 Long projectId = (Long) args[i];
-                Project project = projectRepository.findById(projectId).orElseThrow(() ->new BadRequestException(PROJECT_NOT_EXIST));
+                Project project = projectRepository.findByIdAndStatus(projectId, Status.ACTIVE).orElseThrow(() ->new BadRequestException(PROJECT_NOT_EXIST));
                 boolean projectAble = projectHelper.checkDonationAble(project);
                 if(project.getRegularStatus()!= RegularStatus.REGULAR) throw new BadRequestException(PROJECT_NOT_REGULAR_STATUS);
                 if(!projectAble) throw new BadRequestException(PROJECT_NOT_DONATION_STATUS);
@@ -112,7 +113,7 @@ public class CheckIdExistAspect {
         for (int i = 0; i < parameterNames.length; i++) {
             if ("projectId".equals(parameterNames[i])) {
                 Long projectId = (Long) args[i];
-                Project project = projectRepository.findById(projectId).orElseThrow(() ->new BadRequestException(PROJECT_NOT_EXIST));
+                Project project = projectRepository.findByIdAndStatus(projectId, Status.ACTIVE).orElseThrow(() ->new BadRequestException(PROJECT_NOT_EXIST));
                 boolean projectAble = projectHelper.checkDonationAble(project);
                 if(project.getRegularStatus()!= RegularStatus.ONE_TIME) throw new BadRequestException(PROJECT_NOT_ONETIME_STATUS);
                 if(!projectAble) throw new BadRequestException(PROJECT_NOT_DONATION_STATUS);
