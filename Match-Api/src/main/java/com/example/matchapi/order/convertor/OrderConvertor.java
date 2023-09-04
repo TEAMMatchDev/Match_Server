@@ -115,7 +115,7 @@ public class OrderConvertor {
                 .build();
     }
 
-    public DonationUser donationBillUser(NiceBillOkResponse niceBillOkResponse, Long id, Long amount, Long projectId, String flameName, String inherenceNumber, RegularStatus regularStatus) {
+    public DonationUser donationBillUser(NiceBillOkResponse niceBillOkResponse, Long id, Long amount, Long projectId, String flameName, String inherenceNumber, RegularStatus regularStatus, Long regularPaymentId) {
         return DonationUser.builder()
                 .userId(id)
                 .projectId(projectId)
@@ -127,6 +127,7 @@ public class OrderConvertor {
                 .inherenceName(flameName)
                 .inherenceNumber(inherenceNumber)
                 .regularStatus(regularStatus)
+                .regularPaymentId(regularPaymentId)
                 .build();
     }
 }

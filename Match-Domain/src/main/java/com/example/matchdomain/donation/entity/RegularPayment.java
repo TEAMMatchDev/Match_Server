@@ -54,4 +54,9 @@ public class RegularPayment extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "regularPaymentId")
     private List<RequestPaymentHistory> requestPaymentHistory = new ArrayList<>();
+
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "regularPaymentId")
+    private List<DonationUser> donationUser = new ArrayList<>();
 }

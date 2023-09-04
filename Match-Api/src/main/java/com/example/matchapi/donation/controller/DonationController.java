@@ -25,16 +25,6 @@ import java.util.List;
 @Tag(name = "05-Donation💸",description = "기부금 관련 API 입니다.")
 public class DonationController {
     private final DonationService donationService;
-    @GetMapping("")
-    @ApiErrorCodeExample({DonationListErrorCode.class, UserAuthErrorCode.class})
-    @Operation(summary = "05-01 Donation💸 기부 리스트 조회")
-    public CommonResponse<PageResponse<List<DonationRes.DonationList>>> getDonationList(
-            @Parameter(hidden = true) @AuthenticationPrincipal User user,
-            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
-            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size,
-            @Parameter(description = "필터 전체 조회 0 집행 전 1 집행 중 2 집행완료 3") @RequestParam(required = false,defaultValue = "0") int filter){
-        return CommonResponse.onSuccess(donationService.getDonationList(user.getId(),filter,page, size));
-    }
 
     @PatchMapping("/{donationId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, DonationRefundErrorCode.class})
@@ -71,7 +61,26 @@ public class DonationController {
         return CommonResponse.onSuccess("해지 성공");
     }
 
+    @GetMapping("/status")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    @Operation(summary = "05-05-01 Donation💸 정기 결제 상태 상단 조회")
+    public CommonResponse<DonationRes.DonationCount> getDonationCount(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user
+            ) {
+        return CommonResponse.onSuccess(donationService.getDonationCount(user));
+    }
 
 
+
+    @GetMapping("")
+    @ApiErrorCodeExample({DonationListErrorCode.class, UserAuthErrorCode.class})
+    @Operation(summary = "05-05-02 Donation💸 기부 리스트 조회")
+    public CommonResponse<PageResponse<List<DonationRes.DonationList>>> getDonationList(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size,
+            @Parameter(description = "필터 전체 조회 0 집행 전 1 집행 중 2 집행완료 3") @RequestParam(required = false,defaultValue = "0") int filter){
+        return CommonResponse.onSuccess(donationService.getDonationList(user.getId(),filter,page, size));
+    }
 
 }
