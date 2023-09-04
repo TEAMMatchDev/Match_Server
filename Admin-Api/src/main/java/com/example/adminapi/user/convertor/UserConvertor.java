@@ -21,13 +21,15 @@ public class UserConvertor {
                 .userId(result.getUserId())
                 .name(result.getName())
                 .birth(String.valueOf(result.getBirth()))
-                .socialType(result.getSocialType().getValue())
+                .socialType(result.getSocialType().getName())
                 .gender(result.getGender().getValue())
                 .email(result.getEmail())
                 .phoneNumber(result.getPhoneNumber())
                 .donationCnt(result.getDonationCnt())
                 .totalAmount(result.getTotalAmount())
                 .card(result.getCard())
+                .status(result.getStatus().getName())
+                .createdAt(result.getCreatedAt().toString())
                 .build();
     }
 }

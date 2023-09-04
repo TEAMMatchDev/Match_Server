@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -44,7 +45,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
     @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email," +
             "If((select exists (select * from UserCard UC where UC.userId=U.id)),'true','false')'card'," +
             "(select count(*) from DonationUser DU where DU.userId = U.id)'donationCnt'," +
-            "COALESCE((SELECT SUM(DU.price) FROM DonationUser DU WHERE DU.userId = U.id), 0) AS totalAmount " +
+            "COALESCE((SELECT SUM(DU.price) FROM DonationUser DU WHERE DU.userId = U.id), 0) AS totalAmount,U.status, U.createdAt " +
             "FROM User U order by createdAt desc" ,nativeQuery = true, countQuery = "select count(*) from User")
     Page<UserList> getUserList(Pageable pageable);
 
@@ -66,6 +67,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
         int getTotalAmount();
 
+        Status getStatus();
 
+        LocalDateTime getCreatedAt();
     }
 }

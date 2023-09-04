@@ -2,8 +2,15 @@ package com.example.adminapi.user.dto;
 
 import com.example.matchdomain.user.entity.Gender;
 import com.example.matchdomain.user.entity.SocialType;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 public class UserRes {
     @Getter
@@ -72,5 +79,9 @@ public class UserRes {
         private int donationCnt;
 
         private int totalAmount;
+
+        private String status;
+
+        private String createdAt;
     }
 }

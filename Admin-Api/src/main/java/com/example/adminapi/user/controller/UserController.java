@@ -35,10 +35,10 @@ public class UserController {
 
     @GetMapping("")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
-    @Operation(summary = "02-01💻 윺저 가입 현황파악 API.",description = "프로젝트 리스트 조회 API 입니다.")
+    @Operation(summary = "02-01💻 유저 가입 현황파악 리스트조회 API.",description = "유저 리스트 조회 API 입니다.")
     public CommonResponse<PageResponse<List<UserRes.UserList>>> getUserList(
-            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
-            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") @Min(value = 0) int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size
     ){
         PageResponse<List<UserRes.UserList>> userList = userService.getUserList(page, size);
         return CommonResponse.onSuccess(userList);
