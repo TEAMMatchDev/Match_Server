@@ -1,6 +1,7 @@
 package com.example.matchdomain.project.repository;
 
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.RegularStatus;
 import com.example.matchdomain.project.entity.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.entity.ProjectStatus;
@@ -69,7 +70,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "P.projectName, " +
             "usages," +
             "COALESCE(sum(DU.price), 0)'totalAmount' , " +
-            "count(DU.projectId)'totalDonationCnt' " +
+            "count(DU.projectId)'totalDonationCnt', P.projectStatus, P.regularStatus, P.status " +
             "from Project P left join DonationUser DU on DU.projectId = P.id where P.status = :status group by P.id",
             nativeQuery = true ,
             countQuery = "select count(*) from Project")
@@ -81,6 +82,16 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Optional<Project> findByIdAndStatus(Long projectId, Status status);
 
     boolean existsByIdAndStatus(Long projectId, Status status);
+
+    @Query(value = "select P.id'projectId', " +
+            "P.projectName, " +
+            "usages," +
+            "COALESCE(sum(DU.price), 0)'totalAmount' , " +
+            "count(DU.projectId)'totalDonationCnt' " +
+            "from Project P left join DonationUser DU on DU.projectId = P.id group by P.id",
+            nativeQuery = true ,
+            countQuery = "select count(*) from Project")
+    Page<ProjectAdminList> getProjectAdminList(Pageable pageable);
 
     interface ProjectList {
         Long getId();
@@ -97,5 +108,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         String getProjectName();
         int getTotalDonationCnt();
         int getTotalAmount();
+        RegularStatus getRegularStatus();
+        ProjectStatus getProjectStatus();
+        Status getStatus();
     }
 }

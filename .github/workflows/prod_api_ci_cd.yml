@@ -50,6 +50,8 @@ jobs:
           aws.secret-key: ${{ secrets.AWS_S3_SECRET_KEY }}
           aws.s3.bucket: ${{ secrets.AWS_S3_BUCKET }}
           aws.s3.bucket-url: ${{ secrets.AWS_S3_BASE_URL }}
+          discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
+          discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
 
 
       - name: Set Environment Domain - Domain Prod Yml

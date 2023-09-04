@@ -86,4 +86,27 @@ public class ProjectRes {
 
         private boolean isMy;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProjectAdminList {
+        private Long projectId;
+
+        private String projectName;
+
+        private String usages;
+
+        private int totalDonationCnt;
+
+        private int totalAmount;
+
+        private String projectStatus;
+
+        private String regularStatus;
+
+        private String status;
+    }
 }

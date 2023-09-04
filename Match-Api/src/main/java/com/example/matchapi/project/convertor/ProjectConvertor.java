@@ -1,19 +1,20 @@
 package com.example.matchapi.project.convertor;
 
+import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.project.entity.ProjectComment;
-import com.example.matchdomain.project.entity.ProjectImage;
-import com.example.matchdomain.project.entity.ProjectUserAttention;
+import com.example.matchdomain.project.entity.*;
+import com.example.matchdomain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
+import static com.example.matchdomain.project.entity.ProjectStatus.BEFORE_START;
 
 @Convertor
 @RequiredArgsConstructor
@@ -98,6 +99,40 @@ public class ProjectConvertor {
                 .nickname(result.getUser().getNickname())
                 .userId(result.getUserId())
                 .isMy(result.getUserId().equals(userId))
+                .build();
+    }
+
+    public Project postProject(ProjectReq.Project projects) {
+        return Project.builder()
+                .projectName(projects.getProjectName())
+                .projectExplanation(projects.getDetail())
+                .usages(projects.getUsages())
+                .projectStatus(BEFORE_START)
+                .viewCnt(0)
+                .startedAt(projects.getStartDate())
+                .finishedAt(projects.getEndDate())
+                .build();
+    }
+
+    public ProjectImage postProjectImage(Long id, String imgUrl, ImageRepresentStatus imageRepresentStatus, int sequence) {
+        return ProjectImage.builder()
+                .projectId(id)
+                .url(imgUrl)
+                .imageRepresentStatus(imageRepresentStatus)
+                .sequence(sequence)
+                .build();
+    }
+
+    public ProjectRes.ProjectAdminList ProjectList(ProjectRepository.ProjectAdminList result) {
+        return ProjectRes.ProjectAdminList.builder()
+                .projectId(result.getProjectId())
+                .projectName(result.getProjectName())
+                .totalAmount(result.getTotalAmount())
+                .usages(result.getUsages())
+                .totalDonationCnt(result.getTotalDonationCnt())
+                .projectStatus(result.getProjectStatus().getName())
+                .regularStatus(result.getRegularStatus().getName())
+                .status(result.getStatus().getName())
                 .build();
     }
 }

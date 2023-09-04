@@ -135,6 +135,8 @@ public class JwtService {
 
             Long userId = claims.getBody().get("userId",Long.class);
 
+            log.info("토큰 : {}",getJwt());
+
 
             Optional<AccessToken> accessToken = accessTokenRepository.findById(token);
 

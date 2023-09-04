@@ -7,6 +7,7 @@ import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchapi.user.convertor.UserConvertor;
 import com.example.matchapi.user.dto.UserRes;
+import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.entity.ImageRepresentStatus;
@@ -19,8 +20,15 @@ import com.example.matchdomain.user.entity.UserAddress;
 import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +37,9 @@ import static com.example.matchdomain.donation.entity.DonationStatus.EXECUTION_R
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private static final String FIRST_TIME = "T00:00:00";
+    private static final String LAST_TIME = "T23:59:59";
+
     private final UserRepository userRepository;
     private final UserAddressRepository userAddressRepository;
     private final UserConvertor userConvertor;
@@ -60,5 +71,32 @@ public class UserService {
 
     public OrderRes.UserDetail getUserInfo(User user) {
         return userConvertor.userInfo(user);
+    }
+
+    public UserRes.SignUpInfo getUserSignUpInfo() {
+        LocalDate localDate = LocalDate.now();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        Long totalUser = userRepository.countBy();
+        Long oneDayUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate+FIRST_TIME), LocalDateTime.parse(localDate+LAST_TIME));
+        Long weekUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.minusWeeks(1)+FIRST_TIME) , LocalDateTime.parse(localDate+LAST_TIME));
+        Long monthUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME), LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME));
+
+        return userConvertor.UserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
+    }
+
+    public PageResponse<List<UserRes.UserList>> getUserList(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<UserRepository.UserList> userList = userRepository.getUserList(pageable);
+
+        List<UserRes.UserList> userLists = new ArrayList<>();
+
+        userList.getContent().forEach(
+                result -> userLists.add(
+                        userConvertor.UserList(result)
+                )
+        );
+
+        return new PageResponse<>(userList.isLast(),userList.getTotalElements(),userLists);
     }
 }
