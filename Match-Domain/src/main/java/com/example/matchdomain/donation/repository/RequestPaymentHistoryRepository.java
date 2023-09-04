@@ -17,19 +17,12 @@ public interface RequestPaymentHistoryRepository extends JpaRepository<RequestPa
     List<RequestPaymentHistory> findByPayDateAndPaymentStatus(int currentDay, PaymentStatus paymentStatus);
 
 
-    @EntityGraph(attributePaths = {"user","regularPayment","userCard"})
-    @Query("SELECT rph FROM RequestPaymentHistory rph " +
-            "left join fetch RegularPayment rp on rph.regularPaymentId = rp.id " +
-            "left join fetch UserCard uc on uc.id = rp.userCardId " +
-            "left join fetch User u on rph.userId = u.id " +
-            "where rph.paymentStatus=:paymentStatus")
-    List<RequestPaymentHistory> findByPaymentStatus(@Param("paymentStatus") PaymentStatus paymentStatus);
 
     @EntityGraph(attributePaths = {"user","regularPayment","userCard"})
     @Query("SELECT rph FROM RequestPaymentHistory rph " +
             "left join fetch RegularPayment rp on rph.regularPaymentId = rp.id " +
             "left join fetch UserCard uc on uc.id = rp.userCardId " +
             "left join fetch User u on rph.userId = u.id " +
-            "where rph.paymentStatus=:paymentStatus")
-    List<RequestPaymentHistory> findByPaymentStatusAndStatus(PaymentStatus paymentStatus, Status status);
+            "where rph.paymentStatus=:paymentStatus and rph.status = :status")
+    List<RequestPaymentHistory> findByPaymentStatusAndStatus(@Param("paymentStatus") PaymentStatus paymentStatus,@Param("status") Status status);
 }
