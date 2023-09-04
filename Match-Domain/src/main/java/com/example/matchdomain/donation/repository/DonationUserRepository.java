@@ -63,4 +63,7 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
     Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceAsc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Status status, Pageable pageable);
 
     Page<DonationUser> findByUserIdAndStatusAndDonationStatusNotOrderByCreatedAtDesc(Long userId, Status status, DonationStatus donationStatus, Pageable pageable);
+
+    @EntityGraph(attributePaths = "user")
+    Page<DonationUser> findByProjectId(Long projectId, Pageable pageable);
 }

@@ -138,7 +138,38 @@ public class ProjectRes {
 
         private int totalDonationCnt;
 
+        private int regularDonationCnt;
+
         private List<ProjectImgList> projectImgLists;
     }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DonationList {
+        private Long donationId;
 
+        private Long userId;
+
+        private String name;
+
+        private String email;
+
+        private String phoneNumber;
+
+        private Long amount;
+
+        private String inherenceNumber;
+
+        private String inherenceName;
+
+        private String payMethod;
+
+        private String donationStatus;
+
+        private String regularStatus;
+
+        private String donationDate;
+    }
 }

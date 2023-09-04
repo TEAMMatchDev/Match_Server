@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,7 +52,7 @@ public class AdminProjectController {
 
     @GetMapping("")
     @Operation(summary = "ADMIN-03-02💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
-    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    @ApiErrorCodeExample({UserAuthErrorCode.class,ProjectGetErrorCode.class})
     public CommonResponse<PageResponse<List<ProjectRes.ProjectAdminList>>> getProjectList(
             @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size
@@ -60,6 +61,19 @@ public class AdminProjectController {
 
         return CommonResponse.onSuccess(projectList);
     }
+
+    @GetMapping("/donation-users/{projectId}")
+    @Operation(summary = "ADMIN-03-03-01💻 프로젝트 기부자 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
+    public CommonResponse<PageResponse<List<ProjectRes.DonationList>>> getDonationList(
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size,
+            @PathVariable Long projectId){
+        PageResponse<List<ProjectRes.DonationList>> donationList = projectService.getDonationList(projectId, page, size);
+
+        return CommonResponse.onSuccess(donationList);
+    }
+
 
     @GetMapping("/{projectId}")
     @Operation(summary = "ADMIN-03-03💻 프로젝트 상세 조회 API.",description = "프로젝트 상세 조회 API 입니다.")
@@ -95,4 +109,6 @@ public class AdminProjectController {
         projectService.patchProject(projectId, modifyProject);
         return CommonResponse.onSuccess("삭제 성공");
     }
+
+
 }

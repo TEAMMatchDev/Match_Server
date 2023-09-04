@@ -159,10 +159,29 @@ public class ProjectConvertor {
                 .endDate(result.getEndDate().toString())
                 .projectStatus(result.getProjectStatus().getValue())
                 .regularStatus(result.getRegularStatus().getValue())
+                .regularDonationCnt(result.getRegularTotalCnt())
                 .status(result.getStatus().getValue())
                 .totalAmount(result.getTotalAmount())
                 .totalDonationCnt(result.getTotalDonationCnt())
                 .projectImgLists(projectImgLists)
+                .build();
+    }
+
+    public ProjectRes.DonationList DonationUserInfo(DonationUser result) {
+        return ProjectRes.DonationList
+                .builder()
+                .donationId(result.getId())
+                .userId(result.getUserId())
+                .name(result.getUser().getName())
+                .email(result.getUser().getEmail())
+                .phoneNumber(result.getUser().getPhoneNumber())
+                .amount(result.getPrice())
+                .inherenceName(result.getInherenceName())
+                .inherenceNumber(result.getInherenceNumber())
+                .payMethod(result.getPayMethod().getValue())
+                .donationStatus(result.getDonationStatus().getValue())
+                .regularStatus(result.getRegularStatus().getValue())
+                .donationDate(result.getCreatedAt().toString())
                 .build();
     }
 }

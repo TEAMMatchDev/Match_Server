@@ -97,13 +97,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "P.projectName, " +
             "usages," +
             "COALESCE(sum(DU.price), 0)'totalAmount' , " +
-            "count(DU.projectId)'totalDonationCnt'," +
+            "count(DU.projectId)'totalDonationCnt', (select count(*) from RegularPayment RP where RP.projectId=:projectId)'regularTotalCnt' ," +
             " P.projectExplanation 'detail', " +
             "P.status, " +
             "P.regularStatus, " +
             "P.projectStatus,startedAt'startDate', finishedAt'endDate' " +
             "from Project P " +
-            "left join DonationUser DU on DU.projectId = P.id where P.id=:projectId group by P.id", nativeQuery = true)
+            "left join DonationUser DU on DU.projectId = P.id " +
+            "where P.id=:projectId group by P.id", nativeQuery = true)
     ProjectRepository.ProjectAdminDetail getProjectAdminDetail(@Param("projectId") Long projectId);
 
     interface ProjectList {
@@ -131,6 +132,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         String getUsages();
         String getProjectName();
         int getTotalDonationCnt();
+
+        int getRegularTotalCnt();
         int getTotalAmount();
         RegularStatus getRegularStatus();
         ProjectStatus getProjectStatus();

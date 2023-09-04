@@ -5,8 +5,11 @@ import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchcommon.exception.NotFoundException;
+import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.repository.ProjectCommentRepository;
 import com.example.matchdomain.project.repository.ProjectImageRepository;
@@ -39,6 +42,7 @@ public class ProjectService {
     private final AuthHelper authHelper;
     private final ProjectCommentRepository projectCommentRepository;
     private final S3UploadService s3UploadService;
+    private final DonationUserRepository donationUserRepository;
 
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -245,5 +249,23 @@ public class ProjectService {
         if(projectAdminDetail == null) throw new NotFoundException(PROJECT_NOT_EXIST);
         List<ProjectImage> projectImages = projectImageRepository.findByProjectIdOrderBySequenceAsc(projectId);
         return projectConvertor.ProjectAdminDetail(projectAdminDetail,projectImages);
+    }
+
+    public PageResponse<List<ProjectRes.DonationList>> getDonationList(Long projectId, int page, int size) {
+        Project project = projectRepository.findById(projectId).orElseThrow(()-> new NotFoundException(PROJECT_NOT_EXIST));
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<ProjectRes.DonationList> donationLists = new ArrayList<>();
+
+        Page<DonationUser> donationUsers = donationUserRepository.findByProjectId(projectId, pageable);
+
+        donationUsers.getContent().forEach(
+                result -> donationLists.add(
+                        projectConvertor.DonationUserInfo(result)
+                )
+        );
+
+        return new PageResponse(donationUsers.isLast(), donationUsers.getTotalElements(), donationLists);
     }
 }
