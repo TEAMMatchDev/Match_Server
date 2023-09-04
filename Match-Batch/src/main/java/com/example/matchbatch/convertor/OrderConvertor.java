@@ -28,7 +28,7 @@ public class OrderConvertor {
     public DonationUser donationUser(NiceBillOkResponse niceBillOkResponse, Long userId, String flameName, String inherenceNumber, Long projectId, Long regularPaymentId) {
         return DonationUser.builder()
                 .userId(userId)
-                .price(parseInt(String.valueOf(niceBillOkResponse.getAmount())))
+                .price(niceBillOkResponse.getAmount())
                 .tid(niceBillOkResponse.getTid())
                 .orderId(niceBillOkResponse.getOrderId())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
