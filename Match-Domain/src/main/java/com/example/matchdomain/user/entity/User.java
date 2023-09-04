@@ -61,9 +61,6 @@ public class User extends BaseEntity implements UserDetails {
     private SocialType socialType = SocialType.NORMAL;
 
     @Enumerated(EnumType.STRING)
-    private UserStatus status = UserStatus.ACTIVE;
-
-    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

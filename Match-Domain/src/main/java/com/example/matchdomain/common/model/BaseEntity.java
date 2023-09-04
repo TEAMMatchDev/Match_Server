@@ -19,4 +19,11 @@ public abstract class BaseEntity {
     @Column(name="updatedAt")
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.ACTIVE;
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }

@@ -6,6 +6,8 @@ import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.exception.InternalServerException;
 import com.example.matchcommon.properties.NicePayProperties;
+import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.donation.entity.RegularStatus;
 import com.example.matchdomain.donation.entity.UserCard;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
@@ -139,7 +141,7 @@ public class OrderService {
     }
 
     public List<OrderRes.UserBillCard> getUserBillCard(User user) {
-        List<UserCard> userCards = userCardRepository.findByUser(user);
+        List<UserCard> userCards = userCardRepository.findByUserAndStatus(user,Status.ACTIVE);
         List<OrderRes.UserBillCard> userBillCards = new ArrayList<>();
 
         userCards.forEach(
@@ -159,17 +161,19 @@ public class OrderService {
 
     @Transactional
     public void deleteBillCard(Long cardId) {
-        Optional<UserCard> userCard = userCardRepository.findById(cardId);
+        Optional<UserCard> userCard = userCardRepository.findByIdAndStatus(cardId,Status.ACTIVE);
         NiceBillExpireResponse niceBillExpireResponse = niceAuthFeignClient.billKeyExpire(orderHelper.getNicePaymentAuthorizationHeader(), userCard.get().getBid(), new NiceBillExpireRequest(createRandomUUID()));
         System.out.println(niceBillExpireResponse.getResultCode() + niceBillExpireResponse.getResultMsg());
-        userCardRepository.deleteById(cardId);
+        //userCardRepository.deleteById(cardId);
+
+        userCard.get().setStatus(Status.INACTIVE);
     }
 
 
     @Transactional
     public void regularDonation(User user, OrderReq.RegularDonation regularDonation, Long cardId, Long projectId) {
 
-        Optional<UserCard> card = userCardRepository.findById(cardId);
+        Optional<UserCard> card = userCardRepository.findByIdAndStatus(cardId,Status.ACTIVE);
 
         String orderId = createRandomUUID();
 
@@ -181,14 +185,15 @@ public class OrderService {
 
         String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
-        donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR));
+        RegularPayment regularPayment = regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId, projectId));
 
-        regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId, projectId));
+
+        donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
     }
 
     @Transactional
     public void oneTimeDonationCard(User user, OrderReq.@Valid OneTimeDonation oneTimeDonation, Long cardId, Long projectId) {
-        Optional<UserCard> card = userCardRepository.findById(cardId);
+        Optional<UserCard> card = userCardRepository.findByIdAndStatus(cardId, Status.ACTIVE);
 
         String orderId = createRandomUUID();
 
@@ -200,7 +205,7 @@ public class OrderService {
 
         String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
-        donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME));
+        donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
     }
 
     public String saveRequest(User user, Long projectId) {
@@ -227,7 +232,7 @@ public class OrderService {
 
         Optional<OrderRequest> orderRequest = orderRequestRepository.findById(nicePaymentAuth.getOrderId());
 
-        Optional<User> user = userRepository.findById(Long.valueOf(orderRequest.get().getUserId()));
+        Optional<User> user = userRepository.findByIdAndStatus(Long.valueOf(orderRequest.get().getUserId()),Status.ACTIVE);
 
         String flameName = orderHelper.createFlameName(user.get().getName());
 

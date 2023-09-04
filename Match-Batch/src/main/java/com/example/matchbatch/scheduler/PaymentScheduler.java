@@ -26,7 +26,7 @@ public class PaymentScheduler {
     private final DonationFailedRetry donationFailedRetry;
     private final DiscordFeignClient discordFeignClient;
     //매일 12시 30분에 실행되는 스케줄러
-    @Scheduled(cron = "0 30 12 * * *")
+    //@Scheduled(cron = "0 30 12 * * *")
     //매 1분마다 실행
     //@Scheduled(cron = "0,20,40 * * * * *", zone = "asia/seoul")
     @Scheduled(fixedDelay = 10000)

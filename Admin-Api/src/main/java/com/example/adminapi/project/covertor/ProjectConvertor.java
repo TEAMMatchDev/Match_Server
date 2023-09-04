@@ -1,10 +1,12 @@
 package com.example.adminapi.project.covertor;
 
 import com.example.adminapi.project.dto.ProjectReq;
+import com.example.adminapi.project.dto.ProjectRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.project.entity.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.entity.ProjectImage;
+import com.example.matchdomain.project.repository.ProjectRepository;
 
 import static com.example.matchdomain.project.entity.ProjectStatus.BEFORE_START;
 
@@ -28,6 +30,16 @@ public class ProjectConvertor {
                 .url(imgUrl)
                 .imageRepresentStatus(imageRepresentStatus)
                 .sequence(sequence)
+                .build();
+    }
+
+    public ProjectRes.ProjectList ProjectList(ProjectRepository.ProjectAdminList result) {
+        return ProjectRes.ProjectList.builder()
+                .projectId(result.getProjectId())
+                .projectName(result.getProjectName())
+                .totalAmount(result.getTotalAmount())
+                .usages(result.getUsages())
+                .totalDonationCnt(result.getTotalDonationCnt())
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.example.matchdomain.project.repository;
 
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.project.entity.ProjectComment;
 import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
 import org.springframework.data.domain.Page;
@@ -12,4 +13,6 @@ public interface ProjectCommentRepository extends JpaRepository<ProjectComment, 
 
 
     Page<ProjectComment> findByProjectIdOrderByCreatedAtDesc(Long projectId, Pageable pageable);
+
+    Page<ProjectComment> findByProjectIdAndStatusOrderByCreatedAtDesc(Long projectId, Status status, Pageable pageable);
 }

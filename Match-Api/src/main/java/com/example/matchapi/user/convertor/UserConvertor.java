@@ -6,6 +6,7 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.UserHelper;
 import com.example.matchcommon.annotation.Convertor;
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
@@ -33,7 +34,6 @@ public class UserConvertor {
                 .socialId(kakaoUserInfoDto.getId())
                 .socialType(authType)
                 .phoneNumber(kakaoUserInfoDto.getPhoneNumber().replaceAll("\\D+", "").replaceFirst("^82", "0"))
-                .status(UserStatus.ACTIVE)
                 .birth(authHelper.birthConversion(kakaoUserInfoDto.getBirthYear(), kakaoUserInfoDto.getBirthDay()))
                 .gender(authHelper.genderConversion(kakaoUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
@@ -57,7 +57,6 @@ public class UserConvertor {
                 .socialId(naverUserInfoDto.getId())
                 .socialType(authType)
                 .phoneNumber(naverUserInfoDto.getMobile().replaceAll("\\D+", "").replaceFirst("^82", "0"))
-                .status(UserStatus.ACTIVE)
                 .birth(authHelper.birthConversion(naverUserInfoDto.getBirthyear(), naverUserInfoDto.getBirthday()))
                 .gender(authHelper.genderConversion(naverUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
@@ -73,10 +72,10 @@ public class UserConvertor {
                 .email(signUpUser.getEmail())
                 .socialType(SocialType.NORMAL)
                 .phoneNumber(signUpUser.getPhone())
-                .status(UserStatus.ACTIVE)
                 .birth(authHelper.birthConversionToLocalDate(signUpUser.getBirthDate()))
                 .gender(signUpUser.getGender())
                 .role(AuthorityEnum.ROLE_USER.getValue())
+                .nickname(signUpUser.getName())
                 .build();
     }
 

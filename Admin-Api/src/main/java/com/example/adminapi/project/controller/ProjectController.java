@@ -1,12 +1,14 @@
 package com.example.adminapi.project.controller;
 
 import com.example.adminapi.project.dto.ProjectReq;
+import com.example.adminapi.project.dto.ProjectRes;
 import com.example.adminapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.errorcode.FileUploadException;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
+import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 import static com.example.matchcommon.exception.errorcode.FileUploadException.FILE_UPLOAD_NOT_EMPTY;
@@ -29,7 +32,7 @@ import static com.example.matchcommon.exception.errorcode.FileUploadException.FI
 @Tag(name = "03-Project💻", description = "프로젝트 관리 API 입니다.")
 public class ProjectController {
     private final ProjectService projectService;
-    @Operation(summary = "03-01💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
+    @Operation(summary = "03-01💻 프로젝트 리스트 업로드 API.",description = "프로젝트 업로드 API 입니다.")
     @PostMapping(value = "", consumes = {"multipart/form-data"}, produces = "application/json")
     @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class, FileUploadException.class})
     public CommonResponse<String> postProject(
@@ -53,4 +56,16 @@ public class ProjectController {
     }
 
      */
+
+    @GetMapping("")
+    @Operation(summary = "03-02💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    public CommonResponse<PageResponse<List<ProjectRes.ProjectList>>> getProjectList(
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size
+    ){
+        PageResponse<List<ProjectRes.ProjectList>> projectList = projectService.getProjectList(page,size);
+
+        return CommonResponse.onSuccess(projectList);
+    }
 }
