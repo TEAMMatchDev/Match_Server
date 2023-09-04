@@ -26,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "https://prod.match-api-server.com"
                 )
                 // 모든 HTTP Method를 허용한다.
-                .allowedMethods("*")
+                .allowedMethods("*","PUT","POST","DELETE","OPTIONS","PATCH","GET")
                 // HTTP 요청의 Header에 어떤 값이든 들어갈 수 있도록 허용한다.
                 .allowedHeaders("*")
                 .exposedHeaders("Set-Cookie")
