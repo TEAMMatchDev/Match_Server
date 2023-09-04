@@ -15,4 +15,5 @@ public interface ProjectImageRepository extends JpaRepository<ProjectImage, Long
     @EntityGraph(attributePaths = "project")
     List<ProjectImage> findByProjectIdAndImageRepresentStatusAndProject_StatusOrderBySequenceAsc(Long projectId, ImageRepresentStatus imageRepresentStatus, Status status);
 
+    List<ProjectImage> findByProjectIdOrderBySequenceAsc(Long projectId);
 }

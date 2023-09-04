@@ -49,36 +49,8 @@ public class AdminProjectController {
         return CommonResponse.onSuccess("프로젝트 업로드 성공");
     }
 
-
-    @Operation(summary = "ADMIN-03-03💻 프로젝트 기부 상태 수정.",description = "프로젝트 기부상태 수정 API 입니다.")
-    @PatchMapping(value = "/project-status/{projectId}")
-    @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class, ProjectGetErrorCode.class})
-    public CommonResponse<String> patchProjectStatus(@Enum(message = "enum에 일치하는 값이 존재하지 않습니다.")  @RequestParam ProjectStatus projectStatus, @PathVariable Long projectId){
-        projectService.patchProjectStatus(projectStatus, projectId);
-        return CommonResponse.onSuccess("프로젝트 수정 성공");
-    }
-
-    @Operation(summary = "ADMIN-03-04💻 프로젝트 삭제.",description = "프로젝트 삭제 API 입니다.")
-    @DeleteMapping("/{projectId}")
-    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
-    public CommonResponse<String> deleteProject(@PathVariable Long projectId){
-        projectService.deleteProject(projectId);
-        return CommonResponse.onSuccess("삭제 성공");
-    }
-
-    @Operation(summary = "ADMIN-03-05💻 프로젝트 글 수정.",description = "프로젝트 글 수정 API 입니다.")
-    @PatchMapping("/{projectId}")
-    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
-    public CommonResponse<String> patchProject(@PathVariable Long projectId,
-                                               @RequestPart ProjectReq.ModifyProject modifyProject){
-        projectService.patchProject(projectId, modifyProject);
-        return CommonResponse.onSuccess("삭제 성공");
-    }
-
-
-
     @GetMapping("")
-    @Operation(summary = "ADMIN-03-06💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
+    @Operation(summary = "ADMIN-03-02💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
     @ApiErrorCodeExample({UserAuthErrorCode.class})
     public CommonResponse<PageResponse<List<ProjectRes.ProjectAdminList>>> getProjectList(
             @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
@@ -87,5 +59,40 @@ public class AdminProjectController {
         PageResponse<List<ProjectRes.ProjectAdminList>> projectList = projectService.getProjectList(page,size);
 
         return CommonResponse.onSuccess(projectList);
+    }
+
+    @GetMapping("/{projectId}")
+    @Operation(summary = "ADMIN-03-03💻 프로젝트 상세 조회 API.",description = "프로젝트 상세 조회 API 입니다.")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    public CommonResponse<ProjectRes.ProjectAdminDetail> getProjectDetail(@PathVariable Long projectId){
+        ProjectRes.ProjectAdminDetail projectDetail = projectService.getProjectAdminDetail(projectId);
+
+        return CommonResponse.onSuccess(projectDetail);
+    }
+
+
+    @Operation(summary = "ADMIN-03-04💻 프로젝트 기부 상태 수정.",description = "프로젝트 기부상태 수정 API 입니다.")
+    @PatchMapping(value = "/project-status/{projectId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class, ProjectGetErrorCode.class})
+    public CommonResponse<String> patchProjectStatus(@Enum(message = "enum에 일치하는 값이 존재하지 않습니다.")  @RequestParam ProjectStatus projectStatus, @PathVariable Long projectId){
+        projectService.patchProjectStatus(projectStatus, projectId);
+        return CommonResponse.onSuccess("프로젝트 수정 성공");
+    }
+
+    @Operation(summary = "ADMIN-03-05💻 프로젝트 삭제.",description = "프로젝트 삭제 API 입니다.")
+    @DeleteMapping("/{projectId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
+    public CommonResponse<String> deleteProject(@PathVariable Long projectId){
+        projectService.deleteProject(projectId);
+        return CommonResponse.onSuccess("삭제 성공");
+    }
+
+    @Operation(summary = "ADMIN-03-06💻 프로젝트 글 수정.",description = "프로젝트 글 수정 API 입니다.")
+    @PatchMapping("/{projectId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
+    public CommonResponse<String> patchProject(@PathVariable Long projectId,
+                                               @RequestPart ProjectReq.ModifyProject modifyProject){
+        projectService.patchProject(projectId, modifyProject);
+        return CommonResponse.onSuccess("삭제 성공");
     }
 }

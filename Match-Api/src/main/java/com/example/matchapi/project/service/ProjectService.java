@@ -3,7 +3,6 @@ package com.example.matchapi.project.service;
 import com.example.matchapi.project.convertor.ProjectConvertor;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
-import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
@@ -12,7 +11,6 @@ import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.repository.ProjectCommentRepository;
 import com.example.matchdomain.project.repository.ProjectImageRepository;
 import com.example.matchdomain.project.repository.ProjectRepository;
-import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
@@ -240,5 +238,12 @@ public class ProjectService {
         }
 
         projectImageRepository.saveAll(projectImages);
+    }
+
+    public ProjectRes.ProjectAdminDetail getProjectAdminDetail(Long projectId) {
+        ProjectRepository.ProjectAdminDetail projectAdminDetail = projectRepository.getProjectAdminDetail(projectId);
+        if(projectAdminDetail == null) throw new NotFoundException(PROJECT_NOT_EXIST);
+        List<ProjectImage> projectImages = projectImageRepository.findByProjectIdOrderBySequenceAsc(projectId);
+        return projectConvertor.ProjectAdminDetail(projectAdminDetail,projectImages);
     }
 }

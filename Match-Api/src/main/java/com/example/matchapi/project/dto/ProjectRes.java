@@ -109,4 +109,36 @@ public class ProjectRes {
 
         private String status;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProjectAdminDetail {
+        private Long projectId;
+
+        private String projectName;
+
+        private String detail;
+
+        private String usages;
+
+        private String startDate;
+
+        private String endDate;
+
+        private String projectStatus;
+
+        private String regularStatus;
+
+        private String status;
+
+        private int totalAmount;
+
+        private int totalDonationCnt;
+
+        private List<ProjectImgList> projectImgLists;
+    }
+
 }

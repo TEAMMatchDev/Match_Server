@@ -135,4 +135,34 @@ public class ProjectConvertor {
                 .status(result.getStatus().getName())
                 .build();
     }
+
+    public ProjectRes.ProjectAdminDetail ProjectAdminDetail(ProjectRepository.ProjectAdminDetail result, List<ProjectImage> projectImages) {
+        List<ProjectRes.ProjectImgList> projectImgLists = new ArrayList<>();
+        projectImages.forEach(
+                results -> projectImgLists.add(
+                        new ProjectRes.ProjectImgList(
+                                results.getId(),
+                                results.getUrl(),
+                                results.getSequence()
+                        )
+                )
+        );
+
+
+        return ProjectRes.ProjectAdminDetail
+                .builder()
+                .projectId(result.getProjectId())
+                .projectName(result.getProjectName())
+                .detail(result.getDetail())
+                .usages(result.getUsages())
+                .startDate(result.getStartDate().toString())
+                .endDate(result.getEndDate().toString())
+                .projectStatus(result.getProjectStatus().getValue())
+                .regularStatus(result.getRegularStatus().getValue())
+                .status(result.getStatus().getValue())
+                .totalAmount(result.getTotalAmount())
+                .totalDonationCnt(result.getTotalDonationCnt())
+                .projectImgLists(projectImgLists)
+                .build();
+    }
 }
