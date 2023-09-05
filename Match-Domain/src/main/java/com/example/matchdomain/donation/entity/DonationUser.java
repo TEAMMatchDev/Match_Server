@@ -38,8 +38,14 @@ public class DonationUser extends BaseEntity {
     @Column(name="projectId")
     private Long projectId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "regularPaymentId",nullable = false, insertable=false, updatable=false)
+    private RegularPayment regularPayment;
+
+    private Long regularPaymentId;
+
     @Column(name="price")
-    private int price;
+    private Long price;
 
     private String tid;
 

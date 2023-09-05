@@ -23,12 +23,15 @@ public class WebConfig implements WebMvcConfigurer {
                         "https://www.match-api-server.com",
                         "https://localhost:3000",
                         "https://match-official.vercel.app",
-                        "https://prod.match-api-server.com"
+                        "https://prod.match-api-server.com",
+                        "https://www.official-match.kr",
+                        "https://match-dev-official.vercel.app"
                 )
                 // 모든 HTTP Method를 허용한다.
-                .allowedMethods("*")
+                .allowedMethods("*","PUT","POST","DELETE","OPTIONS","PATCH","GET")
                 // HTTP 요청의 Header에 어떤 값이든 들어갈 수 있도록 허용한다.
                 .allowedHeaders("*")
+                .exposedHeaders("Set-Cookie")
                 // 자격증명 사용을 허용한다.
                 // 해당 옵션 사용시 allowedOrigins를 * (전체)로 설정할 수 없다.
                 .allowCredentials(true);

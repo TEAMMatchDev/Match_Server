@@ -113,6 +113,8 @@ public class JwtService {
 
             Long userId = claims.getBody().get("userId",Long.class);
 
+            log.info("userId : {}",userId);
+
             /*
 
             String expiredAt= redisService.getValues(token);

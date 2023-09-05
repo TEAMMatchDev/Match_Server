@@ -1,7 +1,16 @@
 package com.example.adminapi.user.dto;
 
+import com.example.matchdomain.user.entity.Gender;
+import com.example.matchdomain.user.entity.SocialType;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 public class UserRes {
     @Getter
@@ -28,5 +37,51 @@ public class UserRes {
         private String accessToken;
 
         private String refreshToken;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SignUpInfo {
+        private Long totalUserCnt;
+
+        private Long oneDayUserCnt;
+
+        private Long weekUserCnt;
+
+        private Long monthUserCnt;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserList {
+        private Long userId;
+
+        private String name;
+
+        private String birth;
+
+        private String socialType;
+
+        private String gender;
+
+        private String phoneNumber;
+
+        private String email;
+
+        private boolean card;
+
+        private int donationCnt;
+
+        private int totalAmount;
+
+        private String status;
+
+        private String createdAt;
     }
 }

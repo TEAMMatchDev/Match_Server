@@ -39,12 +39,13 @@ public class JwtFilter extends GenericFilterBean{
             Authentication authentication = jwtService.getAuthentication(jwt,servletRequest);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             if(authentication !=null) {
-                logger.info("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
+                logger.info("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {} method: {}", authentication.getName(), requestURI, ((HttpServletRequest) servletRequest).getMethod());
             }else{
                 logger.info("해당 토큰을 가진 유저가 존재하지 않습니다, uri: {}", requestURI);
             }
 
         } else {
+            logger.info("유효하지 않은 jwt : {}",jwt);
             logger.info("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
         }
 

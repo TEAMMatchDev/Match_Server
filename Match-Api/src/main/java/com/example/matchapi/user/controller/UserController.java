@@ -36,6 +36,7 @@ public class UserController {
     private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
 
+    @Deprecated
     @Operation(summary= "02-01👤 마이페이지 전체 조회",description = "마이페이지 전체 조회입니다.")
     @GetMapping("")
     public CommonResponse<UserRes.MyPage> getMyPage(@Parameter(hidden = true)

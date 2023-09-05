@@ -18,7 +18,7 @@ public class OrderConvertor {
         return DonationUser.builder()
                 .userId(id)
                 .projectId(projectId)
-                .price(parseInt(String.valueOf(orderDetail.getAmount())))
+                .price(orderDetail.getAmount())
                 .tid(nicePaymentAuth.getTid())
                 .orderId(nicePaymentAuth.getOrderId())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
@@ -28,7 +28,7 @@ public class OrderConvertor {
                 .regularStatus(RegularStatus.ONE_TIME)
                 .build();
     }
-    public DonationUser donationUserV2(NicePaymentAuth nicePaymentAuth, Long id, int amount, String projectId, String flameName, String inherenceNumber) {
+    public DonationUser donationUserV2(NicePaymentAuth nicePaymentAuth, Long id, Long amount, String projectId, String flameName, String inherenceNumber) {
         return DonationUser.builder()
                 .userId(id)
                 .projectId(Long.valueOf(projectId))
@@ -54,7 +54,7 @@ public class OrderConvertor {
     public NiceBillOkRequest niceBillOk(NicePayBillkeyResponse nicePayBillkeyResponse, String orderId) {
         return NiceBillOkRequest.builder()
                 .cardQuota(0)
-                .amount(10)
+                .amount(10L)
                 .goodsName("카드 확인 용 결제")
                 .useShopInterest(false)
                 .orderId(orderId)
@@ -86,7 +86,7 @@ public class OrderConvertor {
                 .build();
     }
 
-    public RequestPaymentHistory recordHistory(Long userId, String orderId, String tid, int amount, String reason) {
+    public RequestPaymentHistory recordHistory(Long userId, String orderId, String tid, Long amount, String reason) {
         return RequestPaymentHistory.builder()
                 .userId(userId)
                 .tid(tid)
@@ -105,7 +105,7 @@ public class OrderConvertor {
                 .build();
     }
 
-    public NiceBillOkRequest billCardOneTime(int amount, String orderId) {
+    public NiceBillOkRequest billCardOneTime(Long amount, String orderId) {
         return NiceBillOkRequest.builder()
                 .cardQuota(0)
                 .amount(amount)
@@ -115,7 +115,7 @@ public class OrderConvertor {
                 .build();
     }
 
-    public DonationUser donationBillUser(NiceBillOkResponse niceBillOkResponse, Long id, int amount, Long projectId, String flameName, String inherenceNumber, RegularStatus regularStatus) {
+    public DonationUser donationBillUser(NiceBillOkResponse niceBillOkResponse, Long id, Long amount, Long projectId, String flameName, String inherenceNumber, RegularStatus regularStatus, Long regularPaymentId) {
         return DonationUser.builder()
                 .userId(id)
                 .projectId(projectId)
@@ -127,6 +127,7 @@ public class OrderConvertor {
                 .inherenceName(flameName)
                 .inherenceNumber(inherenceNumber)
                 .regularStatus(regularStatus)
+                .regularPaymentId(regularPaymentId)
                 .build();
     }
 }

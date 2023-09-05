@@ -61,7 +61,7 @@ public class OrderReq {
 
         @NotNull(message = "정기 후원 금액을 입력해주세요")
         @Schema(description = "1000",example = "결제 금액")
-        private int amount;
+        private Long amount;
 
         @NotNull(message = "정기 후원 날짜를 입력해주세요")
         @Schema(description = "15", example = "결제 예정 날")
@@ -78,7 +78,7 @@ public class OrderReq {
 
         @NotNull(message = "정기 후원 금액을 입력해주세요")
         @Schema(description = "1000",example = "결제 금액")
-        private int amount;
+        private Long amount;
 
 
     }

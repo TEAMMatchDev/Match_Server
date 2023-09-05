@@ -42,7 +42,7 @@ public class RegularPayment extends BaseEntity {
     private int payDate;
 
     //정기 결제 금액
-    private int amount;
+    private Long amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userCardId",nullable = false, insertable=false, updatable=false)
@@ -54,4 +54,9 @@ public class RegularPayment extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "regularPaymentId")
     private List<RequestPaymentHistory> requestPaymentHistory = new ArrayList<>();
+
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "regularPaymentId")
+    private List<DonationUser> donationUser = new ArrayList<>();
 }

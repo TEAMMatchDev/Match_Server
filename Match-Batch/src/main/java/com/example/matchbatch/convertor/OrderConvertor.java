@@ -25,10 +25,10 @@ public class OrderConvertor {
                 .build();
     }
 
-    public DonationUser donationUser(NiceBillOkResponse niceBillOkResponse, Long userId, String flameName, String inherenceNumber, Long projectId) {
+    public DonationUser donationUser(NiceBillOkResponse niceBillOkResponse, Long userId, String flameName, String inherenceNumber, Long projectId, Long regularPaymentId) {
         return DonationUser.builder()
                 .userId(userId)
-                .price(parseInt(String.valueOf(niceBillOkResponse.getAmount())))
+                .price(niceBillOkResponse.getAmount())
                 .tid(niceBillOkResponse.getTid())
                 .orderId(niceBillOkResponse.getOrderId())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
@@ -37,6 +37,7 @@ public class OrderConvertor {
                 .inherenceNumber(inherenceNumber)
                 .regularStatus(RegularStatus.REGULAR)
                 .projectId(projectId)
+                .regularPaymentId(regularPaymentId)
                 .build();
     }
 

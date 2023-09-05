@@ -35,7 +35,7 @@ public class RequestPaymentHistory extends BaseEntity {
 
     private String orderId;
 
-    private int amount;
+    private Long amount;
 
     private String reason;
 

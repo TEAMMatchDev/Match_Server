@@ -27,6 +27,7 @@ public class NicepayController {
     private final OrderService orderService;
     private final NicePayProperties nicePayProperties;
 
+    /*
     @RequestMapping("")
     public String indexDemo(Model model, @RequestParam String orderId){
 
@@ -48,4 +49,6 @@ public class NicepayController {
         model.addAttribute("resultMsg","성공");
         return "/response";
     }
+
+     */
 }

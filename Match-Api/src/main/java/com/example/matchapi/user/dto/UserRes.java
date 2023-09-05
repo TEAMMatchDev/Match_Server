@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class UserRes {
@@ -100,5 +99,51 @@ public class UserRes {
     @NoArgsConstructor
     public static class ReIssueToken {
         private String accessToken;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SignUpInfo {
+        private Long totalUserCnt;
+
+        private Long oneDayUserCnt;
+
+        private Long weekUserCnt;
+
+        private Long monthUserCnt;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserList {
+        private Long userId;
+
+        private String name;
+
+        private String birth;
+
+        private String socialType;
+
+        private String gender;
+
+        private String phoneNumber;
+
+        private String email;
+
+        private boolean card;
+
+        private int donationCnt;
+
+        private int totalAmount;
+
+        private String status;
+
+        private String createdAt;
     }
 }
