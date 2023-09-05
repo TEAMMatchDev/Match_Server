@@ -4,12 +4,11 @@ import com.example.matchapi.order.convertor.OrderConvertor;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
+import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.InternalServerException;
 import com.example.matchcommon.properties.NicePayProperties;
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.donation.entity.RegularPayment;
-import com.example.matchdomain.donation.entity.RegularStatus;
-import com.example.matchdomain.donation.entity.UserCard;
+import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.donation.repository.RequestPaymentHistoryRepository;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.example.matchdomain.donation.exception.DonationGerErrorCode.DONATION_NOT_EXIST;
 import static com.example.matchdomain.order.exception.RegistrationCardErrorCode.FAILED_ERROR_ENCRYPT;
 
 @RequiredArgsConstructor
@@ -240,4 +240,18 @@ public class OrderService {
         donationUserRepository.save(orderConvertor.donationUserV2(nicePaymentAuth, user.get().getId(), amount, orderRequest.get().getProjectId(), flameName, inherenceNumber));
     }
 
+    @Transactional
+    public void adminRefundDonation(Long donationUserId) {
+        DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
+        donationUser.setDonationStatus(DonationStatus.EXECUTION_REFUND);
+        cancelPayment(donationUser.getTid(), donationUser.getOrderId());
+        donationUserRepository.save(donationUser);
+    }
+
+    @Transactional
+    public void modifyDonationStatus(Long donationUserId, DonationStatus donationStatus) {
+        DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
+        donationUser.setDonationStatus(donationStatus);
+        donationUserRepository.save(donationUser);
+    }
 }
