@@ -164,7 +164,6 @@ public class OrderService {
         Optional<UserCard> userCard = userCardRepository.findByIdAndStatus(cardId,Status.ACTIVE);
         NiceBillExpireResponse niceBillExpireResponse = niceAuthFeignClient.billKeyExpire(orderHelper.getNicePaymentAuthorizationHeader(), userCard.get().getBid(), new NiceBillExpireRequest(createRandomUUID()));
         System.out.println(niceBillExpireResponse.getResultCode() + niceBillExpireResponse.getResultMsg());
-        //userCardRepository.deleteById(cardId);
 
         userCard.get().setStatus(Status.INACTIVE);
     }

@@ -168,6 +168,8 @@ public class ProjectRes {
 
         private String donationStatus;
 
+        private String donationStatusValue;
+
         private String regularStatus;
 
         private String donationDate;

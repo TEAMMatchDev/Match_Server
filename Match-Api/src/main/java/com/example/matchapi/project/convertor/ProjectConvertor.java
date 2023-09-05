@@ -180,6 +180,7 @@ public class ProjectConvertor {
                 .inherenceNumber(result.getInherenceNumber())
                 .payMethod(result.getPayMethod().getValue())
                 .donationStatus(result.getDonationStatus().getValue())
+                .donationStatusValue(result.getDonationStatus().getName())
                 .regularStatus(result.getRegularStatus().getValue())
                 .donationDate(result.getCreatedAt().toString())
                 .build();
