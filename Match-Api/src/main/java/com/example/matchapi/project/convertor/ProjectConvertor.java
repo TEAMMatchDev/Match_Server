@@ -135,4 +135,54 @@ public class ProjectConvertor {
                 .status(result.getStatus().getName())
                 .build();
     }
+
+    public ProjectRes.ProjectAdminDetail ProjectAdminDetail(ProjectRepository.ProjectAdminDetail result, List<ProjectImage> projectImages) {
+        List<ProjectRes.ProjectImgList> projectImgLists = new ArrayList<>();
+        projectImages.forEach(
+                results -> projectImgLists.add(
+                        new ProjectRes.ProjectImgList(
+                                results.getId(),
+                                results.getUrl(),
+                                results.getSequence()
+                        )
+                )
+        );
+
+
+        return ProjectRes.ProjectAdminDetail
+                .builder()
+                .projectId(result.getProjectId())
+                .projectName(result.getProjectName())
+                .detail(result.getDetail())
+                .usages(result.getUsages())
+                .startDate(result.getStartDate().toString())
+                .endDate(result.getEndDate().toString())
+                .projectStatus(result.getProjectStatus().getValue())
+                .regularStatus(result.getRegularStatus().getValue())
+                .regularDonationCnt(result.getRegularTotalCnt())
+                .status(result.getStatus().getValue())
+                .totalAmount(result.getTotalAmount())
+                .totalDonationCnt(result.getTotalDonationCnt())
+                .projectImgLists(projectImgLists)
+                .build();
+    }
+
+    public ProjectRes.DonationList DonationUserInfo(DonationUser result) {
+        return ProjectRes.DonationList
+                .builder()
+                .donationId(result.getId())
+                .userId(result.getUserId())
+                .name(result.getUser().getName())
+                .email(result.getUser().getEmail())
+                .phoneNumber(result.getUser().getPhoneNumber())
+                .amount(result.getPrice())
+                .inherenceName(result.getInherenceName())
+                .inherenceNumber(result.getInherenceNumber())
+                .payMethod(result.getPayMethod().getValue())
+                .donationStatus(result.getDonationStatus().getValue())
+                .donationStatusValue(result.getDonationStatus().getName())
+                .regularStatus(result.getRegularStatus().getValue())
+                .donationDate(result.getCreatedAt().toString())
+                .build();
+    }
 }

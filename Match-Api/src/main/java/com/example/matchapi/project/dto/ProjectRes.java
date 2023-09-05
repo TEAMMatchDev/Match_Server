@@ -109,4 +109,80 @@ public class ProjectRes {
 
         private String status;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProjectAdminDetail {
+        private Long projectId;
+
+        private String projectName;
+
+        private String detail;
+
+        private String usages;
+
+        private String startDate;
+
+        private String endDate;
+
+        private String projectStatus;
+
+        private String regularStatus;
+
+        private String status;
+
+        private int totalAmount;
+
+        private int totalDonationCnt;
+
+        private int regularDonationCnt;
+
+        private List<ProjectImgList> projectImgLists;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DonationList {
+        private Long donationId;
+
+        private Long userId;
+
+        private String name;
+
+        private String email;
+
+        private String phoneNumber;
+
+        private Long amount;
+
+        private String inherenceNumber;
+
+        private String inherenceName;
+
+        private String payMethod;
+
+        private String donationStatus;
+
+        private String donationStatusValue;
+
+        private String regularStatus;
+
+        private String donationDate;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PatchProjectImg {
+        private Long projectImg;
+
+        private String imgUrl;
+    }
 }

@@ -1,7 +1,8 @@
-package com.example.matchcommon.exception.errorcode;
+package com.example.matchdomain.donation.exception;
 
 import com.example.matchcommon.annotation.ExplainError;
 import com.example.matchcommon.dto.ErrorReason;
+import com.example.matchcommon.exception.errorcode.BaseErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -9,26 +10,19 @@ import org.springframework.http.HttpStatus;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Getter
 @AllArgsConstructor
-public enum FileUploadException implements BaseErrorCode {
-
-    /**
-     * 잘못된 요청
-     */
-    FILE_UPLOAD_EXCEPTION(BAD_REQUEST, "FILE001", "파일 형식이 잘못되었습니다."),
-    FILE_UPLOAD_NOT_EMPTY(BAD_REQUEST, "FILE002", "파일이 비어있습니다."),
-    IMAGE_UPLOAD_ERROR(FORBIDDEN,"FILE003","파일 업로드에 실패했습니다."),
-    IMAGE_DELETE_ERROR(INTERNAL_SERVER_ERROR, "PROJECT_IMG005","이미지 삭제 실패");;
+public enum DonationGerErrorCode implements BaseErrorCode {
+    @ExplainError("해당 도네이션이 존재하지 않습니다.")
+    DONATION_NOT_EXIST(NOT_FOUND,"DONATION001", "도네이션 ID 값이 존재하지 않습니다.");
 
 
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
-
 
     @Override
     public ErrorReason getErrorReason() {

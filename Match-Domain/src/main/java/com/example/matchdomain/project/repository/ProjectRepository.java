@@ -66,7 +66,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                                              @Param("content2") String content2, @Param("projectStatus") String projectStatus,
                                              @Param("now") LocalDateTime now, @Param("imageRepresentStatus") String imageRepresentStatus, Pageable pageable,@Param("status") String status);
 
-    @Query(value = "select P.id'projectId', " +
+    @Query(value = "select P.id as 'projectId', P.projectExplanation'detail', " +
             "P.projectName, " +
             "usages," +
             "COALESCE(sum(DU.price), 0)'totalAmount' , " +
@@ -93,6 +93,20 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             countQuery = "select count(*) from Project")
     Page<ProjectAdminList> getProjectAdminList(Pageable pageable);
 
+    @Query(value = "select P.id'projectId', " +
+            "P.projectName, " +
+            "usages," +
+            "COALESCE(sum(DU.price), 0)'totalAmount' , " +
+            "count(DU.projectId)'totalDonationCnt', (select count(*) from RegularPayment RP where RP.projectId=:projectId)'regularTotalCnt' ," +
+            " P.projectExplanation 'detail', " +
+            "P.status, " +
+            "P.regularStatus, " +
+            "P.projectStatus,startedAt'startDate', finishedAt'endDate' " +
+            "from Project P " +
+            "left join DonationUser DU on DU.projectId = P.id " +
+            "where P.id=:projectId group by P.id", nativeQuery = true)
+    ProjectRepository.ProjectAdminDetail getProjectAdminDetail(@Param("projectId") Long projectId);
+
     interface ProjectList {
         Long getId();
         String getImgUrl();
@@ -110,6 +124,24 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         int getTotalAmount();
         RegularStatus getRegularStatus();
         ProjectStatus getProjectStatus();
+        Status getStatus();
+    }
+
+    public interface ProjectAdminDetail {
+        Long getProjectId();
+        String getUsages();
+        String getProjectName();
+        int getTotalDonationCnt();
+
+        int getRegularTotalCnt();
+        int getTotalAmount();
+        RegularStatus getRegularStatus();
+        ProjectStatus getProjectStatus();
+
+        LocalDateTime getStartDate();
+
+        LocalDateTime getEndDate();
+        String getDetail();
         Status getStatus();
     }
 }

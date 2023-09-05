@@ -3,16 +3,17 @@ package com.example.matchapi.project.service;
 import com.example.matchapi.project.convertor.ProjectConvertor;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
-import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.helper.AuthHelper;
+import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.repository.ProjectCommentRepository;
 import com.example.matchdomain.project.repository.ProjectImageRepository;
 import com.example.matchdomain.project.repository.ProjectRepository;
-import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,8 @@ import java.util.List;
 
 import static com.example.matchdomain.project.entity.ImageRepresentStatus.NORMAL;
 import static com.example.matchdomain.project.entity.ImageRepresentStatus.REPRESENT;
+import static com.example.matchdomain.project.exception.PatchProjectImageErrorCode.PROJECT_IMAGE_NOT_EXIST;
+import static com.example.matchdomain.project.exception.PatchProjectImageErrorCode.PROJECT_NOT_CORRECT_IMAGE;
 import static com.example.matchdomain.project.exception.ProjectGetErrorCode.PROJECT_NOT_EXIST;
 
 
@@ -41,6 +44,7 @@ public class ProjectService {
     private final AuthHelper authHelper;
     private final ProjectCommentRepository projectCommentRepository;
     private final S3UploadService s3UploadService;
+    private final DonationUserRepository donationUserRepository;
 
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -240,5 +244,42 @@ public class ProjectService {
         }
 
         projectImageRepository.saveAll(projectImages);
+    }
+
+    public ProjectRes.ProjectAdminDetail getProjectAdminDetail(Long projectId) {
+        ProjectRepository.ProjectAdminDetail projectAdminDetail = projectRepository.getProjectAdminDetail(projectId);
+        if(projectAdminDetail == null) throw new BadRequestException(PROJECT_NOT_EXIST);
+        List<ProjectImage> projectImages = projectImageRepository.findByProjectIdOrderBySequenceAsc(projectId);
+        return projectConvertor.ProjectAdminDetail(projectAdminDetail,projectImages);
+    }
+
+    public PageResponse<List<ProjectRes.DonationList>> getDonationList(Long projectId, int page, int size) {
+        Project project = projectRepository.findById(projectId).orElseThrow(()-> new BadRequestException(PROJECT_NOT_EXIST));
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<ProjectRes.DonationList> donationLists = new ArrayList<>();
+
+        Page<DonationUser> donationUsers = donationUserRepository.findByProjectId(projectId, pageable);
+
+        donationUsers.getContent().forEach(
+                result -> donationLists.add(
+                        projectConvertor.DonationUserInfo(result)
+                )
+        );
+
+        return new PageResponse(donationUsers.isLast(), donationUsers.getTotalElements(), donationLists);
+    }
+
+    @Transactional
+    public ProjectRes.PatchProjectImg modifyProjectImg(Long projectId, Long projectImgId, MultipartFile multipartFile) {
+
+        ProjectImage projectImage = projectImageRepository.findById(projectImgId).orElseThrow(()-> new BadRequestException(PROJECT_IMAGE_NOT_EXIST));
+        if(!projectImage.getProjectId().equals(projectId)) throw new BadRequestException(PROJECT_NOT_CORRECT_IMAGE);
+        String imgUrl = s3UploadService.uploadProjectPresentFile(projectId, multipartFile);
+        s3UploadService.deleteFile(projectImage.getUrl());
+        projectImage.setUrl(imgUrl);
+        projectImageRepository.save(projectImage);
+        return new ProjectRes.PatchProjectImg(projectImgId, projectImage.getUrl());
     }
 }

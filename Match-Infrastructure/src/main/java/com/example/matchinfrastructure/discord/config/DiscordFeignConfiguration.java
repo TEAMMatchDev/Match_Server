@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import;
 public class DiscordFeignConfiguration {
     @Bean
     public RequestInterceptor requestInterceptor() {
-        return template -> template.header("Content-Type", "application/json; utf-8");
+        return template -> template.header("Content-Type", "application/json");
     }
     @Bean
     public ErrorDecoder errorDecoder() {

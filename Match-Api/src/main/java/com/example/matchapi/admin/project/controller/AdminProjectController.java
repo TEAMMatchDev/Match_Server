@@ -11,6 +11,7 @@ import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.project.entity.ProjectStatus;
+import com.example.matchdomain.project.exception.PatchProjectImageErrorCode;
 import com.example.matchdomain.project.exception.ProjectGetErrorCode;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,37 +51,9 @@ public class AdminProjectController {
         return CommonResponse.onSuccess("프로젝트 업로드 성공");
     }
 
-
-    @Operation(summary = "ADMIN-03-03💻 프로젝트 기부 상태 수정.",description = "프로젝트 기부상태 수정 API 입니다.")
-    @PatchMapping(value = "/project-status/{projectId}")
-    @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class, ProjectGetErrorCode.class})
-    public CommonResponse<String> patchProjectStatus(@Enum(message = "enum에 일치하는 값이 존재하지 않습니다.")  @RequestParam ProjectStatus projectStatus, @PathVariable Long projectId){
-        projectService.patchProjectStatus(projectStatus, projectId);
-        return CommonResponse.onSuccess("프로젝트 수정 성공");
-    }
-
-    @Operation(summary = "ADMIN-03-04💻 프로젝트 삭제.",description = "프로젝트 삭제 API 입니다.")
-    @DeleteMapping("/{projectId}")
-    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
-    public CommonResponse<String> deleteProject(@PathVariable Long projectId){
-        projectService.deleteProject(projectId);
-        return CommonResponse.onSuccess("삭제 성공");
-    }
-
-    @Operation(summary = "ADMIN-03-05💻 프로젝트 글 수정.",description = "프로젝트 글 수정 API 입니다.")
-    @PatchMapping("/{projectId}")
-    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
-    public CommonResponse<String> patchProject(@PathVariable Long projectId,
-                                               @RequestPart ProjectReq.ModifyProject modifyProject){
-        projectService.patchProject(projectId, modifyProject);
-        return CommonResponse.onSuccess("삭제 성공");
-    }
-
-
-
     @GetMapping("")
-    @Operation(summary = "ADMIN-03-06💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
-    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    @Operation(summary = "ADMIN-03-02💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
+    @ApiErrorCodeExample({UserAuthErrorCode.class,ProjectGetErrorCode.class})
     public CommonResponse<PageResponse<List<ProjectRes.ProjectAdminList>>> getProjectList(
             @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size
@@ -88,4 +62,64 @@ public class AdminProjectController {
 
         return CommonResponse.onSuccess(projectList);
     }
+
+    @GetMapping("/donation-users/{projectId}")
+    @Operation(summary = "ADMIN-03-03-01💻 프로젝트 기부자 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
+    public CommonResponse<PageResponse<List<ProjectRes.DonationList>>> getDonationList(
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size,
+            @PathVariable Long projectId){
+        PageResponse<List<ProjectRes.DonationList>> donationList = projectService.getDonationList(projectId, page, size);
+
+        return CommonResponse.onSuccess(donationList);
+    }
+
+
+    @GetMapping("/{projectId}")
+    @Operation(summary = "ADMIN-03-03💻 프로젝트 상세 조회 API.",description = "프로젝트 상세 조회 API 입니다.")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    public CommonResponse<ProjectRes.ProjectAdminDetail> getProjectDetail(@PathVariable Long projectId){
+        ProjectRes.ProjectAdminDetail projectDetail = projectService.getProjectAdminDetail(projectId);
+
+        return CommonResponse.onSuccess(projectDetail);
+    }
+
+
+    @Operation(summary = "ADMIN-03-04💻 프로젝트 기부 상태 수정.",description = "프로젝트 기부상태 수정 API 입니다.")
+    @PatchMapping(value = "/project-status/{projectId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class, ProjectGetErrorCode.class})
+    public CommonResponse<String> patchProjectStatus(@Enum(message = "enum에 일치하는 값이 존재하지 않습니다.")  @RequestParam ProjectStatus projectStatus, @PathVariable Long projectId){
+        projectService.patchProjectStatus(projectStatus, projectId);
+        return CommonResponse.onSuccess("프로젝트 수정 성공");
+    }
+
+    @Operation(summary = "ADMIN-03-05💻 프로젝트 삭제.",description = "프로젝트 삭제 API 입니다.")
+    @DeleteMapping("/{projectId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
+    public CommonResponse<String> deleteProject(@PathVariable Long projectId){
+        projectService.deleteProject(projectId);
+        return CommonResponse.onSuccess("삭제 성공");
+    }
+
+    @Operation(summary = "ADMIN-03-06💻 프로젝트 글 수정.",description = "프로젝트 글 수정 API 입니다.")
+    @PatchMapping("/{projectId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
+    public CommonResponse<String> patchProject(@PathVariable Long projectId,
+                                               @RequestPart ProjectReq.ModifyProject modifyProject){
+        projectService.patchProject(projectId, modifyProject);
+        return CommonResponse.onSuccess("수정 성공");
+    }
+
+    @Operation(summary = "ADMIN-03-07💻 프로젝트 이미지 수정", description = "프로젝트 이미지 수정 API")
+    @PatchMapping(value = "/img/{projectId}/{projectImgId}", consumes = {"multipart/form-data"}, produces = "application/json")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, PatchProjectImageErrorCode.class, FileUploadException.class})
+    public CommonResponse<ProjectRes.PatchProjectImg> modifyProjectImg(@PathVariable Long projectId, @PathVariable Long projectImgId,
+                                                                       @RequestPart("img") MultipartFile multipartFile){
+        if(multipartFile.isEmpty()) throw new BadRequestException(FILE_UPLOAD_NOT_EMPTY);
+        ProjectRes.PatchProjectImg patchProjectImg = projectService.modifyProjectImg(projectId, projectImgId, multipartFile);
+        return CommonResponse.onSuccess(patchProjectImg);
+    }
+
+
 }
