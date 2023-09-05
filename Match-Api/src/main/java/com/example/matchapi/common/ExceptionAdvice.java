@@ -1,8 +1,11 @@
-package com.example.matchcommon.exception;
+package com.example.matchapi.common;
 
 import com.example.matchcommon.exception.BaseDynamicException;
 import com.example.matchcommon.exception.BaseException;
 import com.example.matchcommon.reponse.CommonResponse;
+import com.example.matchinfrastructure.discord.client.DiscordFeignClient;
+import com.example.matchinfrastructure.discord.convertor.DiscordConvertor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +30,10 @@ import java.util.stream.StreamSupport;
 
 @Slf4j
 @RestControllerAdvice
-public class ExceptionAdvice{
+@RequiredArgsConstructor
+public class ExceptionAdvice {
+    private final DiscordFeignClient discordFeignClient;
+    private final DiscordConvertor discordConvertor;
 
 
 
@@ -102,17 +108,14 @@ public class ExceptionAdvice{
 
 
 
-    /*
+
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity onException(Exception exception, @AuthenticationPrincipal User user,
                                       HttpServletRequest request) {
         getExceptionStackTrace(exception, user, request);
+        String returnMessage = discordFeignClient.errorMessage(discordConvertor.Message(user, exception, request));
         return new ResponseEntity<>(CommonResponse.onFailure("500", exception.getMessage(), null), null,
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-     */
-
-
 
 }
