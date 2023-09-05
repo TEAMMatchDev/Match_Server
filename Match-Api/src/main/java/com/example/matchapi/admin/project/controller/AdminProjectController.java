@@ -11,6 +11,7 @@ import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.project.entity.ProjectStatus;
+import com.example.matchdomain.project.exception.PatchProjectImageErrorCode;
 import com.example.matchdomain.project.exception.ProjectGetErrorCode;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -107,7 +108,17 @@ public class AdminProjectController {
     public CommonResponse<String> patchProject(@PathVariable Long projectId,
                                                @RequestPart ProjectReq.ModifyProject modifyProject){
         projectService.patchProject(projectId, modifyProject);
-        return CommonResponse.onSuccess("삭제 성공");
+        return CommonResponse.onSuccess("수정 성공");
+    }
+
+    @Operation(summary = "ADMIN-03-07💻 프로젝트 이미지 수정", description = "프로젝트 이미지 수정 API")
+    @PatchMapping(value = "/img/{projectId}/{projectImgId}", consumes = {"multipart/form-data"}, produces = "application/json")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, PatchProjectImageErrorCode.class, FileUploadException.class})
+    public CommonResponse<ProjectRes.PatchProjectImg> modifyProjectImg(@PathVariable Long projectId, @PathVariable Long projectImgId,
+                                                                       @RequestPart("img") MultipartFile multipartFile){
+        if(multipartFile.isEmpty()) throw new BadRequestException(FILE_UPLOAD_NOT_EMPTY);
+        ProjectRes.PatchProjectImg patchProjectImg = projectService.modifyProjectImg(projectId, projectImgId, multipartFile);
+        return CommonResponse.onSuccess(patchProjectImg);
     }
 
 

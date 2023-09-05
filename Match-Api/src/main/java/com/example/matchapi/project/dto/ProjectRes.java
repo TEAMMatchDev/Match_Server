@@ -172,4 +172,15 @@ public class ProjectRes {
 
         private String donationDate;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PatchProjectImg {
+        private Long projectImg;
+
+        private String imgUrl;
+    }
 }

@@ -4,12 +4,10 @@ package com.example.matchinfrastructure.config.s3;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.ForbiddenException;
+import com.example.matchcommon.exception.InternalServerException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -120,5 +118,22 @@ public class S3UploadService {
             throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
         }
         return amazonS3.getUrl(bucket, fileName).toString();
+    }
+
+    public void deleteFile(String fileName){
+        int index=fileName.indexOf(baseUrl);
+        String fileRoute=fileName.substring(index+baseUrl.length()+1);
+        System.out.println("deletefilename : "+fileRoute);
+        try {
+            boolean isObjectExist = amazonS3.doesObjectExist(bucket, fileRoute);
+            if (isObjectExist) {
+                amazonS3.deleteObject(bucket,fileRoute);
+            } else {
+                throw new InternalServerException(IMAGE_DELETE_ERROR);
+            }
+        } catch (Exception e) {
+            throw new InternalServerException(IMAGE_DELETE_ERROR);
+        }
+
     }
 }
