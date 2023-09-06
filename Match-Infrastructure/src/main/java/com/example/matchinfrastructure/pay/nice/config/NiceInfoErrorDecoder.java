@@ -8,6 +8,7 @@ import feign.FeignException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
 import java.io.ByteArrayOutputStream;
@@ -15,21 +16,25 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static com.example.matchcommon.exception.errorcode.OtherServerErrorCode.*;
-
+@Slf4j
 public class NiceInfoErrorDecoder implements ErrorDecoder {
     @SneakyThrows
     @Override
     public Exception decode(String methodKey, Response response) {
+        InputStream responseBodyStream = response.body().asInputStream();
+
+        String responseBody = convertInputStreamToString(responseBodyStream);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+
+
+        String resultCode = jsonNode.get("resultCode").asText();
+        String resultMsg = jsonNode.get("resultMsg").asText();
+
+        log.info("resultCode = " + resultCode + " resultMsg = " + resultMsg);
+
         if (response.status() >= 400) {
-            InputStream responseBodyStream = response.body().asInputStream(); // Get response body input stream
-
-            String responseBody = convertInputStreamToString(responseBodyStream);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(responseBody); // Parse JSON string
-
-            String resultCode = jsonNode.get("resultCode").asText();
-            String resultMsg = jsonNode.get("resultMsg").asText();
 
             /*
             switch (response.status()) {
