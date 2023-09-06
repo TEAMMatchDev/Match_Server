@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.example.matchcommon.constants.MatchStatic.REGULAR;
 import static com.example.matchdomain.donation.entity.PaymentStatus.COMPLETE;
 import static com.example.matchdomain.donation.entity.PaymentStatus.FAIL;
 
@@ -55,7 +56,7 @@ public class OrderService {
                     Long userId = regularPayment.getUserId();
                     NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(),
                             regularPayment.getUserCard().getBid(),
-                            orderConvertor.niceBillRequest(regularPayment, createRandomUUID()));
+                            orderConvertor.niceBillRequest(regularPayment, REGULAR + createRandomOrderId()));
                     if (niceBillOkResponse.getResultCode().equals("0000")) {
                         String flameName = orderHelper.createFlameName(regularPayment.getUser().getName());
 
@@ -103,6 +104,11 @@ public class OrderService {
 
     public String createRandomUUID() {
         return UUID.randomUUID().toString();
+    }
+
+    @Transactional
+    public String createRandomOrderId() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "-" + UUID.randomUUID().toString();
 
     }
 
@@ -117,7 +123,7 @@ public class OrderService {
             UserCard userCard = requestPaymentHistory.getUserCard();
             NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(),
                     userCard.getBid(),
-                    orderConvertor.niceBillRequest(requestPaymentHistory.getRegularPayment(), createRandomUUID()));
+                    orderConvertor.niceBillRequest(requestPaymentHistory.getRegularPayment(), REGULAR + createRandomOrderId()));
 
             if (niceBillOkResponse.getResultCode().equals("0000")) {
                 String flameName = orderHelper.createFlameName(requestPaymentHistory.getUser().getName());
