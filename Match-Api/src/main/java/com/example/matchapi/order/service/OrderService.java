@@ -53,6 +53,7 @@ public class OrderService {
     private final OrderRequestRepository orderRequestRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public NicePaymentAuth authPayment(String tid, Long amount) {
         String authorizationHeader = orderHelper.getNicePaymentAuthorizationHeader();
         NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.paymentAuth(authorizationHeader, tid, new NicePayRequest(String.valueOf(amount)));
@@ -121,7 +122,7 @@ public class OrderService {
 
     }
 
-
+    @Transactional
     public String encrypt(String plainText, String secretKey, String iv) {
         SecretKey secureKey = new SecretKeySpec(secretKey.getBytes(), "AES");
         try {
@@ -134,12 +135,12 @@ public class OrderService {
         }
     }
 
-
+    @Transactional
     public String createRandomUUID() {
         return UUID.randomUUID().toString();
 
     }
-
+    @Transactional
     public List<OrderRes.UserBillCard> getUserBillCard(User user) {
         List<UserCard> userCards = userCardRepository.findByUserAndStatus(user,Status.ACTIVE);
         List<OrderRes.UserBillCard> userBillCards = new ArrayList<>();
@@ -207,6 +208,7 @@ public class OrderService {
         donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
     }
 
+    @Transactional
     public String saveRequest(User user, Long projectId) {
         String orderId = createRandomUUID();
 
@@ -215,12 +217,14 @@ public class OrderService {
         return orderId;
     }
 
+    @Transactional
     public OrderRequest getOrderRequest(String orderId) {
         Optional<OrderRequest> orderRequest = orderRequestRepository.findById(orderId);
         return orderRequest.get();
 
     }
 
+    @Transactional
     public void requestPaymentAuth(String tid, Long amount) {
         NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.
                 paymentAuth(orderHelper.getNicePaymentAuthorizationHeader(),
