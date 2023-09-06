@@ -159,7 +159,8 @@ public class OrderService {
                                     result.getId(),
                                     result.getCardCode(),
                                     result.getCardName(),
-                                    orderHelper.maskMiddleNum(result.getCardNo())
+                                    orderHelper.maskMiddleNum(result.getCardNo()),
+                                    result.getCardAbleStatus().getName()
                             )
                     );
                 }

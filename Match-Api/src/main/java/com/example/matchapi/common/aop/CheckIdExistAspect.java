@@ -4,6 +4,7 @@ import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.CardAbleStatus;
 import com.example.matchdomain.donation.entity.RegularStatus;
 import com.example.matchdomain.donation.entity.UserCard;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
@@ -20,8 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
-import static com.example.matchdomain.donation.exception.DeleteCardErrorCode.CARD_NOT_CORRECT_USER;
-import static com.example.matchdomain.donation.exception.DeleteCardErrorCode.CARD_NOT_EXIST;
+import static com.example.matchdomain.donation.exception.DeleteCardErrorCode.*;
 import static com.example.matchdomain.project.exception.ProjectOneTimeErrorCode.*;
 import static com.example.matchdomain.project.exception.ProjectRegualrErrorCode.PROJECT_NOT_REGULAR_STATUS;
 
@@ -61,6 +61,7 @@ public class CheckIdExistAspect {
                 Long cardId = (Long) args[i];
                 UserCard userCard = userCardRepository.findByIdAndStatus(cardId, Status.ACTIVE).orElseThrow(() -> new NotFoundException(CARD_NOT_EXIST));
                 if(!userCard.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
+                if(!userCard.getCardAbleStatus().equals(CardAbleStatus.ABLE)) throw new BadRequestException(CARD_NOT_ABLE);
                 break;
             }
         }

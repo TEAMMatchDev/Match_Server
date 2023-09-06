@@ -55,4 +55,6 @@ public class UserCard extends BaseEntity {
 
     private String cardName;
 
+    @Enumerated(EnumType.STRING)
+    private CardAbleStatus cardAbleStatus = CardAbleStatus.ABLE;
 }
