@@ -18,7 +18,9 @@ public enum DeleteCardErrorCode implements BaseErrorCode {
     @ExplainError("카드 아이디가 존재하지 않습니다")
     CARD_NOT_EXIST(NOT_FOUND,"CARD001", "카드 ID 가 존재하지 않습니다."),
     @ExplainError("카드 삭제 권한이 없습니다.")
-    CARD_NOT_CORRECT_USER(BAD_REQUEST,"CARD002","카드 소유자와 일치하지 않습니다. 삭제권한이 없습니다.");
+    CARD_NOT_CORRECT_USER(BAD_REQUEST,"CARD002","카드 소유자와 일치하지 않습니다. 삭제권한이 없습니다."),
+    @ExplainError("카드가 사용 가능한 상태가 아닐 때")
+    CARD_NOT_ABLE(BAD_REQUEST,"CARD003","카드가 사용가능한 상태가 아닙니다. 다른 카드로 결제 시도해주세요");
 
 
     private final HttpStatus httpStatus;

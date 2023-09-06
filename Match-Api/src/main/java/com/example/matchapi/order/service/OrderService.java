@@ -159,7 +159,8 @@ public class OrderService {
                                     result.getId(),
                                     result.getCardCode(),
                                     result.getCardName(),
-                                    orderHelper.maskMiddleNum(result.getCardNo())
+                                    orderHelper.maskMiddleNum(result.getCardNo()),
+                                    result.getCardAbleStatus().getName()
                             )
                     );
                 }
@@ -172,7 +173,6 @@ public class OrderService {
         Optional<UserCard> userCard = userCardRepository.findByIdAndStatus(cardId,Status.ACTIVE);
         NiceBillExpireResponse niceBillExpireResponse = niceAuthFeignClient.billKeyExpire(orderHelper.getNicePaymentAuthorizationHeader(), userCard.get().getBid(), new NiceBillExpireRequest(DELETE + createRandomOrderId()));
         System.out.println(niceBillExpireResponse.getResultCode() + niceBillExpireResponse.getResultMsg());
-
         userCard.get().setStatus(Status.INACTIVE);
     }
 

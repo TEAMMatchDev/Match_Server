@@ -127,6 +127,9 @@ public class User extends BaseEntity implements UserDetails {
         this.logInAt=now;
     }
 
+    public boolean isActivated() {
+        return true;
+    }
 
 
 }
