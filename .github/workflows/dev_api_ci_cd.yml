@@ -49,6 +49,7 @@ jobs:
           aws.s3.bucket-url: ${{ secrets.AWS_S3_BASE_URL }}
           discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
           discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
+          server.host: ${{ secrets.DEV_SERVER_HOST}}
 
 
       - name: Set Environment Domain - Domain DEV Yml
