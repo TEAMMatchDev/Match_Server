@@ -143,7 +143,7 @@ public class UserConvertor {
                 .donationCnt(result.getDonationCnt())
                 .totalAmount(result.getTotalAmount())
                 .card(result.getCard())
-                .status(result.getStatus().getName())
+                .status(result.getStatus().getValue())
                 .createdAt(result.getCreatedAt().toString())
                 .build();
     }

@@ -5,15 +5,13 @@ import com.example.matchapi.user.service.UserService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
 import java.util.List;
@@ -37,9 +35,11 @@ public class AdminUserController {
     @Operation(summary = "ADMIN-02-02👤 유저 가입 현황파악 리스트조회 API.",description = "유저 리스트 조회 API 입니다.")
     public CommonResponse<PageResponse<List<UserRes.UserList>>> getUserList(
             @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") @Min(value = 0) int page,
-            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size
-    ){
-        PageResponse<List<UserRes.UserList>> userList = userService.getUserList(page, size);
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = false) Status status,
+            @RequestParam(required = false) String content
+            ){
+        PageResponse<List<UserRes.UserList>> userList = userService.getUserList(page, size, status, content);
         return CommonResponse.onSuccess(userList);
     }
 
