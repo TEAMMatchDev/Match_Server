@@ -146,4 +146,7 @@ public class UserRes {
 
         private String createdAt;
     }
+
+    public static class UserAdminDetail {
+    }
 }

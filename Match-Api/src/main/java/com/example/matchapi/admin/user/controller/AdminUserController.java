@@ -10,6 +10,7 @@ import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,5 +43,10 @@ public class AdminUserController {
         PageResponse<List<UserRes.UserList>> userList = userService.getUserList(page, size, status, content);
         return CommonResponse.onSuccess(userList);
     }
+
+    @GetMapping("/{userId}")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    @Operation(summary = "ADMIN-02-03👤 유저 상세 조회 API.",description = "유저 상세 조회 API 입니다.")
+    public CommonResponse<UserRes.UserAdminDetail>
 
 }
