@@ -32,13 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
+import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
 import static com.example.matchdomain.donation.entity.DonationStatus.EXECUTION_REFUND;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private static final String FIRST_TIME = "T00:00:00";
-    private static final String LAST_TIME = "T23:59:59";
 
     private final UserRepository userRepository;
     private final UserAddressRepository userAddressRepository;
