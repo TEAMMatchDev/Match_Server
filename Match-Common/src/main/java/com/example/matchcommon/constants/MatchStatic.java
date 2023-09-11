@@ -16,4 +16,7 @@ public class MatchStatic {
 
     public static final String DELETE  = "DELETE-";
 
+    public static final String FIRST_TIME = "T00:00:00";
+    public static final String LAST_TIME = "T23:59:59";
+
 }

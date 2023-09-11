@@ -1,19 +1,18 @@
 package com.example.matchapi.user.service;
 
+import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.order.dto.OrderRes;
+import com.example.matchapi.order.service.OrderService;
 import com.example.matchapi.project.convertor.ProjectConvertor;
-import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.helper.ProjectHelper;
-import com.example.matchapi.project.service.ProjectService;
 import com.example.matchapi.user.convertor.UserConvertor;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.reponse.PageResponse;
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.entity.ImageRepresentStatus;
-import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.entity.ProjectUserAttention;
-import com.example.matchdomain.project.repository.ProjectRepository;
 import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
@@ -32,13 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
+import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
 import static com.example.matchdomain.donation.entity.DonationStatus.EXECUTION_REFUND;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private static final String FIRST_TIME = "T00:00:00";
-    private static final String LAST_TIME = "T23:59:59";
 
     private final UserRepository userRepository;
     private final UserAddressRepository userAddressRepository;
@@ -47,6 +46,7 @@ public class UserService {
     private final ProjectConvertor projectConvertor;
     private final ProjectHelper projectHelper;
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
+    private final OrderService orderService;
 
     public Optional<User> findUser(long id) {
         return userRepository.findById(id);
@@ -84,11 +84,22 @@ public class UserService {
         return userConvertor.UserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
     }
 
-    public PageResponse<List<UserRes.UserList>> getUserList(int page, int size) {
+    public PageResponse<List<UserRes.UserList>> getUserList(int page, int size, Status status, String content) {
         Pageable pageable = PageRequest.of(page, size);
-
-        Page<UserRepository.UserList> userList = userRepository.getUserList(pageable);
-
+        Page<UserRepository.UserList> userList = null;
+        System.out.println(status);
+        if(status == null && content ==null) {
+            userList = userRepository.getUserList(pageable);
+        }
+        else if (status !=null && content ==null){
+            userList = userRepository.getUserListByStatus(pageable, status.getValue());
+        }
+        else if(status!=null){
+            userList = userRepository.getUserListByStatusAndName(pageable, status.getValue(),content);
+        }
+        else{
+            userList = userRepository.getUserListByName(pageable, content);
+        }
         List<UserRes.UserList> userLists = new ArrayList<>();
 
         userList.getContent().forEach(
@@ -99,4 +110,14 @@ public class UserService {
 
         return new PageResponse<>(userList.isLast(),userList.getTotalElements(),userLists);
     }
+
+    public UserRes.UserAdminDetail getUserAdminDetail(Long userId) {
+        UserRepository.UserList userDetail = userRepository.getUserDetail(userId);
+
+        List<OrderRes.UserBillCard> userCards = orderService.getUserBillCard(userId);
+
+
+        return userConvertor.UserAdminDetail(userDetail,userCards);
+    }
+
 }

@@ -148,8 +148,8 @@ public class OrderService {
     }
 
     @Transactional
-    public List<OrderRes.UserBillCard> getUserBillCard(User user) {
-        List<UserCard> userCards = userCardRepository.findByUserAndStatus(user,Status.ACTIVE);
+    public List<OrderRes.UserBillCard> getUserBillCard(Long userId) {
+        List<UserCard> userCards = userCardRepository.findByUserIdAndStatus(userId,Status.ACTIVE);
         List<OrderRes.UserBillCard> userBillCards = new ArrayList<>();
 
         userCards.forEach(
@@ -195,7 +195,6 @@ public class OrderService {
         String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
         RegularPayment regularPayment = regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId, projectId));
-
 
         donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
     }

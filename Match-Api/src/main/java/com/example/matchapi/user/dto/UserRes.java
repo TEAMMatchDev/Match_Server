@@ -1,5 +1,6 @@
 package com.example.matchapi.user.dto;
 
+import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.project.dto.ProjectRes;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -146,4 +147,38 @@ public class UserRes {
 
         private String createdAt;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserAdminDetail {
+        private Long userId;
+
+        private String name;
+
+        private String birth;
+
+        private String socialType;
+
+        private String gender;
+
+        private String phoneNumber;
+
+        private String email;
+
+        private boolean card;
+
+        private int donationCnt;
+
+        private int totalAmount;
+
+        private String status;
+
+        private String createdAt;
+
+        //private List<OrderRes.UserBillCard> userCards;
+    }
+
 }

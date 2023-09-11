@@ -111,7 +111,7 @@ public class OrderController {
     @ApiErrorCodeExample({UserAuthErrorCode.class})
     @Operation(summary = "04-03 Order💸 정기 결제용 카드 조회 api #FRAME 결제 화면 - 단기,정기 결제", description = "정기 결제를 위한 카드 조회 API 입니다..")
     public CommonResponse<List<OrderRes.UserBillCard>> getUserBillCard(@Parameter(hidden = true) @AuthenticationPrincipal User user){
-        return CommonResponse.onSuccess(orderService.getUserBillCard(user));
+        return CommonResponse.onSuccess(orderService.getUserBillCard(user.getId()));
     }
 
     @DeleteMapping("/pay/card/{cardId}")

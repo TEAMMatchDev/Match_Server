@@ -223,6 +223,7 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+    @Transactional
     public void patchProject(Long projectId, ProjectReq.ModifyProject modifyProject) {
         Project project = projectRepository.findById(projectId).orElseThrow(()-> new NotFoundException(PROJECT_NOT_EXIST));
 
@@ -231,6 +232,7 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+    @Transactional
     public void saveImgList(Long id, String url, List<String> imgUrlList) {
         imgUrlList.add(url);
         List<ProjectImage> projectImages = new ArrayList<>();
@@ -246,6 +248,7 @@ public class ProjectService {
         projectImageRepository.saveAll(projectImages);
     }
 
+    @Transactional
     public ProjectRes.ProjectAdminDetail getProjectAdminDetail(Long projectId) {
         ProjectRepository.ProjectAdminDetail projectAdminDetail = projectRepository.getProjectAdminDetail(projectId);
         if(projectAdminDetail == null) throw new BadRequestException(PROJECT_NOT_EXIST);
@@ -268,7 +271,7 @@ public class ProjectService {
                 )
         );
 
-        return new PageResponse(donationUsers.isLast(), donationUsers.getTotalElements(), donationLists);
+        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), donationLists);
     }
 
     @Transactional

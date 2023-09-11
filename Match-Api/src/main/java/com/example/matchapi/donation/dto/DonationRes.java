@@ -59,4 +59,17 @@ public class DonationRes {
         @Schema(description = "후원 집행 진행 중 갯수", required = true, example = "후원 집행 진행 중 갯수")
         private int successCnt;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DonationInfo {
+        private String oneDayDonation;
+
+        private String weekDonation;
+
+        private String monthDonation;
+    }
 }
