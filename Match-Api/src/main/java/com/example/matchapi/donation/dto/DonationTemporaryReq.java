@@ -19,4 +19,17 @@ public class DonationTemporaryReq {
 
         private DonationKind donationKind;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DonationDeposit {
+        private Long donationRequestId;
+
+        private String name;
+
+        private int amount;
+    }
 }

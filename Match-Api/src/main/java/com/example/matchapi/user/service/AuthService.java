@@ -38,8 +38,10 @@ import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
 import static com.example.matchcommon.exception.errorcode.CommonResponseStatus.*;
+import static com.example.matchdomain.user.entity.AuthorityEnum.ROLE_ADMIN;
 import static com.example.matchdomain.user.entity.SocialType.KAKAO;
 import static com.example.matchdomain.user.entity.SocialType.NAVER;
+import static com.example.matchdomain.user.exception.AdminLoginErrorCode.NOT_ADMIN;
 import static com.example.matchdomain.user.exception.UserAuthErrorCode.NOT_EXIST_USER;
 import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_CORRECT_PASSWORD;
 import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_EMAIL;
@@ -201,4 +203,16 @@ public class AuthService {
     }
 
 
+    public UserRes.UserToken adminLogIn(UserReq.LogIn logIn) {
+        User user=userRepository.findByUsername(logIn.getEmail()).orElseThrow(() -> new UnauthorizedException(NOT_EXIST_USER));
+
+        if(!passwordEncoder.matches(logIn.getPassword(),user.getPassword())) throw new BadRequestException(NOT_CORRECT_PASSWORD);
+        if(!user.getRole().contains(ROLE_ADMIN.getValue())) throw new BadRequestException(NOT_ADMIN);
+
+        Long userId = user.getId();
+
+        UserRes.Token token = createToken(userId);
+
+        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
+    }
 }

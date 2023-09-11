@@ -25,7 +25,7 @@ public class DonationList extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "donationTemporaryId", nullable = false, insertable = false, updatable = false)
     private DonationTemporary donationTemporary;
 
