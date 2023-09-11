@@ -76,6 +76,7 @@ public class DonationTemporaryConvertor {
                 .alarmMethod(result.getAlarmMethod().getName())
                 .donationKind(result.getDonationKind().getName())
                 .deposit(result.getDeposit().getName())
+                .createdAt(result.getCreatedAt().toString())
                 .build();
     }
 
@@ -97,6 +98,7 @@ public class DonationTemporaryConvertor {
                 .alarmMethod(donationTemporary.getAlarmMethod().getName())
                 .donationKind(donationTemporary.getDonationKind().getName())
                 .deposit(donationTemporary.getDeposit().getName())
+                .createdAt(donationTemporary.getCreatedAt().toString())
                 .build();
     }
 

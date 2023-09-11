@@ -50,6 +50,8 @@ public class DonationTemporaryRes {
         private String donationKind;
 
         private String deposit;
+
+        private String createdAt;
     }
 
     @Getter
@@ -71,5 +73,7 @@ public class DonationTemporaryRes {
         private String donationKind;
 
         private String deposit;
+
+        private String createdAt;
     }
 }
