@@ -31,7 +31,7 @@ public class AdminDonationTemporaryController {
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     public CommonResponse<PageResponse<List<DonationTemporaryRes.DonationRequestAdminList>>> getDonationRequestList(
             @Parameter(description = "입금 유무") @RequestParam(required = false,defaultValue = "ALL") Deposit deposit,
-            @Parameter(description = "이름") @RequestParam(required = false,defaultValue = "임현우") String content,
+            @Parameter(description = "이름") @RequestParam(required = false) String content,
             @Parameter(description = "페이지", example = "0")@RequestParam(required = false, defaultValue = "0")@Min(value = 0) int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size
     ){
