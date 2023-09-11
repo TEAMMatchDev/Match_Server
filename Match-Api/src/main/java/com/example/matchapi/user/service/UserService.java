@@ -1,6 +1,8 @@
 package com.example.matchapi.user.service;
 
+import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.order.dto.OrderRes;
+import com.example.matchapi.order.service.OrderService;
 import com.example.matchapi.project.convertor.ProjectConvertor;
 import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.convertor.UserConvertor;
@@ -44,6 +46,7 @@ public class UserService {
     private final ProjectConvertor projectConvertor;
     private final ProjectHelper projectHelper;
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
+    private final OrderService orderService;
 
     public Optional<User> findUser(long id) {
         return userRepository.findById(id);
@@ -107,4 +110,14 @@ public class UserService {
 
         return new PageResponse<>(userList.isLast(),userList.getTotalElements(),userLists);
     }
+
+    public UserRes.UserAdminDetail getUserAdminDetail(Long userId) {
+        UserRepository.UserList userDetail = userRepository.getUserDetail(userId);
+
+        List<OrderRes.UserBillCard> userCards = orderService.getUserBillCard(userId);
+
+
+        return userConvertor.UserAdminDetail(userDetail,userCards);
+    }
+
 }
