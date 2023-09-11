@@ -30,6 +30,10 @@ public class DonationTemporary extends BaseEntity {
     @Column(name="userId")
     private Long userId;
 
+    private String name;
+
+    private String phoneNumber;
+
     @Enumerated(EnumType.STRING)
     private AlarmMethod alarmMethod;
 
