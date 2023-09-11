@@ -15,4 +15,17 @@ public class DonationTemporaryRes {
 
         private String email;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DonationList {
+        private String name;
+
+        private String amount;
+
+        private String donationDate;
+    }
 }
