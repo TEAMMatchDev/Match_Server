@@ -99,4 +99,16 @@ public class DonationTemporaryConvertor {
                 .deposit(donationTemporary.getDeposit().getName())
                 .build();
     }
+
+    public DonationTemporary DonationInfoEmail(User user, DonationTemporaryReq.DonationInfo donationInfo) {
+        return DonationTemporary
+                .builder()
+                .userId(user.getId())
+                .donationKind(donationInfo.getDonationKind())
+                .alarmMethod(donationInfo.getAlarmMethod())
+                .email(donationInfo.getEmail())
+                .name(donationInfo.getUsername())
+                .deposit(Deposit.NONEXISTENCE)
+                .build();
+    }
 }

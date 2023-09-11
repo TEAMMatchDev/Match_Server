@@ -15,6 +15,8 @@ public class DonationTemporaryReq {
 
         private String phoneNumber;
 
+        private String email;
+
         private AlarmMethod alarmMethod;
 
         private DonationKind donationKind;
