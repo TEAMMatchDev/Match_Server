@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.example.matchcommon.constants.MatchStatic.*;
 import static com.example.matchdomain.donation.exception.DonationGerErrorCode.DONATION_NOT_EXIST;
 import static com.example.matchdomain.order.exception.RegistrationCardErrorCode.FAILED_ERROR_ENCRYPT;
 
@@ -53,6 +54,7 @@ public class OrderService {
     private final OrderRequestRepository orderRequestRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public NicePaymentAuth authPayment(String tid, Long amount) {
         String authorizationHeader = orderHelper.getNicePaymentAuthorizationHeader();
         NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.paymentAuth(authorizationHeader, tid, new NicePayRequest(String.valueOf(amount)));
@@ -102,7 +104,7 @@ public class OrderService {
     @Transactional
     public void registrationCard(User user, OrderReq.RegistrationCard registrationCard) {
         String encrypt = encrypt(orderConvertor.createPlainText(registrationCard), nicePayProperties.getSecret().substring(0, 32), nicePayProperties.getSecret().substring(0, 16));
-        String orderId = createRandomUUID();
+        String orderId = BILL + createRandomOrderId();
         Long userId = user.getId();
         //빌키 발급
         NicePayBillkeyResponse nicePayBillkeyResponse = niceAuthFeignClient.registrationCard(
@@ -110,7 +112,7 @@ public class OrderService {
                 new NicePayRegistrationCardRequest(encrypt, orderId, "A2"));
 
         //나이스 카드 확인용 OrderId, Bid 필요
-        NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(), nicePayBillkeyResponse.getBid(), orderConvertor.niceBillOk(nicePayBillkeyResponse, createRandomUUID()));
+        NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(), nicePayBillkeyResponse.getBid(), orderConvertor.niceBillOk(nicePayBillkeyResponse, orderId));
 
         //에러코드 핸들링
         orderHelper.checkBillResult(niceBillOkResponse.getResultCode(), niceBillOkResponse.getResultMsg(), niceBillOkResponse.getTid(), niceBillOkResponse.getOrderId());
@@ -121,7 +123,7 @@ public class OrderService {
 
     }
 
-
+    @Transactional
     public String encrypt(String plainText, String secretKey, String iv) {
         SecretKey secureKey = new SecretKeySpec(secretKey.getBytes(), "AES");
         try {
@@ -134,14 +136,20 @@ public class OrderService {
         }
     }
 
-
+    @Transactional
     public String createRandomUUID() {
         return UUID.randomUUID().toString();
+    }
+
+    @Transactional
+    public String createRandomOrderId() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "-" + UUID.randomUUID().toString();
 
     }
 
-    public List<OrderRes.UserBillCard> getUserBillCard(User user) {
-        List<UserCard> userCards = userCardRepository.findByUserAndStatus(user,Status.ACTIVE);
+    @Transactional
+    public List<OrderRes.UserBillCard> getUserBillCard(Long userId) {
+        List<UserCard> userCards = userCardRepository.findByUserIdAndStatus(userId,Status.ACTIVE);
         List<OrderRes.UserBillCard> userBillCards = new ArrayList<>();
 
         userCards.forEach(
@@ -151,7 +159,8 @@ public class OrderService {
                                     result.getId(),
                                     result.getCardCode(),
                                     result.getCardName(),
-                                    orderHelper.maskMiddleNum(result.getCardNo())
+                                    orderHelper.maskMiddleNum(result.getCardNo()),
+                                    result.getCardAbleStatus().getName()
                             )
                     );
                 }
@@ -162,9 +171,8 @@ public class OrderService {
     @Transactional
     public void deleteBillCard(Long cardId) {
         Optional<UserCard> userCard = userCardRepository.findByIdAndStatus(cardId,Status.ACTIVE);
-        NiceBillExpireResponse niceBillExpireResponse = niceAuthFeignClient.billKeyExpire(orderHelper.getNicePaymentAuthorizationHeader(), userCard.get().getBid(), new NiceBillExpireRequest(createRandomUUID()));
+        NiceBillExpireResponse niceBillExpireResponse = niceAuthFeignClient.billKeyExpire(orderHelper.getNicePaymentAuthorizationHeader(), userCard.get().getBid(), new NiceBillExpireRequest(DELETE + createRandomOrderId()));
         System.out.println(niceBillExpireResponse.getResultCode() + niceBillExpireResponse.getResultMsg());
-
         userCard.get().setStatus(Status.INACTIVE);
     }
 
@@ -174,7 +182,9 @@ public class OrderService {
 
         Optional<UserCard> card = userCardRepository.findByIdAndStatus(cardId,Status.ACTIVE);
 
-        String orderId = createRandomUUID();
+        String orderId = REGULAR + createRandomOrderId();
+
+        System.out.println(orderId);
 
         NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(), card.get().getBid(), orderConvertor.billCardOneTime(regularDonation.getAmount(),orderId));
 
@@ -186,7 +196,6 @@ public class OrderService {
 
         RegularPayment regularPayment = regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId, projectId));
 
-
         donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
     }
 
@@ -194,7 +203,7 @@ public class OrderService {
     public void oneTimeDonationCard(User user, OrderReq.@Valid OneTimeDonation oneTimeDonation, Long cardId, Long projectId) {
         Optional<UserCard> card = userCardRepository.findByIdAndStatus(cardId, Status.ACTIVE);
 
-        String orderId = createRandomUUID();
+        String orderId = ONE_TIME + createRandomOrderId();
 
         NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(), card.get().getBid(), orderConvertor.billCardOneTime(oneTimeDonation.getAmount(),orderId));
 
@@ -207,20 +216,23 @@ public class OrderService {
         donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
     }
 
+    @Transactional
     public String saveRequest(User user, Long projectId) {
-        String orderId = createRandomUUID();
+        String orderId = ONE_TIME + createRandomOrderId();
 
         orderRequestRepository.save(orderConvertor.CreateRequest(user.getId(), projectId, orderId));
 
         return orderId;
     }
 
+    @Transactional
     public OrderRequest getOrderRequest(String orderId) {
         Optional<OrderRequest> orderRequest = orderRequestRepository.findById(orderId);
         return orderRequest.get();
 
     }
 
+    @Transactional
     public void requestPaymentAuth(String tid, Long amount) {
         NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.
                 paymentAuth(orderHelper.getNicePaymentAuthorizationHeader(),

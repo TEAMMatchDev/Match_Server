@@ -1,8 +1,10 @@
 package com.example.matchapi.donation.convertor;
 
 import com.example.matchapi.donation.dto.DonationRes;
+import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.DonationUser;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.List;
@@ -10,7 +12,9 @@ import java.util.List;
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
 
 @Convertor
+@RequiredArgsConstructor
 public class DonationConvertor {
+    private final DonationHelper donationHelper;
     public DonationRes.FlameList Flame(DonationUser result) {
         return DonationRes.FlameList.builder()
                 .donationId(result.getId())
@@ -50,7 +54,7 @@ public class DonationConvertor {
     public DonationRes.DonationList DonationList(DonationUser result) {
         String payDate="";
         if(result.getRegularPayment()!=null) {
-            payDate = "매월 " + result.getRegularPayment().getPayDate() + "일 " + result.getRegularPayment().getAmount() + "원";
+            payDate = "매월 " + result.getRegularPayment().getPayDate() + "일 " + donationHelper.parsePriceComma(Math.toIntExact(result.getRegularPayment().getAmount()));
         }else{
             payDate = "단기 후원 " + result.getPrice() + "원";
         }

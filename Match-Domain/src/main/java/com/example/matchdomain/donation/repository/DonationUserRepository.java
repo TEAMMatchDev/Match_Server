@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface DonationUserRepository extends JpaRepository<DonationUser,Long> {
@@ -66,4 +67,8 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
 
     @EntityGraph(attributePaths = "user")
     Page<DonationUser> findByProjectId(Long projectId, Pageable pageable);
+
+    List<DonationUser> findByDonationStatusNotAndCreatedAtGreaterThanAndCreatedAtLessThan(DonationStatus donationStatus, LocalDateTime parse, LocalDateTime parse1);
+
+    List<DonationUser> findByDonationStatusNot(DonationStatus donationStatus);
 }

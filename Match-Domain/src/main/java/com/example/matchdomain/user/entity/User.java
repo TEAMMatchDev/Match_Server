@@ -5,6 +5,7 @@ import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.UserCard;
 import com.example.matchdomain.project.entity.ProjectUserAttention;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,6 +25,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @DynamicUpdate
+@BatchSize(size = 100)
 @DynamicInsert
 public class User extends BaseEntity implements UserDetails {
     @Id
@@ -127,6 +129,9 @@ public class User extends BaseEntity implements UserDetails {
         this.logInAt=now;
     }
 
+    public boolean isActivated() {
+        return true;
+    }
 
 
 }
