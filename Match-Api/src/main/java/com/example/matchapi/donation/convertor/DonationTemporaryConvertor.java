@@ -76,6 +76,7 @@ public class DonationTemporaryConvertor {
                 .alarmMethod(result.getAlarmMethod().getName())
                 .donationKind(result.getDonationKind().getName())
                 .deposit(result.getDeposit().getName())
+                .createdAt(result.getCreatedAt().toString())
                 .build();
     }
 
@@ -97,6 +98,19 @@ public class DonationTemporaryConvertor {
                 .alarmMethod(donationTemporary.getAlarmMethod().getName())
                 .donationKind(donationTemporary.getDonationKind().getName())
                 .deposit(donationTemporary.getDeposit().getName())
+                .createdAt(donationTemporary.getCreatedAt().toString())
+                .build();
+    }
+
+    public DonationTemporary DonationInfoEmail(User user, DonationTemporaryReq.DonationInfo donationInfo) {
+        return DonationTemporary
+                .builder()
+                .userId(user.getId())
+                .donationKind(donationInfo.getDonationKind())
+                .alarmMethod(donationInfo.getAlarmMethod())
+                .email(donationInfo.getEmail())
+                .name(donationInfo.getUsername())
+                .deposit(Deposit.NONEXISTENCE)
                 .build();
     }
 }

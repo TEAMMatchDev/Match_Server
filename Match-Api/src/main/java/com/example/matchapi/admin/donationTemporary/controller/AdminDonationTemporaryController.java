@@ -35,6 +35,8 @@ public class AdminDonationTemporaryController {
             @Parameter(description = "페이지", example = "0")@RequestParam(required = false, defaultValue = "0")@Min(value = 0) int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size
     ){
+        System.out.println(deposit);
+        System.out.println(content);
         return CommonResponse.onSuccess(donationTemporaryService.getDonationRequestList(deposit, page ,size,content));
     }
 
@@ -50,7 +52,7 @@ public class AdminDonationTemporaryController {
 
     @ApiErrorCodeExample({UserAuthErrorCode.class, AdminDonationRequestErrorCode.class})
     @GetMapping("/{donationRequestId}")
-    @Operation(summary = "ADMIN-06-02💸 기부금 입금내역 전 사용 API 정보 불러오기.", description = "기부금 입금내역 API 입니다.")
+    @Operation(summary = "ADMIN-06-02💸 기부금 입금내역 등록 전 사용 API 정보 불러오기.", description = "기부금 입금내역 API 입니다.")
     public CommonResponse<DonationTemporaryRes.DonationDetail> getDonationInfo(@PathVariable("donationRequestId") Long donationRequestId){
         return CommonResponse.onSuccess(donationTemporaryService.getDonationInfo(donationRequestId));
     }
