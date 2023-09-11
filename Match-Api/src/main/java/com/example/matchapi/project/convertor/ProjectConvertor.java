@@ -111,6 +111,8 @@ public class ProjectConvertor {
                 .viewCnt(0)
                 .startedAt(projects.getStartDate())
                 .finishedAt(projects.getEndDate())
+                .regularStatus(projects.getRegularStatus())
+                .projectKind(projects.getProjectKind())
                 .build();
     }
 

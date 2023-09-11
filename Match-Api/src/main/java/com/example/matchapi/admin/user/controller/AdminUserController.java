@@ -6,11 +6,11 @@ import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +47,8 @@ public class AdminUserController {
     @GetMapping("/{userId}")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Operation(summary = "ADMIN-02-03👤 유저 상세 조회 API.",description = "유저 상세 조회 API 입니다.")
-    public CommonResponse<UserRes.UserAdminDetail>
-
+    public CommonResponse<UserRes.UserAdminDetail> getUserDetail(@PathVariable Long userId){
+        UserRes.UserAdminDetail userAdminDetail = userService.getUserAdminDetail(userId);
+        return CommonResponse.onSuccess(userAdminDetail);
+    }
 }

@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
+import java.util.List;
 
 @Convertor
 @RequiredArgsConstructor
@@ -145,6 +146,25 @@ public class UserConvertor {
                 .card(result.getCard())
                 .status(result.getStatus().getValue())
                 .createdAt(result.getCreatedAt().toString())
+                .build();
+    }
+
+    public UserRes.UserAdminDetail UserAdminDetail(UserRepository.UserList userDetail, List<OrderRes.UserBillCard> userCards) {
+        return UserRes.UserAdminDetail
+                .builder()
+                .userId(userDetail.getUserId())
+                .name(userDetail.getName())
+                .birth(String.valueOf(userDetail.getBirth()))
+                .socialType(userDetail.getSocialType().getName())
+                .gender(userDetail.getGender().getValue())
+                .email(userDetail.getEmail())
+                .phoneNumber(userDetail.getPhoneNumber())
+                .donationCnt(userDetail.getDonationCnt())
+                .totalAmount(userDetail.getTotalAmount())
+                .card(userDetail.getCard())
+                .status(userDetail.getStatus().getValue())
+                .createdAt(userDetail.getCreatedAt().toString())
+                //.userCards(userCards)
                 .build();
     }
 }

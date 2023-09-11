@@ -1,4 +1,4 @@
-package com.example.matchdomain.donation.entity;
+package com.example.matchdomain.donationTemporary.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.user.entity.User;
@@ -9,7 +9,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "DonationRequest")
+@Table(name = "DonationTemporary")
 @Getter
 @Setter
 @Builder
@@ -17,7 +17,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-public class DonationRequest extends BaseEntity {
+public class DonationTemporary extends BaseEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,5 +30,16 @@ public class DonationRequest extends BaseEntity {
     @Column(name="userId")
     private Long userId;
 
+    private String name;
 
+    private String phoneNumber;
+
+    @Enumerated(EnumType.STRING)
+    private AlarmMethod alarmMethod;
+
+    @Enumerated(EnumType.STRING)
+    private DonationKind donationKind;
+
+    @Enumerated(EnumType.STRING)
+    private Deposit deposit = Deposit.NONEXISTENCE;
 }

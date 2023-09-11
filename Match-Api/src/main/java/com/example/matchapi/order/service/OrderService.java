@@ -148,8 +148,8 @@ public class OrderService {
     }
 
     @Transactional
-    public List<OrderRes.UserBillCard> getUserBillCard(User user) {
-        List<UserCard> userCards = userCardRepository.findByUserAndStatus(user,Status.ACTIVE);
+    public List<OrderRes.UserBillCard> getUserBillCard(Long userId) {
+        List<UserCard> userCards = userCardRepository.findByUserIdAndStatus(userId,Status.ACTIVE);
         List<OrderRes.UserBillCard> userBillCards = new ArrayList<>();
 
         userCards.forEach(

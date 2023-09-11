@@ -74,6 +74,13 @@ public interface UserRepository extends JpaRepository<User,Long> {
             "FROM User U where name LIKE concat('%',:content,'%') order by createdAt desc" ,nativeQuery = true, countQuery = "select count(*) from User where name LIKE concat('%',:content,'%')")
     Page<UserList> getUserListByName(Pageable pageable,@Param("content") String content);
 
+    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email," +
+            "If((select exists (select * from UserCard UC where UC.userId=U.id)),'true','false')'card'," +
+            "(select count(*) from DonationUser DU where DU.userId = U.id)'donationCnt'," +
+            "COALESCE((SELECT SUM(DU.price) FROM DonationUser DU WHERE DU.userId = U.id), 0) AS totalAmount,U.status, U.createdAt " +
+            "FROM User U where U.id = :userId " ,nativeQuery = true)
+    UserList getUserDetail(@Param("userId") Long userId);
+
     public interface UserList {
         Long getUserId();
         String getName();

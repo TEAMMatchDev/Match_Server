@@ -1,4 +1,4 @@
-package com.example.matchdomain.user.exception;
+package com.example.matchdomain.donationTemporary.exception;
 
 import com.example.matchcommon.annotation.ExplainError;
 import com.example.matchcommon.dto.ErrorReason;
@@ -10,17 +10,15 @@ import org.springframework.http.HttpStatus;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-
 @Getter
 @AllArgsConstructor
-public enum AdminLoginErrorCode implements BaseErrorCode {
-    NOT_CORRECT_PASSWORD(BAD_REQUEST, "U002", "유저 비밀번호를 확인해주세요."),
-    NOT_EXIST_USER(BAD_REQUEST,"U009" , "해당 유저가 존재하지 않습니다."),
-    NOT_ADMIN(BAD_REQUEST,"U003","관리자 권한이 아닙니다.");
+public enum AdminDonationRequestErrorCode implements BaseErrorCode {
 
+    @ExplainError("해당 요청이 존재하지 않습니다.")
+    NOT_EXIST_DONATION_REQUEST(HttpStatus.BAD_REQUEST,false,"DONATION_REQUEST","해당 요청이 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
+    private final boolean isSuccess;
     private final String code;
     private final String message;
 
@@ -28,7 +26,6 @@ public enum AdminLoginErrorCode implements BaseErrorCode {
     public ErrorReason getErrorReason() {
         return ErrorReason.builder().message(message).code(code).isSuccess(false).build();
     }
-
     @Override
     public String getExplainError() throws NoSuchFieldException {
         Field field = this.getClass().getField(this.name());
