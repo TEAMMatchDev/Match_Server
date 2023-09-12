@@ -57,4 +57,6 @@ public class AdminDonationTemporaryController {
         return CommonResponse.onSuccess(donationTemporaryService.getDonationInfo(donationRequestId));
     }
 
+
+
 }

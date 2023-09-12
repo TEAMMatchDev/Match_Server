@@ -49,6 +49,8 @@ public class Project extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProjectStatus projectStatus;
 
+    private String searchKeyword;
+
     @Enumerated(EnumType.STRING)
     private ProjectKind projectKind;
 

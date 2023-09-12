@@ -28,7 +28,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("SELECT p FROM Project p " +
             "join ProjectImage pi on p.id = pi.projectId " +
             "WHERE " +
-            "(p.projectName LIKE %:content% OR p.projectExplanation LIKE %:content1% OR p.usages LIKE %:content2%) " +
+            "(p.projectName LIKE %:content% OR p.projectExplanation LIKE %:content1% OR p.usages LIKE %:content2% OR p.searchKeyword LIKE %:content2%) " +
             "AND p.projectStatus = :projectStatus " +
             "AND p.finishedAt >= :now " +
             "AND pi.imageRepresentStatus = :imageRepresentStatus AND p.status = :status " +
@@ -57,7 +57,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "P.projectName as 'projectName', PI.url as 'imgUrl', " +
             "If((select exists (select * from ProjectUserAttention PUA where PUA.userId=:userId and P.id = PUA.projectId )),'true','false')'like' " +
             "from Project P join ProjectImage PI on P.id = PI.projectId " +
-            "where (P.projectName LIKE concat('%',:content,'%') OR P.projectExplanation LIKE concat('%',:content1,'%') OR P.usages LIKE concat('%',:content2,'%')) " +
+            "where (P.projectName LIKE concat('%',:content,'%') OR P.projectExplanation LIKE concat('%',:content1,'%') OR P.usages LIKE concat('%',:content2,'%') OR P.searchKeyword LIKE concat('%',:content2,'%')) " +
             "and PI.imageRepresentStatus = :imageRepresentStatus and P.projectStatus = :projectStatus and P.finishedAt>=:now and P.status = :status order by viewCnt asc"
             , nativeQuery = true
             , countQuery = "select * from Project P where projectStatus = :projectStatus and finishedAt = :now and (P.projectName LIKE concat('%',:content,'%') OR P.projectExplanation " +
