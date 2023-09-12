@@ -113,6 +113,7 @@ public class ProjectConvertor {
                 .finishedAt(projects.getEndDate())
                 .regularStatus(projects.getRegularStatus())
                 .projectKind(projects.getProjectKind())
+                .searchKeyword(projects.getSearchKeyword())
                 .build();
     }
 
@@ -164,6 +165,7 @@ public class ProjectConvertor {
                 .regularDonationCnt(result.getRegularTotalCnt())
                 .status(result.getStatus().getValue())
                 .totalAmount(result.getTotalAmount())
+                .searchKeyword(result.getSearchKeyword())
                 .totalDonationCnt(result.getTotalDonationCnt())
                 .projectImgLists(projectImgLists)
                 .build();

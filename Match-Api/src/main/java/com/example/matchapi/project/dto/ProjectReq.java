@@ -41,8 +41,7 @@ public class ProjectReq {
         private LocalDateTime endDate;
         @Enum(message = "DOG, CHILDREN,YOUTH,WOMEN, ELDER, DISABLED, SOCIAL, EARTH, NEIGHBOR, ANIMAL, ENVIRONMENT 중 입력해주세요")
         private ProjectKind projectKind;
-
-
+        private String searchKeyword;
     }
     @Getter
     @Setter
@@ -73,5 +72,6 @@ public class ProjectReq {
         private LocalDateTime endDate;
         @Enum(message = "DOG, CHILDREN,YOUTH,WOMEN, ELDER, DISABLED, SOCIAL, EARTH, NEIGHBOR, ANIMAL, ENVIRONMENT 중 입력해주세요")
         private ProjectKind projectKind;
+        private String searchKeyword;
     }
 }

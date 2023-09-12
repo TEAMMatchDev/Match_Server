@@ -134,6 +134,8 @@ public class ProjectRes {
 
         private String status;
 
+        private String searchKeyword;
+
         private int totalAmount;
 
         private int totalDonationCnt;

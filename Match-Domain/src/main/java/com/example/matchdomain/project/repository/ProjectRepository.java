@@ -97,7 +97,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "P.projectName, " +
             "usages," +
             "COALESCE(sum(DU.price), 0)'totalAmount' , " +
-            "count(DU.projectId)'totalDonationCnt', (select count(*) from RegularPayment RP where RP.projectId=:projectId)'regularTotalCnt' ," +
+            "count(DU.projectId)'totalDonationCnt', " +
+            "(select count(*) from RegularPayment RP where RP.projectId=:projectId)'regularTotalCnt' ," +
+            "searchKeyword," +
             " P.projectExplanation 'detail', " +
             "P.status, " +
             "P.regularStatus, " +
@@ -133,6 +135,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         String getProjectName();
         int getTotalDonationCnt();
 
+        String getSearchKeyword();
         int getRegularTotalCnt();
         int getTotalAmount();
         RegularStatus getRegularStatus();
