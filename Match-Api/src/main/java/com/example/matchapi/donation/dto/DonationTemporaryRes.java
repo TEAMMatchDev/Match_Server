@@ -62,6 +62,8 @@ public class DonationTemporaryRes {
     public static class DonationDetail {
         private Long donationRequestId;
 
+        private Long userId;
+
         private String username;
 
         private String phoneNumber;
