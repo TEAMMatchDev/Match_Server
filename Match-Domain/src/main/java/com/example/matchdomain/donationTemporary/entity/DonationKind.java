@@ -1,7 +1,10 @@
 package com.example.matchdomain.donationTemporary.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 @AllArgsConstructor
@@ -12,4 +15,12 @@ public enum DonationKind {
     VISUALLY_IMPAIRED("VISUALLY_IMPAIRED","시각장애인의 안전");
     private final String value;
     private final String name;
+
+    @JsonCreator(mode= JsonCreator.Mode.DELEGATING)
+    public static DonationKind get(String value) {
+        return Arrays.stream(values())
+                .filter(type -> type.getValue().equals(value))
+                .findAny()
+                .orElse(null);
+    }
 }
