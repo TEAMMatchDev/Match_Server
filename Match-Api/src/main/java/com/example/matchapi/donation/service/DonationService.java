@@ -4,6 +4,7 @@ import com.example.matchapi.donation.convertor.DonationConvertor;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.order.service.OrderService;
+import com.example.matchapi.project.convertor.ProjectConvertor;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
@@ -43,6 +44,7 @@ public class DonationService {
     private final DonationConvertor donationConvertor;
     private final RegularPaymentRepository regularPaymentRepository;
     private final DonationHelper donationHelper;
+    private final ProjectConvertor projectConvertor;
 
     public PageResponse<List<DonationRes.DonationList>> getDonationList(Long userId, int filter, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -214,18 +216,15 @@ public class DonationService {
                 monthlyDonationAmount += donationUser.getPrice();
             }
         }
-        /*
-
-        List<DonationUser> oneDayDonation = donationUserRepository.findByDonationStatusNotAndCreatedAtGreaterThanAndCreatedAtLessThan(EXECUTION_REFUND, LocalDateTime.parse(localDate+FIRST_TIME), LocalDateTime.parse(localDate+LAST_TIME));
-        List<DonationUser> weekDonation = donationUserRepository.findByDonationStatusNotAndCreatedAtGreaterThanAndCreatedAtLessThan(EXECUTION_REFUND, LocalDateTime.parse(localDate.minusWeeks(1)+FIRST_TIME) , LocalDateTime.parse(localDate+LAST_TIME));
-        List<DonationUser> monthDonation = donationUserRepository.findByDonationStatusNotAndCreatedAtGreaterThanAndCreatedAtLessThan(EXECUTION_REFUND,LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME), LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME));
-
-
-         */
 
         return new DonationRes.DonationInfo(donationHelper.parsePriceComma(oneDayDonationAmount),donationHelper.parsePriceComma(weekendDonationAmount),donationHelper.parsePriceComma(monthlyDonationAmount));
 
 
 
+    }
+
+    public DonationRes.DonationDetail getDonationDetail(Long donationId) {
+        DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
+        return donationConvertor.getDonationDetail(donationUser);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.matchapi.donation.dto;
 
 import com.example.matchdomain.donation.entity.DonationStatus;
+import com.example.matchdomain.donation.entity.RegularStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -71,5 +72,36 @@ public class DonationRes {
         private String weekDonation;
 
         private String monthDonation;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DonationDetail {
+        private Long donationId;
+
+        private Long userId;
+
+        private String name;
+
+        private String email;
+
+        private String phoneNumber;
+
+        private Long amount;
+
+        private String inherenceNumber;
+
+        private String inherenceName;
+
+        private String payMethod;
+
+        private DonationStatus donationStatus;
+
+        private String regularStatus;
+
+        private String donationDate;
     }
 }
