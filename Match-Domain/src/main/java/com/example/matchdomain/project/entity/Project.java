@@ -49,6 +49,8 @@ public class Project extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProjectStatus projectStatus;
 
+    private String searchKeyword;
+
     @Enumerated(EnumType.STRING)
     private ProjectKind projectKind;
 
@@ -72,7 +74,7 @@ public class Project extends BaseEntity {
         this.projectImage = projectImage;
     }
 
-    public void modifyProject(String projectName, String usages, String detail, RegularStatus regularStatus, LocalDateTime startDate, LocalDateTime endDate, ProjectKind projectKind) {
+    public void modifyProject(String projectName, String usages, String detail, RegularStatus regularStatus, LocalDateTime startDate, LocalDateTime endDate, ProjectKind projectKind, String searchKeyword) {
         this.projectName = projectName;
         this.usages = usages;
         this.projectExplanation = detail;
@@ -80,5 +82,6 @@ public class Project extends BaseEntity {
         this.startedAt = startDate;
         this.finishedAt = endDate;
         this.projectKind = projectKind;
+        this.searchKeyword = searchKeyword;
     }
 }

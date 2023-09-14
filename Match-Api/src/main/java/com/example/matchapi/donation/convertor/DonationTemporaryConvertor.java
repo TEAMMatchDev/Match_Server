@@ -72,10 +72,11 @@ public class DonationTemporaryConvertor {
                 .donationRequestId(result.getId())
                 .username(result.getName())
                 .phoneNumber(result.getPhoneNumber())
-                .email(result.getUser().getEmail())
+                .email(result.getEmail())
                 .alarmMethod(result.getAlarmMethod().getName())
                 .donationKind(result.getDonationKind().getName())
                 .deposit(result.getDeposit().getName())
+                .createdAt(result.getCreatedAt().toString())
                 .build();
     }
 
@@ -92,11 +93,25 @@ public class DonationTemporaryConvertor {
                 .builder()
                 .donationRequestId(donationTemporary.getId())
                 .username(donationTemporary.getName())
+                .userId(donationTemporary.getUserId())
                 .phoneNumber(donationTemporary.getPhoneNumber())
-                .email(donationTemporary.getUser().getEmail())
+                .email(donationTemporary.getEmail())
                 .alarmMethod(donationTemporary.getAlarmMethod().getName())
                 .donationKind(donationTemporary.getDonationKind().getName())
                 .deposit(donationTemporary.getDeposit().getName())
+                .createdAt(donationTemporary.getCreatedAt().toString())
+                .build();
+    }
+
+    public DonationTemporary DonationInfoEmail(User user, DonationTemporaryReq.DonationInfo donationInfo) {
+        return DonationTemporary
+                .builder()
+                .userId(user.getId())
+                .donationKind(donationInfo.getDonationKind())
+                .alarmMethod(donationInfo.getAlarmMethod())
+                .email(donationInfo.getEmail())
+                .name(donationInfo.getUsername())
+                .deposit(Deposit.NONEXISTENCE)
                 .build();
     }
 }

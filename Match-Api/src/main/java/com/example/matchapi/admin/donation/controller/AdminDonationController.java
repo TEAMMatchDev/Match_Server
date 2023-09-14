@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,4 +28,11 @@ public class AdminDonationController {
         DonationRes.DonationInfo info = donationService.getDonationInfo();
         return CommonResponse.onSuccess(info);
     }
-}
+
+    @GetMapping("/{donationId}")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    @Operation(summary = "ADMIN-05-02 기부금 상세조회 API", description = "기부금 상세조회 API")
+    public CommonResponse<DonationRes.DonationDetail> getDonationDetail(@PathVariable Long donationId){
+        return CommonResponse.onSuccess(donationService.getDonationDetail(donationId));
+    }
+ }

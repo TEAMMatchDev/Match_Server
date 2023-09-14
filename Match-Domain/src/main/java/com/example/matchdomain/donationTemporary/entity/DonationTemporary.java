@@ -34,6 +34,8 @@ public class DonationTemporary extends BaseEntity {
 
     private String phoneNumber;
 
+    private String email;
+
     @Enumerated(EnumType.STRING)
     private AlarmMethod alarmMethod;
 

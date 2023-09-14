@@ -10,6 +10,7 @@ import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,8 @@ import static com.example.matchdomain.project.entity.ProjectStatus.BEFORE_START;
 @RequiredArgsConstructor
 public class ProjectConvertor {
     private final ProjectHelper projectHelper;
+    private static final String FIRST_TIME = "T00:00:00";
+    private static final String LAST_TIME = "T23:59:59";
     public ProjectRes.ProjectDetail projectImgList(List<ProjectImage> projectImage) {
         List<ProjectRes.ProjectImgList> projectImgList = new ArrayList<>();
 
@@ -109,10 +112,11 @@ public class ProjectConvertor {
                 .usages(projects.getUsages())
                 .projectStatus(BEFORE_START)
                 .viewCnt(0)
-                .startedAt(projects.getStartDate())
-                .finishedAt(projects.getEndDate())
+                .startedAt(LocalDateTime.parse(projects.getStartDate()+FIRST_TIME))
+                .finishedAt(LocalDateTime.parse(projects.getEndDate()+LAST_TIME))
                 .regularStatus(projects.getRegularStatus())
                 .projectKind(projects.getProjectKind())
+                .searchKeyword(projects.getSearchKeyword())
                 .build();
     }
 
@@ -164,6 +168,7 @@ public class ProjectConvertor {
                 .regularDonationCnt(result.getRegularTotalCnt())
                 .status(result.getStatus().getValue())
                 .totalAmount(result.getTotalAmount())
+                .searchKeyword(result.getSearchKeyword())
                 .totalDonationCnt(result.getTotalDonationCnt())
                 .projectImgLists(projectImgLists)
                 .build();

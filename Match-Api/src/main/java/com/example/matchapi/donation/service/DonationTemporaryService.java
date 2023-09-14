@@ -7,10 +7,7 @@ import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.donationTemporary.entity.Deposit;
-import com.example.matchdomain.donationTemporary.entity.DonationKind;
-import com.example.matchdomain.donationTemporary.entity.DonationList;
-import com.example.matchdomain.donationTemporary.entity.DonationTemporary;
+import com.example.matchdomain.donationTemporary.entity.*;
 import com.example.matchdomain.donationTemporary.repository.DonationListRepository;
 import com.example.matchdomain.donationTemporary.repository.DonationTemporaryRepository;
 import com.example.matchdomain.user.entity.User;
@@ -38,7 +35,11 @@ public class DonationTemporaryService {
     }
 
     public void postDonationTemporary(User user, DonationTemporaryReq.DonationInfo donationInfo) {
-        donationTemporaryRepository.save(donationTemporaryConvertor.DonationInfo(user, donationInfo));
+        if(donationInfo.getAlarmMethod() == AlarmMethod.SMS) {
+            donationTemporaryRepository.save(donationTemporaryConvertor.DonationInfo(user, donationInfo));
+        }else{
+            donationTemporaryRepository.save(donationTemporaryConvertor.DonationInfoEmail(user, donationInfo));
+        }
     }
 
     public PageResponse<List<DonationTemporaryRes.DonationList>> getDonationList(DonationKind donationKind, int page, int size) {

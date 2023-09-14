@@ -50,6 +50,8 @@ public class DonationTemporaryRes {
         private String donationKind;
 
         private String deposit;
+
+        private String createdAt;
     }
 
     @Getter
@@ -59,6 +61,8 @@ public class DonationTemporaryRes {
     @NoArgsConstructor
     public static class DonationDetail {
         private Long donationRequestId;
+
+        private Long userId;
 
         private String username;
 
@@ -71,5 +75,7 @@ public class DonationTemporaryRes {
         private String donationKind;
 
         private String deposit;
+
+        private String createdAt;
     }
 }
