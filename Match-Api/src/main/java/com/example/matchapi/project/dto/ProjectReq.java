@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ProjectReq {
@@ -34,11 +35,11 @@ public class ProjectReq {
         @Schema(description = "프로젝트 기부 시작 날짜입니다. pattern = yyyy-MM-dd'T'HH:mm:ss", required = true, example = "ONE_TIME")
         @NotNull(message = "기부 시작 날짜입니다.")
         @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private LocalDateTime startDate;
+        private LocalDate startDate;
         @Schema(description = "프로젝트기부 종료 날짜입니다. pattern = yyyy-MM-dd'T'HH:mm:ss", required = true, example = "ONE_TIME")
         @NotNull(message = "기부 프로젝트 종류 날자를 입력해주세요")
         @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private LocalDateTime endDate;
+        private LocalDate endDate;
         @Enum(message = "DOG, CHILDREN,YOUTH,WOMEN, ELDER, DISABLED, SOCIAL, EARTH, NEIGHBOR, ANIMAL, ENVIRONMENT 중 입력해주세요")
         private ProjectKind projectKind;
         private String searchKeyword;

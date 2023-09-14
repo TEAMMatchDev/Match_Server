@@ -71,10 +71,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "usages," +
             "COALESCE(sum(DU.price), 0)'totalAmount' , " +
             "count(DU.projectId)'totalDonationCnt', P.projectStatus, P.regularStatus, P.status " +
-            "from Project P left join DonationUser DU on DU.projectId = P.id where P.status = :status group by P.id",
+            "from Project P left join DonationUser DU on DU.projectId = P.id group by P.id",
             nativeQuery = true ,
             countQuery = "select count(*) from Project")
-    Page<ProjectAdminList> getProjectAdminList(Pageable pageable,@Param("status") String status);
+    Page<ProjectAdminList> getProjectAdminList(Pageable pageable);
 
     @EntityGraph(attributePaths = "projectImage")
     Page<Project> findByStatusAndProjectStatusAndFinishedAtGreaterThanEqualAndProjectImage_ImageRepresentStatusOrderByViewCnt(Status status, ProjectStatus projectStatus, LocalDateTime now, ImageRepresentStatus imageRepresentStatus, Pageable pageable);
@@ -82,17 +82,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Optional<Project> findByIdAndStatus(Long projectId, Status status);
 
     boolean existsByIdAndStatus(Long projectId, Status status);
-
-    @Query(value = "select P.id'projectId', " +
-            "P.projectName, " +
-            "usages," +
-            "COALESCE(sum(DU.price), 0)'totalAmount' , " +
-            "count(DU.projectId)'totalDonationCnt' " +
-            "from Project P left join DonationUser DU on DU.projectId = P.id group by P.id",
-            nativeQuery = true ,
-            countQuery = "select count(*) from Project")
-    Page<ProjectAdminList> getProjectAdminList(Pageable pageable);
-
     @Query(value = "select P.id'projectId', " +
             "P.projectName, " +
             "usages," +

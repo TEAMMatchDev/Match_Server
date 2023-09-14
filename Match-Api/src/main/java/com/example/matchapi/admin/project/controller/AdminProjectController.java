@@ -102,6 +102,14 @@ public class AdminProjectController {
         return CommonResponse.onSuccess("삭제 성공");
     }
 
+    @Operation(summary = "ADMIN-03-05-01💻 프로젝트 삭제 복구.",description = "프로젝트 삭제 복구 API 입니다.")
+    @PatchMapping("/activation/{projectId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
+    public CommonResponse<String> patchActiveProject(@PathVariable Long projectId){
+        projectService.patchProjectActive(projectId);
+        return CommonResponse.onSuccess("삭제 성공");
+    }
+
     @Operation(summary = "ADMIN-03-06💻 프로젝트 글 수정.",description = "프로젝트 글 수정 API 입니다.")
     @PatchMapping("/{projectId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})

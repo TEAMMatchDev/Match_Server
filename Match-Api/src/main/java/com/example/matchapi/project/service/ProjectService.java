@@ -193,7 +193,7 @@ public class ProjectService {
     public PageResponse<List<ProjectRes.ProjectAdminList>> getProjectList(int page, int size) {
         Pageable pageable  = PageRequest.of(page,size);
 
-        Page<ProjectRepository.ProjectAdminList> projectAdminLists = projectRepository.getProjectAdminList(pageable, Status.ACTIVE.getValue());
+        Page<ProjectRepository.ProjectAdminList> projectAdminLists = projectRepository.getProjectAdminList(pageable);
 
         List<ProjectRes.ProjectAdminList> projectLists = new ArrayList<>();
 
@@ -284,5 +284,13 @@ public class ProjectService {
         projectImage.setUrl(imgUrl);
         projectImageRepository.save(projectImage);
         return new ProjectRes.PatchProjectImg(projectImgId, projectImage.getUrl());
+    }
+
+    public void patchProjectActive(Long projectId) {
+        Project project = projectRepository.findById(projectId).orElseThrow(()-> new NotFoundException(PROJECT_NOT_EXIST));
+
+        project.setStatus(Status.ACTIVE);
+
+        projectRepository.save(project);
     }
 }
