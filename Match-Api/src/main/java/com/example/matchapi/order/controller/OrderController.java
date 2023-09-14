@@ -8,6 +8,7 @@ import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchapi.user.service.UserService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchcommon.exception.errorcode.NicePayErrorCode;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.properties.NicePayProperties;
@@ -97,7 +98,7 @@ public class OrderController {
     }
 
     @PostMapping("/pay/card")
-    @ApiErrorCodeExample({UserAuthErrorCode.class, OtherServerErrorCode.class, RegistrationCardErrorCode.class})
+    @ApiErrorCodeExample({UserAuthErrorCode.class, OtherServerErrorCode.class, RegistrationCardErrorCode.class, NicePayErrorCode.class})
     @Operation(summary = "04-02 Order💸 정기 결제용 카드 등록 api",description = "정기 결제를 위한 카드 등록 API 입니다.")
     public CommonResponse<String> registrationCard(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
@@ -110,7 +111,7 @@ public class OrderController {
     @ApiErrorCodeExample({UserAuthErrorCode.class})
     @Operation(summary = "04-03 Order💸 정기 결제용 카드 조회 api #FRAME 결제 화면 - 단기,정기 결제", description = "정기 결제를 위한 카드 조회 API 입니다..")
     public CommonResponse<List<OrderRes.UserBillCard>> getUserBillCard(@Parameter(hidden = true) @AuthenticationPrincipal User user){
-        return CommonResponse.onSuccess(orderService.getUserBillCard(user));
+        return CommonResponse.onSuccess(orderService.getUserBillCard(user.getId()));
     }
 
     @DeleteMapping("/pay/card/{cardId}")

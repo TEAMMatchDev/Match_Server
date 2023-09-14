@@ -1,17 +1,18 @@
 package com.example.matchapi.config;
 
-import com.example.matchapi.security.JwtAccessDeniedHandler;
-import com.example.matchapi.security.JwtAuthenticationEntryPoint;
-import com.example.matchapi.security.JwtSecurityConfig;
-import com.example.matchapi.security.JwtService;
+import com.example.matchapi.security.*;
+import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsUtils;
@@ -24,15 +25,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtService jwtService;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final UserDetailsService userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public UserDetailsService userDetailsService(UserRepository userRepository){
+        return new UserDetailsServiceImpl(userRepository);
+    }
+
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web
+    web
                 .ignoring()
                 .antMatchers(
                         "/h2-console/**"
@@ -42,12 +49,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
 
+        httpSecurity
                 // token을 사용하는 방식이기 때문에 csrf를 disable합니다.
                 .csrf().disable()
-
-
                 // enable h2-console
                 .headers()
                 .frameOptions()
@@ -87,13 +92,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/").permitAll()
                 .antMatchers("/serverAuth").permitAll()
                 .antMatchers("/users/refresh").permitAll()
-                .antMatchers("admin/**").hasAnyRole("ROLE_ADMIN"
-                )
-
+                .antMatchers("/admin/projects/**").hasAnyRole("ADMIN")
+                .antMatchers("/admin/users/**").hasAnyRole("ADMIN")
+                .antMatchers("/admin/users/**").hasAnyRole("ADMIN")
+                .antMatchers("/admin/donation-users/**").hasAnyRole("ADMIN")
+                .antMatchers("/admin/order/**").hasAnyRole("ADMIN")
+                .antMatchers("/admin/auth/logIn").permitAll()
                 .anyRequest().authenticated()
 
                 .and()
                 .apply(new JwtSecurityConfig(jwtService));
 
+        httpSecurity
+                .httpBasic()
+                .and()
+                .formLogin()
+                .disable();
     }
+
+
+
 }

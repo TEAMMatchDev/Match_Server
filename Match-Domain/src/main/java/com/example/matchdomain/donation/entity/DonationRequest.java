@@ -29,4 +29,6 @@ public class DonationRequest extends BaseEntity {
 
     @Column(name="userId")
     private Long userId;
+
+
 }

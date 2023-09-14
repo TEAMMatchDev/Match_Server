@@ -193,7 +193,7 @@ public class ProjectService {
     public PageResponse<List<ProjectRes.ProjectAdminList>> getProjectList(int page, int size) {
         Pageable pageable  = PageRequest.of(page,size);
 
-        Page<ProjectRepository.ProjectAdminList> projectAdminLists = projectRepository.getProjectAdminList(pageable, Status.ACTIVE.getValue());
+        Page<ProjectRepository.ProjectAdminList> projectAdminLists = projectRepository.getProjectAdminList(pageable);
 
         List<ProjectRes.ProjectAdminList> projectLists = new ArrayList<>();
 
@@ -223,14 +223,16 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+    @Transactional
     public void patchProject(Long projectId, ProjectReq.ModifyProject modifyProject) {
         Project project = projectRepository.findById(projectId).orElseThrow(()-> new NotFoundException(PROJECT_NOT_EXIST));
 
-        project.modifyProject(modifyProject.getProjectName(), modifyProject.getUsages(), modifyProject.getDetail(), modifyProject.getRegularStatus(), modifyProject.getStartDate(), modifyProject.getEndDate(), modifyProject.getProjectKind());
+        project.modifyProject(modifyProject.getProjectName(), modifyProject.getUsages(), modifyProject.getDetail(), modifyProject.getRegularStatus(), modifyProject.getStartDate(), modifyProject.getEndDate(), modifyProject.getProjectKind(), modifyProject.getSearchKeyword());
 
         projectRepository.save(project);
     }
 
+    @Transactional
     public void saveImgList(Long id, String url, List<String> imgUrlList) {
         imgUrlList.add(url);
         List<ProjectImage> projectImages = new ArrayList<>();
@@ -246,6 +248,7 @@ public class ProjectService {
         projectImageRepository.saveAll(projectImages);
     }
 
+    @Transactional
     public ProjectRes.ProjectAdminDetail getProjectAdminDetail(Long projectId) {
         ProjectRepository.ProjectAdminDetail projectAdminDetail = projectRepository.getProjectAdminDetail(projectId);
         if(projectAdminDetail == null) throw new BadRequestException(PROJECT_NOT_EXIST);
@@ -268,7 +271,7 @@ public class ProjectService {
                 )
         );
 
-        return new PageResponse(donationUsers.isLast(), donationUsers.getTotalElements(), donationLists);
+        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), donationLists);
     }
 
     @Transactional
@@ -281,5 +284,13 @@ public class ProjectService {
         projectImage.setUrl(imgUrl);
         projectImageRepository.save(projectImage);
         return new ProjectRes.PatchProjectImg(projectImgId, projectImage.getUrl());
+    }
+
+    public void patchProjectActive(Long projectId) {
+        Project project = projectRepository.findById(projectId).orElseThrow(()-> new NotFoundException(PROJECT_NOT_EXIST));
+
+        project.setStatus(Status.ACTIVE);
+
+        projectRepository.save(project);
     }
 }

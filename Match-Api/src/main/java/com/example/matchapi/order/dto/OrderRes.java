@@ -18,6 +18,8 @@ public class OrderRes {
         private String cardName;
 
         private String cardNo;
+
+        private String cardAbleStatus;
     }
     @Getter
     @Setter

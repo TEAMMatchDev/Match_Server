@@ -10,6 +10,8 @@ import com.example.matchdomain.donation.entity.UserCard;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.donation.repository.RequestPaymentHistoryRepository;
+import com.example.matchinfrastructure.discord.client.DiscordFeignClient;
+import com.example.matchinfrastructure.discord.convertor.DiscordConvertor;
 import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
 import com.example.matchinfrastructure.pay.nice.dto.NiceBillOkResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.example.matchcommon.constants.MatchStatic.REGULAR;
 import static com.example.matchdomain.donation.entity.PaymentStatus.COMPLETE;
 import static com.example.matchdomain.donation.entity.PaymentStatus.FAIL;
 
@@ -35,6 +38,8 @@ public class OrderService {
     private final OrderConvertor orderConvertor;
     private final RequestPaymentHistoryRepository regularPaymentHistoryRepository;
     private final DonationUserRepository donationUserRepository;
+    private final DiscordFeignClient discordFeignClient;
+    private final DiscordConvertor discordConvertor;
 
     @Transactional
     public void regularDonationPayment() {
@@ -42,6 +47,14 @@ public class OrderService {
         List<RegularPayment> regularPayments = calculateDay();
         List<RequestPaymentHistory> requestPaymentHistories = new ArrayList<>();
         List<DonationUser> donationUsers = new ArrayList<>();
+
+        int trueCnt = 0;
+        int amount = 0;
+        int successCnt = 0;
+
+        discordFeignClient.alertMessage(discordConvertor.AlertBatchMessage("정기 결제 스케줄러 시작", regularPayments.size()));
+
+
 
         if (regularPayments.size() > 0) {
             LocalDate currentDate = LocalDate.now();
@@ -52,10 +65,12 @@ public class OrderService {
                     log.info("not pay Day of Month " + "userId :" + regularPayment.getUserId()+ " bid :" + regularPayment.getUserCard().getBid() + " amount :" + regularPayment.getAmount() + "원 projectId :" + regularPayment.getProjectId() + " payId : "+ regularPayment.getId());
                 }
                 else{
+                    trueCnt +=1 ;
+
                     Long userId = regularPayment.getUserId();
                     NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(),
                             regularPayment.getUserCard().getBid(),
-                            orderConvertor.niceBillRequest(regularPayment, createRandomUUID()));
+                            orderConvertor.niceBillRequest(regularPayment, REGULAR + createRandomOrderId()));
                     if (niceBillOkResponse.getResultCode().equals("0000")) {
                         String flameName = orderHelper.createFlameName(regularPayment.getUser().getName());
 
@@ -65,6 +80,8 @@ public class OrderService {
 
                         requestPaymentHistories.add(orderConvertor.RegularHistory(niceBillOkResponse, userId, COMPLETE, "SUCCESS",regularPayment.getId(), regularPayment.getPayDate(),regularPayment.getUserCardId()));
                         log.info("success Payment " + "userId :" + regularPayment.getUserId() + " orderId : " + niceBillOkResponse.getOrderId() + " bid :" + regularPayment.getUserCard().getBid() + " amount :" + regularPayment.getAmount() + "원 projectId :" + regularPayment.getProjectId());
+                        amount += regularPayment.getAmount();
+                        successCnt += 1;
                     } else {
                         requestPaymentHistories.add(orderConvertor.RegularHistory(niceBillOkResponse, userId, FAIL, niceBillOkResponse.getResultMsg(), regularPayment.getId(), regularPayment.getPayDate(), regularPayment.getUserCardId()));
 
@@ -74,6 +91,8 @@ public class OrderService {
             }
             donationUserRepository.saveAll(donationUsers);
             regularPaymentHistoryRepository.saveAll(requestPaymentHistories);
+            discordFeignClient.alertMessage(discordConvertor.AlertFinishMessage("정기 결제 스케줄러 종료", amount, regularPayments.size(),successCnt, trueCnt));
+
         }
     }
 
@@ -103,6 +122,11 @@ public class OrderService {
 
     public String createRandomUUID() {
         return UUID.randomUUID().toString();
+    }
+
+    @Transactional
+    public String createRandomOrderId() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "-" + UUID.randomUUID().toString();
 
     }
 
@@ -112,12 +136,19 @@ public class OrderService {
 
         List<RequestPaymentHistory> requestPaymentHistories = regularPaymentHistoryRepository.findByPaymentStatusAndStatus(FAIL, Status.ACTIVE);
 
+        int amount = 0;
+        int trueCnt = 0;
+        int successCnt = 0 ;
+
+        discordFeignClient.alertMessage(discordConvertor.AlertBatchMessage("정기 결제 실패 한 리스트 스케줄러가 시작",  requestPaymentHistories.size()));
+
         for(RequestPaymentHistory requestPaymentHistory : requestPaymentHistories){
             RegularPayment regularPayment = requestPaymentHistory.getRegularPayment();
             UserCard userCard = requestPaymentHistory.getUserCard();
             NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(),
                     userCard.getBid(),
-                    orderConvertor.niceBillRequest(requestPaymentHistory.getRegularPayment(), createRandomUUID()));
+                    orderConvertor.niceBillRequest(requestPaymentHistory.getRegularPayment(), REGULAR + createRandomOrderId()));
+            trueCnt +=1 ;
 
             if (niceBillOkResponse.getResultCode().equals("0000")) {
                 String flameName = orderHelper.createFlameName(requestPaymentHistory.getUser().getName());
@@ -128,6 +159,9 @@ public class OrderService {
 
                 requestPaymentHistory.setPaymentStatus(COMPLETE);
 
+                amount += regularPayment.getAmount();
+                successCnt +=1;
+
                 log.info("success Payment Retry historyId: " + requestPaymentHistory.getId()+" userId :" + regularPayment.getUserId() + " orderId : " + niceBillOkResponse.getOrderId() + " bid :" + regularPayment.getUserCard().getBid() + " amount :" + regularPayment.getAmount() + "원 projectId :" + regularPayment.getProjectId());
             } else {
                 log.info("fail Payment Retry historyId: " + requestPaymentHistory.getId()+ " userId :" + regularPayment.getUserId() + " orderId : " + niceBillOkResponse.getOrderId() + " bid :" + regularPayment.getUserCard().getBid() + " amount :" + regularPayment.getAmount());
@@ -135,6 +169,8 @@ public class OrderService {
         }
 
         donationUserRepository.saveAll(donationUsers);
+
+        discordFeignClient.alertMessage(discordConvertor.AlertFinishMessage("실패한 정기 결제 스케줄러가 종료", amount, requestPaymentHistories.size(),successCnt,trueCnt));
 
     }
 

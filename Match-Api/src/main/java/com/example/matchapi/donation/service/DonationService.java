@@ -2,6 +2,7 @@ package com.example.matchapi.donation.service;
 
 import com.example.matchapi.donation.convertor.DonationConvertor;
 import com.example.matchapi.donation.dto.DonationRes;
+import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
@@ -20,9 +21,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
+import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_CORRECT_USER;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_EXIST;
@@ -36,6 +42,7 @@ public class DonationService {
     private final OrderService orderService;
     private final DonationConvertor donationConvertor;
     private final RegularPaymentRepository regularPaymentRepository;
+    private final DonationHelper donationHelper;
 
     public PageResponse<List<DonationRes.DonationList>> getDonationList(Long userId, int filter, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -93,10 +100,10 @@ public class DonationService {
         if(flame == 0){
             if(content == null){
                 if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtAsc(user.getId(), EXECUTION_REFUND, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtDesc(user.getId(), EXECUTION_REFUND, Status.ACTIVE, pageable);
                 }
                 else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtDesc(user.getId(),EXECUTION_REFUND, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtAsc(user.getId(),EXECUTION_REFUND, Status.ACTIVE, pageable);
                 }
                 else if(order == 2){
                     donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByPriceDesc(user.getId(), EXECUTION_REFUND, Status.ACTIVE, pageable);
@@ -107,10 +114,10 @@ public class DonationService {
             }
             else{
                 if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(user.getId(), EXECUTION_REFUND, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(user.getId(), EXECUTION_REFUND, content, content, content, Status.ACTIVE, pageable);
                 }
                 else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(user.getId(), EXECUTION_REFUND, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(user.getId(), EXECUTION_REFUND, content, content, content, Status.ACTIVE, pageable);
                 }
                 else if(order == 2){
                     donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceDesc(user.getId(), EXECUTION_REFUND, content, content, content, Status.ACTIVE, pageable);
@@ -134,10 +141,10 @@ public class DonationService {
 
             if(content == null){
                 if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtAsc(user.getId(), donationStatus, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(user.getId(), donationStatus, Status.ACTIVE, pageable);
                 }
                 else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(user.getId(),donationStatus, Status.ACTIVE,pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtAsc(user.getId(),donationStatus, Status.ACTIVE,pageable);
                 }
                 else if(order == 2){
                     donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByPriceDesc(user.getId(), donationStatus, Status.ACTIVE, pageable);
@@ -148,10 +155,10 @@ public class DonationService {
             }
             else{
                 if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(user.getId(), donationStatus, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(user.getId(), donationStatus, content, content, content, Status.ACTIVE, pageable);
                 }
                 else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(user.getId(), donationStatus, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(user.getId(), donationStatus, content, content, content, Status.ACTIVE, pageable);
                 }
                 else if(order == 2){
                     donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceDesc(user.getId(), donationStatus, content, content, content, Status.ACTIVE, pageable);
@@ -185,5 +192,40 @@ public class DonationService {
         List<DonationUser> donationUser = donationUserRepository.findByUserAndDonationStatusNotAndStatus(user, EXECUTION_REFUND, Status.ACTIVE);
 
         return donationConvertor.DonationCount(donationUser);
+    }
+
+    @Transactional
+    public DonationRes.DonationInfo getDonationInfo() {
+        LocalDate localDate = LocalDate.now();
+
+        List<DonationUser> donationUsers = donationUserRepository.findByDonationStatusNot(EXECUTION_REFUND);
+
+        int oneDayDonationAmount = 0;
+        int weekendDonationAmount = 0;
+        int monthlyDonationAmount = 0;
+        for (DonationUser donationUser : donationUsers) {
+            if(donationUser.getCreatedAt().isAfter(LocalDateTime.parse(localDate+FIRST_TIME))&&donationUser.getCreatedAt().isBefore(LocalDateTime.parse(localDate+LAST_TIME))){
+                oneDayDonationAmount += donationUser.getPrice();
+            }
+            if(donationUser.getCreatedAt().isAfter(LocalDateTime.parse(localDate.minusWeeks(1)+FIRST_TIME))&&donationUser.getCreatedAt().isBefore(LocalDateTime.parse(localDate+LAST_TIME))){
+                weekendDonationAmount += donationUser.getPrice();
+            }
+            if(donationUser.getCreatedAt().isAfter(LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME))&&donationUser.getCreatedAt().isBefore( LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME))){
+                monthlyDonationAmount += donationUser.getPrice();
+            }
+        }
+        /*
+
+        List<DonationUser> oneDayDonation = donationUserRepository.findByDonationStatusNotAndCreatedAtGreaterThanAndCreatedAtLessThan(EXECUTION_REFUND, LocalDateTime.parse(localDate+FIRST_TIME), LocalDateTime.parse(localDate+LAST_TIME));
+        List<DonationUser> weekDonation = donationUserRepository.findByDonationStatusNotAndCreatedAtGreaterThanAndCreatedAtLessThan(EXECUTION_REFUND, LocalDateTime.parse(localDate.minusWeeks(1)+FIRST_TIME) , LocalDateTime.parse(localDate+LAST_TIME));
+        List<DonationUser> monthDonation = donationUserRepository.findByDonationStatusNotAndCreatedAtGreaterThanAndCreatedAtLessThan(EXECUTION_REFUND,LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME), LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME));
+
+
+         */
+
+        return new DonationRes.DonationInfo(donationHelper.parsePriceComma(oneDayDonationAmount),donationHelper.parsePriceComma(weekendDonationAmount),donationHelper.parsePriceComma(monthlyDonationAmount));
+
+
+
     }
 }
