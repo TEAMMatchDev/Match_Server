@@ -4,7 +4,9 @@ import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchcommon.annotation.Convertor;
+import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.HistoryStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -85,6 +87,13 @@ public class DonationConvertor {
                 .donationStatus(donationUser.getDonationStatus())
                 .regularStatus(donationUser.getRegularStatus().getName())
                 .donationDate(donationUser.getCreatedAt().toString())
+                .build();
+    }
+
+    public DonationHistory DonationHistory(Long id, HistoryStatus historyStatus) {
+        return DonationHistory.builder()
+                .donationUserId(id)
+                .historyStatus(historyStatus)
                 .build();
     }
 }
