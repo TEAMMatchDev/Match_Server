@@ -24,8 +24,7 @@ dependencies {
 
     api group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
 
-
-
+    api group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
 
     //jwt
     api group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
