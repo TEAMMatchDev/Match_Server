@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,4 +84,14 @@ public class DonationController {
         return CommonResponse.onSuccess(donationService.getDonationList(user.getId(),filter,page, size));
     }
 
+    @GetMapping("/burning-match")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    @Operation(summary = "05-06 유저의 불타는 매치 #FRAME_홈")
+    public CommonResponse<PageResponse<List<DonationRes.BurningMatchRes>>> getBurningMatch(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
+    ){
+        return CommonResponse.onSuccess(donationService.getBurningMatch(user,page,size));
+    }
 }

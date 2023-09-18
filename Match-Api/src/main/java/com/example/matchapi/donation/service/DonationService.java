@@ -227,4 +227,10 @@ public class DonationService {
         DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
         return donationConvertor.getDonationDetail(donationUser);
     }
+
+    public PageResponse<List<DonationRes.BurningMatchRes>> getBurningMatch(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return null;
+    }
 }
