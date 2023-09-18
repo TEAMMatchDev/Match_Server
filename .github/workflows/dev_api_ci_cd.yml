@@ -50,6 +50,7 @@ jobs:
           discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
           discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
           server.host: ${{ secrets.DEV_SERVER_HOST}}
+          web.return.url: ${{ secrets.DEV_RETURN_URL }}
 
 
       - name: Set Environment Domain - Domain DEV Yml
