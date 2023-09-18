@@ -11,9 +11,11 @@ import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.entity.*;
+import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
 import com.example.matchdomain.project.repository.ProjectCommentRepository;
 import com.example.matchdomain.project.repository.ProjectImageRepository;
 import com.example.matchdomain.project.repository.ProjectRepository;
+import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +50,7 @@ public class ProjectService {
     private final ProjectCommentRepository projectCommentRepository;
     private final S3UploadService s3UploadService;
     private final DonationUserRepository donationUserRepository;
+    private final ProjectUserAttentionRepository projectUserAttentionRepository;
 
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -327,5 +330,17 @@ public class ProjectService {
                 }
         );
         return new PageResponse<>(projects.isLast(), projects.getTotalElements(), project);
+    }
+
+    @Transactional
+    public ProjectRes.ProjectLike patchProjectLike(User user, Long projectId) {
+        boolean checkProjectLike = projectUserAttentionRepository.existsById_userIdAndId_projectId(user.getId(), projectId);
+        if(checkProjectLike){
+            projectUserAttentionRepository.deleteById_userIdAndId_projectId(user.getId(), projectId);
+        }else{
+            projectUserAttentionRepository.save(ProjectUserAttention.builder().id(new ProjectUserAttentionPk(user.getId(), projectId)).build());
+        }
+
+        return new ProjectRes.ProjectLike(!checkProjectLike);
     }
 }

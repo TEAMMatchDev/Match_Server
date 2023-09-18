@@ -210,4 +210,14 @@ public class ProjectRes {
 
         private String imgUrl;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProjectLike {
+        @Schema(description = "프로젝트 관심 유무", required = true, example = "true")
+        private boolean like;
+    }
 }

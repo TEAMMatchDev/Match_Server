@@ -226,6 +226,15 @@ public class OrderService {
     }
 
     @Transactional
+    public String saveRequest(Long projectId) {
+        String orderId = ONE_TIME + createRandomOrderId();
+
+        orderRequestRepository.save(orderConvertor.CreateRequest(1L, projectId, orderId));
+
+        return orderId;
+    }
+
+    @Transactional
     public OrderRequest getOrderRequest(String orderId) {
         Optional<OrderRequest> orderRequest = orderRequestRepository.findById(orderId);
         return orderRequest.get();
