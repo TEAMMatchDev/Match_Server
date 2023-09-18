@@ -22,6 +22,8 @@ dependencies {
 
     api group: 'org.json', name: 'json', version: '20090211'
 
+    api group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
+
 
 
 
