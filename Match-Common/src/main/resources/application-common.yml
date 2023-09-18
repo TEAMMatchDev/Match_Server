@@ -44,3 +44,7 @@ discord:
   webhook:
     error: ${DISCORD_WEBHOOK_ERROR}
     alert: ${DISCORD_WEBHOOK_ALERT}
+
+web:
+  return:
+    url: ${RETURN_URL}
