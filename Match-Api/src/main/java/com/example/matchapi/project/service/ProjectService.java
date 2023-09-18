@@ -299,8 +299,6 @@ public class ProjectService {
 
     public PageResponse<List<ProjectRes.ProjectLists>> getProjectLists(User user, int page, int size, ProjectKind projectKind, String content) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Project> projectList = null;
-
         Page<ProjectRepository.ProjectList> projects = null;
         List<ProjectRes.ProjectLists> project = new ArrayList<>();
         if(projectKind == null){
