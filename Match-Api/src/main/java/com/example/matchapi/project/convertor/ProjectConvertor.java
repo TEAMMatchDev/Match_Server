@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
 import static com.example.matchdomain.project.entity.ProjectStatus.BEFORE_START;
@@ -190,6 +192,24 @@ public class ProjectConvertor {
                 .donationStatusValue(result.getDonationStatus().getName())
                 .regularStatus(result.getRegularStatus().getValue())
                 .donationDate(result.getCreatedAt().toString())
+                .build();
+    }
+
+    public ProjectRes.ProjectLists ProjectLists(ProjectRepository.ProjectList result) {
+        List<String> imgUrlList = null;
+        if(result.getImgUrlList()!=null){
+            imgUrlList = Stream.of(result.getImgUrlList().split(",")).collect(Collectors.toList());
+        }
+        return ProjectRes.ProjectLists
+                .builder()
+                .projectId(result.getId())
+                .imgUrl(result.getImgUrl())
+                .title(result.getProjectName())
+                .usages(result.getUsages())
+                .kind(result.getProjectKind())
+                .like(result.getLike())
+                .userProfileImages(imgUrlList)
+                .totalDonationCnt(result.getTotalDonationCnt())
                 .build();
     }
 }

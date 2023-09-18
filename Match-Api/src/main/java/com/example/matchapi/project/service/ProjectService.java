@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +28,8 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.example.matchdomain.project.entity.ImageRepresentStatus.NORMAL;
 import static com.example.matchdomain.project.entity.ImageRepresentStatus.REPRESENT;
@@ -292,5 +295,39 @@ public class ProjectService {
         project.setStatus(Status.ACTIVE);
 
         projectRepository.save(project);
+    }
+
+    public PageResponse<List<ProjectRes.ProjectLists>> getProjectLists(User user, int page, int size, ProjectKind projectKind, String content) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Project> projectList = null;
+
+        Page<ProjectRepository.ProjectList> projects = null;
+        List<ProjectRes.ProjectLists> project = new ArrayList<>();
+        if(projectKind == null){
+            if(content == null){
+                projects =  projectRepository.findLoginUserProjectList(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, Status.ACTIVE.getValue());
+            }
+            else{
+                projects =  projectRepository.findByContent(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, Status.ACTIVE.getValue(), content);
+
+            }
+        }else{
+            if(content == null){
+                projects = projectRepository.findByProjectKind(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(),
+                        ImageRepresentStatus.REPRESENT.getValue(), pageable, Status.ACTIVE.getValue(), projectKind.getValue());
+
+            }
+            else{
+                projects =  projectRepository.findByContentAndProjectKind(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(),
+                        ImageRepresentStatus.REPRESENT.getValue(), pageable, Status.ACTIVE.getValue(), projectKind.getValue(), content);
+            }
+        }
+
+        projects.getContent().forEach(
+                result -> {
+                    project.add(projectConvertor.ProjectLists(result));
+                }
+        );
+        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), project);
     }
 }
