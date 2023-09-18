@@ -72,7 +72,7 @@ public class NicePaymentAuth {
     private Card card;
     private Bank bank;
     private Vbank vbank;
-    private List<Coupon> coupon;
+    private Coupon coupon;
 
     private List<Cancels> cancels;
     @Getter
