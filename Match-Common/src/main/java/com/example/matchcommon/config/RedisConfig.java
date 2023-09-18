@@ -37,8 +37,8 @@ public class RedisConfig {
                         .build())
                 .commandTimeout(Duration.ofSeconds(1000L)).build();
 
-        return new LettuceConnectionFactory(clusterConfiguration, clientConfiguration);
-        //return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
+        //return new LettuceConnectionFactory(clusterConfiguration, clientConfiguration);
+        return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
     }
 
     @Bean
