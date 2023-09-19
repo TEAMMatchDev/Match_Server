@@ -4,6 +4,7 @@ import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -53,10 +54,12 @@ public class RegularPayment extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "regularPaymentId")
+    @BatchSize(size = 100)
     private List<RequestPaymentHistory> requestPaymentHistory = new ArrayList<>();
 
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "regularPaymentId")
+    @BatchSize(size = 100)
     private List<DonationUser> donationUser = new ArrayList<>();
 }

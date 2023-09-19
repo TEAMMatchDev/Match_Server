@@ -16,6 +16,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 
 @RequestMapping("/test")
@@ -25,13 +29,8 @@ public class TestController {
     private final OrderHelper orderHelper;
 
     @GetMapping("")
-    @ApiErrorCodeExample({OtherServerErrorCode.class, UserAuthErrorCode.class, RequestErrorCode.class})
-    @Operation(summary= "닉네임 랜덤생성",description = "")
-    public CommonResponse<String> requestPayment(
-            @Parameter(hidden = true) @AuthenticationPrincipal User user){
-        String flameName = orderHelper.createFlameName(user.getName());
-        System.out.println(flameName);
-        return CommonResponse.onSuccess(flameName);
+    public void exRedirect3(HttpServletResponse httpServletResponse) throws IOException {
+        httpServletResponse.sendRedirect("https://naver.com");
     }
 
     @CheckIdExist

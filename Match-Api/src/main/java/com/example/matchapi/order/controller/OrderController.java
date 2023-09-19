@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -54,15 +55,19 @@ public class OrderController {
         return CommonResponse.onSuccess(orderId);
     }
 
-    @GetMapping("/serverAuth")
+
+    @RequestMapping("/serverAuth")
     @Operation(summary= "04-01 Order💸 결제 인증용",description = "결제 요청용 API 입니다")
     public CommonResponse<String> requestPaymentAuth(
             @RequestParam String tid,
-            @RequestParam Long amount){
+            @RequestParam String amount, Model model){
+        Long amountValue = Long.parseLong(amount);
         log.info("04-01 Order 결제 인증용 API 결제 ID: " + tid + " 결제 금액 " + amount);
-        orderService.requestPaymentAuth(tid, amount);
+        orderService.requestPaymentAuth(tid, amountValue);
         return CommonResponse.onSuccess("성공");
     }
+
+
 
     @Deprecated
     @PostMapping("/test/pay")

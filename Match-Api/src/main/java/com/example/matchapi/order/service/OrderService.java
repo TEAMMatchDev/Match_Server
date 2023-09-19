@@ -1,5 +1,6 @@
 package com.example.matchapi.order.service;
 
+import com.example.matchapi.donation.convertor.DonationConvertor;
 import com.example.matchapi.order.convertor.OrderConvertor;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
@@ -9,10 +10,7 @@ import com.example.matchcommon.exception.InternalServerException;
 import com.example.matchcommon.properties.NicePayProperties;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.*;
-import com.example.matchdomain.donation.repository.DonationUserRepository;
-import com.example.matchdomain.donation.repository.RegularPaymentRepository;
-import com.example.matchdomain.donation.repository.RequestPaymentHistoryRepository;
-import com.example.matchdomain.donation.repository.UserCardRepository;
+import com.example.matchdomain.donation.repository.*;
 import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchdomain.redis.repository.OrderRequestRepository;
 import com.example.matchdomain.user.entity.User;
@@ -37,6 +35,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.matchcommon.constants.MatchStatic.*;
+import static com.example.matchdomain.donation.entity.HistoryStatus.CREATE;
 import static com.example.matchdomain.donation.exception.DonationGerErrorCode.DONATION_NOT_EXIST;
 import static com.example.matchdomain.order.exception.RegistrationCardErrorCode.FAILED_ERROR_ENCRYPT;
 
@@ -53,6 +52,8 @@ public class OrderService {
     private final RequestPaymentHistoryRepository requestPaymentHistoryRepository;
     private final OrderRequestRepository orderRequestRepository;
     private final UserRepository userRepository;
+    private final DonationHistoryRepository donationHistoryRepository;
+    private final DonationConvertor donationConvertor;
 
     @Transactional
     public NicePaymentAuth authPayment(String tid, Long amount) {
@@ -196,7 +197,9 @@ public class OrderService {
 
         RegularPayment regularPayment = regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId, projectId));
 
-        donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
+        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
+
+        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE, regularPayment.getId()));
     }
 
     @Transactional
@@ -213,7 +216,10 @@ public class OrderService {
 
         String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
-        donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
+        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
+
+        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE, null));
+
     }
 
     @Transactional
@@ -221,6 +227,15 @@ public class OrderService {
         String orderId = ONE_TIME + createRandomOrderId();
 
         orderRequestRepository.save(orderConvertor.CreateRequest(user.getId(), projectId, orderId));
+
+        return orderId;
+    }
+
+    @Transactional
+    public String saveRequest(Long projectId) {
+        String orderId = ONE_TIME + createRandomOrderId();
+
+        orderRequestRepository.save(orderConvertor.CreateRequest(1L, projectId, orderId));
 
         return orderId;
     }
@@ -249,7 +264,10 @@ public class OrderService {
 
         String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
-        donationUserRepository.save(orderConvertor.donationUserV2(nicePaymentAuth, user.get().getId(), amount, orderRequest.get().getProjectId(), flameName, inherenceNumber));
+        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationUserV2(nicePaymentAuth, user.get().getId(), amount, orderRequest.get().getProjectId(), flameName, inherenceNumber));
+
+        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE, null));
+
     }
 
     @Transactional

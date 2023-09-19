@@ -8,12 +8,14 @@ import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.exception.CancelRegularPayErrorCode;
 import com.example.matchdomain.donation.exception.DonationListErrorCode;
 import com.example.matchdomain.donation.exception.DonationRefundErrorCode;
+import com.example.matchdomain.donation.exception.GetRegularErrorCode;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -81,6 +83,47 @@ public class DonationController {
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size,
             @Parameter(description = "필터 전체 조회 0 집행 전 1 집행 중 2 집행완료 3") @RequestParam(required = false,defaultValue = "0") int filter){
         return CommonResponse.onSuccess(donationService.getDonationList(user.getId(),filter,page, size));
+    }
+
+    @GetMapping("/burning-match")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    @Operation(summary = "05-06 유저의 불타는 매치 #FRAME_홈")
+    public CommonResponse<PageResponse<List<DonationRes.BurningMatchRes>>> getBurningMatch(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
+    ){
+        return CommonResponse.onSuccess(donationService.getBurningMatch(user,page,size));
+    }
+
+    @GetMapping("/top/{regularPayId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
+    @Operation(summary = "05-07-01 후원 상세 보기 조회 #FRAME_후원_상세_보기_상단조회")
+    public CommonResponse<DonationRes.DonationRegular> getDonationRegular(@PathVariable Long regularPayId,
+                                                                          @Parameter(hidden = true) @AuthenticationPrincipal User user){
+        return CommonResponse.onSuccess(donationService.getDonationRegular(regularPayId, user));
+    }
+
+
+    @GetMapping("/bottom/{regularPayId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
+    @Operation(summary = "05-07-02 후원 상세 보기 조회 #FRAME_후원_상세_보기_하단조회")
+    public CommonResponse<PageResponse<List<DonationRes.DonationRegularList>>> getDonationRegularList(
+            @PathVariable Long regularPayId,
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
+    ){
+        return CommonResponse.onSuccess(donationService.getDonationRegularList(regularPayId, user, page, size));
+    }
+
+    @GetMapping("/pay/{regularPayId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
+    @Operation(summary = "05-08 매치 결제 내역 리스트 조회 #매치 결제 내역")
+    public CommonResponse<List<DonationRes.PayList>> getPayList(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @PathVariable Long regularPayId){
+        return CommonResponse.onSuccess(donationService.getPayList(user, regularPayId));
     }
 
 }
