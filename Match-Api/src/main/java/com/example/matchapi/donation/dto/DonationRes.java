@@ -161,4 +161,19 @@ public class DonationRes {
 
         private String imageUrl;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PayList {
+        private String payDate;
+
+        private String payStatus;
+
+        private String payMethod;
+
+        private String amount;
+    }
 }

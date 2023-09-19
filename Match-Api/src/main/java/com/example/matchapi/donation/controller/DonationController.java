@@ -117,5 +117,13 @@ public class DonationController {
         return CommonResponse.onSuccess(donationService.getDonationRegularList(regularPayId, user, page, size));
     }
 
+    @GetMapping("/pay/{regularPayId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
+    @Operation(summary = "05-08 매치 결제 내역 리스트 조회 #매치 결제 내역")
+    public CommonResponse<List<DonationRes.PayList>> getPayList(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @PathVariable Long regularPayId){
+        return CommonResponse.onSuccess(donationService.getPayList(user, regularPayId));
+    }
 
 }

@@ -70,4 +70,7 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
     Page<DonationUser> findByProjectId(@Param("projectId") Long projectId, Pageable pageable);
 
     List<DonationUser> findByDonationStatusNot(DonationStatus donationStatus);
+
+
+    List<DonationUser> findByRegularPaymentIdAndStatusOrderByCreatedAtDesc(Long regularPayId, Status status);
 }

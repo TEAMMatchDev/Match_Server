@@ -150,4 +150,18 @@ public class DonationConvertor {
 
         return donationHistoryImages;
     }
+
+    public DonationRes.PayList PayList(DonationUser result) {
+        String payStatus = "결제완료";
+        if(result.getDonationStatus() == EXECUTION_REFUND){
+            payStatus = "환불";
+        }
+        return DonationRes.PayList
+                .builder()
+                .payDate(donationHelper.timeFormat(result.getCreatedAt()))
+                .payMethod(result.getPayMethod().getName())
+                .payStatus(payStatus)
+                .amount(donationHelper.parsePriceComma(Math.toIntExact(result.getPrice())))
+                .build();
+    }
 }

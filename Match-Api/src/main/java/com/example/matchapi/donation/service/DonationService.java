@@ -32,6 +32,7 @@ import java.util.List;
 
 import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
 import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
+import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_CORRECT_USER;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_EXIST;
@@ -57,16 +58,16 @@ public class DonationService {
         List<DonationRes.DonationList> donationLists = new ArrayList<>();
 
         if(filter == 0){
-            donationUsers = donationUserRepository.findByUserIdAndStatusAndDonationStatusNotOrderByCreatedAtDesc(userId, Status.ACTIVE,EXECUTION_REFUND, pageable);
+            donationUsers = donationUserRepository.findByUserIdAndStatusAndDonationStatusNotOrderByCreatedAtDesc(userId, ACTIVE,EXECUTION_REFUND, pageable);
         }
         else if(filter == 1){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(userId,DonationStatus.EXECUTION_SUCCESS, Status.ACTIVE, pageable);
+            donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(userId,DonationStatus.EXECUTION_SUCCESS, ACTIVE, pageable);
         }
         else if(filter == 2){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(userId,DonationStatus.EXECUTION_SUCCESS, Status.ACTIVE, pageable);
+            donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(userId,DonationStatus.EXECUTION_SUCCESS, ACTIVE, pageable);
 
         }else if(filter == 3){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(userId,DonationStatus.EXECUTION_SUCCESS, Status.ACTIVE, pageable);
+            donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(userId,DonationStatus.EXECUTION_SUCCESS, ACTIVE, pageable);
 
         }else{
             throw new BadRequestException(FILTER_NOT_EXIST);
@@ -106,30 +107,30 @@ public class DonationService {
         if(flame == 0){
             if(content == null){
                 if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtDesc(user.getId(), EXECUTION_REFUND, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtDesc(user.getId(), EXECUTION_REFUND, ACTIVE, pageable);
                 }
                 else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtAsc(user.getId(),EXECUTION_REFUND, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtAsc(user.getId(),EXECUTION_REFUND, ACTIVE, pageable);
                 }
                 else if(order == 2){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByPriceDesc(user.getId(), EXECUTION_REFUND, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByPriceDesc(user.getId(), EXECUTION_REFUND, ACTIVE, pageable);
                 }
                 else if(order ==3){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByPriceAsc(user.getId(), EXECUTION_REFUND, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotAndStatusOrderByPriceAsc(user.getId(), EXECUTION_REFUND, ACTIVE, pageable);
                 }
             }
             else{
                 if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(user.getId(), EXECUTION_REFUND, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(user.getId(), EXECUTION_REFUND, content, content, content, ACTIVE, pageable);
                 }
                 else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(user.getId(), EXECUTION_REFUND, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(user.getId(), EXECUTION_REFUND, content, content, content, ACTIVE, pageable);
                 }
                 else if(order == 2){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceDesc(user.getId(), EXECUTION_REFUND, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceDesc(user.getId(), EXECUTION_REFUND, content, content, content, ACTIVE, pageable);
                 }
                 else if(order ==3){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceAsc(user.getId(), EXECUTION_REFUND, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceAsc(user.getId(), EXECUTION_REFUND, content, content, content, ACTIVE, pageable);
                 }
             }
         }
@@ -147,30 +148,30 @@ public class DonationService {
 
             if(content == null){
                 if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(user.getId(), donationStatus, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(user.getId(), donationStatus, ACTIVE, pageable);
                 }
                 else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtAsc(user.getId(),donationStatus, Status.ACTIVE,pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtAsc(user.getId(),donationStatus, ACTIVE,pageable);
                 }
                 else if(order == 2){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByPriceDesc(user.getId(), donationStatus, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByPriceDesc(user.getId(), donationStatus, ACTIVE, pageable);
                 }
                 else if(order ==3){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByPriceAsc(user.getId(), donationStatus, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByPriceAsc(user.getId(), donationStatus, ACTIVE, pageable);
                 }
             }
             else{
                 if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(user.getId(), donationStatus, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(user.getId(), donationStatus, content, content, content, ACTIVE, pageable);
                 }
                 else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(user.getId(), donationStatus, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(user.getId(), donationStatus, content, content, content, ACTIVE, pageable);
                 }
                 else if(order == 2){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceDesc(user.getId(), donationStatus, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceDesc(user.getId(), donationStatus, content, content, content, ACTIVE, pageable);
                 }
                 else if(order ==3){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceAsc(user.getId(), donationStatus, content, content, content, Status.ACTIVE, pageable);
+                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceAsc(user.getId(), donationStatus, content, content, content, ACTIVE, pageable);
                 }
             }
         }
@@ -186,7 +187,7 @@ public class DonationService {
     }
 
     public void cancelRegularPay(User user, Long regularId) {
-        RegularPayment regularPayment = regularPaymentRepository.findByIdAndStatus(regularId, Status.ACTIVE).orElseThrow(() -> new BadRequestException(REGULAR_PAY_NOT_EXIST));
+        RegularPayment regularPayment = regularPaymentRepository.findByIdAndStatus(regularId, ACTIVE).orElseThrow(() -> new BadRequestException(REGULAR_PAY_NOT_EXIST));
 
         if(!regularPayment.getUserId().equals(user.getId())) throw new BadRequestException(REGULAR_PAY_NOT_CORRECT_USER);
 
@@ -195,7 +196,7 @@ public class DonationService {
     }
 
     public DonationRes.DonationCount getDonationCount(User user) {
-        List<DonationUser> donationUser = donationUserRepository.findByUserAndDonationStatusNotAndStatus(user, EXECUTION_REFUND, Status.ACTIVE);
+        List<DonationUser> donationUser = donationUserRepository.findByUserAndDonationStatusNotAndStatus(user, EXECUTION_REFUND, ACTIVE);
 
         return donationConvertor.DonationCount(donationUser);
     }
@@ -261,5 +262,18 @@ public class DonationService {
         );
 
         return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationRegularLists);
+    }
+
+    public List<DonationRes.PayList> getPayList(User user, Long regularPayId) {
+        List<DonationUser> donationUsers = donationUserRepository.findByRegularPaymentIdAndStatusOrderByCreatedAtDesc(regularPayId, ACTIVE);
+        List<DonationRes.PayList> payLists = new ArrayList<>();
+
+        donationUsers.forEach(
+                result -> payLists.add(
+                        donationConvertor.PayList(result)
+                )
+        );
+
+        return payLists;
     }
 }
