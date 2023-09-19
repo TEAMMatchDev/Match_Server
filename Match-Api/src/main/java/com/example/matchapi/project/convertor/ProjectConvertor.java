@@ -6,6 +6,7 @@ import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.project.dto.ProjectList;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -210,6 +211,20 @@ public class ProjectConvertor {
                 .like(result.getLike())
                 .userProfileImages(imgUrlList)
                 .totalDonationCnt(result.getTotalDonationCnt())
+                .build();
+    }
+
+    public ProjectRes.ProjectLists ProjectListQueryDsl(ProjectList result) {
+        return ProjectRes.ProjectLists
+                .builder()
+                .projectId(result.getId())
+                .imgUrl(result.getImgUrl())
+                .title(result.getProjectName())
+                .usages(result.getUsages())
+                .kind(result.getProjectKind().getName())
+                .like(result.getLike())
+                .userProfileImages(result.getImgUrlList())
+                .totalDonationCnt(Math.toIntExact(result.getTotalDonationCnt()))
                 .build();
     }
 }

@@ -14,7 +14,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-public interface ProjectRepository extends JpaRepository<Project, Long> {
+public interface ProjectRepository extends JpaRepository<Project, Long>, ProjectCustomRepository {
     @Query("SELECT p FROM Project p " +
             "join ProjectImage pi on p.id = pi.projectId " +
             "WHERE " +

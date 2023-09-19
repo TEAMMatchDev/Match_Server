@@ -86,7 +86,7 @@ public class ProjectController {
             @Parameter(description = "검색어")  @RequestParam(required = false) String content
     ) {
         log.info("03-05 프로젝트 리스트 조회");
-        return CommonResponse.onSuccess(projectService.getProjectLists(user, page, size, projectKind, content));
+        return CommonResponse.onSuccess(projectService.getProjectListQueryDsl(user, page, size, projectKind, content));
     }
 
     @PatchMapping("/{projectId}")
