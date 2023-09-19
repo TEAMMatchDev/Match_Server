@@ -263,8 +263,6 @@ public class ProjectService {
     }
 
     public PageResponse<List<ProjectRes.DonationList>> getDonationList(Long projectId, int page, int size) {
-        Project project = projectRepository.findById(projectId).orElseThrow(()-> new BadRequestException(PROJECT_NOT_EXIST));
-
         Pageable pageable = PageRequest.of(page, size);
 
         List<ProjectRes.DonationList> donationLists = new ArrayList<>();

@@ -8,6 +8,7 @@ import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.exception.CancelRegularPayErrorCode;
 import com.example.matchdomain.donation.exception.DonationListErrorCode;
 import com.example.matchdomain.donation.exception.DonationRefundErrorCode;
+import com.example.matchdomain.donation.exception.GetRegularErrorCode;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -94,4 +95,27 @@ public class DonationController {
     ){
         return CommonResponse.onSuccess(donationService.getBurningMatch(user,page,size));
     }
+
+    @GetMapping("/top/{regularPayId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
+    @Operation(summary = "05-07-01 후원 상세 보기 조회 #FRAME_후원_상세_보기_상단조회")
+    public CommonResponse<DonationRes.DonationRegular> getDonationRegular(@PathVariable Long regularPayId,
+                                                                          @Parameter(hidden = true) @AuthenticationPrincipal User user){
+        return CommonResponse.onSuccess(donationService.getDonationRegular(regularPayId, user));
+    }
+
+
+    @GetMapping("/bottom/{regularPayId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
+    @Operation(summary = "05-07-02 후원 상세 보기 조회 #FRAME_후원_상세_보기_하단조회")
+    public CommonResponse<PageResponse<List<DonationRes.DonationRegularList>>> getDonationRegularList(
+            @PathVariable Long regularPayId,
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
+    ){
+        return CommonResponse.onSuccess(donationService.getDonationRegularList(regularPayId, user, page, size));
+    }
+
+
 }

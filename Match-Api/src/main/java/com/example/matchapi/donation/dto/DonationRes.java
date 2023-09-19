@@ -1,6 +1,7 @@
 package com.example.matchapi.donation.dto;
 
 import com.example.matchdomain.donation.entity.DonationStatus;
+import com.example.matchdomain.donation.entity.HistoryStatus;
 import com.example.matchdomain.donation.entity.RegularStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -118,5 +119,46 @@ public class DonationRes {
         private List<String> userProfileImages;
         @Schema(description = "후원 유저 총원", required = true, example = "15")
         private int totalDonationCnt;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DonationRegular {
+        private int amount;
+
+        private Long regularPayId;
+
+        private int payDate;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DonationRegularList {
+        private Long historyId;
+
+        private HistoryStatus historyStatus;
+
+        private String histories;
+
+        private String historyDate;
+
+        private String flameImage;
+
+        private List<DonationHistoryImage> donationHistoryImages;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DonationHistoryImage {
+        private Long imageId;
+
+        private String imageUrl;
     }
 }

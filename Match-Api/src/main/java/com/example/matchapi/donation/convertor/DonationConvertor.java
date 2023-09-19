@@ -2,14 +2,12 @@ package com.example.matchapi.donation.convertor;
 
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
-import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchcommon.annotation.Convertor;
-import com.example.matchdomain.donation.entity.DonationHistory;
-import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.donation.entity.HistoryStatus;
+import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.repository.HistoryImageRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
@@ -18,6 +16,7 @@ import static com.example.matchdomain.donation.entity.DonationStatus.*;
 @RequiredArgsConstructor
 public class DonationConvertor {
     private final DonationHelper donationHelper;
+    private final HistoryImageRepository historyImageRepository;
     public DonationRes.FlameList Flame(DonationUser result) {
         return DonationRes.FlameList.builder()
                 .donationId(result.getId())
@@ -90,10 +89,65 @@ public class DonationConvertor {
                 .build();
     }
 
-    public DonationHistory DonationHistory(Long id, HistoryStatus historyStatus) {
+    public DonationHistory DonationHistory(Long id, HistoryStatus historyStatus, Long regularPaymentId) {
         return DonationHistory.builder()
                 .donationUserId(id)
                 .historyStatus(historyStatus)
+                .regularPaymentId(regularPaymentId)
                 .build();
+    }
+
+    public DonationRes.DonationRegular DonationRegular(RegularPayment regularPayment) {
+        return DonationRes.DonationRegular
+                .builder()
+                .regularPayId(regularPayment.getId())
+                .payDate(regularPayment.getPayDate())
+                .amount(Math.toIntExact(regularPayment.getAmount()))
+                .build();
+    }
+
+    public DonationRes.DonationRegularList DonationRegularList(DonationHistory result) {
+        String histories = "";
+        String flameImage = null;
+        List<DonationRes.DonationHistoryImage> donationHistoryImages = new ArrayList<>();
+        System.out.println("분기");
+        if(result.getHistoryStatus() == HistoryStatus.CREATE){
+            System.out.println("CREATE");
+            histories = result.getDonationUser().getUser().getName() + "님의 불꽃이 탄생했습니다.";
+            flameImage= result.getFlameImage();
+        }else if(result.getHistoryStatus() == HistoryStatus.COMPLETE) {
+            System.out.println("COMPLETE");
+            histories = "'후원품'을 '후원처'에 전달했습니다.";
+            donationHistoryImages = DonationHistoryImage(result.getHistoryImages());
+        }else{
+            histories = result.getCnt() + "명의 불꽃이 후원품으로 변했습니다.";
+        }
+
+        return DonationRes.DonationRegularList
+                .builder()
+                .historyId(result.getId())
+                .historyDate(result.getCreatedAt().getYear()+"."+result.getCreatedAt().getMonthValue()+"."+result.getCreatedAt().getDayOfMonth())
+                .histories(histories)
+                .flameImage(flameImage)
+                .historyStatus(result.getHistoryStatus())
+                .donationHistoryImages(donationHistoryImages)
+                .build();
+    }
+
+    private List<DonationRes.DonationHistoryImage> DonationHistoryImage(List<HistoryImage> historyImages) {
+        List<DonationRes.DonationHistoryImage> donationHistoryImages = new ArrayList<>();
+
+        System.out.println(historyImages.size());
+        historyImages.forEach(
+              result -> donationHistoryImages.add(
+                        DonationRes.DonationHistoryImage
+                                .builder()
+                                .imageId(result.getId())
+                                .imageUrl(result.getImgUrl())
+                                .build()
+                )
+        );
+
+        return donationHistoryImages;
     }
 }
