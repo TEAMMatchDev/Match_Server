@@ -7,7 +7,6 @@ import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.entity.ProjectStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,15 +15,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
-    @EntityGraph(attributePaths = "projectImage")
-    Page<Project> findByProjectStatusAndProjectImage_ImageRepresentStatusOrderByViewCnt(ProjectStatus projectStatus, ImageRepresentStatus imageRepresentStatus, Pageable pageable);
-
-    @EntityGraph(attributePaths = "projectImage")
-    Page<Project> findByProjectStatusOrProjectNameContainingOrUsagesContainingOrProjectExplanationContainingAndProjectImage_ImageRepresentStatusOrderByViewCnt(ProjectStatus projectStatus, String content, String s, String content1,  ImageRepresentStatus imageRepresentStatus, Pageable pageable);
-    @EntityGraph(attributePaths = "projectImage")
-    Page<Project> findByProjectStatusAndFinishedAtGreaterThanEqualAndProjectImage_ImageRepresentStatusOrderByViewCnt(ProjectStatus projectStatus, LocalDateTime now, ImageRepresentStatus imageRepresentStatus, Pageable pageable);
-
-    @EntityGraph(attributePaths = "projectImage")
     @Query("SELECT p FROM Project p " +
             "join ProjectImage pi on p.id = pi.projectId " +
             "WHERE " +
@@ -81,7 +71,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             countQuery = "select count(*) from Project")
     Page<ProjectAdminList> getProjectAdminList(Pageable pageable);
 
-    @EntityGraph(attributePaths = "projectImage")
     Page<Project> findByStatusAndProjectStatusAndFinishedAtGreaterThanEqualAndProjectImage_ImageRepresentStatusOrderByViewCnt(Status status, ProjectStatus projectStatus, LocalDateTime now, ImageRepresentStatus imageRepresentStatus, Pageable pageable);
 
     Optional<Project> findByIdAndStatus(Long projectId, Status status);

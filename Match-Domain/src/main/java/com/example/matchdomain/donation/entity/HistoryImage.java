@@ -32,4 +32,5 @@ public class HistoryImage extends BaseEntity {
     private Long donationHistoryId;
 
     private String imgUrl;
+
 }

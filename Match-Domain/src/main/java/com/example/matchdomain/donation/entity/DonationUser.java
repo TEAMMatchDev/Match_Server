@@ -21,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-@BatchSize(size = 100)
+@BatchSize(size = 1000)
 public class DonationUser extends BaseEntity {
     @Id
     @Column(name = "id")

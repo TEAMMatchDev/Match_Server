@@ -4,12 +4,12 @@ import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.RegularStatus;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
+@BatchSize(size = 100)
 public class Project extends BaseEntity {
     @Id
     @Column(name = "id")
@@ -59,6 +60,7 @@ public class Project extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "projectId")
+    @BatchSize(size = 100)
     private List<DonationUser> donationUser = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

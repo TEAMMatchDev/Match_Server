@@ -19,12 +19,14 @@ import java.util.List;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-@BatchSize(size = 100)
+@BatchSize(size = 1000)
 public class DonationHistory extends BaseEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private int cnt;
 
     @Enumerated(EnumType.STRING)
     private HistoryStatus historyStatus;
@@ -36,9 +38,18 @@ public class DonationHistory extends BaseEntity {
     @Column(name="donationUserId")
     private Long donationUserId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "regularPaymentId",nullable = false, insertable=false, updatable=false)
+    private RegularPayment regularPayment;
+
+    @Column(name="regularPaymentId")
+    private Long regularPaymentId;
+
+    private String flameImage;
+
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "donationHistoryId")
-    @BatchSize(size = 100)
     private List<HistoryImage> historyImages = new ArrayList<>();
+
 }

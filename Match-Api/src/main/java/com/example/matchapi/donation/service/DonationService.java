@@ -9,9 +9,11 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchdomain.donation.repository.DonationHistoryRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.user.entity.User;
@@ -35,6 +37,7 @@ import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCo
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationListErrorCode.FILTER_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationRefundErrorCode.*;
+import static com.example.matchdomain.donation.exception.GetRegularErrorCode.REGULAR_NOT_EXIST;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +48,7 @@ public class DonationService {
     private final RegularPaymentRepository regularPaymentRepository;
     private final DonationHelper donationHelper;
     private final ProjectConvertor projectConvertor;
+    private final DonationHistoryRepository donationHistoryRepository;
 
     public PageResponse<List<DonationRes.DonationList>> getDonationList(Long userId, int filter, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -232,5 +236,30 @@ public class DonationService {
         Pageable pageable = PageRequest.of(page, size);
 
         return null;
+    }
+
+    @Transactional
+    public DonationRes.DonationRegular getDonationRegular(Long regularPayId, User user) {
+        RegularPayment regularPayment = regularPaymentRepository.findById(regularPayId).orElseThrow(()-> new BadRequestException(REGULAR_NOT_EXIST));
+        return donationConvertor.DonationRegular(regularPayment);
+    }
+
+    @Transactional
+    public PageResponse<List<DonationRes.DonationRegularList>> getDonationRegularList(Long regularPayId, User user, int page, int size) {
+        System.out.println("존재 유무 확인");
+        RegularPayment regularPayment = regularPaymentRepository.findById(regularPayId).orElseThrow(()-> new BadRequestException(REGULAR_NOT_EXIST));
+        Pageable pageable = PageRequest.of(page, size);
+        System.out.println("페이지 네이션");
+        Page<DonationHistory> donationHistories = donationHistoryRepository.findByRegularPaymentIdOrderByCreatedAtDesc(regularPayId,pageable);
+
+        List<DonationRes.DonationRegularList> donationRegularLists = new ArrayList<>();
+
+        donationHistories.forEach(
+                result -> donationRegularLists.add(
+                        donationConvertor.DonationRegularList(result)
+                )
+        );
+
+        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationRegularLists);
     }
 }

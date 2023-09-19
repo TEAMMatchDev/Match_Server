@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -65,10 +67,10 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
 
     Page<DonationUser> findByUserIdAndStatusAndDonationStatusNotOrderByCreatedAtDesc(Long userId, Status status, DonationStatus donationStatus, Pageable pageable);
 
-    @EntityGraph(attributePaths = "user")
-    Page<DonationUser> findByProjectId(Long projectId, Pageable pageable);
-
-    List<DonationUser> findByDonationStatusNotAndCreatedAtGreaterThanAndCreatedAtLessThan(DonationStatus donationStatus, LocalDateTime parse, LocalDateTime parse1);
+    @Query(value = "SELECT DU FROM DonationUser DU JOIN FETCH DU.user " +
+            "where DU.projectId=:projectId",
+    countQuery = "SELECT count(DU) FROM DonationUser DU where DU.projectId=:projectId")
+    Page<DonationUser> findByProjectId(@Param("projectId") Long projectId, Pageable pageable);
 
     List<DonationUser> findByDonationStatusNot(DonationStatus donationStatus);
 }
