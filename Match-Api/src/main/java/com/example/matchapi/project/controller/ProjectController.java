@@ -4,10 +4,13 @@ import com.example.matchapi.common.aop.CheckIdExist;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchdomain.project.entity.ProjectKind;
+import com.example.matchdomain.project.exception.ProjectGetErrorCode;
 import com.example.matchdomain.project.exception.ProjectOneTimeErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.user.entity.User;
+import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -71,6 +74,32 @@ public class ProjectController {
         log.info("03-04 프로젝트 댓글 조회 projectId : "+ projectId);
         return CommonResponse.onSuccess(projectService.getProjectComment(user, projectId, page, size));
     }
+
+    @Operation(summary = "03-05💻 프로젝트 리스트 조회 API #FRAME_프로젝트 리스트 조회.",description = "프로젝트 리스트 조회 API 입니다.")
+    @GetMapping("/list")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    public CommonResponse<PageResponse<List<ProjectRes.ProjectLists>>> getProjectLists(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size,
+            @Parameter(description = "후원종류") @RequestParam(required = false)ProjectKind projectKind,
+            @Parameter(description = "검색어")  @RequestParam(required = false) String content
+    ) {
+        log.info("03-05 프로젝트 리스트 조회");
+        return CommonResponse.onSuccess(projectService.getProjectListQueryDsl(user, page, size, projectKind, content));
+    }
+
+    @PatchMapping("/{projectId}")
+    @CheckIdExist
+    @Operation(summary = "03-06💻 프로젝트 관심설정/관심삭제 API #FRAME_프로젝트 리스트 조회.",description = "프로젝트 관심 설정/삭제 API 입니다.")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
+    public CommonResponse<ProjectRes.ProjectLike> patchProjectLike(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @PathVariable Long projectId
+            ){
+        return CommonResponse.onSuccess(projectService.patchProjectLike(user, projectId));
+    }
+
 
 
 

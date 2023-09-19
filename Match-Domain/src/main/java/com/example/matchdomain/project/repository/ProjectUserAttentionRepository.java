@@ -21,4 +21,7 @@ public interface ProjectUserAttentionRepository extends JpaRepository<ProjectUse
             @Param("imageRepresentStatus") ImageRepresentStatus imageRepresentStatus
     );
 
+    boolean existsById_userIdAndId_projectId(Long id, Long projectId);
+
+    void deleteById_userIdAndId_projectId(Long id, Long projectId);
 }

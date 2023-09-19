@@ -22,8 +22,31 @@ public class ProjectRes {
         private String usages;
         @Schema(description = "프로젝트 후원 분야",required = true, example = "kind")
         private String kind;
-        @Schema(description = "프로젝트 관 유무", required = true, example = "true")
+        @Schema(description = "프로젝트 관심 유무", required = true, example = "true")
         private boolean like;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProjectLists {
+        @Schema(description = "projectId 값", required = true, example = "1")
+        private Long projectId;
+        @Schema(description = "프로젝트 대표 이미지 URL", required = true, example = "imgUrl")
+        private String imgUrl;
+        @Schema(description = "프로젝트 이름", required = true, example = "title")
+        private String title;
+        @Schema(description = "프로젝트 사용처", required = true, example = "프로젝트 사용처")
+        private String usages;
+        @Schema(description = "프로젝트 후원 분야",required = true, example = "kind")
+        private String kind;
+        @Schema(description = "프로젝트 관심 유무", required = true, example = "true")
+        private boolean like;
+        @Schema(description = "후원 유저 프로필 이미지 리스트", required = true, example = "")
+        private List<String> userProfileImages;
+        @Schema(description = "후원 유저 총원", required = true, example = "15")
+        private int totalDonationCnt;
     }
 
     @Getter
@@ -186,5 +209,15 @@ public class ProjectRes {
         private Long projectImg;
 
         private String imgUrl;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProjectLike {
+        @Schema(description = "프로젝트 관심 유무", required = true, example = "true")
+        private boolean like;
     }
 }
