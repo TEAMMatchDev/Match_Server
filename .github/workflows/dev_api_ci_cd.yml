@@ -50,6 +50,7 @@ jobs:
           discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
           discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
           server.host: ${{ secrets.DEV_SERVER_HOST}}
+          spring.password: ${{ secrets.APP_PASSWORD}}
 
 
       - name: Set Environment Domain - Domain DEV Yml
