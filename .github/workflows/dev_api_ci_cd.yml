@@ -51,6 +51,8 @@ jobs:
           discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
           server.host: ${{ secrets.DEV_SERVER_HOST}}
           spring.password: ${{ secrets.APP_PASSWORD}}
+          aligo.username: ${{ secrets.ALIGO_USERNAME }}
+          aligo.key: ${{ secrets.ALIGO_KEY }}
 
 
       - name: Set Environment Domain - Domain DEV Yml

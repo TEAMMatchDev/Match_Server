@@ -85,11 +85,13 @@ public class AuthController {
     @ApiErrorCodeExample(RequestErrorCode.class)
     @Operation(summary= "01-04🔑 회원 문자인증 요청", description = "회원 문자인증 용 API 입니다.")
     @PostMapping(value="/sms")
+    @Deprecated
     public CommonResponse<UserRes.Sms> checkSms(@RequestBody @Valid UserReq.Sms sms){
         log.info("01-04 비회원 문자인증 = " +sms.getPhone());
         String number = smsHelper.sendSms(sms.getPhone());
         return CommonResponse.onSuccess(new UserRes.Sms(number));
     }
+
     @ApiErrorCodeExample({UserNormalSignUpErrorCode.class, UserSignUpErrorCode.class, RequestErrorCode.class})
     @Operation(summary="01-05🔑 유저 회원가입", description= "회원가입 용 API 입니다.")
     @PostMapping(value="/user")
@@ -143,6 +145,15 @@ public class AuthController {
         return CommonResponse.onSuccess("메일 인증 성공");
     }
 
+
+    @ApiErrorCodeExample(RequestErrorCode.class)
+    @Operation(summary= "01-09🔑 회원 문자인증 요청", description = "회원 문자인증 용 API 입니다.")
+    @GetMapping(value="/phone")
+    public CommonResponse<String> checkPhone(@RequestParam String phone){
+        log.info("01-09 비회원 문자인증 = " + phone);
+        authService.sendPhone(phone);
+        return CommonResponse.onSuccess("문자 전송 성공");
+    }
 
 
 }

@@ -1,0 +1,64 @@
+package com.example.matchinfrastructure.aligo.config;
+
+import com.example.matchcommon.exception.BaseException;
+import com.example.matchcommon.exception.OtherServerException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
+import feign.Response;
+import feign.codec.ErrorDecoder;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import static com.example.matchcommon.exception.errorcode.OtherServerErrorCode.*;
+
+@Slf4j
+public class AligoInfoErrorDecoder implements ErrorDecoder {
+    @SneakyThrows
+    @Override
+    public Exception decode(String methodKey, Response response) {
+        InputStream responseBodyStream = response.body().asInputStream();
+
+        String responseBody = convertInputStreamToString(responseBodyStream);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+
+
+        String resultCode = jsonNode.get("resultCode").asText();
+        String resultMsg = jsonNode.get("resultMsg").asText();
+
+        log.info("resultCode = " + resultCode + " resultMsg = " + resultMsg);
+        if (response.status() >= 400) {
+            switch (response.status()) {
+                case 401:
+                    throw new OtherServerException(OTHER_SERVER_UNAUTHORIZED);
+                case 403:
+                    throw new OtherServerException(OTHER_SERVER_FORBIDDEN);
+                case 419:
+                    throw new OtherServerException(OTHER_SERVER_EXPIRED_TOKEN);
+                default:
+                    throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
+            }
+        }
+        throw new BaseException(HttpStatus.BAD_REQUEST,
+                false,
+                resultCode,
+                resultMsg);
+    }
+
+    private String convertInputStreamToString(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) != -1) {
+            result.write(buffer, 0, length);
+        }
+        return result.toString("UTF-8");
+    }
+}

@@ -12,7 +12,8 @@ import org.springframework.context.annotation.Configuration;
         CoolSmsProperties.class,
         NicePayProperties.class,
         RedisProperties.class,
-        DiscordProperties.class
+        DiscordProperties.class,
+        AligoProperties.class
 })
 @Configuration
 public class ConfigurationPropertiesConfig {}

@@ -15,7 +15,6 @@ oauth:
     redirect-url: ${NAVER_REDIRECT}
 
 jwt:
-
   header: X-AUTH-TOKEN
   secret: ${JWT_SECRET_KEY}
   refresh: ${JWT_REFRESH_KEY}
@@ -61,3 +60,8 @@ spring:
           timeout: 5000
           writetimeout: 5000
     auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30분
+
+aligo:
+  username: ${ALIGO_USERNAME}
+  key: ${ALIGO_KEY}
+  sender: ${SMS_SENDER}

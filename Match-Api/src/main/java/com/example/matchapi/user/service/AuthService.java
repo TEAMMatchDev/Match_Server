@@ -8,6 +8,7 @@ import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.UnauthorizedException;
+import com.example.matchcommon.properties.AligoProperties;
 import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
@@ -20,6 +21,9 @@ import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
 import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserRepository;
+import com.example.matchinfrastructure.aligo.client.AligoFeignClient;
+import com.example.matchinfrastructure.aligo.dto.SendReq;
+import com.example.matchinfrastructure.aligo.dto.SendRes;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoLoginFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoLoginTokenRes;
@@ -72,6 +76,8 @@ public class AuthService {
     private final JwtProperties jwtProperties;
     private final MailService mailService;
     private final CodeAuthRepository codeAuthRepository;
+    private final AligoFeignClient aligoFeignClient;
+    private final AligoProperties aligoProperties;
 
 
     @Transactional
@@ -237,5 +243,16 @@ public class AuthService {
     public void checkUserEmailAuth(UserReq.UserEmailAuth email) {
         CodeAuth codeAuth = codeAuthRepository.findById(email.getEmail()).orElseThrow(()->new BadRequestException(NOT_CORRECT_AUTH));
         if(!codeAuth.getCode().equals(email.getCode()))throw new BadRequestException(NOT_CORRECT_CODE);
+    }
+
+    public void sendPhone(String phone) {
+        checkUserPhone(new UserReq.UserPhone(phone));
+        String code = smsHelper.createRandomNumber();
+        String msg = "[MATCH] 회원님의 인증번호는 [" + code + "] 입니다.";
+        codeAuthRepository.save(CodeAuth.builder().auth(phone).code(code).ttl(300).build());
+        SendRes sendRes = aligoFeignClient.sendOneMsg(aligoProperties.getKey(), aligoProperties.getUsername(),
+                aligoProperties.getSender(), phone, msg);
+        System.out.println(sendRes.getResultCode());
+        System.out.println(sendRes.getMessage());
     }
 }

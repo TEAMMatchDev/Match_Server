@@ -2,6 +2,7 @@ package com.example.matchinfrastructure.config;
 
 
 import com.example.matchcommon.properties.NicePayProperties;
+import com.example.matchinfrastructure.aligo.BaseFeignAligoPackage;
 import com.example.matchinfrastructure.discord.BaseFeignDiscordPackage;
 import com.example.matchinfrastructure.oauth.BaseFeignClientPackage;
 import com.example.matchinfrastructure.pay.BasePayFeignClientPackage;
@@ -20,7 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableFeignClients(basePackageClasses = {BaseFeignClientPackage.class, BasePayFeignClientPackage.class, BaseFeignDiscordPackage.class})
+@EnableFeignClients(basePackageClasses = {BaseFeignClientPackage.class, BasePayFeignClientPackage.class, BaseFeignDiscordPackage.class, BaseFeignAligoPackage.class})
 public class FeignCommonConfig {
 
     @Bean
