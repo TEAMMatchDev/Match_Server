@@ -15,7 +15,6 @@ oauth:
     redirect-url: ${NAVER_REDIRECT}
 
 jwt:
-
   header: X-AUTH-TOKEN
   secret: ${JWT_SECRET_KEY}
   refresh: ${JWT_REFRESH_KEY}
@@ -48,8 +47,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: officail.match.kr@gmail.com
-    password: puofrxedultxqtul
+    username: official.match.kr@gmail.com
+    password: ${APP_PASSWORD}
     properties:
       mail:
         smtp:
@@ -61,6 +60,11 @@ spring:
           timeout: 5000
           writetimeout: 5000
     auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30분
+
+aligo:
+  username: ${ALIGO_USERNAME}
+  key: ${ALIGO_KEY}
+  sender: ${SMS_SENDER}
 
 web:
   return:

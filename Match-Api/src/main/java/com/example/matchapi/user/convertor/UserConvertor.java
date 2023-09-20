@@ -6,10 +6,12 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.UserHelper;
 import com.example.matchcommon.annotation.Convertor;
+import com.example.matchcommon.properties.AligoProperties;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
 import com.example.matchdomain.user.repository.UserRepository;
+import com.example.matchinfrastructure.aligo.dto.SendReq;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
@@ -25,6 +27,7 @@ public class UserConvertor {
     private final AuthHelper authHelper;
     private final UserHelper userHelper;
     private final PasswordEncoder passwordEncoder;
+    private final AligoProperties aligoProperties;
 
     public User KakaoSignUpUser(KakaoUserInfoDto kakaoUserInfoDto, SocialType authType, Authority authority) {
         return User.builder()
@@ -165,6 +168,17 @@ public class UserConvertor {
                 .status(userDetail.getStatus().getValue())
                 .createdAt(userDetail.getCreatedAt().toString())
                 //.userCards(userCards)
+                .build();
+    }
+
+    public SendReq SendSms(String phone, String code) {
+        return SendReq
+                .builder()
+                .key(aligoProperties.getKey())
+                .sender(aligoProperties.getSender())
+                .userId(aligoProperties.getUsername())
+                .msg("[MATCH] 회원님의 인증번호는 [" + code + "] 입니다.")
+                .receiver(phone)
                 .build();
     }
 }

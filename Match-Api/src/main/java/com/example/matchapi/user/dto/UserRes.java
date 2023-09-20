@@ -181,4 +181,7 @@ public class UserRes {
         //private List<OrderRes.UserBillCard> userCards;
     }
 
+    public static class EmailAuth {
+        private String number;
+    }
 }
