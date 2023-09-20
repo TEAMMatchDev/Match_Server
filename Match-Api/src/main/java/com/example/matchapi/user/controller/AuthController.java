@@ -5,8 +5,10 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.service.AuthService;
 import com.example.matchapi.user.helper.SmsHelper;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchcommon.exception.errorcode.MailSendErrorCode;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
+import com.example.matchcommon.service.MailService;
 import com.example.matchdomain.user.exception.UserLoginErrorCode;
 import com.example.matchdomain.user.exception.UserNormalSignUpErrorCode;
 import com.example.matchdomain.user.exception.UserSignUpErrorCode;
@@ -29,7 +31,7 @@ public class AuthController {
     private final AuthService authService;
     private final SmsHelper smsHelper;
     private UserReq.UserEmail signUpUser;
-
+    private final MailService mailService;
     @Operation(summary = "kakao 코드 발급 후 토큰 생성용 개발용 API 입니다",description = "kakao 코드를 발급 할 수 있음")
     @GetMapping(value = "/kakao")
     public String kakaoOauthRedirect(@RequestParam String code) {
@@ -126,7 +128,20 @@ public class AuthController {
 
 
 
+    @Operation(summary="01-07🔑 유저 이메일 인증번호 보내기", description= "이메일 인증번호 보내기 API 입니다.")
+    @ApiErrorCodeExample({MailSendErrorCode.class, UserNormalSignUpErrorCode.class})
+    @GetMapping("/email")
+    public CommonResponse<String> emailAuth(@RequestParam String email){
+        authService.sendEmailMessage(email);
+        return CommonResponse.onSuccess("메일 전송 성공");
+    }
 
+    @Operation(summary="01-08🔑 유저 이메일 인증번호 확인 API", description= "이메일 인증번호 확인 API 입니다.")
+    @PostMapping("/check/email")
+    public CommonResponse<String> checkEmailAuth(@RequestBody UserReq.UserEmailAuth email){
+        authService.checkUserEmailAuth(email);
+        return CommonResponse.onSuccess("메일 인증 성공");
+    }
 
 
 

@@ -1,13 +1,17 @@
 package com.example.matchcommon.service;
 
-import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.InternalServerException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import javax.mail.internet.MimeMessage;
 
 import static com.example.matchcommon.exception.errorcode.MailSendErrorCode.UNABLE_TO_SEND_EMAIL;
 
@@ -18,6 +22,7 @@ import static com.example.matchcommon.exception.errorcode.MailSendErrorCode.UNAB
 public class MailService {
 
     private final JavaMailSender emailSender;
+    private final SpringTemplateEngine templateEngine;
 
     public void sendEmail(String toEmail,
                           String title,
@@ -26,6 +31,7 @@ public class MailService {
         try {
             emailSender.send(emailForm);
         } catch (RuntimeException e) {
+            log.info(e.getMessage());
             log.error("MailService.sendEmail exception occur toEmail: {}, " +
                     "title: {}, text: {}", toEmail, title, text);
             throw new InternalServerException(UNABLE_TO_SEND_EMAIL);
@@ -43,4 +49,24 @@ public class MailService {
 
         return message;
     }
+
+    @Async
+    public void sendEmailMessage(String email, String code){
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            message.addRecipients(MimeMessage.RecipientType.TO, email);
+            message.setSubject("[MATCH] 인증번호 발송");
+            message.setText(setContext(code), "utf-8", "html");
+            emailSender.send(message);
+        }catch(Exception exception){
+            throw new InternalServerException(UNABLE_TO_SEND_EMAIL);
+        }
+    }
+    private String setContext(String code) {
+        Context context = new Context();
+        context.setVariable("code", code);
+        return templateEngine.process("../../resources/TemplateMail", context);
+    }
+
+
 }
