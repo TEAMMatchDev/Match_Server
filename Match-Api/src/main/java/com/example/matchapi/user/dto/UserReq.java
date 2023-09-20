@@ -119,4 +119,14 @@ public class UserReq {
         private String newPassword;
 
     }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserEmailAuth {
+        private String email;
+
+        private String code;
+    }
 }
