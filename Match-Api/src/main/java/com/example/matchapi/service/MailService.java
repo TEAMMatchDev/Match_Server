@@ -1,4 +1,4 @@
-package com.example.matchcommon.service;
+package com.example.matchapi.service;
 
 import com.example.matchcommon.exception.InternalServerException;
 import lombok.RequiredArgsConstructor;

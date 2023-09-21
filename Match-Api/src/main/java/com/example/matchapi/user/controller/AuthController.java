@@ -8,7 +8,7 @@ import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.MailSendErrorCode;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
-import com.example.matchcommon.service.MailService;
+import com.example.matchapi.service.MailService;
 import com.example.matchdomain.user.exception.UserLoginErrorCode;
 import com.example.matchdomain.user.exception.UserNormalSignUpErrorCode;
 import com.example.matchdomain.user.exception.UserSignUpErrorCode;
