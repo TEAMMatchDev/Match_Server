@@ -17,8 +17,8 @@ public class AligoService {
 
     public void sendPhone(String phone, String code) {
         String msg = "[MATCH] 회원님의 인증번호는 [" + code + "] 입니다.";
-        SendRes sendRes = aligoFeignClient.sendOneTestMsg(aligoProperties.getKey(), aligoProperties.getUsername(),
-                aligoProperties.getSender(), phone, msg, "Y");
+        SendRes sendRes = aligoFeignClient.sendOneMsg(aligoProperties.getKey(), aligoProperties.getUsername(),
+                aligoProperties.getSender(), phone, msg);
         System.out.println(sendRes.getResultCode());
         System.out.println(sendRes.getMessage());
     }

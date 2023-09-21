@@ -86,11 +86,11 @@ jobs:
       - name: Generate deployment packagez
         run: |
           mkdir -p deploy
-          cp Match-Api/build/libs/*.jar deploy/match-prod-api.jar
+          cp Match-Aligo/build/libs/*.jar deploy/match-aligo-api.jar
           cp Procfile deploy/Procfile
-          cp -r .ebextensions-prod deploy/.ebextensions
+          cp -r .ebextensions-aligo deploy/.ebextensions
           cp -r .platform deploy/.platform
-          cd deploy && zip -r match-prod-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
+          cd deploy && zip -r match-aligo-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
 
       - name: Deploy Consumer to EB
         uses: einaregilsson/beanstalk-deploy@v19
@@ -99,7 +99,7 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: MatchAligoServer
           environment_name: MatchAligoServer-env
-          version_label: match-prod-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
+          version_label: match-aligo-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
           region: ap-northeast-2
-          deployment_package: deploy/match-prod-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
+          deployment_package: deploy/match-aligo-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
           wait_for_deployment: false
