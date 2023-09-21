@@ -1,4 +1,4 @@
-name: dev MATCH API Server CI/CD
+name: aligo MATCH API Server CI/CD
 
 on:
   push:
@@ -56,16 +56,15 @@ jobs:
           web.return.url: ${{ secrets.DEV_RETURN_URL }}
           match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
 
-
-      - name: Set Environment Domain - Domain DEV Yml
+      - name: Set Environment Domain - Domain Prod Yml
         uses: microsoft/variable-substitution@v1
         with:
-          files: ./Match-Domain/src/main/resources/application-domain-dev.yml
+          files: ./Match-Domain/src/main/resources/application-domain-prod.yml
         env:
-          spring.datasource.url: ${{ secrets.DB_URL_HOST }}
+          spring.datasource.url: ${{ secrets.PROD_DB_URL_HOST }}
           spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
           spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
-          spring.redis.host : ${{ secrets.REDIS_DEV_HOST }}
+          spring.redis.host : ${{ secrets.REDIS_PROD_HOST }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -82,23 +81,23 @@ jobs:
           format: YYYYMMDDTHHmm
           utcOffset: "+09:00"
 
-      - name: Generate deployment package
+      - name: Generate deployment packagez
         run: |
           mkdir -p deploy
-          cp Match-Api/build/libs/*.jar deploy/match-dev-api.jar
+          cp Match-Aligo/build/libs/*.jar deploy/match-aligo-api.jar
           cp Procfile deploy/Procfile
-          cp -r .ebextensions-dev deploy/.ebextensions
+          cp -r .ebextensions-aligo deploy/.ebextensions
           cp -r .platform deploy/.platform
-          cd deploy && zip -r match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
+          cd deploy && zip -r match-aligo-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
 
       - name: Deploy Consumer to EB
         uses: einaregilsson/beanstalk-deploy@v19
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: MatchServerApp
-          environment_name: match-aligo-env
-          version_label: match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
+          application_name: MatchAligoServer
+          environment_name: MatchAligoServer-env
+          version_label: match-aligo-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
           region: ap-northeast-2
-          deployment_package: deploy/match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
+          deployment_package: deploy/match-aligo-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
           wait_for_deployment: false
