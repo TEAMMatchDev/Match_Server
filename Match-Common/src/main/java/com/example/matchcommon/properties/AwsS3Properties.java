@@ -19,9 +19,10 @@ public class AwsS3Properties {
     private S3 s3;
     @Getter
     @Setter
-    private static class S3{
+    public static class S3{
         private String bucket;
         private String baseUrl;
     }
+
 
 }
