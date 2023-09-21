@@ -95,8 +95,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: MatchAligoServer
-          environment_name: MatchAligoServer-env
+          application_name: MatchServerApp
+          environment_name: match-aligo-env
           version_label: match-aligo-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
           region: ap-northeast-2
           deployment_package: deploy/match-aligo-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
