@@ -22,7 +22,7 @@ spring:
         matching-strategy: ant_path_matcher
 
 springdoc:
-  packages-to-scan: com.example.adminapi
+  packages-to-scan: com.example.matchaligo
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   swagger-ui:
