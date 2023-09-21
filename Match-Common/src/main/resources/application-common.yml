@@ -69,3 +69,7 @@ aligo:
 web:
   return:
     url: ${RETURN_URL}
+
+match:
+  aligo:
+    url: ${MATCH_ALIGO_URL}
