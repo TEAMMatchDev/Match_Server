@@ -60,6 +60,8 @@ jobs:
           spring.password: ${{ secrets.APP_PASSWORD}}
           web.return.url: ${{ secrets.PROD_RETURN_URL }}
           match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
+          aligo.username: ${{ secrets.ALIGO_USERNAME }}
+          aligo.key: ${{ secrets.ALIGO_KEY }}
 
       - name: Set Environment Domain - Domain Prod Yml
         uses: microsoft/variable-substitution@v1
