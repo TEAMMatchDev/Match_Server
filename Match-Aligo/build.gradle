@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group 'com.example'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+jar {
+    archivesBaseName = 'match-aligo'
+}
+
+dependencies {
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation project(':Match-Common')
+    implementation project(':Match-Domain')
+    implementation project(':Match-Infrastructure')
+
+    implementation 'net.nurigo:sdk:4.3.0'
+
+}
+test {
+    useJUnitPlatform()
+}

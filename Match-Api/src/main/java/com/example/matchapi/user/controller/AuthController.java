@@ -150,7 +150,6 @@ public class AuthController {
     @Operation(summary= "01-09🔑 회원 문자인증 요청", description = "회원 문자인증 용 API 입니다.")
     @GetMapping(value="/phone")
     public CommonResponse<String> checkPhone(@RequestParam String phone){
-        log.info("01-09 비회원 문자인증 = " + phone);
         authService.sendPhone(phone);
         return CommonResponse.onSuccess("문자 전송 성공");
     }

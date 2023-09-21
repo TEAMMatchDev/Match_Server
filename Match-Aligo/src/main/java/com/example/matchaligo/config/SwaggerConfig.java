@@ -1,4 +1,4 @@
-package com.example.matchapi.config;
+package com.example.matchaligo.config;
 
 
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
@@ -6,6 +6,7 @@ import com.example.matchcommon.dto.ErrorReason;
 import com.example.matchcommon.exception.errorcode.BaseErrorCode;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -13,34 +14,23 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationContext;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerMethod;
-import org.springdoc.core.customizers.OperationCustomizer;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.lang.Integer.parseInt;
-import static java.util.stream.Collectors.groupingBy;
-
 @Configuration
-@RequiredArgsConstructor
 public class SwaggerConfig {
     //jwt 토큰 인증을 위한 버튼까지 포함
-
-
-    private final ApplicationContext applicationContext;
-
     @Bean
     public OpenAPI openAPI() {
         Info info = new Info()
-                .title("Match Aligo Rest API 문서") // 타이틀
+                .title("Match Rest ADMIN API 문서") // 타이틀
                 .version("0.0.1") // 문서 버전
                 .description("잘못된 부분이나 오류 발생 시 바로 말씀해주세요.") // 문서 설명
                 .contact(new Contact() // 연락처
@@ -64,11 +54,6 @@ public class SwaggerConfig {
                 .addSecurityItem(addSecurityItem)
                 .info(info);
     }
-
-
-
-
-
 
 
     @Bean

@@ -12,6 +12,7 @@ import com.example.matchcommon.properties.AligoProperties;
 import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
+import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.service.MailService;
 import com.example.matchdomain.redis.entity.CodeAuth;
 import com.example.matchdomain.redis.repository.CodeAuthRepository;
@@ -24,6 +25,7 @@ import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.aligo.client.AligoFeignClient;
 import com.example.matchinfrastructure.aligo.dto.SendReq;
 import com.example.matchinfrastructure.aligo.dto.SendRes;
+import com.example.matchinfrastructure.match_aligo.client.MatchAligoFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoLoginFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoLoginTokenRes;
@@ -76,8 +78,7 @@ public class AuthService {
     private final JwtProperties jwtProperties;
     private final MailService mailService;
     private final CodeAuthRepository codeAuthRepository;
-    private final AligoFeignClient aligoFeignClient;
-    private final AligoProperties aligoProperties;
+    private final MatchAligoFeignClient matchAligoFeignClient;
 
 
     @Transactional
@@ -248,11 +249,9 @@ public class AuthService {
     public void sendPhone(String phone) {
         checkUserPhone(new UserReq.UserPhone(phone));
         String code = smsHelper.createRandomNumber();
-        String msg = "[MATCH] 회원님의 인증번호는 [" + code + "] 입니다.";
         codeAuthRepository.save(CodeAuth.builder().auth(phone).code(code).ttl(300).build());
-        SendRes sendRes = aligoFeignClient.sendOneMsg(aligoProperties.getKey(), aligoProperties.getUsername(),
-                aligoProperties.getSender(), phone, msg);
-        System.out.println(sendRes.getResultCode());
+        CommonResponse<String> sendRes = matchAligoFeignClient.sendSmsAuth(jwtService.createToken(1L), phone, code);
+        System.out.println(sendRes.getCode());
         System.out.println(sendRes.getMessage());
     }
 }

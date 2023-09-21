@@ -5,3 +5,5 @@ include 'Match-Batch'
 include 'Admin-Api'
 include 'Match-Domain'
 include 'Match-Infrastructure'
+include 'Match-Aligo'
+
