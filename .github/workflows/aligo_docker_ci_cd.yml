@@ -62,6 +62,7 @@ jobs:
           match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
           aligo.username: ${{ secrets.ALIGO_USERNAME }}
           aligo.key: ${{ secrets.ALIGO_KEY }}
+          aligo.sender: ${{ secrets.SMS_SENDER }}
 
       - name: Set Environment Domain - Domain Prod Yml
         uses: microsoft/variable-substitution@v1
