@@ -2,7 +2,7 @@ version: '3'
 services:
   web:
     container_name: web
-    image: aligo_match/aligo_match
+    image: austinmenu/aligo_match
     expose:
       - 9000
     ports:
