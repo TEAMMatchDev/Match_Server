@@ -53,6 +53,7 @@ jobs:
           spring.password: ${{ secrets.APP_PASSWORD}}
           aligo.username: ${{ secrets.ALIGO_USERNAME }}
           aligo.key: ${{ secrets.ALIGO_KEY }}
+          web.return.url: ${{ secrets.DEV_RETURN_URL }}
 
 
       - name: Set Environment Domain - Domain DEV Yml

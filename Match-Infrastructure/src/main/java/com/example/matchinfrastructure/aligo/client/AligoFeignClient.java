@@ -19,4 +19,11 @@ public interface AligoFeignClient {
                        @RequestParam("sender") String sender,
                        @RequestParam("receiver") String receiver,
                        @RequestParam("msg") String msg);
+
+    @PostMapping("/send/")
+    SendRes sendOneTestMsg(@RequestParam("key") String key,
+                       @RequestParam("user_id") String userId,
+                       @RequestParam("sender") String sender,
+                       @RequestParam("receiver") String receiver,
+                       @RequestParam("msg") String msg, @RequestParam("testmode_yn") String testMode);
 }
