@@ -1,5 +1,6 @@
 package com.example.matchcommon.config;
 
+import com.example.matchcommon.properties.EmailPasswordProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,7 @@ import java.util.Properties;
 
 @Configuration
 public class EmailConfig {
+    private final EmailPasswordProperties emailPasswordProperties;
 
     @Value("${spring.mail.host}")
     private String host;
@@ -20,8 +22,6 @@ public class EmailConfig {
     @Value("${spring.mail.username}")
     private String username;
 
-    @Value("${spring.mail.password}")
-    private String password;
 
     @Value("${spring.mail.properties.mail.smtp.auth}")
     private boolean auth;
@@ -41,13 +41,17 @@ public class EmailConfig {
     @Value("${spring.mail.properties.mail.smtp.writetimeout}")
     private int writeTimeout;
 
+    public EmailConfig(EmailPasswordProperties emailPasswordProperties) {
+        this.emailPasswordProperties = emailPasswordProperties;
+    }
+
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(host);
         mailSender.setPort(port);
         mailSender.setUsername(username);
-        mailSender.setPassword(password);
+        mailSender.setPassword(emailPasswordProperties.getPassword());
         mailSender.setDefaultEncoding("UTF-8");
         mailSender.setJavaMailProperties(getMailProperties());
 
