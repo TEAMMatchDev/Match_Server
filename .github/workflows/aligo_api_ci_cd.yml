@@ -71,7 +71,7 @@ jobs:
         shell: bash
 
       - name: Build with Gradle
-        run: ./gradlew Match-Api:bootJar
+        run: ./gradlew Match-Aligo:bootJar
         shell: bash
 
       - name: Get current time
