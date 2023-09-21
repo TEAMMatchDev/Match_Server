@@ -1,4 +1,4 @@
-package com.example.matchapi.service;
+package com.example.matchcommon.service;
 
 import com.example.matchcommon.exception.InternalServerException;
 import lombok.RequiredArgsConstructor;
@@ -8,8 +8,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import javax.mail.internet.MimeMessage;
 
@@ -22,7 +25,7 @@ import static com.example.matchcommon.exception.errorcode.MailSendErrorCode.UNAB
 public class MailService {
 
     private final JavaMailSender emailSender;
-    private final SpringTemplateEngine templateEngine;
+    //private final SpringTemplateEngine templateEngine;
 
     public void sendEmail(String toEmail,
                           String title,
@@ -65,7 +68,17 @@ public class MailService {
     private String setContext(String code) {
         Context context = new Context();
         context.setVariable("code", code);
-        return templateEngine.process("../../resources/TemplateMail", context);
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setPrefix("templates/");
+        templateResolver.setSuffix("TemplateMail.html");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+        templateResolver.setCharacterEncoding("UTF-8");
+        templateResolver.setOrder(0);
+        templateEngine.setTemplateResolver(templateResolver);
+
+        return templateEngine.process("", context);
     }
 
 
