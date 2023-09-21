@@ -13,7 +13,12 @@ import org.springframework.context.annotation.Configuration;
         NicePayProperties.class,
         RedisProperties.class,
         DiscordProperties.class,
-        AligoProperties.class
+        AligoProperties.class,
+        AwsS3Properties.class,
+        EmailPasswordProperties.class,
+        MatchAligoUrl.class,
+        ServerHostProperties.class,
+        WebReturnUrl.class
 })
 @Configuration
 public class ConfigurationPropertiesConfig {}
