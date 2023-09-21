@@ -8,7 +8,6 @@ import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.MailSendErrorCode;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
-import com.example.matchcommon.service.MailService;
 import com.example.matchdomain.user.exception.UserLoginErrorCode;
 import com.example.matchdomain.user.exception.UserNormalSignUpErrorCode;
 import com.example.matchdomain.user.exception.UserSignUpErrorCode;
@@ -30,8 +29,6 @@ import javax.validation.Valid;
 public class AuthController {
     private final AuthService authService;
     private final SmsHelper smsHelper;
-    private UserReq.UserEmail signUpUser;
-    private final MailService mailService;
     @Operation(summary = "kakao 코드 발급 후 토큰 생성용 개발용 API 입니다",description = "kakao 코드를 발급 할 수 있음")
     @GetMapping(value = "/kakao")
     public String kakaoOauthRedirect(@RequestParam String code) {

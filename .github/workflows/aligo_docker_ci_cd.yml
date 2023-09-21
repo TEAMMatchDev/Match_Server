@@ -1,16 +1,21 @@
-name: prod MATCH API Server CI/CD
+name: aligo MATCH API Server CI/CD
 
+# 언제 이 파일의 내용이 실행될 것인지 정의합니다.
+# 여기서는 main 브랜치에 코드가 push 되거나 pull_request되었을 때 실행할 것을 말하고 있습니다.
 on:
   push:
-    branches: [aligo]
-    #tags:
-    # - Dev-Api-v*.*.*
-  workflow_dispatch: # 수동 실행 옵션 (생략)
+    branches: [ "aligo" ]
+  pull_request:
+    branches: [ "aligo" ]
 
+ # 코드의 내용을 이 파일을 실행하여 action을 수행하는 주체(Github Actions에서 사용하는 VM)가 읽을 수 있도록 허용합니다.
+permissions:
+   contents: read
+
+ # 실제 실행될 내용들을 정의합니다.
 jobs:
   build:
-    runs-on: ubuntu-latest # action 스크립트가 작동될 OS
-
+    runs-on: ubuntu-latest # ubuntu 최신 버전에서 script를 실행
     steps: # 작업 단계
       - name: Checkout source code #  단계별 이름, 구분자로 소스를 가져옴
         uses: actions/checkout@v2
@@ -56,8 +61,6 @@ jobs:
           web.return.url: ${{ secrets.PROD_RETURN_URL }}
           match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
 
-
-
       - name: Set Environment Domain - Domain Prod Yml
         uses: microsoft/variable-substitution@v1
         with:
@@ -68,38 +71,31 @@ jobs:
           spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
           spring.redis.host : ${{ secrets.REDIS_PROD_HOST }}
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-        shell: bash
-
       - name: Build with Gradle
         run: ./gradlew Match-Aligo:bootJar
         shell: bash
 
-      - name: Get current time
-        uses: 1466587594/get-current-time@v2
-        id: current-time
-        with:
-          format: YYYYMMDDTHHmm
-          utcOffset: "+09:00"
-
-      - name: Generate deployment packagez
+   # dockerfile을 통해 이미지를 빌드하고, 이를 docker repo로 push 합니다.
+   # 이 때 사용되는 ${{ secrets.DOCKER_REPO }}/directors-dev 가 위에서 만든 도커 repository 입니다.
+      - name: Docker build & push to docker repo
         run: |
-          mkdir -p deploy
-          cp Match-Aligo/build/libs/*.jar deploy/match-aligo-api.jar
-          cp Procfile deploy/Procfile
-          cp -r .ebextensions-aligo deploy/.ebextensions
-          cp -r .platform deploy/.platform
-          cd deploy && zip -r match-aligo-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/match-aligo .
+          docker push ${{ secrets.DOCKER_REPO }}/match-aligo
 
-      - name: Deploy Consumer to EB
-        uses: einaregilsson/beanstalk-deploy@v19
+   # appleboy/ssh-action@master 액션을 사용하여 지정한 서버에 ssh로 접속하고, script를 실행합니다.
+   # script의 내용은 도커의 기존 프로세스들을 제거하고, docker repo로부터 방금 위에서 push한 내용을 pull 받아 실행하는 것입니다.
+   # 실행 시, docker-compose를 사용합니다.
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        id: deploy
         with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: MatchAligoServer
-          environment_name: MatchAligoServer-env
-          version_label: match-aligo-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
-          region: ap-northeast-2
-          deployment_package: deploy/match-aligo-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
-          wait_for_deployment: false
+          host: ${{ secrets.HOST }}
+          username: ubuntu
+          key: ${{ secrets.KEY }}
+          envs: GITHUB_SHA
+        script: |
+          sudo docker rm -f $(docker ps -qa)
+          sudo docker pull ${{ secrets.DOCKER_REPO }}/directors-dev
+          docker-compose up -d
+          docker image prune -f
