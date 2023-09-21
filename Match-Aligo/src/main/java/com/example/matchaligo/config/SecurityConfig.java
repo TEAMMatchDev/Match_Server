@@ -73,6 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api-docs/**").permitAll()
                 .antMatchers("/webjars/**").permitAll()
                 .antMatchers("/v3/api-docs").permitAll()
+                .antMatchers("/health").permitAll()
                 .antMatchers("/send").hasAnyRole("ADMIN")
 
                 .anyRequest().authenticated()
