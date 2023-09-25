@@ -12,6 +12,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.matchdomain.donation.entity.RegularPayStatus.PROCEEDING;
+
 @Entity
 @Table(name = "RegularPayment")
 @Getter
@@ -44,6 +46,9 @@ public class RegularPayment extends BaseEntity {
 
     //정기 결제 금액
     private Long amount;
+
+    @Enumerated(EnumType.STRING)
+    private RegularPayStatus regularPayStatus = PROCEEDING;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userCardId",nullable = false, insertable=false, updatable=false)

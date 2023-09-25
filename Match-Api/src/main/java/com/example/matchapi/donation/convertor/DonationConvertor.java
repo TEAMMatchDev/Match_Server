@@ -4,11 +4,14 @@ import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.HistoryImageRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
 
@@ -100,6 +103,8 @@ public class DonationConvertor {
     public DonationRes.DonationRegular DonationRegular(RegularPayment regularPayment) {
         return DonationRes.DonationRegular
                 .builder()
+                .projectTitle(regularPayment.getProject().getProjectName())
+                .imgUrl(regularPayment.getProject().getProjectImage().get(0).getUrl())
                 .regularPayId(regularPayment.getId())
                 .payDate(regularPayment.getPayDate())
                 .amount(Math.toIntExact(regularPayment.getAmount()))
@@ -162,6 +167,22 @@ public class DonationConvertor {
                 .payMethod(result.getPayMethod().getName())
                 .payStatus(payStatus)
                 .amount(donationHelper.parsePriceComma(Math.toIntExact(result.getPrice())))
+                .build();
+    }
+
+    public DonationRes.BurningMatchRes BurningMatch(DonationUserRepository.flameList result) {
+        List<String> imgUrlList = null;
+        if(result.getImgUrlList()!=null){
+            imgUrlList = Stream.of(result.getImgUrlList().split(",")).collect(Collectors.toList());
+        }
+        return DonationRes.BurningMatchRes
+                .builder()
+                .regularPayId(result.getRegularPayId())
+                .projectId(result.getProjectId())
+                .projectTitle(result.getProjectName())
+                .imgUrl(result.getImgUrl())
+                .totalDonationCnt(result.getTotalDonationCnt())
+                .userProfileImages(imgUrlList)
                 .build();
     }
 }

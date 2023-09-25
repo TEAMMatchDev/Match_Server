@@ -89,15 +89,26 @@ public class ProjectController {
         return CommonResponse.onSuccess(projectService.getProjectListQueryDsl(user, page, size, projectKind, content));
     }
 
+    @Operation(summary = "03-06💻 프로젝트 관심설정/관심삭제 API #FRAME_프로젝트 리스트 조회.",description = "프로젝트 관심 설정/삭제 API 입니다.")
     @PatchMapping("/{projectId}")
     @CheckIdExist
-    @Operation(summary = "03-06💻 프로젝트 관심설정/관심삭제 API #FRAME_프로젝트 리스트 조회.",description = "프로젝트 관심 설정/삭제 API 입니다.")
     @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
     public CommonResponse<ProjectRes.ProjectLike> patchProjectLike(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @PathVariable Long projectId
             ){
         return CommonResponse.onSuccess(projectService.patchProjectLike(user, projectId));
+    }
+
+
+    @Operation(summary = "03-07💻 오늘의 후원 조회 #FRAME_홈_오늘의 후원",description = "오늘의 후원 조회 API 입니다.")
+    @GetMapping("/today")
+    public CommonResponse<PageResponse<List<ProjectRes.ProjectLists>>> getTodayProjectList(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size
+    ){
+        return CommonResponse.onSuccess(projectService.getTodayProjectLists(user, page ,size));
     }
 
 

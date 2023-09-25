@@ -254,4 +254,9 @@ public class AuthService {
         System.out.println(sendRes.getCode());
         System.out.println(sendRes.getMessage());
     }
+
+    public void checkPhoneAuth(UserReq.UserPhoneAuth phone) {
+        CodeAuth codeAuth = codeAuthRepository.findById(phone.getPhone()).orElseThrow(()->new BadRequestException(NOT_CORRECT_AUTH));
+        if(!codeAuth.getCode().equals(phone.getCode()))throw new BadRequestException(NOT_CORRECT_CODE);
+    }
 }

@@ -58,6 +58,9 @@ public class Project extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private RegularStatus regularStatus;
 
+    @Enumerated(EnumType.STRING)
+    private TodayStatus todayStatus = TodayStatus.NOT_TODAY;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "projectId")
     @BatchSize(size = 100)

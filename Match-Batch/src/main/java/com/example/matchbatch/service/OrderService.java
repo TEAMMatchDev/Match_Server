@@ -116,11 +116,11 @@ public class OrderService {
         if (currentDay == lastDayOfMonth) {
             //현재 날짜와 달의 마지막 날짜가 같거나 클때의 로직
             System.out.println("현재 날짜가 같아요");
-            return regularPaymentRepository.findByPayDateGreaterThanEqualAndStatus(currentDay, Status.ACTIVE);
+            return regularPaymentRepository.findByPayDateGreaterThanEqualAndStatusAndRegularPayStatus(currentDay, Status.ACTIVE, RegularPayStatus.PROCEEDING);
         } else {
             // 현재 날짜가 같지 않을 때의 로직
             System.out.println("현재 날짜가 달라요");
-            return regularPaymentRepository.findByPayDateAndStatus(currentDay, Status.ACTIVE);
+            return regularPaymentRepository.findByPayDateGreaterThanEqualAndStatusAndRegularPayStatus(currentDay, Status.ACTIVE, RegularPayStatus.PROCEEDING);
         }
     }
 

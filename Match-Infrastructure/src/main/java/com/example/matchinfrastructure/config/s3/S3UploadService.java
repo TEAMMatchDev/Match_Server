@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.model.*;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.ForbiddenException;
 import com.example.matchcommon.exception.InternalServerException;
+import com.example.matchcommon.properties.AwsS3Properties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,14 +31,7 @@ import static com.example.matchcommon.exception.errorcode.FileUploadException.*;
 public class S3UploadService {
 
     private final AmazonS3 amazonS3;
-
-    @Value("${aws.s3.bucket}")
-    private String bucket;
-
-    @Value("${aws.s3.base-url}")
-    private String baseUrl;
-
-
+    private final AwsS3Properties awsS3Properties;
 
 
     private String getFileExtension(String fileName) {
@@ -86,8 +80,8 @@ public class S3UploadService {
             objectMetadata.setContentType(file.getContentType());
 
             try (InputStream inputStream = file.getInputStream()) {
-                amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
-                imgUrlList.add(amazonS3.getUrl(bucket, fileName).toString());
+                amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+                imgUrlList.add(amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString());
             } catch (IOException e) {
                 log.info("파일 업로드 실패 프로젝트 ID : " + projectId);
                 throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
@@ -112,22 +106,22 @@ public class S3UploadService {
         objectMetadata.setContentType(presentFile.getContentType());
 
         try (InputStream inputStream = presentFile.getInputStream()) {
-            amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+            amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (IOException e) {
             log.info("파일 업로드 실패 프로젝트 ID : " + projectId);
             throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
         }
-        return amazonS3.getUrl(bucket, fileName).toString();
+        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
     }
 
     public void deleteFile(String fileName){
-        int index=fileName.indexOf(baseUrl);
-        String fileRoute=fileName.substring(index+baseUrl.length()+1);
+        int index=fileName.indexOf(awsS3Properties.getS3().getBaseUrl());
+        String fileRoute=fileName.substring(index+awsS3Properties.getS3().getBaseUrl().length()+1);
         System.out.println("deletefilename : "+fileRoute);
         try {
-            boolean isObjectExist = amazonS3.doesObjectExist(bucket, fileRoute);
+            boolean isObjectExist = amazonS3.doesObjectExist(awsS3Properties.getS3().getBucket(), fileRoute);
             if (isObjectExist) {
-                amazonS3.deleteObject(bucket,fileRoute);
+                amazonS3.deleteObject(awsS3Properties.getS3().getBucket(),fileRoute);
             } else {
                 throw new InternalServerException(IMAGE_DELETE_ERROR);
             }

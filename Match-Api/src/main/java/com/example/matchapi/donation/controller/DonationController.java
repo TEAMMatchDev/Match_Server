@@ -87,7 +87,7 @@ public class DonationController {
 
     @GetMapping("/burning-match")
     @ApiErrorCodeExample({UserAuthErrorCode.class})
-    @Operation(summary = "05-06 유저의 불타는 매치 #FRAME_홈")
+    @Operation(summary = "05-06 유저의 불타는 매치 #FRAME_홈_불타는 매치")
     public CommonResponse<PageResponse<List<DonationRes.BurningMatchRes>>> getBurningMatch(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
@@ -98,7 +98,7 @@ public class DonationController {
 
     @GetMapping("/top/{regularPayId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
-    @Operation(summary = "05-07-01 후원 상세 보기 조회 #FRAME_후원_상세_보기_상단조회")
+    @Operation(summary = "05-07-01 후원 상세 보기 조회 #FRAME_불타는 매치_후원_상세_보기_상단조회")
     public CommonResponse<DonationRes.DonationRegular> getDonationRegular(@PathVariable Long regularPayId,
                                                                           @Parameter(hidden = true) @AuthenticationPrincipal User user){
         return CommonResponse.onSuccess(donationService.getDonationRegular(regularPayId, user));
@@ -107,7 +107,7 @@ public class DonationController {
 
     @GetMapping("/bottom/{regularPayId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
-    @Operation(summary = "05-07-02 후원 상세 보기 조회 #FRAME_후원_상세_보기_하단조회")
+    @Operation(summary = "05-07-02 후원 상세 보기 조회 #FRAME_불타는 매치_후원_상세_보기_하단조회")
     public CommonResponse<PageResponse<List<DonationRes.DonationRegularList>>> getDonationRegularList(
             @PathVariable Long regularPayId,
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
@@ -119,7 +119,7 @@ public class DonationController {
 
     @GetMapping("/pay/{regularPayId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
-    @Operation(summary = "05-08 매치 결제 내역 리스트 조회 #매치 결제 내역")
+    @Operation(summary = "05-08 매치 결제 내역 리스트 조회 #FRAME_불타는 매치_매치 결제 내역")
     public CommonResponse<List<DonationRes.PayList>> getPayList(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @PathVariable Long regularPayId){

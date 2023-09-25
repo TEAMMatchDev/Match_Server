@@ -21,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Collections;
 import java.util.List;
 
+import static com.example.matchcommon.constants.MatchStatic.BASE_PROFILE;
+
 @Convertor
 @RequiredArgsConstructor
 public class UserConvertor {
@@ -30,10 +32,14 @@ public class UserConvertor {
     private final AligoProperties aligoProperties;
 
     public User KakaoSignUpUser(KakaoUserInfoDto kakaoUserInfoDto, SocialType authType, Authority authority) {
+        String profileImg = BASE_PROFILE;
+        if(kakaoUserInfoDto.getProfileUrl() != null){
+            profileImg = kakaoUserInfoDto.getProfileUrl();
+        }
         return User.builder()
                 .username(kakaoUserInfoDto.getId())
                 .password(authHelper.createRandomPassword())
-                .profileImgUrl(kakaoUserInfoDto.getProfileUrl())
+                .profileImgUrl(profileImg)
                 .name(kakaoUserInfoDto.getName())
                 .email(kakaoUserInfoDto.getEmail())
                 .socialId(kakaoUserInfoDto.getId())
@@ -53,10 +59,14 @@ public class UserConvertor {
     }
 
     public User NaverSignUpUser(NaverUserInfoDto naverUserInfoDto, SocialType authType, Authority authority) {
+        String profileImg = BASE_PROFILE;
+        if(naverUserInfoDto.getProfileImage() != null){
+            profileImg = naverUserInfoDto.getProfileImage();
+        }
         return User.builder()
                 .username(naverUserInfoDto.getId())
                 .password(authHelper.createRandomPassword())
-                .profileImgUrl(naverUserInfoDto.getProfileImage())
+                .profileImgUrl(profileImg)
                 .name(naverUserInfoDto.getName())
                 .email(naverUserInfoDto.getEmail())
                 .socialId(naverUserInfoDto.getId())
@@ -72,6 +82,7 @@ public class UserConvertor {
     public User SignUpUser(UserReq.SignUpUser signUpUser, Authority authority) {
         return User.builder()
                 .username(signUpUser.getEmail())
+                .profileImgUrl(BASE_PROFILE)
                 .password(passwordEncoder.encode(signUpUser.getPassword()))
                 .name(signUpUser.getName())
                 .email(signUpUser.getEmail())

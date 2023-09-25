@@ -31,7 +31,6 @@ public class ProjectCustomRepositoryImpl implements ProjectCustomRepository{
         QProject project = QProject.project;
         QProjectImage projectImage = QProjectImage.projectImage;
         QRegularPayment regularPayment = QRegularPayment.regularPayment;
-        QUser user = QUser.user;
         QProjectUserAttention projectUserAttention = QProjectUserAttention.projectUserAttention;
 
         Predicate predicate = buildSearchPredicate(project, projectImage, kind, content, imageRepresentStatus, projectStatus , now, status);
@@ -73,8 +72,8 @@ public class ProjectCustomRepositoryImpl implements ProjectCustomRepository{
 
         long total = query.fetchCount();
 
-        for (int i = 0; i < results.size(); i++) {
-            results.get(i).setImgUrlList(getImgUrlList(results.get(i).getId()));
+        for (ProjectList result : results) {
+            result.setImgUrlList(getImgUrlList(result.getId()));
         }
 
         return new PageImpl<>(results, pageable, total);
@@ -115,4 +114,13 @@ public class ProjectCustomRepositoryImpl implements ProjectCustomRepository{
 
         return predicate;
     }
+
+    @Override
+    public Page<ProjectList> getTodayProjectCustom(User user, int page, int size, ProjectStatus projectStatus, LocalDateTime now, ImageRepresentStatus imageRepresentStatus, Status status) {
+        QProject project = QProject.project;
+
+
+        return null;
+    }
+
 }
