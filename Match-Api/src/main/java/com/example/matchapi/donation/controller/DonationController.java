@@ -119,7 +119,7 @@ public class DonationController {
 
     @GetMapping("/pay/{regularPayId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
-    @Operation(summary = "05-08 매치 결제 내역 리스트 조회 #매치 결제 내역")
+    @Operation(summary = "05-08 매치 결제 내역 리스트 조회 #FRAME_불타는 매치_매치 결제 내역")
     public CommonResponse<List<DonationRes.PayList>> getPayList(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @PathVariable Long regularPayId){
