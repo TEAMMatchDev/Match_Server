@@ -50,6 +50,8 @@ public class QProject extends EntityPathBase<Project> {
     //inherited
     public final EnumPath<com.example.matchdomain.common.model.Status> status = _super.status;
 
+    public final EnumPath<TodayStatus> todayStatus = createEnum("todayStatus", TodayStatus.class);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 

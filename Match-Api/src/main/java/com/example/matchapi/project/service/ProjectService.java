@@ -37,6 +37,8 @@ import java.util.stream.Stream;
 import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.project.entity.ImageRepresentStatus.NORMAL;
 import static com.example.matchdomain.project.entity.ImageRepresentStatus.REPRESENT;
+import static com.example.matchdomain.project.entity.ProjectStatus.PROCEEDING;
+import static com.example.matchdomain.project.entity.TodayStatus.TODAY;
 import static com.example.matchdomain.project.exception.PatchProjectImageErrorCode.PROJECT_IMAGE_NOT_EXIST;
 import static com.example.matchdomain.project.exception.PatchProjectImageErrorCode.PROJECT_NOT_CORRECT_IMAGE;
 import static com.example.matchdomain.project.exception.ProjectGetErrorCode.PROJECT_NOT_EXIST;
@@ -64,7 +66,7 @@ public class ProjectService {
         List<ProjectRes.ProjectList> projectLists = new ArrayList<>();
 
         if(!userId.equals(0L)){
-            Page<ProjectRepository.ProjectList> projects = projectRepository.findLoginUserProjectList(userId, ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue());
+            Page<ProjectRepository.ProjectList> projects = projectRepository.findLoginUserProjectList(userId, PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue());
             projects.getContent().forEach(
                     result -> {
                         projectLists.add(new ProjectRes.ProjectList(
@@ -81,7 +83,7 @@ public class ProjectService {
         }
 
         else{
-            Page<Project> projects = projectRepository.findByStatusAndProjectStatusAndFinishedAtGreaterThanEqualAndProjectImage_ImageRepresentStatusOrderByViewCnt(ACTIVE,ProjectStatus.PROCEEDING, LocalDateTime.now(), ImageRepresentStatus.REPRESENT, pageable);
+            Page<Project> projects = projectRepository.findByStatusAndProjectStatusAndFinishedAtGreaterThanEqualAndProjectImage_ImageRepresentStatusOrderByViewCnt(ACTIVE, PROCEEDING, LocalDateTime.now(), ImageRepresentStatus.REPRESENT, pageable);
             projects.getContent().forEach(
                     result -> {
                         String imageUrl = result.getProjectImage().isEmpty() ? null : result.getProjectImage().get(0).getUrl();
@@ -116,7 +118,7 @@ public class ProjectService {
 
         if(!userId.equals(0L)){
 
-            Page<ProjectRepository.ProjectList> projects = projectRepository.searchProjectLoginUser(userId,content,content,content,ProjectStatus.PROCEEDING.getValue(),LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(),pageable, ACTIVE.getValue());
+            Page<ProjectRepository.ProjectList> projects = projectRepository.searchProjectLoginUser(userId,content,content,content, PROCEEDING.getValue(),LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(),pageable, ACTIVE.getValue());
 
             projects.getContent().forEach(
                     result -> {
@@ -136,7 +138,7 @@ public class ProjectService {
 
         }
         else{
-            Page<Project> projects = projectRepository.searchProject(content,content,content,ProjectStatus.PROCEEDING,LocalDateTime.now(),ImageRepresentStatus.REPRESENT,pageable, ACTIVE);
+            Page<Project> projects = projectRepository.searchProject(content,content,content, PROCEEDING,LocalDateTime.now(),ImageRepresentStatus.REPRESENT,pageable, ACTIVE);
 
             projects.getContent().forEach(
                     result -> {
@@ -307,20 +309,20 @@ public class ProjectService {
 
         if(projectKind == null){
             if(content == null){
-                projects =  projectRepository.findLoginUserProjectList(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue());
+                projects =  projectRepository.findLoginUserProjectList(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue());
             }
             else{
-                projects =  projectRepository.findByContent(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), content);
+                projects =  projectRepository.findByContent(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), content);
 
             }
         }else{
             if(content == null){
-                projects = projectRepository.findByProjectKind(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(),
+                projects = projectRepository.findByProjectKind(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
                         ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), projectKind.getValue());
 
             }
             else{
-                projects =  projectRepository.findByContentAndProjectKind(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(),
+                projects =  projectRepository.findByContentAndProjectKind(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
                         ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), projectKind.getValue(), content);
             }
         }
@@ -350,35 +352,47 @@ public class ProjectService {
         Pageable pageable = PageRequest.of(page, size);
         List<ProjectRes.ProjectLists> project = new ArrayList<>();
 
-        Page<ProjectList> projects = projectRepository.searchProjectCustom(user, page, size, projectKind, content, ProjectStatus.PROCEEDING, LocalDateTime.now(), REPRESENT, ACTIVE, pageable);
+        Page<ProjectRepository.ProjectList> projects = null;
 
 
-        /*
         if(projectKind == null){
             if(content == null){
-                projects =  projectRepository.findLoginUserProjectList(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, Status.ACTIVE.getValue());
+                projects =  projectRepository.findLoginUserProjectList(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), REPRESENT.getValue(), pageable, ACTIVE.getValue());
             }
             else{
-                projects =  projectRepository.findByContent(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, Status.ACTIVE.getValue(), content);
+                projects =  projectRepository.findByContent(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), REPRESENT.getValue(), pageable, ACTIVE.getValue(), content);
 
             }
         }else{
             if(content == null){
-                projects = projectRepository.findByProjectKind(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(),
-                        ImageRepresentStatus.REPRESENT.getValue(), pageable, Status.ACTIVE.getValue(), projectKind.getValue());
+                projects = projectRepository.findByProjectKind(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
+                        REPRESENT.getValue(), pageable, ACTIVE.getValue(), projectKind.getValue());
 
             }
             else{
-                projects =  projectRepository.findByContentAndProjectKind(user.getId(), ProjectStatus.PROCEEDING.getValue(), LocalDateTime.now(),
-                        ImageRepresentStatus.REPRESENT.getValue(), pageable, Status.ACTIVE.getValue(), projectKind.getValue(), content);
+                projects =  projectRepository.findByContentAndProjectKind(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
+                        REPRESENT.getValue(), pageable, ACTIVE.getValue(), projectKind.getValue(), content);
             }
         }
 
-         */
 
         projects.getContent().forEach(
                 result -> {
-                    project.add(projectConvertor.ProjectListQueryDsl(result));
+                    project.add(projectConvertor.ProjectLists(result));
+                }
+        );
+        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), project);
+    }
+
+    public PageResponse<List<ProjectRes.ProjectLists>> getTodayProjectLists(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<ProjectRes.ProjectLists> project = new ArrayList<>();
+
+        Page<ProjectRepository.ProjectList> projects = projectRepository.findTodayProject(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), REPRESENT.getValue(), ACTIVE.getValue(), TODAY.getValue(), pageable);
+
+        projects.getContent().forEach(
+                result -> {
+                    project.add(projectConvertor.ProjectLists(result));
                 }
         );
         return new PageResponse<>(projects.isLast(), projects.getTotalElements(), project);

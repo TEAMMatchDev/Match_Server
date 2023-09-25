@@ -13,4 +13,6 @@ import java.time.LocalDateTime;
 
 public interface ProjectCustomRepository {
     Page<ProjectList> searchProjectCustom(User user, int page, int size, ProjectKind projectKind, String content, ProjectStatus proceeding, LocalDateTime now, ImageRepresentStatus represent, Status active, Pageable pageable);
+
+    Page<ProjectList> getTodayProjectCustom(User user, int page, int size, ProjectStatus projectStatus, LocalDateTime now, ImageRepresentStatus imageRepresentStatus, Status status);
 }
