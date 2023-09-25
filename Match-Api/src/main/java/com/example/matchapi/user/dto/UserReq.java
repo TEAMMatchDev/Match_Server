@@ -129,4 +129,14 @@ public class UserReq {
 
         private String code;
     }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserPhoneAuth {
+        private String phone;
+
+        private String code;
+    }
 }

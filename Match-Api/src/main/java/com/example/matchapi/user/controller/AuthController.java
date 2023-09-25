@@ -8,6 +8,7 @@ import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.MailSendErrorCode;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
+import com.example.matchdomain.user.exception.CodeAuthErrorCode;
 import com.example.matchdomain.user.exception.UserLoginErrorCode;
 import com.example.matchdomain.user.exception.UserNormalSignUpErrorCode;
 import com.example.matchdomain.user.exception.UserSignUpErrorCode;
@@ -79,6 +80,7 @@ public class AuthController {
      */
 
 
+
     @ApiErrorCodeExample(RequestErrorCode.class)
     @Operation(summary= "01-04🔑 회원 문자인증 요청", description = "회원 문자인증 용 API 입니다.")
     @PostMapping(value="/sms")
@@ -137,6 +139,7 @@ public class AuthController {
 
     @Operation(summary="01-08🔑 유저 이메일 인증번호 확인 API", description= "이메일 인증번호 확인 API 입니다.")
     @PostMapping("/check/email")
+    @ApiErrorCodeExample(CodeAuthErrorCode.class)
     public CommonResponse<String> checkEmailAuth(@RequestBody UserReq.UserEmailAuth email){
         authService.checkUserEmailAuth(email);
         return CommonResponse.onSuccess("메일 인증 성공");
@@ -151,5 +154,12 @@ public class AuthController {
         return CommonResponse.onSuccess("문자 전송 성공");
     }
 
+    @Operation(summary="01-10🔑 유저 전화번호 인증번호 확인 API", description= "전화번호 인증번호 확인 API 입니다.")
+    @PostMapping("/check/phone")
+    @ApiErrorCodeExample(CodeAuthErrorCode.class)
+    public CommonResponse<String> checkEmailAuth(@RequestBody UserReq.UserPhoneAuth phone){
+        authService.checkPhoneAuth(phone);
+        return CommonResponse.onSuccess("핸드폰 인증 성공");
+    }
 
 }
