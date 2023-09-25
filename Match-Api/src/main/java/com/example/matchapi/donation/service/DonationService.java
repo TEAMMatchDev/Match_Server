@@ -8,7 +8,6 @@ import com.example.matchapi.project.convertor.ProjectConvertor;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
-import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
@@ -21,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -35,13 +33,14 @@ import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
 import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
 import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
-import static com.example.matchdomain.donation.entity.RegularPayStatus.PROCEEDING;
+import static com.example.matchdomain.donation.entity.HistoryStatus.CREATE;
 import static com.example.matchdomain.donation.entity.RegularPayStatus.USER_CANCEL;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_CORRECT_USER;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationListErrorCode.FILTER_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationRefundErrorCode.*;
 import static com.example.matchdomain.donation.exception.GetRegularErrorCode.REGULAR_NOT_EXIST;
+import static com.example.matchdomain.project.entity.ImageRepresentStatus.REPRESENT;
 
 @Service
 @RequiredArgsConstructor
@@ -288,5 +287,38 @@ public class DonationService {
         );
 
         return payLists;
+    }
+
+    public DonationRes.FlameProject getFlameProjectList(User user, String content) {
+        List<DonationUser> donationUsers = donationUserRepository.findByUserAndInherenceNameContainingAndProject_ProjectImg_RepresentStatusOrderByCreatedAtDesc(user, content, REPRESENT);
+        List<DonationRes.FlameProjectList> flameProjectLists = new ArrayList<>();
+
+        System.out.println(donationUsers.size());
+        donationUsers.forEach(
+                result -> flameProjectLists.add(
+                        donationConvertor.FlameProject(result)
+                )
+        );
+        return new DonationRes.FlameProject(donationUsers.size(), flameProjectLists);
+    }
+
+    public PageResponse<List<DonationRes.DonationRegularList>> getFlameRegularList(Long donationId, User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
+        List<DonationRes.DonationRegularList> donationRegularLists = new ArrayList<>();
+        Page<DonationHistory> donationHistories = donationHistoryRepository.getDonationHistoryCustom(donationUser.getRegularPaymentId(), donationId, CREATE, pageable);
+        donationHistories.forEach(
+                result -> donationRegularLists.add(
+                        donationConvertor.DonationRegularList(result)
+                )
+        );
+
+        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationRegularLists);
+    }
+
+    public DonationRes.DonationFlame getFlameRegular(Long donationId, User user) {
+        DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
+        RegularPayment regularPayment = regularPaymentRepository.findById(donationUser.getRegularPaymentId()).orElseThrow(()-> new BadRequestException(REGULAR_NOT_EXIST));
+        return donationConvertor.DonationFlame(regularPayment, donationUser);
     }
 }

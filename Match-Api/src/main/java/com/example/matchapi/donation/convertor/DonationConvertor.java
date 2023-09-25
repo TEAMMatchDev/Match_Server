@@ -185,4 +185,27 @@ public class DonationConvertor {
                 .userProfileImages(imgUrlList)
                 .build();
     }
+
+    public DonationRes.FlameProjectList FlameProject(DonationUser result) {
+        return DonationRes.FlameProjectList
+                .builder()
+                .donationId(result.getId())
+                .projectId(result.getProjectId())
+                .flameName(result.getInherenceName())
+                .projectName(result.getProject().getProjectName())
+                .imgUrl(result.getProject().getProjectImage().get(0).getUrl())
+                .build();
+    }
+
+    public DonationRes.DonationFlame DonationFlame(RegularPayment regularPayment, DonationUser donationUser) {
+        return DonationRes.DonationFlame
+                .builder()
+                .inherenceName(donationUser.getInherenceName())
+                .regularPayStatus(regularPayment.getRegularPayStatus())
+                .imgUrl(regularPayment.getProject().getProjectImage().get(0).getUrl())
+                .regularPayId(regularPayment.getId())
+                .payDate(regularPayment.getPayDate())
+                .amount(Math.toIntExact(regularPayment.getAmount()))
+                .build();
+    }
 }
