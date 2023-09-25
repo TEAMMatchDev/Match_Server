@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -34,6 +35,8 @@ import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
 import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
 import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
+import static com.example.matchdomain.donation.entity.RegularPayStatus.PROCEEDING;
+import static com.example.matchdomain.donation.entity.RegularPayStatus.USER_CANCEL;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_CORRECT_USER;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationListErrorCode.FILTER_NOT_EXIST;
@@ -191,7 +194,7 @@ public class DonationService {
 
         if(!regularPayment.getUserId().equals(user.getId())) throw new BadRequestException(REGULAR_PAY_NOT_CORRECT_USER);
 
-        regularPayment.setStatus(Status.INACTIVE);
+        regularPayment.setRegularPayStatus(USER_CANCEL);
         regularPaymentRepository.save(regularPayment);
     }
 
@@ -235,8 +238,18 @@ public class DonationService {
 
     public PageResponse<List<DonationRes.BurningMatchRes>> getBurningMatch(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+        Page<DonationUserRepository.flameList> flameLists = donationUserRepository.getFlameList(user.getId(), pageable);
 
-        return null;
+        List<DonationRes.BurningMatchRes> burningMatchRes = new ArrayList<>();
+
+        flameLists.forEach(
+                result -> {
+                    burningMatchRes.add(donationConvertor.BurningMatch(result));
+                }
+        );
+
+
+        return new PageResponse<>(flameLists.isLast(), flameLists.getTotalElements(), burningMatchRes);
     }
 
     @Transactional

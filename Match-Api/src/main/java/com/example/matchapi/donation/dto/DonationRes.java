@@ -113,6 +113,15 @@ public class DonationRes {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BurningMatchRes {
+        @Schema(description = "후원 id", required = true, example = "2")
+        private Long regularPayId;
+
+        private Long projectId;
+
+        private boolean like;
+
+        @Schema(description = "후원 이미지", required = true, example = "imgUrl")
+        private String imgUrl;
         @Schema(description = "후원 타이틀", required = true, example = "후원 함께할 분, 들어와요")
         private String projectTitle;
         @Schema(description = "후원 유저 프로필 이미지 리스트", required = true, example = "")
@@ -120,12 +129,17 @@ public class DonationRes {
         @Schema(description = "후원 유저 총원", required = true, example = "15")
         private int totalDonationCnt;
     }
+
     @Getter
     @Setter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
     public static class DonationRegular {
+        private String imgUrl;
+
+        private String projectTitle;
+
         private int amount;
 
         private Long regularPayId;

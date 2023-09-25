@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface DonationUserRepository extends JpaRepository<DonationUser,Long> {
@@ -73,4 +72,49 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
 
 
     List<DonationUser> findByRegularPaymentIdAndStatusOrderByCreatedAtDesc(Long regularPayId, Status status);
+
+    @Query(value = "SELECT\n" +
+            "    RP.id AS 'regularPayId',\n" +
+            "    P.id AS 'projectId',\n" +
+            "    P.projectName,PI.url'imgUrl',\n" +
+            "    IF(PUA.projectId IS NOT NULL, 'true', 'false') AS 'like',\n" +
+            "    (\n" +
+            "        SELECT GROUP_CONCAT(U.profileImgUrl SEPARATOR ',')\n" +
+            "        FROM (\n" +
+            "                 SELECT DISTINCT RP2.userId\n" +
+            "                 FROM RegularPayment RP2\n" +
+            "                 WHERE RP2.projectId = P.id\n" +
+            "                   AND RP2.regularPayStatus = 'PROCEEDING'\n" +
+            "                 LIMIT 3\n" +
+            "             ) AS Subquery\n" +
+            "                 JOIN User U ON U.id = Subquery.userId\n" +
+            "    ) AS 'imgUrlList',\n" +
+            "    COUNT(RP2.id) AS 'totalDonationCnt'\n" +
+            "FROM Project P\n" +
+            "         JOIN RegularPayment RP ON P.id = RP.projectId\n" +
+            "    AND RP.userId = :userId\n" +
+            "    AND RP.regularPayStatus = 'PROCEEDING'\n" +
+            "         LEFT JOIN ProjectUserAttention PUA ON PUA.userId = :userId AND PUA.projectId = P.id\n" +
+            "         JOIN RegularPayment RP2 ON RP2.projectId = P.id\n" +
+            "    AND RP2.regularPayStatus = 'PROCEEDING'" +
+            "         JOIN ProjectImage PI on P.id = PI.projectId and PI.imageRepresentStatus = 'REPRESENT' \n" +
+            "WHERE P.projectStatus = 'PROCEEDING'\n" +
+            "GROUP BY RP.id ", countQuery = "select * from RegularPayment where userId =:userId and regularPayStatus = 'PROCEEDING' ",nativeQuery = true)
+    Page<flameList> getFlameList(@Param("userId") Long userId, Pageable pageable);
+
+    interface flameList {
+        Long getRegularPayId();
+
+        Long getProjectId();
+
+        String getProjectName();
+
+        boolean getLike();
+
+        String getImgUrl();
+
+        String getImgUrlList();
+
+        int getTotalDonationCnt();
+    }
 }
