@@ -204,9 +204,12 @@ public class ProjectConvertor {
     }
 
     public ProjectRes.ProjectLists ProjectLists(ProjectRepository.ProjectList result) {
-        List<String> imgUrlList = null;
+        List<String> imgUrlList = new ArrayList<>();
         if(result.getImgUrlList()!=null){
             imgUrlList = Stream.of(result.getImgUrlList().split(",")).collect(Collectors.toList());
+        }
+        if(imgUrlList.size() >3){
+            imgUrlList = imgUrlList.subList(0,3);
         }
         return ProjectRes.ProjectLists
                 .builder()
@@ -246,9 +249,12 @@ public class ProjectConvertor {
                 thumbNail = projectImage.getUrl();
             }
         }
-        List<String> imgUrlList = null;
+        List<String> imgUrlList = new ArrayList<>();
         if(projects.getImgUrlList()!=null){
             imgUrlList = Stream.of(projects.getImgUrlList().split(",")).collect(Collectors.toList());
+        }
+        if(imgUrlList.size() >3){
+            imgUrlList = imgUrlList.subList(0,3);
         }
 
         return ProjectRes.ProjectAppDetail
