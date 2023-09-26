@@ -2,6 +2,7 @@ package com.example.matchapi.user.dto;
 
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.project.dto.ProjectRes;
+import com.example.matchdomain.user.entity.SocialType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -182,5 +183,21 @@ public class UserRes {
 
     public static class EmailAuth {
         private String number;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Profile {
+        private String profileImgUrl;
+
+        private String name;
+
+        private SocialType socialType;
+
+        private String email;;
+
+        private String phone;
     }
 }

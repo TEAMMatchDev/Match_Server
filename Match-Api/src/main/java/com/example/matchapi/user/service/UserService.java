@@ -123,4 +123,7 @@ public class UserService {
         return userConvertor.UserAdminDetail(userDetail,userCards);
     }
 
+    public UserRes.Profile getProfile(User user) {
+        return userConvertor.UserProfile(user);
+    }
 }

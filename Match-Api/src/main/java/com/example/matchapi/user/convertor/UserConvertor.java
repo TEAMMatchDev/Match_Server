@@ -192,4 +192,15 @@ public class UserConvertor {
                 .receiver(phone)
                 .build();
     }
+
+    public UserRes.Profile UserProfile(User user) {
+        return UserRes.Profile
+                .builder()
+                .profileImgUrl(user.getProfileImgUrl())
+                .name(user.getName())
+                .socialType(user.getSocialType())
+                .email(user.getEmail())
+                .phone(user.getPhoneNumber())
+                .build();
+    }
 }

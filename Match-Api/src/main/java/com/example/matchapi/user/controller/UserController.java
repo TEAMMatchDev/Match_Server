@@ -104,12 +104,24 @@ public class UserController {
     }
 
     @Operation(summary= "02-01👤 마이페이지 전체 조회",description = "마이페이지 전체 조회입니다.")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
     @GetMapping("")
     public CommonResponse<UserRes.MyPage> getMyPage(@Parameter(hidden = true)
                                                     @AuthenticationPrincipal User user){
         log.info("02-01 마이페이지 전체조회 userId : " + user.getId());
         return CommonResponse.onSuccess(userService.getMyPage(user));
     }
+
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    @GetMapping("/profile")
+    @Operation(summary= "02-02👤 프로필 조회",description = "프로필 조회입니다.")
+    public CommonResponse<UserRes.Profile> getProfile(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal User user
+    ){
+        return CommonResponse.onSuccess(userService.getProfile(user));
+    }
+
 
 
 
