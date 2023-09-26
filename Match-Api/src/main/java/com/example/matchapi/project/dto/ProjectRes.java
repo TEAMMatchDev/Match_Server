@@ -220,4 +220,31 @@ public class ProjectRes {
         @Schema(description = "프로젝트 관심 유무", required = true, example = "true")
         private boolean like;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProjectAppDetail {
+        @Schema(description = "projectId 값", required = true, example = "1")
+        private Long projectId;
+        @Schema(description = "썸네일 이미지")
+        String thumbNail;
+        @Schema(description = "프로젝트 이미지 리스트", required = true, example = "imgUrl")
+        private List<ProjectImgList> projectImgList;
+        @Schema(description = "프로젝트 이름", required = true, example = "title")
+        private String title;
+        @Schema(description = "프로젝트 사용처", required = true, example = "프로젝트 사용처")
+        private String usages;
+        @Schema(description = "프로젝트 후원 분야",required = true, example = "kind")
+        private String kind;
+        @Schema(description = "프로젝트 정기 후원인지 아닌지", required = true, example = "REGULAR OR ONE_TIME")
+        private String regularStatus;
+        private boolean like;
+        @Schema(description = "후원 유저 프로필 이미지 리스트", required = true, example = "")
+        private List<String> userProfileImages;
+        @Schema(description = "후원 유저 총원", required = true, example = "15")
+        private int totalDonationCnt;
+    }
 }

@@ -10,6 +10,7 @@ import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
+import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.dto.ProjectList;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
@@ -397,4 +398,30 @@ public class ProjectService {
         );
         return new PageResponse<>(projects.isLast(), projects.getTotalElements(), project);
     }
+
+    public ProjectRes.ProjectAppDetail getProjectAppDetail(User user, Long projectId) {
+        ProjectRepository.ProjectDetail projects = projectRepository.getProjectAppDetail(user.getId(), projectId);
+        List<ProjectImage> projectImages = projectImageRepository.findByProjectIdOrderBySequenceAsc(projectId);
+
+        return projectConvertor.ProjectAppDetail(projects, projectImages);
+    }
+
+    public PageResponse<List<ProjectRes.ProjectLists>> projectList(User user, int page, int size, ProjectKind projectKind, String content) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<ProjectRes.ProjectLists> project = new ArrayList<>();
+
+        Page<ProjectDto> projects = projectRepository.findProject(user, PROCEEDING, LocalDateTime.now(),
+                REPRESENT, ACTIVE, projectKind, content,  pageable);
+
+
+        projects.getContent().forEach(
+                result -> {
+                    project.add(projectConvertor.ProjectToDto(result));
+                }
+        );
+
+        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), project);
+    }
+
+
 }

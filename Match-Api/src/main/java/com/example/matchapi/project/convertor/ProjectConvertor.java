@@ -6,9 +6,14 @@ import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.RegularPayStatus;
+import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchdomain.donation.repository.RegularPaymentRepository;
+import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.dto.ProjectList;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.repository.ProjectRepository;
+import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -19,11 +24,13 @@ import java.util.stream.Stream;
 
 import static com.example.matchdomain.donation.entity.DonationStatus.*;
 import static com.example.matchdomain.project.entity.ProjectStatus.BEFORE_START;
+import static com.example.matchdomain.project.entity.ProjectStatus.PROCEEDING;
 
 @Convertor
 @RequiredArgsConstructor
 public class ProjectConvertor {
     private final ProjectHelper projectHelper;
+    private final RegularPaymentRepository regularPaymentRepository;
     private static final String FIRST_TIME = "T00:00:00";
     private static final String LAST_TIME = "T23:59:59";
     public ProjectRes.ProjectDetail projectImgList(List<ProjectImage> projectImage) {
@@ -227,4 +234,66 @@ public class ProjectConvertor {
                 .totalDonationCnt(Math.toIntExact(result.getTotalDonationCnt()))
                 .build();
     }
+
+    public ProjectRes.ProjectAppDetail ProjectAppDetail(ProjectRepository.ProjectDetail projects, List<ProjectImage> projectImages) {
+        List<ProjectRes.ProjectImgList> projectImgLists = new ArrayList<>();
+        String thumbNail = "";
+        for(ProjectImage projectImage : projectImages){
+            if(projectImage.getImageRepresentStatus() == ImageRepresentStatus.NORMAL){
+                projectImgLists.add(ProjectImages(projectImage));
+            }
+            else {
+                thumbNail = projectImage.getUrl();
+            }
+        }
+        List<String> imgUrlList = null;
+        if(projects.getImgUrlList()!=null){
+            imgUrlList = Stream.of(projects.getImgUrlList().split(",")).collect(Collectors.toList());
+        }
+
+        return ProjectRes.ProjectAppDetail
+                .builder()
+                .projectId(projects.getId())
+                .thumbNail(thumbNail)
+                .projectImgList(projectImgLists)
+                .title(projects.getProjectName())
+                .usages(projects.getUsages())
+                .kind(projects.getProjectKind())
+                .regularStatus(projects.getRegularStatus())
+                .like(projects.getLike())
+                .userProfileImages(imgUrlList)
+                .totalDonationCnt(projects.getTotalDonationCnt())
+                .build();
+    }
+
+    private ProjectRes.ProjectImgList ProjectImages(ProjectImage projectImage) {
+        return ProjectRes.ProjectImgList
+                .builder()
+                .imgId(projectImage.getId())
+                .sequence(projectImage.getSequence())
+                .imgUrl(projectImage.getUrl())
+                .build();
+    }
+
+    public ProjectRes.ProjectLists ProjectToDto(ProjectDto result) {
+        List<String> imgUrlList = new ArrayList<>();
+        List<RegularPayment> regularPayments = regularPaymentRepository.findByProjectIdAndRegularPayStatus(result.getId(), RegularPayStatus.PROCEEDING);
+
+        for(RegularPayment regularPayment : regularPayments){
+            imgUrlList.add(regularPayment.getUser().getProfileImgUrl());
+        }
+
+        return ProjectRes.ProjectLists
+                .builder()
+                .projectId(result.getId())
+                .imgUrl(result.getImgUrl())
+                .title(result.getProjectName())
+                .usages(result.getUsages())
+                .kind(result.getProjectKind().getName())
+                .like(result.getLike())
+                .userProfileImages(imgUrlList)
+                .totalDonationCnt(imgUrlList.size())
+                .build();
+    }
+
 }

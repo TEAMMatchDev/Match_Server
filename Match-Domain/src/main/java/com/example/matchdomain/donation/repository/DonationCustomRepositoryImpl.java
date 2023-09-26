@@ -26,8 +26,8 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
                 .from(donationHistory)
                 .join(regularPayment).on(donationHistory.regularPaymentId.eq(regularPayment.id))
                 .where(
-                        donationHistory.donationUserId.eq(161L).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
-                                .or(regularPayment.id.eq(3L).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE)))
+                        donationHistory.donationUserId.eq(donationId).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
+                                .or(regularPayment.id.eq(regularPaymentId).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE)))
                 )
                 .orderBy(donationHistory.createdAt.asc())
                 .offset(pageable.getOffset())
@@ -37,8 +37,8 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
         JPAQuery<DonationHistory> countQuery = queryFactory.selectFrom(donationHistory)
                 .join(regularPayment).on(donationHistory.regularPaymentId.eq(regularPayment.id))
                 .where(
-                        donationHistory.donationUserId.eq(161L).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
-                                .or(regularPayment.id.eq(3L).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE)))
+                        donationHistory.donationUserId.eq(donationId).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
+                                .or(regularPayment.id.eq(regularPaymentId).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE)))
                 ).orderBy(donationHistory.createdAt.asc());
         return PageableExecutionUtils.getPage(donationHistories, pageable, countQuery::fetchCount);
     }

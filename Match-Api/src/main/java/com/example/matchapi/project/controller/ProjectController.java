@@ -86,7 +86,7 @@ public class ProjectController {
             @Parameter(description = "검색어")  @RequestParam(required = false) String content
     ) {
         log.info("03-05 프로젝트 리스트 조회");
-        return CommonResponse.onSuccess(projectService.getProjectListQueryDsl(user, page, size, projectKind, content));
+        return CommonResponse.onSuccess(projectService.getProjectLists(user, page, size, projectKind, content));
     }
 
     @Operation(summary = "03-06💻 프로젝트 관심설정/관심삭제 API #FRAME_프로젝트 리스트 조회.",description = "프로젝트 관심 설정/삭제 API 입니다.")
@@ -111,6 +111,15 @@ public class ProjectController {
         return CommonResponse.onSuccess(projectService.getTodayProjectLists(user, page ,size));
     }
 
+
+    @Operation(summary = "03-08💻 후원 상세조회 #FRAME_후원 상세조회",description = "후원 상세조회 API 입니다.")
+    @GetMapping("/detail/{projectId}")
+    public CommonResponse<ProjectRes.ProjectAppDetail> getProjectAppDetail(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @PathVariable Long projectId
+    ){
+        return CommonResponse.onSuccess(projectService.getProjectAppDetail(user, projectId));
+    }
 
 
 
