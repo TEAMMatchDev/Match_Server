@@ -2,9 +2,11 @@ package com.example.matchapi.project.controller;
 
 import com.example.matchapi.common.aop.CheckIdExist;
 import com.example.matchapi.donation.service.DonationService;
+import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchdomain.project.entity.ProjectKind;
 import com.example.matchdomain.project.exception.ProjectGetErrorCode;
 import com.example.matchdomain.project.exception.ProjectOneTimeErrorCode;
@@ -20,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
 
@@ -71,7 +74,7 @@ public class ProjectController {
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size,
-            @Parameter(description = "검색어")  @PathVariable("projectId") Long projectId
+            @Parameter(description = "프로젝트 id")  @PathVariable("projectId") Long projectId
     ){
         log.info("03-04 프로젝트 댓글 조회 projectId : "+ projectId);
         return CommonResponse.onSuccess(projectService.getProjectComment(user, projectId, page, size));
@@ -105,6 +108,7 @@ public class ProjectController {
 
     @Operation(summary = "03-07💻 오늘의 후원 조회 #FRAME_홈_오늘의 후원",description = "오늘의 후원 조회 API 입니다.")
     @GetMapping("/today")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
     public CommonResponse<PageResponse<List<ProjectRes.ProjectLists>>> getTodayProjectList(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
@@ -116,22 +120,36 @@ public class ProjectController {
 
     @Operation(summary = "03-08💻 후원 상세조회 #FRAME_후원 상세조회",description = "후원 상세조회 API 입니다.")
     @GetMapping("/detail/{projectId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
     public CommonResponse<ProjectRes.ProjectAppDetail> getProjectAppDetail(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
-            @PathVariable Long projectId
+            @Parameter(description = "프로젝트 id")  @PathVariable("projectId") Long projectId
     ){
         return CommonResponse.onSuccess(projectService.getProjectAppDetail(user, projectId));
     }
 
     @Operation(summary = "03-09💻 후원 매치 기록 조회 #FRAME_후원 상세조회",description = "후원 매치 기록조회 API 입니다.")
     @GetMapping("/match/{projectId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
     public CommonResponse<PageResponse<List<ProjectRes.MatchHistory>>> getMatchHistory(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
-            @PathVariable Long projectId,
+            @Parameter(description = "프로젝트 id")  @PathVariable("projectId") Long projectId,
             @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size
     ){
         return CommonResponse.onSuccess(donationService.getMatchHistory(user, projectId, page, size));
     }
+
+    @Operation(summary = "03-10💻 후원 매치응원하기  #FRAME_후원 상세조회",description = "후원 매치 응원하기 POST API 입니다.")
+    @CheckIdExist
+    @PostMapping("/comment/{projectId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class, RequestErrorCode.class})
+    public CommonResponse<String> postComment(@Parameter(hidden = true) @AuthenticationPrincipal User user,
+                                              @Parameter(description = "프로젝트 id")  @PathVariable("projectId") Long projectId,
+                                              @Valid  @RequestBody ProjectReq.Comment comment){
+        projectService.postComment(user, projectId, comment);
+        return CommonResponse.onSuccess("응원 달기 성공");
+    }
+
 
 }

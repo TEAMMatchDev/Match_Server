@@ -1,5 +1,6 @@
 package com.example.matchapi.project.convertor;
 
+import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.helper.ProjectHelper;
@@ -31,6 +32,7 @@ import static com.example.matchdomain.project.entity.ProjectStatus.PROCEEDING;
 public class ProjectConvertor {
     private final ProjectHelper projectHelper;
     private final RegularPaymentRepository regularPaymentRepository;
+    private final DonationHelper donationHelper;
     private static final String FIRST_TIME = "T00:00:00";
     private static final String LAST_TIME = "T23:59:59";
     public ProjectRes.ProjectDetail projectImgList(List<ProjectImage> projectImage) {
@@ -108,7 +110,7 @@ public class ProjectConvertor {
         return ProjectRes.CommentList.builder()
                 .commentId(result.getId())
                 .comment(result.getComment())
-                .commentDate(result.getCreatedAt().getDayOfYear()+"."+result.getCreatedAt().getDayOfMonth()+"."+result.getCreatedAt().getDayOfYear()+". " + result.getCreatedAt().getHour()+":"+result.getCreatedAt().getMinute())
+                .commentDate(donationHelper.dayTimeFormat(result.getCreatedAt()))
                 .nickname(result.getUser().getNickname())
                 .userId(result.getUserId())
                 .isMy(result.getUserId().equals(userId))
@@ -302,4 +304,12 @@ public class ProjectConvertor {
                 .build();
     }
 
+    public ProjectComment Comment(Long id, Long projectId, String comment) {
+        return ProjectComment
+                .builder()
+                .userId(id)
+                .comment(comment)
+                .projectId(projectId)
+                .build();
+    }
 }

@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -169,7 +170,7 @@ public class ProjectService {
             userId = 0L;
         }
 
-        Page<ProjectComment> projectComments = projectCommentRepository.findByProjectIdAndStatusOrderByCreatedAtDesc(projectId, ACTIVE,pageable);
+        Page<ProjectComment> projectComments = projectCommentRepository.findByProjectIdAndStatusOrderByCreatedAtAsc(projectId, ACTIVE,pageable);
 
         List<ProjectRes.CommentList> commentLists = new ArrayList<>();
         projectComments.getContent().forEach(
@@ -181,7 +182,7 @@ public class ProjectService {
         );
 
 
-        return null;
+        return new PageResponse<>(projectComments.isLast(), projectComments.getTotalElements(), commentLists);
     }
 
 
@@ -423,5 +424,7 @@ public class ProjectService {
     }
 
 
-
+    public void postComment(User user, Long projectId, ProjectReq.Comment comment) {
+        projectCommentRepository.save(projectConvertor.Comment(user.getId(), projectId, comment.getComment()));
+    }
 }
