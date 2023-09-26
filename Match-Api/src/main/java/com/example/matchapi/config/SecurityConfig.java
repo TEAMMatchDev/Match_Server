@@ -5,6 +5,7 @@ import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -91,6 +92,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/projects/**").permitAll()
                 .antMatchers("/").permitAll()
                 .antMatchers("/serverAuth").permitAll()
+                .antMatchers(HttpMethod.GET,"/donation-temporaries").permitAll()
                 .antMatchers("/users/refresh").permitAll()
                 .antMatchers("/admin/projects/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/users/**").hasAnyRole("ADMIN")
