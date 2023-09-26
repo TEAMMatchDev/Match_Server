@@ -1,6 +1,7 @@
 package com.example.matchapi.project.controller;
 
 import com.example.matchapi.common.aop.CheckIdExist;
+import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
@@ -29,6 +30,7 @@ import java.util.List;
 @Tag(name = "03-Project💻", description = "프로젝트 모아보기 용 API 입니다.")
 public class ProjectController {
     private final ProjectService projectService;
+    private final DonationService donationService;
     @Operation(summary = "03-01💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
     @GetMapping("")
     public CommonResponse<PageResponse<List<ProjectRes.ProjectList>>> getProjectList(
@@ -121,6 +123,15 @@ public class ProjectController {
         return CommonResponse.onSuccess(projectService.getProjectAppDetail(user, projectId));
     }
 
-
+    @Operation(summary = "03-09💻 후원 매치 기록 조회 #FRAME_후원 상세조회",description = "후원 매치 기록조회 API 입니다.")
+    @GetMapping("/match/{projectId}")
+    public CommonResponse<PageResponse<List<ProjectRes.MatchHistory>>> getMatchHistory(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @PathVariable Long projectId,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size
+    ){
+        return CommonResponse.onSuccess(donationService.getMatchHistory(user, projectId, page, size));
+    }
 
 }

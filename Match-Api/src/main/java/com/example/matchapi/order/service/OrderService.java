@@ -36,6 +36,7 @@ import java.util.UUID;
 
 import static com.example.matchcommon.constants.MatchStatic.*;
 import static com.example.matchdomain.donation.entity.HistoryStatus.CREATE;
+import static com.example.matchdomain.donation.entity.HistoryStatus.TURN_ON;
 import static com.example.matchdomain.donation.exception.DonationGerErrorCode.DONATION_NOT_EXIST;
 import static com.example.matchdomain.order.exception.RegistrationCardErrorCode.FAILED_ERROR_ENCRYPT;
 
@@ -185,8 +186,6 @@ public class OrderService {
 
         String orderId = REGULAR + createRandomOrderId();
 
-        System.out.println(orderId);
-
         NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(), card.get().getBid(), orderConvertor.billCardOneTime(regularDonation.getAmount(),orderId));
 
         orderHelper.checkNicePaymentsResult(niceBillOkResponse.getResultCode(), niceBillOkResponse.getResultMsg());
@@ -199,6 +198,7 @@ public class OrderService {
 
         DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
 
+        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), TURN_ON, regularPayment.getId()));
         donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE, regularPayment.getId()));
     }
 

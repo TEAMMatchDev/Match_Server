@@ -2,6 +2,7 @@ package com.example.matchdomain.donation.repository;
 
 
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.project.entity.ImageRepresentStatus;
@@ -107,6 +108,8 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
     @Query("select du from DonationUser du join fetch du.project p join fetch p.projectImage pi" +
             " where du.user = :user and pi.imageRepresentStatus = :represent and du.inherenceName LIKE %:content%")
     List<DonationUser> findByUserAndInherenceNameContainingAndProject_ProjectImg_RepresentStatusOrderByCreatedAtDesc(@Param("user") User user,@Param("content") String content,@Param("represent") ImageRepresentStatus represent);
+
+
 
     interface flameList {
         Long getRegularPayId();

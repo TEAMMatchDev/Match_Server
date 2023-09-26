@@ -1,5 +1,7 @@
 package com.example.matchapi.project.dto;
 
+import com.example.matchapi.donation.dto.DonationRes;
+import com.example.matchdomain.donation.entity.HistoryStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -246,5 +248,30 @@ public class ProjectRes {
         private List<String> userProfileImages;
         @Schema(description = "후원 유저 총원", required = true, example = "15")
         private int totalDonationCnt;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class MatchHistory {
+        @Schema(description = "기록 id", required = true, example = "2")
+        private Long historyId;
+
+        @Schema(description = "후원 상태 START = 매치 시작 FINISH = 매치 종료 CREATE = 불꽃이 생성, COMPLETE = 전달 완료, CHANGE = 후원품 변환, TURN_ON 정기 후원 시작", required = true, example = "CREATE")
+        private HistoryStatus historyStatus;
+
+        @Schema(description = "후원 기록", required = true, example = "N 명의 불꽃이 탄생")
+        private String histories;
+
+        @Schema(description = "후원 기록 날짜", required = true, example = "2023.12.25 07:23")
+        private String historyDate;
+
+        @Schema(description = "프로필 이미지", required = true, example = "이미지 url")
+        private String profileImageUrl;
+
+        private String nickname;
+
     }
 }

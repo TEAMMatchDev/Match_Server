@@ -1,6 +1,7 @@
 package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.project.entity.Project;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
@@ -47,6 +48,12 @@ public class DonationHistory extends BaseEntity {
 
     private String flameImage;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projectId",nullable = false, insertable=false, updatable=false)
+    private Project project;
+
+    @Column(name="projectId")
+    private Long projectId;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "donationHistoryId")

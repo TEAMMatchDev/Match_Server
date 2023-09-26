@@ -5,13 +5,11 @@ import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchapi.project.convertor.ProjectConvertor;
+import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
-import com.example.matchdomain.donation.entity.DonationHistory;
-import com.example.matchdomain.donation.entity.DonationStatus;
-import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.repository.DonationHistoryRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
@@ -20,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -263,7 +262,7 @@ public class DonationService {
         RegularPayment regularPayment = regularPaymentRepository.findById(regularPayId).orElseThrow(()-> new BadRequestException(REGULAR_NOT_EXIST));
         Pageable pageable = PageRequest.of(page, size);
         System.out.println("페이지 네이션");
-        Page<DonationHistory> donationHistories = donationHistoryRepository.findByRegularPaymentIdOrderByCreatedAtDesc(regularPayId,pageable);
+        Page<DonationHistory> donationHistories = donationHistoryRepository.findByRegularPaymentIdAndHistoryStatusNotOrderByCreatedAtAsc(regularPayId, HistoryStatus.TURN_ON ,pageable);
 
         List<DonationRes.DonationRegularList> donationRegularLists = new ArrayList<>();
 
@@ -320,5 +319,20 @@ public class DonationService {
         DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
         RegularPayment regularPayment = regularPaymentRepository.findById(donationUser.getRegularPaymentId()).orElseThrow(()-> new BadRequestException(REGULAR_NOT_EXIST));
         return donationConvertor.DonationFlame(regularPayment, donationUser);
+    }
+
+    public PageResponse<List<ProjectRes.MatchHistory>> getMatchHistory(User user, Long projectId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<ProjectRes.MatchHistory> matchHistories = new ArrayList<>();
+        Page<DonationHistory> donationHistories = donationHistoryRepository.findByDonationUser_ProjectOrProjectIdIdOrderByCreatedAtAsc(projectId, pageable);
+
+        donationHistories.forEach(
+                result -> matchHistories.add(
+                        donationConvertor.MatchHistory(result)
+                )
+        );
+
+
+        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), matchHistories);
     }
 }

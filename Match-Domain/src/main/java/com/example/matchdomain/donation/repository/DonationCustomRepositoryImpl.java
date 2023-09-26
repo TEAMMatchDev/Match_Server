@@ -28,6 +28,7 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
                 .where(
                         donationHistory.donationUserId.eq(donationId).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
                                 .or(regularPayment.id.eq(regularPaymentId).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE)))
+                                .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON))
                 )
                 .orderBy(donationHistory.createdAt.asc())
                 .offset(pageable.getOffset())
@@ -39,6 +40,7 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
                 .where(
                         donationHistory.donationUserId.eq(donationId).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
                                 .or(regularPayment.id.eq(regularPaymentId).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE)))
+                                .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON))
                 ).orderBy(donationHistory.createdAt.asc());
         return PageableExecutionUtils.getPage(donationHistories, pageable, countQuery::fetchCount);
     }

@@ -8,10 +8,11 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.HistoryStatus;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.dto.ProjectDto;
-import com.example.matchdomain.project.dto.ProjectList;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
 import com.example.matchdomain.project.repository.ProjectCommentRepository;
@@ -24,16 +25,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.project.entity.ImageRepresentStatus.NORMAL;
@@ -422,6 +421,7 @@ public class ProjectService {
 
         return new PageResponse<>(projects.isLast(), projects.getTotalElements(), project);
     }
+
 
 
 }
