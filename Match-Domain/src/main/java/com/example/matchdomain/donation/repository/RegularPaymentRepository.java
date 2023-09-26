@@ -2,9 +2,11 @@ package com.example.matchdomain.donation.repository;
 
 
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.DonationStatus;
 import com.example.matchdomain.donation.entity.RegularPayStatus;
 import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.project.entity.ProjectStatus;
+import com.example.matchdomain.user.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +30,6 @@ public interface RegularPaymentRepository extends JpaRepository<RegularPayment,L
 
     @Query("SELECT RP FROM RegularPayment RP join fetch RP.user where RP.projectId=:id and RP.regularPayStatus=:regularPayStatus")
     List<RegularPayment> findByProjectIdAndRegularPayStatus(@Param("id") Long id,@Param("regularPayStatus") RegularPayStatus regularPayStatus);
+
+    List<RegularPayment> findByUser(User user);
 }

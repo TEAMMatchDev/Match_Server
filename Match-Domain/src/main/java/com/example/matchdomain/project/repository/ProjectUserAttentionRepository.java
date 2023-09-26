@@ -24,4 +24,8 @@ public interface ProjectUserAttentionRepository extends JpaRepository<ProjectUse
     boolean existsById_userIdAndId_projectId(Long id, Long projectId);
 
     void deleteById_userIdAndId_projectId(Long id, Long projectId);
+
+    List<ProjectUserAttention> findById_userId(Long id);
+
+    Long countById_userId(Long id);
 }

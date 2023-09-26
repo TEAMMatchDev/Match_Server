@@ -10,7 +10,9 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
+import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.project.entity.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.ProjectUserAttention;
 import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
@@ -47,6 +49,7 @@ public class UserService {
     private final ProjectHelper projectHelper;
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
     private final OrderService orderService;
+    private final RegularPaymentRepository regularPaymentRepository;
 
     public Optional<User> findUser(long id) {
         return userRepository.findById(id);
@@ -63,10 +66,10 @@ public class UserService {
     }
 
     public UserRes.MyPage getMyPage(User user) {
-        List<DonationUser> donationUser = donationUserRepository.findByUserAndDonationStatusNot(user, EXECUTION_REFUND);
-        List<ProjectUserAttention> projectList = projectUserAttentionRepository.findById_userIdAndProject_ProjectImage_imageRepresentStatusOrderByCreatedAt(user.getId(),ImageRepresentStatus.REPRESENT);
+        List<RegularPayment> regularPayments = regularPaymentRepository.findByUser(user);
+        Long projectAttentionCnt = projectUserAttentionRepository.countById_userId(user.getId());
 
-        return projectConvertor.getMyPage(donationUser,projectList);
+        return projectConvertor.getMyPage(regularPayments,projectAttentionCnt, user.getName());
     }
 
     public OrderRes.UserDetail getUserInfo(User user) {

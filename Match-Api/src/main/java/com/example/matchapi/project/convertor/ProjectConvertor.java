@@ -14,7 +14,6 @@ import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.dto.ProjectList;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.repository.ProjectRepository;
-import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -23,9 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.example.matchdomain.donation.entity.DonationStatus.*;
 import static com.example.matchdomain.project.entity.ProjectStatus.BEFORE_START;
-import static com.example.matchdomain.project.entity.ProjectStatus.PROCEEDING;
 
 @Convertor
 @RequiredArgsConstructor
@@ -62,47 +59,24 @@ public class ProjectConvertor {
     }
 
 
-    public UserRes.MyPage getMyPage(List<DonationUser> donationUserList, List<ProjectUserAttention> project) {
-        int beforeCnt=0;
+    public UserRes.MyPage getMyPage(List<RegularPayment> regularPayments, Long likeCnt, String name) {
         int underCnt=0;
         int successCnt=0;
 
-        for (DonationUser donationUser : donationUserList) {
-            if(donationUser.getDonationStatus()==EXECUTION_BEFORE){
-                beforeCnt+=1;
-            }else if(donationUser.getDonationStatus()==EXECUTION_UNDER){
+        for (RegularPayment regularPayment : regularPayments) {
+            if(regularPayment.getRegularPayStatus().equals(RegularPayStatus.PROCEEDING)){
                 underCnt+=1;
-            }else if(donationUser.getDonationStatus()==EXECUTION_SUCCESS){
+            }else{
                 successCnt+=1;
             }
         }
-        List<ProjectRes.ProjectList> projectList = new ArrayList<>();
-
-        project.forEach(
-                result -> {
-                    String imageUrl = result.getProject().getProjectImage().isEmpty() ? null : result.getProject().getProjectImage().get(0).getUrl();
-                    projectList.add(
-                            new ProjectRes.ProjectList(
-                                    result.getProject().getId(),
-                                    imageUrl,
-                                    result.getProject().getProjectName() ,
-                                    result.getProject().getUsages(),
-                                    result.getProject().getProjectKind().getValue(),
-                                    false
-                    ));
-                }
-
-        );
 
         return UserRes.MyPage.builder()
-                .beforeCnt(beforeCnt)
+                .username(name)
+                .likeCnt(Math.toIntExact(likeCnt))
                 .underCnt(underCnt)
                 .successCnt(successCnt)
-                .projectList(projectList)
                 .build();
-
-
-
     }
 
 
