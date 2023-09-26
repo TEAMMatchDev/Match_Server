@@ -130,4 +130,19 @@ public class S3UploadService {
         }
 
     }
+
+    public String uploadProfilePresentFile(Long userId,MultipartFile presentFile) {
+        String fileName = getForUserFileName(userId, getFileExtension(presentFile.getOriginalFilename()));
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(presentFile.getSize());
+        objectMetadata.setContentType(presentFile.getContentType());
+
+        try (InputStream inputStream = presentFile.getInputStream()) {
+            amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+        } catch (IOException e) {
+            log.info("파일 업로드 실패 프로젝트 ID : " + userId);
+            throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
+        }
+        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
+    }
 }

@@ -5,6 +5,7 @@ import com.example.matchdomain.user.entity.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import com.example.matchcommon.annotation.Enum;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.validation.constraints.*;
@@ -138,5 +139,18 @@ public class UserReq {
         private String phone;
 
         private String code;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ModifyProfile {
+        @Schema(description = "이름", required = false, example = "이메누")
+        private String name;
+
+        @Schema(description="프로필 사진 변경",required =false,example = "프로필 사진 변경")
+        private MultipartFile multipartFile;
     }
 }

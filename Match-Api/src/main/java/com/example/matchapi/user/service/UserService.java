@@ -6,6 +6,7 @@ import com.example.matchapi.order.service.OrderService;
 import com.example.matchapi.project.convertor.ProjectConvertor;
 import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.convertor.UserConvertor;
+import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
@@ -20,6 +21,7 @@ import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
 import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserRepository;
+import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,8 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
-import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
+import static com.example.matchcommon.constants.MatchStatic.*;
 import static com.example.matchdomain.donation.entity.DonationStatus.EXECUTION_REFUND;
 
 @Service
@@ -50,6 +51,7 @@ public class UserService {
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
     private final OrderService orderService;
     private final RegularPaymentRepository regularPaymentRepository;
+    private final S3UploadService s3UploadService;
 
     public Optional<User> findUser(long id) {
         return userRepository.findById(id);
@@ -125,5 +127,29 @@ public class UserService {
 
     public UserRes.Profile getProfile(User user) {
         return userConvertor.UserProfile(user);
+    }
+
+    public void modifyUserProfile(User user, UserReq.ModifyProfile modifyProfile) {
+        if(modifyProfile.getName() == null && modifyProfile.getMultipartFile()!=null){
+            String beforeProfileImg = user.getProfileImgUrl();
+            if(!beforeProfileImg.equals(BASE_PROFILE)){
+                s3UploadService.deleteFile(beforeProfileImg);
+            }
+            String newProfileImg = s3UploadService.uploadProfilePresentFile(user.getId(), modifyProfile.getMultipartFile());
+            user.setProfileImgUrl(newProfileImg);
+        }
+        else if(modifyProfile.getMultipartFile() == null && modifyProfile.getName()!=null){
+            user.setName(modifyProfile.getName());
+        }
+        else if (modifyProfile.getMultipartFile() != null){
+            String beforeProfileImg = user.getProfileImgUrl();
+            if(!beforeProfileImg.equals(BASE_PROFILE)){
+                s3UploadService.deleteFile(beforeProfileImg);
+            }
+            String newProfileImg = s3UploadService.uploadProfilePresentFile(user.getId(), modifyProfile.getMultipartFile());
+            user.setModifyProfile(newProfileImg, modifyProfile.getName());
+        }
+
+        userRepository.save(user);
     }
 }
