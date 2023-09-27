@@ -11,6 +11,7 @@ import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.HistoryStatus;
+import com.example.matchdomain.donation.repository.DonationHistoryRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.entity.*;
@@ -56,6 +57,7 @@ public class ProjectService {
     private final S3UploadService s3UploadService;
     private final DonationUserRepository donationUserRepository;
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
+    private final DonationHistoryRepository donationHistoryRepository;
 
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -198,7 +200,7 @@ public class ProjectService {
 
         saveImgList(project.getId(), url, imgUrlList);
 
-        System.out.println(url);
+        donationHistoryRepository.save(projectConvertor.DonationHistory(project.getId(), HistoryStatus.TURN_ON));
     }
 
     public PageResponse<List<ProjectRes.ProjectAdminList>> getProjectList(int page, int size) {
@@ -222,6 +224,8 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId).orElseThrow(()-> new NotFoundException(PROJECT_NOT_EXIST));
 
         project.setProjectStatus(projectStatus);
+
+        if(projectStatus.equals(ProjectStatus.DEADLINE)) donationHistoryRepository.save(projectConvertor.DonationHistory(projectId, HistoryStatus.FINISH));
 
         projectRepository.save(project);
     }
