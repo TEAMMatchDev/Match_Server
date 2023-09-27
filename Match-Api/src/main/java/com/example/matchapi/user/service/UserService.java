@@ -8,6 +8,7 @@ import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.convertor.UserConvertor;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
+import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationUser;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
@@ -40,6 +42,8 @@ import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.*;
 import static com.example.matchdomain.donation.entity.DonationStatus.EXECUTION_REFUND;
+import static com.example.matchdomain.user.exception.ModifyPhoneErrorCode.NOT_CORRECT_PHONE;
+import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_PHONE;
 
 @Service
 @RequiredArgsConstructor
@@ -163,5 +167,14 @@ public class UserService {
 
     public void deleteFcmToken(Long userId, String deviceId) {
         userFcmTokenRepository.deleteById(UserFcmPk.builder().userId(userId).deviceId(deviceId).build());
+    }
+
+    @Transactional
+    public void modifyPhoneNumber(User user, UserReq.ModifyPhone phone) {
+        if(!user.getPhoneNumber().equals(phone.getOldPhone())) throw new BadRequestException(NOT_CORRECT_PHONE);
+        if(userRepository.existsByPhoneNumber(phone.getNewPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
+        user.setPhoneNumber(phone.getNewPhone());
+        userRepository.save(user);
+
     }
 }

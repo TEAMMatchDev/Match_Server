@@ -164,4 +164,15 @@ public class UserReq {
 
         private String deviceId;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ModifyPhone {
+        private String oldPhone;
+
+        private String newPhone;
+    }
 }

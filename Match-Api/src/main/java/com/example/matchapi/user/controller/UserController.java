@@ -74,7 +74,6 @@ public class UserController {
     @GetMapping("/logout")
     public CommonResponse<String> logOut(@Parameter(hidden = true) @AuthenticationPrincipal User user,
                                          @Parameter(description = "디바이스 아이디", required = true, in = ParameterIn.HEADER, name = "DEVICE_ID", schema = @Schema(type = "string")) @RequestHeader("DEVICE_ID") String deviceId){
-
         log.info("api = logout 02-03");
         Long userId = user.getId();
 
@@ -139,5 +138,17 @@ public class UserController {
         userService.saveFcmToken(user, token);
         return CommonResponse.onSuccess("저장 성공");
     }
+
+    @Operation(summary = "02-08 유저 FCM 토큰 생성후 전송 👤",description = "유저 FCM 토큰과 deviceId 를 보내주시면 됩니다.")
+    @PostMapping("/fcm")
+    public CommonResponse<String> modifyPhoneNumber(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @RequestBody UserReq.ModifyPhone phone
+    ){
+        userService.modifyPhoneNumber(user, phone);
+        return CommonResponse.onSuccess("저장 성공");
+    }
+
+
 
 }
