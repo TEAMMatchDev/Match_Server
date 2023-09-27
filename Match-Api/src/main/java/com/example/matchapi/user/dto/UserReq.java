@@ -153,4 +153,15 @@ public class UserReq {
         @Schema(description="프로필 사진 변경",required =false,example = "프로필 사진 변경")
         private MultipartFile multipartFile;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class FcmToken {
+        private String fcmToken;
+
+        private String deviceId;
+    }
 }

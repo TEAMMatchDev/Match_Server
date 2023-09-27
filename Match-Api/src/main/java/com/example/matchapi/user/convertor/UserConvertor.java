@@ -10,6 +10,7 @@ import com.example.matchcommon.properties.AligoProperties;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
+import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.aligo.dto.SendReq;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
@@ -201,6 +202,17 @@ public class UserConvertor {
                 .socialType(user.getSocialType())
                 .email(user.getEmail())
                 .phone(user.getPhoneNumber())
+                .build();
+    }
+
+    public UserFcmToken UserFcm(User user, UserReq.FcmToken token) {
+        return UserFcmToken.builder()
+                .userFcmPk(
+                        UserFcmPk.builder()
+                                .userId(user.getId())
+                                .deviceId(token.getDeviceId())
+                                .build())
+                .fcmToken(token.getFcmToken())
                 .build();
     }
 }

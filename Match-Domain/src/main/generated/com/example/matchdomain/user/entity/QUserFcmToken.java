@@ -27,7 +27,7 @@ public class QUserFcmToken extends EntityPathBase<UserFcmToken> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final StringPath deviceId = createString("deviceId");
+    public final StringPath fcmToken = createString("fcmToken");
 
     //inherited
     public final EnumPath<com.example.matchdomain.common.model.Status> status = _super.status;

@@ -26,7 +26,7 @@ public class UserFcmToken extends BaseEntity {
     @JoinColumn(name = "userId", nullable = false,insertable=false, updatable=false)
     private User user;
 
-    @Column(name = "deviceId")
-    private String deviceId;
+    @Column(name = "fcmToken")
+    private String fcmToken;
 
 }

@@ -19,7 +19,10 @@ import com.example.matchdomain.project.entity.ProjectUserAttention;
 import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
+import com.example.matchdomain.user.entity.UserFcmToken;
+import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.repository.UserAddressRepository;
+import com.example.matchdomain.user.repository.UserFcmTokenRepository;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +55,7 @@ public class UserService {
     private final OrderService orderService;
     private final RegularPaymentRepository regularPaymentRepository;
     private final S3UploadService s3UploadService;
+    private final UserFcmTokenRepository userFcmTokenRepository;
 
     public Optional<User> findUser(long id) {
         return userRepository.findById(id);
@@ -151,5 +155,13 @@ public class UserService {
         }
 
         userRepository.save(user);
+    }
+
+    public void saveFcmToken(User user, UserReq.FcmToken token) {
+        userFcmTokenRepository.save(userConvertor.UserFcm(user, token));
+    }
+
+    public void deleteFcmToken(Long userId, String deviceId) {
+        userFcmTokenRepository.deleteById(UserFcmPk.builder().userId(userId).deviceId(deviceId).build());
     }
 }

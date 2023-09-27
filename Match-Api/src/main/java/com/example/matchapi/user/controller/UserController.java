@@ -72,16 +72,14 @@ public class UserController {
     @Operation(summary = "02-04 로그아웃 👤", description = "로그아웃 요청 API")
     @ResponseBody
     @GetMapping("/logout")
-    public CommonResponse<String> logOut(@Parameter(hidden = true) @AuthenticationPrincipal User user){
+    public CommonResponse<String> logOut(@Parameter(hidden = true) @AuthenticationPrincipal User user,
+                                         @Parameter(description = "디바이스 아이디", required = true, in = ParameterIn.HEADER, name = "DEVICE_ID", schema = @Schema(type = "string")) @RequestHeader("DEVICE_ID") String deviceId){
 
-        log.info("logout");
         log.info("api = logout 02-03");
-
         Long userId = user.getId();
 
         jwtService.logOut(userId);
-        //TODO : FCM 설정 시 메소드 주석 삭제
-        //logInService.deleteFcmToken(userId);
+        userService.deleteFcmToken(userId, deviceId);
         return CommonResponse.onSuccess("로그아웃 성공");
     }
 
@@ -125,11 +123,21 @@ public class UserController {
 
     @Operation(summary = "02-06 프로필 편집 👤 FRAME MY",description = "이미지 파일 변경할 경우 multipart 에 넣어주시고, 이미지 변경 안할 시 multipart null 값으로 보내주세요 아이디는 기존 아이디값+변경할 아이디값 둘중 하나 보내시면 됩니다")
     @PatchMapping("/profile")
-    public CommonResponse<String> modifyUserProfile(@ModelAttribute UserReq.ModifyProfile modifyProfile, @AuthenticationPrincipal User user) throws IOException {
+    public CommonResponse<String> modifyUserProfile(@ModelAttribute UserReq.ModifyProfile modifyProfile, @Parameter(hidden = true) @AuthenticationPrincipal User user) throws IOException {
         userService.modifyUserProfile(user, modifyProfile);
         return CommonResponse.onSuccess("변경 성공");
     }
 
 
+
+    @Operation(summary = "02-07 유저 FCM 토큰 생성후 전송 👤",description = "유저 FCM 토큰과 deviceId 를 보내주시면 됩니다.")
+    @PostMapping("/fcm")
+    public CommonResponse<String> saveFcmToken(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @RequestBody UserReq.FcmToken token
+    ){
+        userService.saveFcmToken(user, token);
+        return CommonResponse.onSuccess("저장 성공");
+    }
 
 }
