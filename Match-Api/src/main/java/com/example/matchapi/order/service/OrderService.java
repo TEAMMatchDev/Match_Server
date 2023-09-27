@@ -198,8 +198,8 @@ public class OrderService {
 
         DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
 
-        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), TURN_ON, regularPayment.getId()));
-        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE, regularPayment.getId()));
+        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), TURN_ON));
+        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE));
     }
 
     @Transactional
@@ -218,7 +218,7 @@ public class OrderService {
 
         DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
 
-        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE, null));
+        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE));
 
     }
 
@@ -266,7 +266,7 @@ public class OrderService {
 
         DonationUser donationUser = donationUserRepository.save(orderConvertor.donationUserV2(nicePaymentAuth, user.get().getId(), amount, orderRequest.get().getProjectId(), flameName, inherenceNumber));
 
-        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE, null));
+        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE));
 
     }
 

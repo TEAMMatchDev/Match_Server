@@ -1,18 +1,17 @@
 package com.example.matchapi.admin.donation.controller;
 
+import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.service.DonationService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -35,4 +34,11 @@ public class AdminDonationController {
     public CommonResponse<DonationRes.DonationDetail> getDonationDetail(@PathVariable Long donationId){
         return CommonResponse.onSuccess(donationService.getDonationDetail(donationId));
     }
- }
+
+    @PostMapping("/enforce")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class})
+    @Operation(summary = "ADMIN-05-03 기부금 집행 내역 POST API", description = "기부금 집행 API")
+    public CommonResponse<String> enforceDonation(@RequestBody DonationReq.EnforceDonation enforceDonation){
+        return CommonResponse.onSuccess("성공");
+    }
+}

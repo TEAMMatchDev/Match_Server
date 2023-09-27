@@ -12,11 +12,15 @@ import java.util.List;
 
 public interface DonationHistoryRepository extends JpaRepository<DonationHistory, Long>, DonationCustomRepository {
     @Query(value = "SELECT DH FROM DonationHistory DH " +
-            "LEFT JOIN FETCH DH.donationUser DU LEFT JOIN FETCH DU.user " +
-            "WHERE DH.regularPaymentId = :regularPayId and DH.historyStatus != :historyStatus " +
+            "LEFT JOIN FETCH DH.donationUser DU " +
+            "LEFT JOIN FETCH DU.user " +
+            "WHERE DU.regularPaymentId = :regularPayId and DH.historyStatus != :historyStatus " +
             "ORDER BY DH.createdAt ASC",
-            countQuery = "SELECT COUNT(DH) FROM DonationHistory DH where DH.regularPaymentId =: regularPayId and DH.historyStatus != :historyStatus")
-    Page<DonationHistory> findByRegularPaymentIdAndHistoryStatusNotOrderByCreatedAtAsc(@Param("regularPayId") Long regularPayId,@Param("historyStatus") HistoryStatus historyStatus, Pageable pageable);
+            countQuery = "SELECT COUNT(DH) FROM DonationHistory DH LEFT JOIN DH.donationUser DU " +
+                    "LEFT JOIN DU.user " +
+                    "where DU.regularPaymentId =: regularPayId " +
+                    "and DH.historyStatus != :historyStatus")
+    Page<DonationHistory> findByDonationUser_RegularPaymentIdAndHistoryStatusNotOrderByCreatedAtAsc(@Param("regularPayId") Long regularPayId,@Param("historyStatus") HistoryStatus historyStatus, Pageable pageable);
 
 
     @Query(value = "SELECT DH FROM DonationHistory DH " +

@@ -139,8 +139,8 @@ public class UserController {
         return CommonResponse.onSuccess("저장 성공");
     }
 
-    @Operation(summary = "02-08 유저 FCM 토큰 생성후 전송 👤",description = "유저 FCM 토큰과 deviceId 를 보내주시면 됩니다.")
-    @PostMapping("/fcm")
+    @Operation(summary = "02-08 휴대폰번호 변경 👤",description = "휴대폰 번호 변경.")
+    @PostMapping("/phone")
     public CommonResponse<String> modifyPhoneNumber(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @RequestBody UserReq.ModifyPhone phone

@@ -1,9 +1,6 @@
 package com.example.matchdomain.donation.repository;
 
-import com.example.matchdomain.donation.entity.DonationHistory;
-import com.example.matchdomain.donation.entity.HistoryStatus;
-import com.example.matchdomain.donation.entity.QDonationHistory;
-import com.example.matchdomain.donation.entity.QRegularPayment;
+import com.example.matchdomain.donation.entity.*;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +18,13 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
     public Page<DonationHistory> getDonationHistoryCustom(Long regularPaymentId, Long donationId, HistoryStatus historyStatus, Pageable pageable) {
         QDonationHistory donationHistory = QDonationHistory.donationHistory;
         QRegularPayment regularPayment = QRegularPayment.regularPayment;
+        QDonationUser donationUser = QDonationUser.donationUser;
+
 
         List<DonationHistory> donationHistories = queryFactory.select(donationHistory)
                 .from(donationHistory)
-                .join(regularPayment).on(donationHistory.regularPaymentId.eq(regularPayment.id))
+                .join(donationHistory).on(donationHistory.donationUserId.eq(donationId))
+                .join(regularPayment).on(donationUser.regularPaymentId.eq(regularPayment.id))
                 .where(
                         donationHistory.donationUserId.eq(donationId).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
                                 .or(regularPayment.id.eq(regularPaymentId).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE)))
@@ -36,7 +36,8 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
                 .fetch();
 
         JPAQuery<DonationHistory> countQuery = queryFactory.selectFrom(donationHistory)
-                .join(regularPayment).on(donationHistory.regularPaymentId.eq(regularPayment.id))
+                .join(donationHistory).on(donationHistory.donationUserId.eq(donationId))
+                .join(regularPayment).on(donationUser.regularPaymentId.eq(regularPayment.id))
                 .where(
                         donationHistory.donationUserId.eq(donationId).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
                                 .or(regularPayment.id.eq(regularPaymentId).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE)))
