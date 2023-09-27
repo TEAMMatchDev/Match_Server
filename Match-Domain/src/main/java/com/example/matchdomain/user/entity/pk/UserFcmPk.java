@@ -17,6 +17,6 @@ public class UserFcmPk implements Serializable {
     @Column(name="userId")
     private Long userId;
 
-    @Column(name = "fcmToken")
-    private String fcmToken;
+    @Column(name = "deviceId")
+    private String deviceId;
 }

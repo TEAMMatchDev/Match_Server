@@ -8,9 +8,11 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.HistoryStatus;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
-import com.example.matchdomain.project.dto.ProjectList;
+import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
 import com.example.matchdomain.project.repository.ProjectCommentRepository;
@@ -28,11 +30,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.project.entity.ImageRepresentStatus.NORMAL;
@@ -169,7 +170,7 @@ public class ProjectService {
             userId = 0L;
         }
 
-        Page<ProjectComment> projectComments = projectCommentRepository.findByProjectIdAndStatusOrderByCreatedAtDesc(projectId, ACTIVE,pageable);
+        Page<ProjectComment> projectComments = projectCommentRepository.findByProjectIdAndStatusOrderByCreatedAtAsc(projectId, ACTIVE,pageable);
 
         List<ProjectRes.CommentList> commentLists = new ArrayList<>();
         projectComments.getContent().forEach(
@@ -181,7 +182,7 @@ public class ProjectService {
         );
 
 
-        return null;
+        return new PageResponse<>(projectComments.isLast(), projectComments.getTotalElements(), commentLists);
     }
 
 
@@ -396,5 +397,34 @@ public class ProjectService {
                 }
         );
         return new PageResponse<>(projects.isLast(), projects.getTotalElements(), project);
+    }
+
+    public ProjectRes.ProjectAppDetail getProjectAppDetail(User user, Long projectId) {
+        ProjectRepository.ProjectDetail projects = projectRepository.getProjectAppDetail(user.getId(), projectId);
+        List<ProjectImage> projectImages = projectImageRepository.findByProjectIdOrderBySequenceAsc(projectId);
+
+        return projectConvertor.ProjectAppDetail(projects, projectImages);
+    }
+
+    public PageResponse<List<ProjectRes.ProjectLists>> projectList(User user, int page, int size, ProjectKind projectKind, String content) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<ProjectRes.ProjectLists> project = new ArrayList<>();
+
+        Page<ProjectDto> projects = projectRepository.findProject(user, PROCEEDING, LocalDateTime.now(),
+                REPRESENT, ACTIVE, projectKind, content,  pageable);
+
+
+        projects.getContent().forEach(
+                result -> {
+                    project.add(projectConvertor.ProjectToDto(result));
+                }
+        );
+
+        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), project);
+    }
+
+
+    public void postComment(User user, Long projectId, ProjectReq.Comment comment) {
+        projectCommentRepository.save(projectConvertor.Comment(user.getId(), projectId, comment.getComment()));
     }
 }

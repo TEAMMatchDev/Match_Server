@@ -2,6 +2,7 @@ package com.example.matchapi.donation.dto;
 
 import com.example.matchdomain.donation.entity.DonationStatus;
 import com.example.matchdomain.donation.entity.HistoryStatus;
+import com.example.matchdomain.donation.entity.RegularPayStatus;
 import com.example.matchdomain.donation.entity.RegularStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -162,6 +163,31 @@ public class DonationRes {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    public static class DonationFlame {
+        @Schema(description = "후원 대표 이미지", required = true, example = "이미지 url")
+        private String imgUrl;
+
+        @Schema(description = "고유 이름", required = true, example = "불꽃이 고유 이름")
+        private String inherenceName;
+
+        @Schema(description = "PROCEEDING = 기부 진행중, PROJECT_FINISH = 프로젝트 마감으로 인한 매칭 종료, USER_CANCEL = 유저 후원 취소")
+        private RegularPayStatus regularPayStatus;
+
+        @Schema(description = "후원 금액" , required = true, example = "후원 금액")
+        private int amount;
+
+        @Schema(description = "후원 id", required = true, example = "2")
+        private Long regularPayId;
+
+        @Schema(description = "후원 날짜", required = true, example = "2")
+        private int payDate;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class DonationRegularList {
         @Schema(description = "기록 id", required = true, example = "2")
         private Long historyId;
@@ -207,5 +233,33 @@ public class DonationRes {
         private String payMethod;
 
         private String amount;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class FlameProject {
+        private int totalCnt;
+
+        private List<FlameProjectList> flameProjectLists;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class FlameProjectList {
+        private Long donationId;
+
+        private Long projectId;
+
+        private String flameName;
+
+        private String projectName;
+
+        private String imgUrl;
     }
 }

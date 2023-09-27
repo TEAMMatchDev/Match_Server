@@ -1,11 +1,16 @@
 package com.example.matchapi.project.convertor;
 
+import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.RegularPayStatus;
+import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchdomain.donation.repository.RegularPaymentRepository;
+import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.dto.ProjectList;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.repository.ProjectRepository;
@@ -17,13 +22,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.example.matchdomain.donation.entity.DonationStatus.*;
 import static com.example.matchdomain.project.entity.ProjectStatus.BEFORE_START;
 
 @Convertor
 @RequiredArgsConstructor
 public class ProjectConvertor {
     private final ProjectHelper projectHelper;
+    private final RegularPaymentRepository regularPaymentRepository;
+    private final DonationHelper donationHelper;
     private static final String FIRST_TIME = "T00:00:00";
     private static final String LAST_TIME = "T23:59:59";
     public ProjectRes.ProjectDetail projectImgList(List<ProjectImage> projectImage) {
@@ -53,47 +59,24 @@ public class ProjectConvertor {
     }
 
 
-    public UserRes.MyPage getMyPage(List<DonationUser> donationUserList, List<ProjectUserAttention> project) {
-        int beforeCnt=0;
+    public UserRes.MyPage getMyPage(List<RegularPayment> regularPayments, Long likeCnt, String name) {
         int underCnt=0;
         int successCnt=0;
 
-        for (DonationUser donationUser : donationUserList) {
-            if(donationUser.getDonationStatus()==EXECUTION_BEFORE){
-                beforeCnt+=1;
-            }else if(donationUser.getDonationStatus()==EXECUTION_UNDER){
+        for (RegularPayment regularPayment : regularPayments) {
+            if(regularPayment.getRegularPayStatus().equals(RegularPayStatus.PROCEEDING)){
                 underCnt+=1;
-            }else if(donationUser.getDonationStatus()==EXECUTION_SUCCESS){
+            }else{
                 successCnt+=1;
             }
         }
-        List<ProjectRes.ProjectList> projectList = new ArrayList<>();
-
-        project.forEach(
-                result -> {
-                    String imageUrl = result.getProject().getProjectImage().isEmpty() ? null : result.getProject().getProjectImage().get(0).getUrl();
-                    projectList.add(
-                            new ProjectRes.ProjectList(
-                                    result.getProject().getId(),
-                                    imageUrl,
-                                    result.getProject().getProjectName() ,
-                                    result.getProject().getUsages(),
-                                    result.getProject().getProjectKind().getValue(),
-                                    false
-                    ));
-                }
-
-        );
 
         return UserRes.MyPage.builder()
-                .beforeCnt(beforeCnt)
+                .username(name)
+                .likeCnt(Math.toIntExact(likeCnt))
                 .underCnt(underCnt)
                 .successCnt(successCnt)
-                .projectList(projectList)
                 .build();
-
-
-
     }
 
 
@@ -101,7 +84,7 @@ public class ProjectConvertor {
         return ProjectRes.CommentList.builder()
                 .commentId(result.getId())
                 .comment(result.getComment())
-                .commentDate(result.getCreatedAt().getDayOfYear()+"."+result.getCreatedAt().getDayOfMonth()+"."+result.getCreatedAt().getDayOfYear()+". " + result.getCreatedAt().getHour()+":"+result.getCreatedAt().getMinute())
+                .commentDate(donationHelper.dayTimeFormat(result.getCreatedAt()))
                 .nickname(result.getUser().getNickname())
                 .userId(result.getUserId())
                 .isMy(result.getUserId().equals(userId))
@@ -197,9 +180,12 @@ public class ProjectConvertor {
     }
 
     public ProjectRes.ProjectLists ProjectLists(ProjectRepository.ProjectList result) {
-        List<String> imgUrlList = null;
+        List<String> imgUrlList = new ArrayList<>();
         if(result.getImgUrlList()!=null){
             imgUrlList = Stream.of(result.getImgUrlList().split(",")).collect(Collectors.toList());
+        }
+        if(imgUrlList.size() >3){
+            imgUrlList = imgUrlList.subList(0,3);
         }
         return ProjectRes.ProjectLists
                 .builder()
@@ -225,6 +211,79 @@ public class ProjectConvertor {
                 .like(result.getLike())
                 .userProfileImages(result.getImgUrlList())
                 .totalDonationCnt(Math.toIntExact(result.getTotalDonationCnt()))
+                .build();
+    }
+
+    public ProjectRes.ProjectAppDetail ProjectAppDetail(ProjectRepository.ProjectDetail projects, List<ProjectImage> projectImages) {
+        List<ProjectRes.ProjectImgList> projectImgLists = new ArrayList<>();
+        String thumbNail = "";
+        for(ProjectImage projectImage : projectImages){
+            if(projectImage.getImageRepresentStatus() == ImageRepresentStatus.NORMAL){
+                projectImgLists.add(ProjectImages(projectImage));
+            }
+            else {
+                thumbNail = projectImage.getUrl();
+            }
+        }
+        List<String> imgUrlList = new ArrayList<>();
+        if(projects.getImgUrlList()!=null){
+            imgUrlList = Stream.of(projects.getImgUrlList().split(",")).collect(Collectors.toList());
+        }
+        if(imgUrlList.size() >3){
+            imgUrlList = imgUrlList.subList(0,3);
+        }
+
+        return ProjectRes.ProjectAppDetail
+                .builder()
+                .projectId(projects.getId())
+                .thumbNail(thumbNail)
+                .projectImgList(projectImgLists)
+                .title(projects.getProjectName())
+                .usages(projects.getUsages())
+                .kind(projects.getProjectKind())
+                .regularStatus(projects.getRegularStatus())
+                .like(projects.getLike())
+                .userProfileImages(imgUrlList)
+                .totalDonationCnt(projects.getTotalDonationCnt())
+                .build();
+    }
+
+    private ProjectRes.ProjectImgList ProjectImages(ProjectImage projectImage) {
+        return ProjectRes.ProjectImgList
+                .builder()
+                .imgId(projectImage.getId())
+                .sequence(projectImage.getSequence())
+                .imgUrl(projectImage.getUrl())
+                .build();
+    }
+
+    public ProjectRes.ProjectLists ProjectToDto(ProjectDto result) {
+        List<String> imgUrlList = new ArrayList<>();
+        List<RegularPayment> regularPayments = regularPaymentRepository.findByProjectIdAndRegularPayStatus(result.getId(), RegularPayStatus.PROCEEDING);
+
+        for(RegularPayment regularPayment : regularPayments){
+            imgUrlList.add(regularPayment.getUser().getProfileImgUrl());
+        }
+
+        return ProjectRes.ProjectLists
+                .builder()
+                .projectId(result.getId())
+                .imgUrl(result.getImgUrl())
+                .title(result.getProjectName())
+                .usages(result.getUsages())
+                .kind(result.getProjectKind().getName())
+                .like(result.getLike())
+                .userProfileImages(imgUrlList)
+                .totalDonationCnt(imgUrlList.size())
+                .build();
+    }
+
+    public ProjectComment Comment(Long id, Long projectId, String comment) {
+        return ProjectComment
+                .builder()
+                .userId(id)
+                .comment(comment)
+                .projectId(projectId)
                 .build();
     }
 }

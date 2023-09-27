@@ -5,10 +5,7 @@ import com.example.matchapi.donation.service.DonationService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
-import com.example.matchdomain.donation.exception.CancelRegularPayErrorCode;
-import com.example.matchdomain.donation.exception.DonationListErrorCode;
-import com.example.matchdomain.donation.exception.DonationRefundErrorCode;
-import com.example.matchdomain.donation.exception.GetRegularErrorCode;
+import com.example.matchdomain.donation.exception.*;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,12 +31,13 @@ public class DonationController {
     public CommonResponse<String> refundDonation(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "기부금 id") @PathVariable Long donationId
-            ){
-        donationService.refundDonation(user,donationId);
+    ) {
+        donationService.refundDonation(user, donationId);
         return CommonResponse.onSuccess("기부금 환불 성공");
     }
 
-    @GetMapping("/flame")
+    @GetMapping("/flame/filter")
+    @Deprecated
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Operation(summary = "05-03 Donation💸 홈화면 불꽃이 필터링 조회")
     public CommonResponse<PageResponse<List<DonationRes.FlameList>>> getFlameList(
@@ -48,8 +46,8 @@ public class DonationController {
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size,
             @Parameter(description = "불꽃이 필터링 0 = 불꽃이 전체, 1 = 전달 전 불꽃이, 2 = 전달 중인 불꽃이, 3 = 전달 완료된 불꽃이", example = "0") @RequestParam(required = false, defaultValue = "0") int flame,
             @Parameter(description = "정렬 필터링 0 = 최신순, 1 = 오래된 순, 2 = 기부금액 큰 순, 3 = 기부금액 작은 순", example = "0") @RequestParam(required = false, defaultValue = "0") int order,
-            @Parameter(description = "검색어")  @RequestParam(required = false) String content
-    ){
+            @Parameter(description = "검색어") @RequestParam(required = false) String content
+    ) {
         return CommonResponse.onSuccess(donationService.getFlameList(user, page, size, flame, order, content));
     }
 
@@ -58,7 +56,7 @@ public class DonationController {
     @Operation(summary = "05-04 Donation💸 정기 결제 해지 API")
     public CommonResponse<String> cancelRegularPay(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
-            @Parameter(description = "정기결제 id") @PathVariable Long regularId){
+            @Parameter(description = "정기결제 id") @PathVariable Long regularId) {
         donationService.cancelRegularPay(user, regularId);
         return CommonResponse.onSuccess("해지 성공");
     }
@@ -68,10 +66,9 @@ public class DonationController {
     @Operation(summary = "05-05-01 Donation💸 정기 결제 상태 상단 조회")
     public CommonResponse<DonationRes.DonationCount> getDonationCount(
             @Parameter(hidden = true) @AuthenticationPrincipal User user
-            ) {
+    ) {
         return CommonResponse.onSuccess(donationService.getDonationCount(user));
     }
-
 
 
     @GetMapping("")
@@ -81,8 +78,8 @@ public class DonationController {
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size,
-            @Parameter(description = "필터 전체 조회 0 집행 전 1 집행 중 2 집행완료 3") @RequestParam(required = false,defaultValue = "0") int filter){
-        return CommonResponse.onSuccess(donationService.getDonationList(user.getId(),filter,page, size));
+            @Parameter(description = "필터 전체 조회 0 집행 전 1 집행 중 2 집행완료 3") @RequestParam(required = false, defaultValue = "0") int filter) {
+        return CommonResponse.onSuccess(donationService.getDonationList(user.getId(), filter, page, size));
     }
 
     @GetMapping("/burning-match")
@@ -92,15 +89,15 @@ public class DonationController {
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
-    ){
-        return CommonResponse.onSuccess(donationService.getBurningMatch(user,page,size));
+    ) {
+        return CommonResponse.onSuccess(donationService.getBurningMatch(user, page, size));
     }
 
     @GetMapping("/top/{regularPayId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
     @Operation(summary = "05-07-01 후원 상세 보기 조회 #FRAME_불타는 매치_후원_상세_보기_상단조회")
     public CommonResponse<DonationRes.DonationRegular> getDonationRegular(@PathVariable Long regularPayId,
-                                                                          @Parameter(hidden = true) @AuthenticationPrincipal User user){
+                                                                          @Parameter(hidden = true) @AuthenticationPrincipal User user) {
         return CommonResponse.onSuccess(donationService.getDonationRegular(regularPayId, user));
     }
 
@@ -113,7 +110,7 @@ public class DonationController {
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
-    ){
+    ) {
         return CommonResponse.onSuccess(donationService.getDonationRegularList(regularPayId, user, page, size));
     }
 
@@ -122,8 +119,39 @@ public class DonationController {
     @Operation(summary = "05-08 매치 결제 내역 리스트 조회 #FRAME_불타는 매치_매치 결제 내역")
     public CommonResponse<List<DonationRes.PayList>> getPayList(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
-            @PathVariable Long regularPayId){
+            @PathVariable Long regularPayId) {
         return CommonResponse.onSuccess(donationService.getPayList(user, regularPayId));
+    }
+
+    @GetMapping("/flame")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    @Operation(summary = "05-09 매치 불꽃이 고유 이름 검색 #FRAME_홈")
+    public CommonResponse<DonationRes.FlameProject> getFlameProjectList(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "검색어") @RequestParam(required = false) String content
+    ) {
+        return CommonResponse.onSuccess(donationService.getFlameProjectList(user, content));
+    }
+
+    @GetMapping("/flame/top/{donationId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class, DonationGerErrorCode.class})
+    @Operation(summary = "05-10-01 불꽃이 상세 보기 조회 #FRAME_불타는 매치_후원_상세_보기_상단조회")
+    public CommonResponse<DonationRes.DonationFlame> getFlameRegular(@PathVariable Long donationId,
+                                                                       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+        return CommonResponse.onSuccess(donationService.getFlameRegular(donationId, user));
+    }
+
+
+    @GetMapping("/flame/bottom/{donationId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class, DonationGerErrorCode.class})
+    @Operation(summary = "05-10-02 불꽃이 상세 보기 조회 #FRAME_불타는 매치_후원_상세_보기_하단조회")
+    public CommonResponse<PageResponse<List<DonationRes.DonationRegularList>>> getFlameRegularList(
+            @PathVariable Long donationId,
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
+    ) {
+        return CommonResponse.onSuccess(donationService.getFlameRegularList(donationId, user, page, size));
     }
 
 }

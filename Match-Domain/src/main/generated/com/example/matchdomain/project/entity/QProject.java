@@ -41,6 +41,8 @@ public class QProject extends EntityPathBase<Project> {
 
     public final EnumPath<ProjectStatus> projectStatus = createEnum("projectStatus", ProjectStatus.class);
 
+    public final ListPath<com.example.matchdomain.donation.entity.RegularPayment, com.example.matchdomain.donation.entity.QRegularPayment> regularPayments = this.<com.example.matchdomain.donation.entity.RegularPayment, com.example.matchdomain.donation.entity.QRegularPayment>createList("regularPayments", com.example.matchdomain.donation.entity.RegularPayment.class, com.example.matchdomain.donation.entity.QRegularPayment.class, PathInits.DIRECT2);
+
     public final EnumPath<com.example.matchdomain.donation.entity.RegularStatus> regularStatus = createEnum("regularStatus", com.example.matchdomain.donation.entity.RegularStatus.class);
 
     public final StringPath searchKeyword = createString("searchKeyword");

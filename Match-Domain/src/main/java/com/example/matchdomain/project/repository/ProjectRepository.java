@@ -34,21 +34,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
                 "          'true', 'false')
      */
 
-    @Query(value = "select P.id as 'id', P.usages as 'usages', P.projectKind as 'projectKind', viewCnt, " +
-            "P.projectName as 'projectName', PI.url as 'imgUrl', " +
-            "If((select exists (select * from ProjectUserAttention PUA where PUA.userId=:userId and P.id = PUA.projectId )),'true','false')'like', " +
-            "       (select GROUP_CONCAT(distinct (U.profileImgUrl) SEPARATOR ',')\n" +
-            "        from RegularPayment RP2 \n" +
-            "                 join User U on RP2.userId = U.id\n" +
-            "        where RP2.projectId = P.id and RP2.regularPayStatus = 'PROCEEDING' limit 3 \n" +
-            "       )as 'imgUrlList', count(RP.id)'totalDonationCnt' \n" +
-            "from Project P join ProjectImage PI on P.id = PI.projectId left join RegularPayment RP on RP.projectId=P.id " +
-            "where PI.imageRepresentStatus = :imageRepresentStatus and P.projectStatus = :projectStatus and P.finishedAt>=:now " +
-            "and P.status = :status group by P.id order by totalDonationCnt desc"
-            , nativeQuery = true
-            , countQuery = "select * from Project where projectStatus = :projectStatus and finishedAt = :now and status = :status")
-    Page<ProjectList> findLoginUserProjectList(@Param("userId") Long userId, @Param("projectStatus") String projectStatus, @Param("now") LocalDateTime now,
-                                               @Param("imageRepresentStatus") String imageRepresentStatus, Pageable pageable,@Param("status") String status);
 
     @Query(value = "select P.id as 'id', P.usages as 'usages', P.projectKind as 'projectKind', " +
             "P.projectName as 'projectName', PI.url as 'imgUrl', " +
@@ -78,6 +63,39 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
     Optional<Project> findByIdAndStatus(Long projectId, Status status);
 
     boolean existsByIdAndStatus(Long projectId, Status status);
+
+    @Query(value = "SELECT\n" +
+            "    P.id as 'id',\n" +
+            "    P.usages as 'usages',\n" +
+            "    P.projectKind as 'projectKind',\n" +
+            "    viewCnt,\n" +
+            "    P.projectName as 'projectName',\n" +
+            "    PI.url as 'imgUrl',\n" +
+            "    IF((\n" +
+            "        SELECT EXISTS (\n" +
+            "            SELECT *\n" +
+            "            FROM ProjectUserAttention PUA\n" +
+            "            WHERE PUA.userId = :userId\n" +
+            "            AND P.id = PUA.projectId\n" +
+            "        )\n" +
+            "    ), 'true', 'false') AS 'like',\n" +
+            "GROUP_CONCAT(U.profileImgUrl SEPARATOR ',') AS 'imgUrlList', \n" +
+            "    COUNT(RP.id) AS 'totalDonationCnt'\n" +
+            "FROM Project P\n" +
+            "JOIN ProjectImage PI ON P.id = PI.projectId\n" +
+            "LEFT JOIN RegularPayment RP ON RP.projectId = P.id AND RP.regularPayStatus = 'PROCEEDING'\n" +
+            "left join User U on U.id = RP.userId " +
+            "WHERE PI.imageRepresentStatus = :imageRepresentStatus\n" +
+            "AND P.projectStatus = :projectStatus\n" +
+            "AND P.finishedAt >= :now\n" +
+            "AND P.status = :status\n" +
+            "GROUP BY P.id\n" +
+            "ORDER BY totalDonationCnt DESC"
+            , nativeQuery = true
+            , countQuery = "select * from Project where projectStatus = :projectStatus and finishedAt = :now and status = :status")
+    Page<ProjectList> findLoginUserProjectList(@Param("userId") Long userId, @Param("projectStatus") String projectStatus, @Param("now") LocalDateTime now,
+                                               @Param("imageRepresentStatus") String imageRepresentStatus, Pageable pageable,@Param("status") String status);
+
     @Query(value = "select P.id'projectId', " +
             "P.projectName, " +
             "usages," +
@@ -96,12 +114,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
     @Query(value = "select P.id as 'id', P.usages as 'usages', P.projectKind as 'projectKind', viewCnt, " +
             "P.projectName as 'projectName', PI.url as 'imgUrl', " +
             "If((select exists (select * from ProjectUserAttention PUA where PUA.userId=:userId and P.id = PUA.projectId )),'true','false')'like', " +
-            "       (select GROUP_CONCAT((U.profileImgUrl) SEPARATOR ',')\n" +
-            "        from RegularPayment RP2 \n" +
-            "                 join User U on RP2.userId = U.id\n" +
-            "        where RP2.projectId = P.id limit 3 \n" +
-            "       )as 'imgUrlList', count(RP.id)'totalDonationCnt' \n" +
-            "from Project P join ProjectImage PI on P.id = PI.projectId left join RegularPayment RP on RP.projectId=P.id " +
+            "GROUP_CONCAT(U.profileImgUrl SEPARATOR ',') AS 'imgUrlList', \n" +
+            "count(RP.id)'totalDonationCnt' \n" +
+            "from Project P join ProjectImage PI on P.id = PI.projectId left join RegularPayment RP on RP.projectId=P.id and RP.regularPayStatus = 'PROCEEDING' " +
+            "left join User U on U.id = RP.userId " +
             "where PI.imageRepresentStatus = :imageRepresentStatus and P.projectStatus = :projectStatus and P.finishedAt>=:now and P.status = :status and P.projectKind =:projectKind group by P.id order by totalDonationCnt desc"
             , nativeQuery = true
             , countQuery = "select * from Project where projectStatus = :projectStatus and finishedAt = :now and status = :status and projectKind = :projectKind")
@@ -110,12 +126,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
     @Query(value = "select P.id as 'id', P.usages as 'usages', P.projectKind as 'projectKind', viewCnt, " +
             "P.projectName as 'projectName', PI.url as 'imgUrl', " +
             "If((select exists (select * from ProjectUserAttention PUA where PUA.userId=:userId and P.id = PUA.projectId )),'true','false')'like', " +
-            "       (select GROUP_CONCAT((U.profileImgUrl) SEPARATOR ',')\n" +
-            "        from RegularPayment RP2 \n" +
-            "                 join User U on RP2.userId = U.id\n" +
-            "        where RP2.projectId = P.id and RP2.regularPayStatus = 'PROCEEDING' limit 3 \n" +
-            "       )as 'imgUrlList', count(RP.id)'totalDonationCnt' \n" +
-            "from Project P join ProjectImage PI on P.id = PI.projectId left join RegularPayment RP on RP.projectId=P.id " +
+            "GROUP_CONCAT(U.profileImgUrl SEPARATOR ',') AS 'imgUrlList', \n" +
+            "count(RP.id)'totalDonationCnt' \n" +
+            "from Project P join ProjectImage PI on P.id = PI.projectId " +
+            "left join RegularPayment RP on RP.projectId=P.id and RP.regularPayStatus = 'PROCEEDING' " +
+            "left join User U on U.id = RP.userId " +
             "where PI.imageRepresentStatus = :imageRepresentStatus and P.projectStatus = :projectStatus and P.finishedAt>=:now and P.status = :status and P.projectKind =:projectKind " +
             "  and (P.projectName LIKE concat('%',:content,'%') OR P.projectExplanation " +
             "  LIKE concat('%',:content,'%') OR P.usages LIKE concat('%',:content,'%') OR P.searchKeyword LIKE concat('%',:content,'%')) group by P.id order by totalDonationCnt desc"
@@ -129,12 +144,12 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
     @Query(value = "select P.id as 'id', P.usages as 'usages', P.projectKind as 'projectKind', viewCnt, " +
             "P.projectName as 'projectName', PI.url as 'imgUrl', " +
             "If((select exists (select * from ProjectUserAttention PUA where PUA.userId=:userId and P.id = PUA.projectId )),'true','false')'like', " +
-            "       (select GROUP_CONCAT((U.profileImgUrl) SEPARATOR ',')\n" +
-            "        from RegularPayment RP2 \n" +
-            "                 join User U on RP2.userId = U.id\n" +
-            "        where RP2.projectId = P.id and RP2.regularPayStatus = 'PROCEEDING' limit 3 \n" +
-            "       )as 'imgUrlList', count(RP.id)'totalDonationCnt' \n" +
-            "from Project P join ProjectImage PI on P.id = PI.projectId left join RegularPayment RP on RP.projectId=P.id " +
+            "GROUP_CONCAT(U.profileImgUrl SEPARATOR ',') AS 'imgUrlList', \n" +
+            "count(RP.id)'totalDonationCnt' \n" +
+            "from Project P " +
+            "join ProjectImage PI on P.id = PI.projectId " +
+            "left join RegularPayment RP on RP.projectId=P.id and RP.regularPayStatus = 'PROCEEDING'" +
+            "left join User U on U.id = RP.userId " +
             "where PI.imageRepresentStatus = :imageRepresentStatus and P.projectStatus = :projectStatus and P.finishedAt>=:now and P.status = :status" +
             "  and (P.projectName LIKE concat('%',:content,'%') OR P.projectExplanation LIKE concat('%',:content,'%') " +
             "  OR P.usages LIKE concat('%',:content,'%') OR P.searchKeyword LIKE concat('%',:content,'%')) group by P.id order by totalDonationCnt desc"
@@ -149,12 +164,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
     @Query(value = "select P.id as 'id', P.usages as 'usages', P.projectKind as 'projectKind', viewCnt, " +
             "P.projectName as 'projectName', PI.url as 'imgUrl', " +
             "If((select exists (select * from ProjectUserAttention PUA where PUA.userId=:userId and P.id = PUA.projectId )),'true','false')'like', " +
-            "       (select GROUP_CONCAT((U.profileImgUrl) SEPARATOR ',')\n" +
-            "        from RegularPayment RP2 \n" +
-            "                 join User U on RP2.userId = U.id\n" +
-            "        where RP2.projectId = P.id limit 3 \n" +
-            "       )as 'imgUrlList', count(RP.id)'totalDonationCnt' \n" +
-            "from Project P join ProjectImage PI on P.id = PI.projectId left join RegularPayment RP on RP.projectId=P.id " +
+            "GROUP_CONCAT(U.profileImgUrl SEPARATOR ',') AS 'imgUrlList', \n" +
+            "count(RP.id)'totalDonationCnt' \n" +
+            "from Project P join ProjectImage PI on P.id = PI.projectId " +
+            "left join RegularPayment RP on RP.projectId=P.id " +
+            "left join User U on U.id = RP.userId " +
             "where PI.imageRepresentStatus = :imageRepresentStatus and P.projectStatus = :projectStatus " +
             "and P.finishedAt>=:now and P.status = :status and P.todayStatus = :todayStatus " +
             "group by P.id order by totalDonationCnt desc"
@@ -164,6 +178,31 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
                                        @Param("imageRepresentStatus") String imageRepresentStatus,@Param("status") String status,
                                        @Param("todayStatus") String todayStatus, Pageable pageable);
 
+    @Query(value = "select\n" +
+            "    P.id,\n" +
+            "    P.projectKind,\n" +
+            "    P.projectName,\n" +
+            "    P.usages,\n" +
+            "    P.regularStatus,\n" +
+            "    If((select\n" +
+            "            exists (select\n" +
+            "                        *\n" +
+            "                    from\n" +
+            "                        ProjectUserAttention PUA\n" +
+            "                    where\n" +
+            "                            PUA.userId=:userId \n" +
+            "                      and P.id = PUA.projectId )),\n" +
+            "       'true',\n" +
+            "       'false')'like',\n" +
+            "    count(RP.id)'totalDonationCnt',\n" +
+            "    GROUP_CONCAT(U.profileImgUrl SEPARATOR ',') AS 'imgUrlList'\n" +
+            "FROM Project P\n" +
+            "         LEFT JOIN RegularPayment RP ON P.id = RP.projectId\n" +
+            "         LEFT JOIN User U ON RP.userId = U.id\n" +
+            "WHERE P.id = :projectId \n" +
+            "GROUP BY P.id ", nativeQuery = true)
+    ProjectDetail getProjectAppDetail(@Param("userId") Long userId, @Param("projectId") Long projectId);
+
     interface ProjectList {
         Long getId();
         String getImgUrl();
@@ -172,7 +211,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
         String getProjectKind();
         boolean getLike();
         int getTotalDonationCnt();
-
         String getImgUrlList();
     }
 
@@ -204,5 +242,19 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
         LocalDateTime getEndDate();
         String getDetail();
         Status getStatus();
+    }
+
+    interface ProjectDetail {
+        Long getId();
+        String getUsages();
+
+        String getRegularStatus();
+
+        String getProjectName();
+        String getProjectKind();
+        boolean getLike();
+        int getTotalDonationCnt();
+
+        String getImgUrlList();
     }
 }

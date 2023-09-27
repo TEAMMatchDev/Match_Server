@@ -2,6 +2,7 @@ package com.example.matchdomain.project.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.donation.entity.RegularStatus;
 import lombok.*;
 import org.hibernate.annotations.*;
@@ -71,6 +72,9 @@ public class Project extends BaseEntity {
     @Fetch(FetchMode.JOIN)
     private List<ProjectImage> projectImage = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "projectId")
+    private List<RegularPayment> regularPayments = new ArrayList<>();
 
     public Project(Long id, String projectName, String usages, List<ProjectImage> projectImage) {
         this.id = id;

@@ -19,7 +19,7 @@ public class QUserFcmPk extends BeanPath<UserFcmPk> {
 
     public static final QUserFcmPk userFcmPk = new QUserFcmPk("userFcmPk");
 
-    public final StringPath fcmToken = createString("fcmToken");
+    public final StringPath deviceId = createString("deviceId");
 
     public final NumberPath<Long> userId = createNumber("userId", Long.class);
 

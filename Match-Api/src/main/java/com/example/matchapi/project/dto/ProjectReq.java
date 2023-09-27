@@ -75,4 +75,14 @@ public class ProjectReq {
         private ProjectKind projectKind;
         private String searchKeyword;
     }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Comment {
+        @NotEmpty(message = "프로젝트 이름을 입력해주세요")
+        @Schema(description = "프로젝트 이름", required = true, example = "tbt")
+        private String comment;
+    }
 }

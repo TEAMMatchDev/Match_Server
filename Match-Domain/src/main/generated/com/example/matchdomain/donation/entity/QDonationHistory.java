@@ -41,6 +41,10 @@ public class QDonationHistory extends EntityPathBase<DonationHistory> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final com.example.matchdomain.project.entity.QProject project;
+
+    public final NumberPath<Long> projectId = createNumber("projectId", Long.class);
+
     public final QRegularPayment regularPayment;
 
     public final NumberPath<Long> regularPaymentId = createNumber("regularPaymentId", Long.class);
@@ -70,6 +74,7 @@ public class QDonationHistory extends EntityPathBase<DonationHistory> {
     public QDonationHistory(Class<? extends DonationHistory> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.donationUser = inits.isInitialized("donationUser") ? new QDonationUser(forProperty("donationUser"), inits.get("donationUser")) : null;
+        this.project = inits.isInitialized("project") ? new com.example.matchdomain.project.entity.QProject(forProperty("project")) : null;
         this.regularPayment = inits.isInitialized("regularPayment") ? new QRegularPayment(forProperty("regularPayment"), inits.get("regularPayment")) : null;
     }
 
