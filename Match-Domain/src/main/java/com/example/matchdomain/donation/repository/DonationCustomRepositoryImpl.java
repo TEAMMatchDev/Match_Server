@@ -6,7 +6,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.support.Querydsl;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
 public class DonationCustomRepositoryImpl implements DonationCustomRepository{
     private final JPAQueryFactory queryFactory;
     @Override
-    public Page<DonationHistory> getDonationHistoryCustom(Long regularPaymentId, Long donationId, HistoryStatus historyStatus, Pageable pageable) {
+    public Page<DonationHistory> getDonationHistoryCustom(Long regularPaymentId, Long donationId, HistoryStatus historyStatus, Pageable pageable, Long projectId) {
         QDonationHistory donationHistory = QDonationHistory.donationHistory;
         QRegularPayment regularPayment = QRegularPayment.regularPayment;
         QDonationUser donationUser = QDonationUser.donationUser;
@@ -23,12 +22,13 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
 
         List<DonationHistory> donationHistories = queryFactory.select(donationHistory)
                 .from(donationHistory)
-                .join(donationHistory).on(donationHistory.donationUserId.eq(donationId))
-                .join(regularPayment).on(donationUser.regularPaymentId.eq(regularPayment.id))
+                .leftJoin(donationUser).on(donationUser.id.eq(donationHistory.donationUserId))
+                .leftJoin(regularPayment).on(regularPayment.id.eq(donationUser.regularPaymentId))
                 .where(
                         donationHistory.donationUserId.eq(donationId).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
-                                .or(regularPayment.id.eq(regularPaymentId).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE)))
-                                .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON))
+                                .or(regularPayment.id.eq(regularPaymentId).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE))
+                                        .or(donationHistory.projectId.eq(projectId)))
+                                .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON)).and(donationHistory.historyStatus.ne(HistoryStatus.START)).and(donationHistory.historyStatus.ne(HistoryStatus.FINISH))
                 )
                 .orderBy(donationHistory.createdAt.asc())
                 .offset(pageable.getOffset())
@@ -36,13 +36,15 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
                 .fetch();
 
         JPAQuery<DonationHistory> countQuery = queryFactory.selectFrom(donationHistory)
-                .join(donationHistory).on(donationHistory.donationUserId.eq(donationId))
-                .join(regularPayment).on(donationUser.regularPaymentId.eq(regularPayment.id))
+                .leftJoin(donationUser).on(donationUser.id.eq(donationHistory.donationUserId))
+                .leftJoin(regularPayment).on(regularPayment.id.eq(donationUser.regularPaymentId))
                 .where(
                         donationHistory.donationUserId.eq(donationId).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
                                 .or(regularPayment.id.eq(regularPaymentId).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE)))
-                                .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON))
-                ).orderBy(donationHistory.createdAt.asc());
+                                .or(donationHistory.projectId.eq(projectId))
+                .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON)).and(donationHistory.historyStatus.ne(HistoryStatus.START)).and(donationHistory.historyStatus.ne(HistoryStatus.FINISH))
+                )
+                .orderBy(donationHistory.createdAt.asc());
         return PageableExecutionUtils.getPage(donationHistories, pageable, countQuery::fetchCount);
     }
 }

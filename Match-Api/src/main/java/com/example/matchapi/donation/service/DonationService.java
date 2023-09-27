@@ -305,7 +305,7 @@ public class DonationService {
         Pageable pageable = PageRequest.of(page, size);
         DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
         List<DonationRes.DonationRegularList> donationRegularLists = new ArrayList<>();
-        Page<DonationHistory> donationHistories = donationHistoryRepository.getDonationHistoryCustom(donationUser.getRegularPaymentId(), donationId, CREATE, pageable);
+        Page<DonationHistory> donationHistories = donationHistoryRepository.getDonationHistoryCustom(donationUser.getRegularPaymentId(), donationId, CREATE, pageable, donationUser.getProjectId());
         donationHistories.forEach(
                 result -> donationRegularLists.add(
                         donationConvertor.DonationRegularList(result)
