@@ -8,6 +8,9 @@ import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchdomain.project.entity.ProjectKind;
+import com.example.matchdomain.project.entity.ReportReason;
+import com.example.matchdomain.project.exception.CommentDeleteErrorCode;
+import com.example.matchdomain.project.exception.CommentGetErrorCode;
 import com.example.matchdomain.project.exception.ProjectGetErrorCode;
 import com.example.matchdomain.project.exception.ProjectOneTimeErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
@@ -151,5 +154,23 @@ public class ProjectController {
         return CommonResponse.onSuccess("응원 달기 성공");
     }
 
+    @Operation(summary = "03-11💻 후원 응원 신고하기 #FRAME_후원 상세조회", description = "후원 응원 신고하기 기능입니다")
+    @PostMapping("/comment/report/{commentId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, CommentGetErrorCode.class})
+    public CommonResponse<String> reportComment(@PathVariable Long commentId,
+                                                @RequestParam("reportReason")ReportReason reportReason){
+        projectService.reportComment(commentId,reportReason);
+        return CommonResponse.onSuccess("신고 성공");
+    }
+
+    @Operation(summary = "03-12💻 후원 응원 삭제하기 #FRAME_후원 상세조회", description = "후원 신고하기 기능입니다")
+    @DeleteMapping("/comment/{commentId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, CommentDeleteErrorCode.class})
+    public CommonResponse<String> deleteComment(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @PathVariable Long commentId){
+        projectService.deleteComment(user, commentId);
+        return CommonResponse.onSuccess("신고 성공");
+    }
 
 }

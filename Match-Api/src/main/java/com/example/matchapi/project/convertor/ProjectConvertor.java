@@ -293,4 +293,12 @@ public class ProjectConvertor {
                 .historyStatus(historyStatus)
                 .build();
     }
+
+    public CommentReport ReportComment(Long commentId, ReportReason reportReason) {
+        return CommentReport
+                .builder()
+                .commentId(commentId)
+                .reportReason(reportReason)
+                .build();
+    }
 }
