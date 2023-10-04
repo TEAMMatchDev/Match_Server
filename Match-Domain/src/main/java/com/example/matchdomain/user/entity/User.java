@@ -85,6 +85,11 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "role")
     private String role;
 
+    @Enumerated(EnumType.STRING)
+    private Alarm serviceAlarm = Alarm.INACTIVE;
+
+    @Enumerated(EnumType.STRING)
+    private Alarm eventAlarm = Alarm.INACTIVE;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
