@@ -2,7 +2,6 @@ package com.example.matchdomain.donation.repository;
 
 
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.project.entity.ImageRepresentStatus;
@@ -12,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -105,9 +103,10 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
             "GROUP BY RP.id ", countQuery = "select * from RegularPayment where userId =:userId and regularPayStatus = 'PROCEEDING' ",nativeQuery = true)
     Page<flameList> getFlameList(@Param("userId") Long userId, Pageable pageable);
 
-    @Query("select du from DonationUser du join fetch du.project p join fetch p.projectImage pi" +
-            " where du.user = :user and pi.imageRepresentStatus = :represent and du.inherenceName LIKE %:content%")
-    List<DonationUser> findByUserAndInherenceNameContainingAndProject_ProjectImg_RepresentStatusOrderByCreatedAtDesc(@Param("user") User user,@Param("content") String content,@Param("represent") ImageRepresentStatus represent);
+    @Query(value = "select du from DonationUser du join fetch du.project p join fetch p.projectImage pi" +
+            " where du.user = :user and pi.imageRepresentStatus = :represent and du.inherenceName LIKE %:content%",
+    countQuery = "select count(du) from DonationUser du where du.user = :user and du.inherenceName LIKE %:content%")
+    Page<DonationUser> findByUserAndInherenceNameContainingAndProject_ProjectImg_RepresentStatusOrderByCreatedAtDesc(@Param("user") User user, @Param("content") String content, @Param("represent") ImageRepresentStatus represent, Pageable pageable);
 
 
 
