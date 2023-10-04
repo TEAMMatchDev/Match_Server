@@ -6,9 +6,7 @@ import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.Convertor;
-import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.donation.entity.RegularPayStatus;
-import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.dto.ProjectList;
@@ -22,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.example.matchdomain.donation.entity.HistoryStatus.FINISH;
 import static com.example.matchdomain.project.entity.ProjectStatus.BEFORE_START;
 
 @Convertor
@@ -284,6 +283,22 @@ public class ProjectConvertor {
                 .userId(id)
                 .comment(comment)
                 .projectId(projectId)
+                .build();
+    }
+
+    public DonationHistory DonationHistory(Long projectId, HistoryStatus historyStatus) {
+        return DonationHistory
+                .builder()
+                .projectId(projectId)
+                .historyStatus(historyStatus)
+                .build();
+    }
+
+    public CommentReport ReportComment(Long commentId, ReportReason reportReason) {
+        return CommentReport
+                .builder()
+                .commentId(commentId)
+                .reportReason(reportReason)
                 .build();
     }
 }

@@ -6,11 +6,10 @@ import com.example.matchdomain.donation.entity.HistoryStatus;
 
 @Convertor
 public class DonationConvertor {
-    public DonationHistory DonationHistory(Long id, HistoryStatus historyStatus, Long regularPaymentId) {
+    public DonationHistory DonationHistory(Long id, HistoryStatus historyStatus) {
         return DonationHistory.builder()
                 .donationUserId(id)
                 .historyStatus(historyStatus)
-                .regularPaymentId(regularPaymentId)
                 .build();
     }
 }

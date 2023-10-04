@@ -31,6 +31,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath email = createString("email");
 
+    public final EnumPath<Alarm> eventAlarm = createEnum("eventAlarm", Alarm.class);
+
     public final EnumPath<Gender> gender = createEnum("gender", Gender.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
@@ -48,6 +50,8 @@ public class QUser extends EntityPathBase<User> {
     public final StringPath profileImgUrl = createString("profileImgUrl");
 
     public final StringPath role = createString("role");
+
+    public final EnumPath<Alarm> serviceAlarm = createEnum("serviceAlarm", Alarm.class);
 
     public final StringPath socialId = createString("socialId");
 

@@ -9,6 +9,8 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.redis.repository.RefreshTokenRepository;
+import com.example.matchdomain.user.exception.ModifyEmailCode;
+import com.example.matchdomain.user.exception.ModifyPhoneErrorCode;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchdomain.user.entity.User;
@@ -139,14 +141,26 @@ public class UserController {
         return CommonResponse.onSuccess("저장 성공");
     }
 
-    @Operation(summary = "02-08 유저 FCM 토큰 생성후 전송 👤",description = "유저 FCM 토큰과 deviceId 를 보내주시면 됩니다.")
-    @PostMapping("/fcm")
+    @Operation(summary = "02-08 휴대폰번호 변경 👤",description = "휴대폰 번호 변경.")
+    @PostMapping("/phone")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ModifyPhoneErrorCode.class})
     public CommonResponse<String> modifyPhoneNumber(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @RequestBody UserReq.ModifyPhone phone
     ){
         userService.modifyPhoneNumber(user, phone);
-        return CommonResponse.onSuccess("저장 성공");
+        return CommonResponse.onSuccess("변경 성공");
+    }
+
+    @Operation(summary = "02-08 이메일 변경 👤",description = "이메일 변경.")
+    @PostMapping("/email")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, ModifyEmailCode.class})
+    public CommonResponse<String> modifyEmail(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @RequestBody UserReq.ModifyEmail email
+    ){
+        userService.modifyEmail(user, email);
+        return CommonResponse.onSuccess("변경 성공");
     }
 
 

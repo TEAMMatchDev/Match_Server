@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -262,7 +261,7 @@ public class DonationService {
         RegularPayment regularPayment = regularPaymentRepository.findById(regularPayId).orElseThrow(()-> new BadRequestException(REGULAR_NOT_EXIST));
         Pageable pageable = PageRequest.of(page, size);
         System.out.println("페이지 네이션");
-        Page<DonationHistory> donationHistories = donationHistoryRepository.findByRegularPaymentIdAndHistoryStatusNotOrderByCreatedAtAsc(regularPayId, HistoryStatus.TURN_ON ,pageable);
+        Page<DonationHistory> donationHistories = donationHistoryRepository.findByDonationUser_RegularPaymentIdAndHistoryStatusNotOrderByCreatedAtAsc(regularPayId, HistoryStatus.TURN_ON ,pageable);
 
         List<DonationRes.DonationRegularList> donationRegularLists = new ArrayList<>();
 
@@ -288,24 +287,24 @@ public class DonationService {
         return payLists;
     }
 
-    public DonationRes.FlameProject getFlameProjectList(User user, String content) {
-        List<DonationUser> donationUsers = donationUserRepository.findByUserAndInherenceNameContainingAndProject_ProjectImg_RepresentStatusOrderByCreatedAtDesc(user, content, REPRESENT);
+    public PageResponse<List<DonationRes.FlameProjectList>> getFlameProjectList(User user, String content, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DonationUser> donationUsers = donationUserRepository.findByUserAndInherenceNameContainingAndProject_ProjectImg_RepresentStatusOrderByCreatedAtDesc(user, content, REPRESENT, pageable);
         List<DonationRes.FlameProjectList> flameProjectLists = new ArrayList<>();
 
-        System.out.println(donationUsers.size());
-        donationUsers.forEach(
+        donationUsers.getContent().forEach(
                 result -> flameProjectLists.add(
                         donationConvertor.FlameProject(result)
                 )
         );
-        return new DonationRes.FlameProject(donationUsers.size(), flameProjectLists);
+        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), flameProjectLists);
     }
 
     public PageResponse<List<DonationRes.DonationRegularList>> getFlameRegularList(Long donationId, User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
         List<DonationRes.DonationRegularList> donationRegularLists = new ArrayList<>();
-        Page<DonationHistory> donationHistories = donationHistoryRepository.getDonationHistoryCustom(donationUser.getRegularPaymentId(), donationId, CREATE, pageable);
+        Page<DonationHistory> donationHistories = donationHistoryRepository.getDonationHistoryCustom(donationUser.getRegularPaymentId(), donationId, CREATE, pageable, donationUser.getProjectId());
         donationHistories.forEach(
                 result -> donationRegularLists.add(
                         donationConvertor.DonationRegularList(result)

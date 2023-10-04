@@ -22,6 +22,7 @@ import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
 import com.example.matchdomain.user.entity.UserFcmToken;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
+import com.example.matchdomain.user.exception.ModifyEmailCode;
 import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserFcmTokenRepository;
 import com.example.matchdomain.user.repository.UserRepository;
@@ -42,7 +43,9 @@ import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.*;
 import static com.example.matchdomain.donation.entity.DonationStatus.EXECUTION_REFUND;
+import static com.example.matchdomain.user.exception.ModifyEmailCode.NOT_CORRECT_EMAIL;
 import static com.example.matchdomain.user.exception.ModifyPhoneErrorCode.NOT_CORRECT_PHONE;
+import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_EMAIL;
 import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_PHONE;
 
 @Service
@@ -176,5 +179,13 @@ public class UserService {
         user.setPhoneNumber(phone.getNewPhone());
         userRepository.save(user);
 
+    }
+
+    @Transactional
+    public void modifyEmail(User user, UserReq.ModifyEmail email) {
+        if(!user.getEmail().equals(email.getOldEmail())) throw new BadRequestException(NOT_CORRECT_EMAIL);
+        if(userRepository.existsByEmail(email.getNewEmail())) throw new BadRequestException(ModifyEmailCode.USERS_EXISTS_EMAIL);
+        user.setEmail(email.getNewEmail());
+        userRepository.save(user);
     }
 }

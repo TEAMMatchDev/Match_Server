@@ -10,7 +10,6 @@ import java.util.Arrays;
 @Getter
 @AllArgsConstructor
 public enum ProjectKind {
-    DOG("DOG","강아지"),
     CHILDREN("CHILDREN","어린이"),
     YOUTH("YOUTH","청년"),
     WOMEN("WOMEN","여성"),

@@ -11,14 +11,12 @@ import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.HistoryStatus;
+import com.example.matchdomain.donation.repository.DonationHistoryRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
-import com.example.matchdomain.project.repository.ProjectCommentRepository;
-import com.example.matchdomain.project.repository.ProjectImageRepository;
-import com.example.matchdomain.project.repository.ProjectRepository;
-import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
+import com.example.matchdomain.project.repository.*;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +34,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
+import static com.example.matchdomain.common.model.Status.INACTIVE;
 import static com.example.matchdomain.project.entity.ImageRepresentStatus.NORMAL;
 import static com.example.matchdomain.project.entity.ImageRepresentStatus.REPRESENT;
 import static com.example.matchdomain.project.entity.ProjectStatus.PROCEEDING;
 import static com.example.matchdomain.project.entity.TodayStatus.TODAY;
+import static com.example.matchdomain.project.exception.CommentDeleteErrorCode.COMMENT_DELETE_ERROR_CODE;
+import static com.example.matchdomain.project.exception.CommentGetErrorCode.COMMENT_NOT_EXIST;
 import static com.example.matchdomain.project.exception.PatchProjectImageErrorCode.PROJECT_IMAGE_NOT_EXIST;
 import static com.example.matchdomain.project.exception.PatchProjectImageErrorCode.PROJECT_NOT_CORRECT_IMAGE;
 import static com.example.matchdomain.project.exception.ProjectGetErrorCode.PROJECT_NOT_EXIST;
@@ -56,6 +57,8 @@ public class ProjectService {
     private final S3UploadService s3UploadService;
     private final DonationUserRepository donationUserRepository;
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
+    private final DonationHistoryRepository donationHistoryRepository;
+    private final CommentReportRepository commentReportRepository;
 
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -170,7 +173,7 @@ public class ProjectService {
             userId = 0L;
         }
 
-        Page<ProjectComment> projectComments = projectCommentRepository.findByProjectIdAndStatusOrderByCreatedAtAsc(projectId, ACTIVE,pageable);
+        Page<ProjectComment> projectComments = projectCommentRepository.findByProjectIdAndStatusOrderByCreatedAtAsc(projectId, ACTIVE, pageable);
 
         List<ProjectRes.CommentList> commentLists = new ArrayList<>();
         projectComments.getContent().forEach(
@@ -198,7 +201,7 @@ public class ProjectService {
 
         saveImgList(project.getId(), url, imgUrlList);
 
-        System.out.println(url);
+        donationHistoryRepository.save(projectConvertor.DonationHistory(project.getId(), HistoryStatus.TURN_ON));
     }
 
     public PageResponse<List<ProjectRes.ProjectAdminList>> getProjectList(int page, int size) {
@@ -222,6 +225,8 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId).orElseThrow(()-> new NotFoundException(PROJECT_NOT_EXIST));
 
         project.setProjectStatus(projectStatus);
+
+        if(projectStatus.equals(ProjectStatus.DEADLINE)) donationHistoryRepository.save(projectConvertor.DonationHistory(projectId, HistoryStatus.FINISH));
 
         projectRepository.save(project);
     }
@@ -426,5 +431,18 @@ public class ProjectService {
 
     public void postComment(User user, Long projectId, ProjectReq.Comment comment) {
         projectCommentRepository.save(projectConvertor.Comment(user.getId(), projectId, comment.getComment()));
+    }
+
+    public void reportComment(Long commentId, ReportReason reportReason) {
+        ProjectComment projectComment = projectCommentRepository.findByIdAndStatus(commentId, ACTIVE).orElseThrow(()-> new NotFoundException(COMMENT_NOT_EXIST));
+
+        commentReportRepository.save(projectConvertor.ReportComment(commentId, reportReason));
+    }
+
+    public void deleteComment(User user, Long commentId) {
+        ProjectComment projectComment = projectCommentRepository.findByIdAndStatus(commentId, ACTIVE).orElseThrow(()-> new NotFoundException(COMMENT_NOT_EXIST));
+        if(!projectComment.getUserId().equals(user.getId())) throw new BadRequestException(COMMENT_DELETE_ERROR_CODE);
+        projectComment.setStatus(INACTIVE);
+        projectCommentRepository.save(projectComment);
     }
 }

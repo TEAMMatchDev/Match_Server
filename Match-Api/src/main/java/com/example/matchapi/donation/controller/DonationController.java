@@ -126,11 +126,13 @@ public class DonationController {
     @GetMapping("/flame")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Operation(summary = "05-09 매치 불꽃이 고유 이름 검색 #FRAME_홈")
-    public CommonResponse<DonationRes.FlameProject> getFlameProjectList(
+    public CommonResponse<PageResponse<List<DonationRes.FlameProjectList>>> getFlameProjectList(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
-            @Parameter(description = "검색어") @RequestParam(required = false) String content
+            @Parameter(description = "검색어") @RequestParam(required = false) String content,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
     ) {
-        return CommonResponse.onSuccess(donationService.getFlameProjectList(user, content));
+        return CommonResponse.onSuccess(donationService.getFlameProjectList(user, content, page, size));
     }
 
     @GetMapping("/flame/top/{donationId}")
