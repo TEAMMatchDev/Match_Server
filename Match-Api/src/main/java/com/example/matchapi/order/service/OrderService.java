@@ -7,6 +7,7 @@ import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.InternalServerException;
+import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.properties.NicePayProperties;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.*;
@@ -37,6 +38,8 @@ import java.util.UUID;
 import static com.example.matchcommon.constants.MatchStatic.*;
 import static com.example.matchdomain.donation.entity.HistoryStatus.CREATE;
 import static com.example.matchdomain.donation.entity.HistoryStatus.TURN_ON;
+import static com.example.matchdomain.donation.exception.DeleteCardErrorCode.CARD_NOT_CORRECT_USER;
+import static com.example.matchdomain.donation.exception.DeleteCardErrorCode.CARD_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationGerErrorCode.DONATION_NOT_EXIST;
 import static com.example.matchdomain.order.exception.RegistrationCardErrorCode.FAILED_ERROR_ENCRYPT;
 
@@ -283,5 +286,18 @@ public class OrderService {
         DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
         donationUser.setDonationStatus(donationStatus);
         donationUserRepository.save(donationUser);
+    }
+
+    @Transactional
+    public void revokePay(User user, Long cardId) {
+        UserCard userCard = userCardRepository.findByIdAndStatus(cardId, Status.ACTIVE).orElseThrow(() -> new NotFoundException(CARD_NOT_EXIST));
+        if(!userCard.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
+        List<RegularPayment> regularPayments = regularPaymentRepository.findByUserCardId(cardId);
+
+        for(RegularPayment regularPayment : regularPayments){
+            regularPayment.setRegularPayStatus(RegularPayStatus.USER_CANCEL);
+        }
+
+        regularPaymentRepository.saveAll(regularPayments);
     }
 }

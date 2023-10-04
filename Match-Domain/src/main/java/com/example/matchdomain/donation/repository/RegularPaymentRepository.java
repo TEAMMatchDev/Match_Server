@@ -32,4 +32,6 @@ public interface RegularPaymentRepository extends JpaRepository<RegularPayment,L
     List<RegularPayment> findByProjectIdAndRegularPayStatus(@Param("id") Long id,@Param("regularPayStatus") RegularPayStatus regularPayStatus);
 
     List<RegularPayment> findByUser(User user);
+
+    List<RegularPayment> findByUserCardId(Long cardId);
 }

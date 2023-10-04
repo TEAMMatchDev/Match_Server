@@ -169,4 +169,15 @@ public class OrderController {
         return CommonResponse.onSuccess(userService.getUserInfo(user));
     }
 
+
+    @DeleteMapping("/revoke/{cardId}")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    @Operation(summary = "04-08 Order💸 간편결제 해지",description = "후원자 정보조회 API 입니다.")
+    public CommonResponse<String> revokePay(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @PathVariable Long cardId
+    ) {
+        orderService.revokePay(user, cardId);
+        return CommonResponse.onSuccess("간편 결제 해지");
+    }
 }
