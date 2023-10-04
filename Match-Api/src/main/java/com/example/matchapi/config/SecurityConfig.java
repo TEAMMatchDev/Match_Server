@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsUtils;
+import org.springframework.http.HttpMethod;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -94,6 +95,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/serverAuth").permitAll()
                 .antMatchers(HttpMethod.GET,"/donation-temporaries").permitAll()
                 .antMatchers("/users/refresh").permitAll()
+                .antMatchers(HttpMethod.GET,"/donation-temporaries").permitAll()
                 .antMatchers("/admin/projects/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/users/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/users/**").hasAnyRole("ADMIN")
