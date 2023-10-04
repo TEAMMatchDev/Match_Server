@@ -11,12 +11,17 @@ import com.example.matchcommon.exception.UnauthorizedException;
 import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchcommon.properties.KakaoProperties;
 import com.example.matchcommon.properties.NaverProperties;
+import com.example.matchcommon.reponse.CommonResponse;
+import com.example.matchcommon.service.MailService;
+import com.example.matchdomain.redis.entity.CodeAuth;
+import com.example.matchdomain.redis.repository.CodeAuthRepository;
 import com.example.matchdomain.redis.repository.RefreshTokenRepository;
 import com.example.matchdomain.user.entity.Authority;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
 import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserRepository;
+import com.example.matchinfrastructure.match_aligo.client.MatchAligoFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoLoginFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoLoginTokenRes;
@@ -37,11 +42,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
-import static com.example.matchcommon.exception.errorcode.CommonResponseStatus.*;
-import static com.example.matchdomain.user.entity.AuthorityEnum.ROLE_ADMIN;
-import static com.example.matchdomain.user.entity.SocialType.KAKAO;
-import static com.example.matchdomain.user.entity.SocialType.NAVER;
+import static com.example.matchdomain.user.entity.enums.AuthorityEnum.ROLE_ADMIN;
+import static com.example.matchdomain.user.entity.enums.SocialType.KAKAO;
+import static com.example.matchdomain.user.entity.enums.SocialType.NAVER;
 import static com.example.matchdomain.user.exception.AdminLoginErrorCode.NOT_ADMIN;
+import static com.example.matchdomain.user.exception.CodeAuthErrorCode.NOT_CORRECT_AUTH;
+import static com.example.matchdomain.user.exception.CodeAuthErrorCode.NOT_CORRECT_CODE;
 import static com.example.matchdomain.user.exception.UserAuthErrorCode.NOT_EXIST_USER;
 import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_CORRECT_PASSWORD;
 import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_EMAIL;
@@ -65,6 +71,9 @@ public class AuthService {
     private final SmsHelper smsHelper;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProperties jwtProperties;
+    private final MailService mailService;
+    private final CodeAuthRepository codeAuthRepository;
+    private final MatchAligoFeignClient matchAligoFeignClient;
 
 
     @Transactional
@@ -214,5 +223,35 @@ public class AuthService {
         UserRes.Token token = createToken(userId);
 
         return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
+    }
+
+    public void sendEmailMessage(String email) {
+        checkUserEmail(new UserReq.UserEmail(email));
+
+        String code = smsHelper.createRandomNumber();
+
+        codeAuthRepository.save(CodeAuth.builder().auth(email).code(code).ttl(300).build());
+
+        mailService.sendEmailMessage(email, code);
+
+    }
+
+    public void checkUserEmailAuth(UserReq.UserEmailAuth email) {
+        CodeAuth codeAuth = codeAuthRepository.findById(email.getEmail()).orElseThrow(()->new BadRequestException(NOT_CORRECT_AUTH));
+        if(!codeAuth.getCode().equals(email.getCode()))throw new BadRequestException(NOT_CORRECT_CODE);
+    }
+
+    public void sendPhone(String phone) {
+        checkUserPhone(new UserReq.UserPhone(phone));
+        String code = smsHelper.createRandomNumber();
+        codeAuthRepository.save(CodeAuth.builder().auth(phone).code(code).ttl(300).build());
+        CommonResponse<String> sendRes = matchAligoFeignClient.sendSmsAuth(jwtService.createToken(1L), phone, code);
+        System.out.println(sendRes.getCode());
+        System.out.println(sendRes.getMessage());
+    }
+
+    public void checkPhoneAuth(UserReq.UserPhoneAuth phone) {
+        CodeAuth codeAuth = codeAuthRepository.findById(phone.getPhone()).orElseThrow(()->new BadRequestException(NOT_CORRECT_AUTH));
+        if(!codeAuth.getCode().equals(phone.getCode()))throw new BadRequestException(NOT_CORRECT_CODE);
     }
 }

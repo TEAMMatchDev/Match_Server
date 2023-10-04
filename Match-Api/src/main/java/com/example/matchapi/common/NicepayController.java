@@ -29,15 +29,14 @@ public class NicepayController {
 
     /*
     @RequestMapping("")
-    public String indexDemo(Model model, @RequestParam String orderId){
+    public String indexDemo(Model model) {
 
-        OrderRequest orderRequest = orderService.getOrderRequest(orderId);
-
+        String orderId = orderService.saveRequest(2L);
+        model.addAttribute("method","kakaopay");
         model.addAttribute("orderId", orderId);
         model.addAttribute("clientId", nicePayProperties.getClient());
         return "/index";
     }
-
 
     @RequestMapping("/serverAuth")
     public String requestPaymentAuth(
@@ -51,4 +50,5 @@ public class NicepayController {
     }
 
      */
+
 }

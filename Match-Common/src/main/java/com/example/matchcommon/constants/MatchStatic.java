@@ -19,4 +19,11 @@ public class MatchStatic {
     public static final String FIRST_TIME = "T00:00:00";
     public static final String LAST_TIME = "T23:59:59";
 
+    public static final String BASE_PROFILE = "https://match-image.s3.ap-northeast-2.amazonaws.com/profile.png";
+
+    public static final String MATCH_PROFILE = "https://match-image.s3.ap-northeast-2.amazonaws.com/profile.png";
+
+    public static final String MATCH_NAME = "매치";
+
+
 }

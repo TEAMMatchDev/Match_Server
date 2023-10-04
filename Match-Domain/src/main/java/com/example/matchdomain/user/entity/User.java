@@ -3,7 +3,9 @@ package com.example.matchdomain.user.entity;
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.UserCard;
-import com.example.matchdomain.project.entity.ProjectUserAttention;
+import com.example.matchdomain.user.entity.enums.Alarm;
+import com.example.matchdomain.user.entity.enums.Gender;
+import com.example.matchdomain.user.entity.enums.SocialType;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
@@ -85,6 +87,11 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "role")
     private String role;
 
+    @Enumerated(EnumType.STRING)
+    private Alarm serviceAlarm = Alarm.INACTIVE;
+
+    @Enumerated(EnumType.STRING)
+    private Alarm eventAlarm = Alarm.INACTIVE;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -134,4 +141,8 @@ public class User extends BaseEntity implements UserDetails {
     }
 
 
+    public void setModifyProfile(String newProfileImg, String name) {
+        this.profileImgUrl = newProfileImg;
+        this.name = name;
+    }
 }

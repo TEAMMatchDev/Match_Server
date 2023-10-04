@@ -1,6 +1,7 @@
 package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.donation.entity.enums.CardAbleStatus;
 import com.example.matchdomain.user.entity.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;

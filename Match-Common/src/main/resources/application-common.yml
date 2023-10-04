@@ -15,13 +15,11 @@ oauth:
     redirect-url: ${NAVER_REDIRECT}
 
 jwt:
-
   header: X-AUTH-TOKEN
   secret: ${JWT_SECRET_KEY}
   refresh: ${JWT_REFRESH_KEY}
   access-token-seconds: 31536000
   refresh-token-seconds: 31536000
-
 sms:
   secret: ${SMS_SECRET_KEY}
   api: ${SMS_API_KEY}
@@ -45,6 +43,33 @@ discord:
     error: ${DISCORD_WEBHOOK_ERROR}
     alert: ${DISCORD_WEBHOOK_ALERT}
 
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: official.match.kr@gmail.com
+    password: ${APP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+    auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30분
+
+aligo:
+  username: ${ALIGO_USERNAME}
+  key: ${ALIGO_KEY}
+  sender: ${SMS_SENDER}
+
 web:
   return:
     url: ${RETURN_URL}
+
+match:
+  aligo:
+    url: ${MATCH_ALIGO_URL}

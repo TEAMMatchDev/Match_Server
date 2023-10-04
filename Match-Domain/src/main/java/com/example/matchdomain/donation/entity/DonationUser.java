@@ -1,13 +1,19 @@
 package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
+import com.example.matchdomain.donation.entity.enums.PayMethod;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "DonationUser",indexes = @Index(columnList = "inherenceName"))
@@ -18,6 +24,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
+@BatchSize(size = 1000)
 public class DonationUser extends BaseEntity {
     @Id
     @Column(name = "id")
@@ -63,6 +70,11 @@ public class DonationUser extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private RegularStatus regularStatus;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "donationUserId")
+    @BatchSize(size = 100)
+    private List<DonationHistory> donationHistories = new ArrayList<>();
 
     public void updateInherenceNumber(String inherenceNumber, String flameName) {
         this.inherenceNumber = inherenceNumber;

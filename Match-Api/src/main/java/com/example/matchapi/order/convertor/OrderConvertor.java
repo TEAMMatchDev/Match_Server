@@ -4,6 +4,8 @@ import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
 import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchinfrastructure.pay.nice.dto.*;
 import lombok.RequiredArgsConstructor;

@@ -1,12 +1,12 @@
 package com.example.matchbatch.service;
 
 import com.example.matchbatch.OrderHelper;
+import com.example.matchbatch.convertor.DonationConvertor;
 import com.example.matchbatch.convertor.OrderConvertor;
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.donation.entity.RegularPayment;
-import com.example.matchdomain.donation.entity.RequestPaymentHistory;
-import com.example.matchdomain.donation.entity.UserCard;
+import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
+import com.example.matchdomain.donation.repository.DonationHistoryRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.donation.repository.RequestPaymentHistoryRepository;
@@ -25,8 +25,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.example.matchcommon.constants.MatchStatic.REGULAR;
-import static com.example.matchdomain.donation.entity.PaymentStatus.COMPLETE;
-import static com.example.matchdomain.donation.entity.PaymentStatus.FAIL;
+import static com.example.matchdomain.donation.entity.enums.HistoryStatus.CREATE;
+import static com.example.matchdomain.donation.entity.enums.PaymentStatus.COMPLETE;
+import static com.example.matchdomain.donation.entity.enums.PaymentStatus.FAIL;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +41,8 @@ public class OrderService {
     private final DonationUserRepository donationUserRepository;
     private final DiscordFeignClient discordFeignClient;
     private final DiscordConvertor discordConvertor;
+    private final DonationHistoryRepository donationHistoryRepository;
+    private final DonationConvertor donationConvertor;
 
     @Transactional
     public void regularDonationPayment() {
@@ -47,6 +50,7 @@ public class OrderService {
         List<RegularPayment> regularPayments = calculateDay();
         List<RequestPaymentHistory> requestPaymentHistories = new ArrayList<>();
         List<DonationUser> donationUsers = new ArrayList<>();
+        List<DonationHistory> donationHistories = new ArrayList<>();
 
         int trueCnt = 0;
         int amount = 0;
@@ -76,7 +80,8 @@ public class OrderService {
 
                         String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
-                        donationUsers.add(orderConvertor.donationUser(niceBillOkResponse, userId, flameName, inherenceNumber, regularPayment.getProjectId(),regularPayment.getId()));
+                        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationUser(niceBillOkResponse, userId, flameName, inherenceNumber, regularPayment.getProjectId(),regularPayment.getId()));
+                        donationHistories.add(donationConvertor.DonationHistory(donationUser.getId(), CREATE ));
 
                         requestPaymentHistories.add(orderConvertor.RegularHistory(niceBillOkResponse, userId, COMPLETE, "SUCCESS",regularPayment.getId(), regularPayment.getPayDate(),regularPayment.getUserCardId()));
                         log.info("success Payment " + "userId :" + regularPayment.getUserId() + " orderId : " + niceBillOkResponse.getOrderId() + " bid :" + regularPayment.getUserCard().getBid() + " amount :" + regularPayment.getAmount() + "원 projectId :" + regularPayment.getProjectId());
@@ -89,7 +94,7 @@ public class OrderService {
                     }
                 }
             }
-            donationUserRepository.saveAll(donationUsers);
+            donationHistoryRepository.saveAll(donationHistories);
             regularPaymentHistoryRepository.saveAll(requestPaymentHistories);
             discordFeignClient.alertMessage(discordConvertor.AlertFinishMessage("정기 결제 스케줄러 종료", amount, regularPayments.size(),successCnt, trueCnt));
 
@@ -112,11 +117,11 @@ public class OrderService {
         if (currentDay == lastDayOfMonth) {
             //현재 날짜와 달의 마지막 날짜가 같거나 클때의 로직
             System.out.println("현재 날짜가 같아요");
-            return regularPaymentRepository.findByPayDateGreaterThanEqualAndStatus(currentDay, Status.ACTIVE);
+            return regularPaymentRepository.findByPayDateGreaterThanEqualAndStatusAndRegularPayStatus(currentDay, Status.ACTIVE, RegularPayStatus.PROCEEDING);
         } else {
             // 현재 날짜가 같지 않을 때의 로직
             System.out.println("현재 날짜가 달라요");
-            return regularPaymentRepository.findByPayDateAndStatus(currentDay, Status.ACTIVE);
+            return regularPaymentRepository.findByPayDateGreaterThanEqualAndStatusAndRegularPayStatus(currentDay, Status.ACTIVE, RegularPayStatus.PROCEEDING);
         }
     }
 
@@ -135,6 +140,8 @@ public class OrderService {
         List<DonationUser> donationUsers = new ArrayList<>();
 
         List<RequestPaymentHistory> requestPaymentHistories = regularPaymentHistoryRepository.findByPaymentStatusAndStatus(FAIL, Status.ACTIVE);
+
+        List<DonationHistory> donationHistories = new ArrayList<>();
 
         int amount = 0;
         int trueCnt = 0;

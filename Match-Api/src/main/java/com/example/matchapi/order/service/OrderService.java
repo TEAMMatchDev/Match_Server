@@ -1,18 +1,20 @@
 package com.example.matchapi.order.service;
 
+import com.example.matchapi.donation.convertor.DonationConvertor;
 import com.example.matchapi.order.convertor.OrderConvertor;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.InternalServerException;
+import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.properties.NicePayProperties;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.*;
-import com.example.matchdomain.donation.repository.DonationUserRepository;
-import com.example.matchdomain.donation.repository.RegularPaymentRepository;
-import com.example.matchdomain.donation.repository.RequestPaymentHistoryRepository;
-import com.example.matchdomain.donation.repository.UserCardRepository;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
+import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.donation.repository.*;
 import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchdomain.redis.repository.OrderRequestRepository;
 import com.example.matchdomain.user.entity.User;
@@ -37,6 +39,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.matchcommon.constants.MatchStatic.*;
+import static com.example.matchdomain.donation.entity.enums.HistoryStatus.CREATE;
+import static com.example.matchdomain.donation.entity.enums.HistoryStatus.TURN_ON;
+import static com.example.matchdomain.donation.exception.DeleteCardErrorCode.CARD_NOT_CORRECT_USER;
+import static com.example.matchdomain.donation.exception.DeleteCardErrorCode.CARD_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationGerErrorCode.DONATION_NOT_EXIST;
 import static com.example.matchdomain.order.exception.RegistrationCardErrorCode.FAILED_ERROR_ENCRYPT;
 
@@ -53,6 +59,8 @@ public class OrderService {
     private final RequestPaymentHistoryRepository requestPaymentHistoryRepository;
     private final OrderRequestRepository orderRequestRepository;
     private final UserRepository userRepository;
+    private final DonationHistoryRepository donationHistoryRepository;
+    private final DonationConvertor donationConvertor;
 
     @Transactional
     public NicePaymentAuth authPayment(String tid, Long amount) {
@@ -184,8 +192,6 @@ public class OrderService {
 
         String orderId = REGULAR + createRandomOrderId();
 
-        System.out.println(orderId);
-
         NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(), card.get().getBid(), orderConvertor.billCardOneTime(regularDonation.getAmount(),orderId));
 
         orderHelper.checkNicePaymentsResult(niceBillOkResponse.getResultCode(), niceBillOkResponse.getResultMsg());
@@ -196,7 +202,10 @@ public class OrderService {
 
         RegularPayment regularPayment = regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId, projectId));
 
-        donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
+        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
+
+        donationHistoryRepository.save(donationConvertor.DonationHistoryTurnOn(regularPayment.getId(), TURN_ON));
+        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE));
     }
 
     @Transactional
@@ -213,7 +222,10 @@ public class OrderService {
 
         String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
-        donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
+        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
+
+        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE));
+
     }
 
     @Transactional
@@ -221,6 +233,15 @@ public class OrderService {
         String orderId = ONE_TIME + createRandomOrderId();
 
         orderRequestRepository.save(orderConvertor.CreateRequest(user.getId(), projectId, orderId));
+
+        return orderId;
+    }
+
+    @Transactional
+    public String saveRequest(Long projectId) {
+        String orderId = ONE_TIME + createRandomOrderId();
+
+        orderRequestRepository.save(orderConvertor.CreateRequest(1L, projectId, orderId));
 
         return orderId;
     }
@@ -249,7 +270,10 @@ public class OrderService {
 
         String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
 
-        donationUserRepository.save(orderConvertor.donationUserV2(nicePaymentAuth, user.get().getId(), amount, orderRequest.get().getProjectId(), flameName, inherenceNumber));
+        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationUserV2(nicePaymentAuth, user.get().getId(), amount, orderRequest.get().getProjectId(), flameName, inherenceNumber));
+
+        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE));
+
     }
 
     @Transactional
@@ -265,5 +289,18 @@ public class OrderService {
         DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
         donationUser.setDonationStatus(donationStatus);
         donationUserRepository.save(donationUser);
+    }
+
+    @Transactional
+    public void revokePay(User user, Long cardId) {
+        UserCard userCard = userCardRepository.findByIdAndStatus(cardId, Status.ACTIVE).orElseThrow(() -> new NotFoundException(CARD_NOT_EXIST));
+        if(!userCard.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
+        List<RegularPayment> regularPayments = regularPaymentRepository.findByUserCardId(cardId);
+
+        for(RegularPayment regularPayment : regularPayments){
+            regularPayment.setRegularPayStatus(RegularPayStatus.USER_CANCEL);
+        }
+
+        regularPaymentRepository.saveAll(regularPayments);
     }
 }

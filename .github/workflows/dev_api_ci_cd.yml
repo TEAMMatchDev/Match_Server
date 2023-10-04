@@ -50,6 +50,11 @@ jobs:
           discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
           discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
           server.host: ${{ secrets.DEV_SERVER_HOST}}
+          spring.password: ${{ secrets.APP_PASSWORD}}
+          aligo.username: ${{ secrets.ALIGO_USERNAME }}
+          aligo.key: ${{ secrets.ALIGO_KEY }}
+          web.return.url: ${{ secrets.DEV_RETURN_URL }}
+          match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
           web.return.url: ${{ secrets.DEV_RETURN_URL }}
 
 
@@ -62,6 +67,14 @@ jobs:
           spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
           spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
           spring.redis.host : ${{ secrets.REDIS_DEV_HOST }}
+
+      - name: create-fcm-json
+        id: create-fcm-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "serviceAccountKey.json"
+          json: ${{ secrets.FCM_JSON }}
+          dir: "Match-Common/src/main/resources/"
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew

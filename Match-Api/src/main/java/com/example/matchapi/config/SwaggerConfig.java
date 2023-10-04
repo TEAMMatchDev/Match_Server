@@ -40,7 +40,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
         Info info = new Info()
-                .title("Match Rest API 문서") // 타이틀
+                .title("Match Aligo Rest API 문서") // 타이틀
                 .version("0.0.1") // 문서 버전
                 .description("잘못된 부분이나 오류 발생 시 바로 말씀해주세요.") // 문서 설명
                 .contact(new Contact() // 연락처

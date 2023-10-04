@@ -2,7 +2,6 @@ package com.example.adminapi.security;
 
 import com.example.adminapi.user.dto.UserRes;
 import com.example.matchcommon.properties.JwtProperties;
-import com.example.matchdomain.user.entity.AuthorityEnum;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import io.jsonwebtoken.*;

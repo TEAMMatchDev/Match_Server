@@ -5,7 +5,6 @@ import com.example.adminapi.user.dto.UserReq;
 import com.example.adminapi.user.dto.UserRes;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.UnauthorizedException;
-import com.example.matchdomain.user.entity.AuthorityEnum;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
