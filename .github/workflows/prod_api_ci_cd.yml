@@ -55,6 +55,8 @@ jobs:
           server.host: ${{ secrets.DEV_SERVER_HOST}}
           spring.password: ${{ secrets.APP_PASSWORD}}
           web.return.url: ${{ secrets.PROD_RETURN_URL }}
+          aligo.username: ${{ secrets.ALIGO_USERNAME }}
+          aligo.key: ${{ secrets.ALIGO_KEY }}
           match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
 
 
