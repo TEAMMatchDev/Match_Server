@@ -175,4 +175,14 @@ public class UserReq {
 
         private String newPhone;
     }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ModifyEmail {
+        private String oldEmail;
+
+        private String newEmail;
+    }
 }
