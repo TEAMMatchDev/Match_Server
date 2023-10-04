@@ -108,6 +108,7 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
     countQuery = "select count(du) from DonationUser du where du.user = :user and du.inherenceName LIKE %:content%")
     Page<DonationUser> findByUserAndInherenceNameContainingAndProject_ProjectImg_RepresentStatusOrderByCreatedAtDesc(@Param("user") User user, @Param("content") String content, @Param("represent") ImageRepresentStatus represent, Pageable pageable);
 
+    List<DonationUser> findByIdIn(List<Long> donationUserLists);
 
 
     interface flameList {

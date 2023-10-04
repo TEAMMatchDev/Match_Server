@@ -5,20 +5,29 @@ import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.HistoryImage;
+import com.example.matchdomain.donation.repository.DonationHistoryRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
+import com.example.matchdomain.donation.repository.HistoryImageRepository;
+import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
 import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
 import static com.example.matchdomain.donation.entity.enums.DonationStatus.EXECUTION_REFUND;
+import static com.example.matchdomain.donation.entity.enums.DonationStatus.EXECUTION_SUCCESS;
 import static com.example.matchdomain.donation.exception.DonationRefundErrorCode.DONATION_NOT_EXIST;
 
 @Service
@@ -27,6 +36,9 @@ public class AdminDonationService {
     private final DonationUserRepository donationUserRepository;
     private final DonationHelper donationHelper;
     private final AdminDonationConvertor adminDonationConvertor;
+    private final DonationHistoryRepository donationHistoryRepository;
+    private final S3UploadService s3UploadService;
+    private final HistoryImageRepository historyImageRepository;
 
     @Transactional
     public DonationRes.DonationInfo getDonationInfo() {
@@ -57,7 +69,35 @@ public class AdminDonationService {
         return adminDonationConvertor.getDonationDetail(donationUser);
     }
 
-    public void enforceDonation(DonationReq.EnforceDonation enforceDonation) {
 
+    @Transactional
+    public void enforceDonation(List<MultipartFile> imageLists, DonationReq.EnforceDonation enforceDonation) {
+        donationHistoryRepository.save(adminDonationConvertor.DonationHistoryChange(enforceDonation));
+
+        DonationHistory donationHistory = donationHistoryRepository.save(adminDonationConvertor.DonationHistoryComplete(enforceDonation.getProjectId()));
+
+        saveDonationHistoryImages(imageLists, donationHistory.getId());
+
+        executionSuccessDonation(enforceDonation.getDonationUserLists());
+    }
+
+    private void executionSuccessDonation(List<Long> donationUserLists) {
+        List<DonationUser> donationUsers = donationUserRepository.findByIdIn(donationUserLists);
+        for(DonationUser donationUser : donationUsers){
+            donationUser.setDonationStatus(EXECUTION_SUCCESS);
+        }
+
+        donationUserRepository.saveAll(donationUsers);
+    }
+
+    private void saveDonationHistoryImages(List<MultipartFile> imageLists, Long historyId) {
+        List<String> images = s3UploadService.listUploadCompleteFiles(historyId, imageLists);
+
+        List<HistoryImage> historyImages = new ArrayList<>();
+
+        for(String image : images){
+            historyImages.add(adminDonationConvertor.HistoryImage(image, historyId));
+        }
+        historyImageRepository.saveAll(historyImages);
     }
 }

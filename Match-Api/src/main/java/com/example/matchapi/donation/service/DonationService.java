@@ -231,7 +231,7 @@ public class DonationService {
         RegularPayment regularPayment = regularPaymentRepository.findById(regularPayId).orElseThrow(()-> new BadRequestException(REGULAR_NOT_EXIST));
         Pageable pageable = PageRequest.of(page, size);
         System.out.println("페이지 네이션");
-        Page<DonationHistory> donationHistories = donationHistoryRepository.findByDonationUser_RegularPaymentIdAndHistoryStatusNotOrderByCreatedAtAsc(regularPayId, HistoryStatus.TURN_ON ,pageable);
+        Page<DonationHistory> donationHistories = donationHistoryRepository.findByDonationUser_RegularPaymentIdOrRegularPaymentIdOrProjectIdAndHistoryStatusNotOrderByCreatedAtAsc(regularPayId, regularPayId, regularPayment.getProjectId(), HistoryStatus.TURN_ON ,pageable);
 
         List<DonationRes.DonationRegularList> donationRegularLists = new ArrayList<>();
 

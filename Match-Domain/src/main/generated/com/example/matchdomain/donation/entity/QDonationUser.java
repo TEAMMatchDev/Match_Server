@@ -2,9 +2,6 @@ package com.example.matchdomain.donation.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.example.matchdomain.donation.entity.enums.DonationStatus;
-import com.example.matchdomain.donation.entity.enums.PayMethod;
-import com.example.matchdomain.donation.entity.enums.RegularStatus;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -32,7 +29,7 @@ public class QDonationUser extends EntityPathBase<DonationUser> {
 
     public final ListPath<DonationHistory, QDonationHistory> donationHistories = this.<DonationHistory, QDonationHistory>createList("donationHistories", DonationHistory.class, QDonationHistory.class, PathInits.DIRECT2);
 
-    public final EnumPath<DonationStatus> donationStatus = createEnum("donationStatus", DonationStatus.class);
+    public final EnumPath<com.example.matchdomain.donation.entity.enums.DonationStatus> donationStatus = createEnum("donationStatus", com.example.matchdomain.donation.entity.enums.DonationStatus.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -42,7 +39,7 @@ public class QDonationUser extends EntityPathBase<DonationUser> {
 
     public final StringPath orderId = createString("orderId");
 
-    public final EnumPath<PayMethod> payMethod = createEnum("payMethod", PayMethod.class);
+    public final EnumPath<com.example.matchdomain.donation.entity.enums.PayMethod> payMethod = createEnum("payMethod", com.example.matchdomain.donation.entity.enums.PayMethod.class);
 
     public final NumberPath<Long> price = createNumber("price", Long.class);
 
@@ -54,7 +51,7 @@ public class QDonationUser extends EntityPathBase<DonationUser> {
 
     public final NumberPath<Long> regularPaymentId = createNumber("regularPaymentId", Long.class);
 
-    public final EnumPath<RegularStatus> regularStatus = createEnum("regularStatus", RegularStatus.class);
+    public final EnumPath<com.example.matchdomain.donation.entity.enums.RegularStatus> regularStatus = createEnum("regularStatus", com.example.matchdomain.donation.entity.enums.RegularStatus.class);
 
     //inherited
     public final EnumPath<com.example.matchdomain.common.model.Status> status = _super.status;

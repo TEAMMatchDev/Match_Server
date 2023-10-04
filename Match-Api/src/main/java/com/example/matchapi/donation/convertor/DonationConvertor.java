@@ -237,4 +237,11 @@ public class DonationConvertor {
                 .historyDate(donationHelper.dayTimeFormat(result.getCreatedAt()))
                 .build();
     }
+
+    public DonationHistory DonationHistoryTurnOn(Long id, HistoryStatus historyStatus) {
+        return DonationHistory.builder()
+                .regularPaymentId(id)
+                .historyStatus(historyStatus)
+                .build();
+    }
 }

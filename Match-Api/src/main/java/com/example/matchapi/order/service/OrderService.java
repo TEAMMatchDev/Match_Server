@@ -204,7 +204,7 @@ public class OrderService {
 
         DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
 
-        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), TURN_ON));
+        donationHistoryRepository.save(donationConvertor.DonationHistoryTurnOn(regularPayment.getId(), TURN_ON));
         donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE));
     }
 

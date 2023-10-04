@@ -2,7 +2,6 @@ package com.example.matchdomain.user.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.example.matchdomain.user.entity.enums.AddressType;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -27,7 +26,7 @@ public class QUserAddress extends EntityPathBase<UserAddress> {
 
     public final StringPath addressPhoneNumber = createString("addressPhoneNumber");
 
-    public final EnumPath<AddressType> addressType = createEnum("addressType", AddressType.class);
+    public final EnumPath<com.example.matchdomain.user.entity.enums.AddressType> addressType = createEnum("addressType", com.example.matchdomain.user.entity.enums.AddressType.class);
 
     public final StringPath baseAddress = createString("baseAddress");
 

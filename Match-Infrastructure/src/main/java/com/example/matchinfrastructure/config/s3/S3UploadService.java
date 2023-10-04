@@ -91,6 +91,34 @@ public class S3UploadService {
         return imgUrlList;
     }
 
+    public List<String> listUploadCompleteFiles(Long historyId,List<MultipartFile> multipartFiles){
+        List<String> imgUrlList = new ArrayList<>();
+
+        for (MultipartFile file : multipartFiles) {
+            String fileName = getForHistoryFileName(historyId, getFileExtension(file.getOriginalFilename()));
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(file.getSize());
+            objectMetadata.setContentType(file.getContentType());
+
+            try (InputStream inputStream = file.getInputStream()) {
+                amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+                imgUrlList.add(amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString());
+            } catch (IOException e) {
+                log.info("파일 업로드 실패 프로젝트 ID : " + historyId);
+                throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
+            }
+        }
+
+        return imgUrlList;
+    }
+
+    private String getForHistoryFileName(Long historyId, String fileExtension) {
+        return "history/"
+                + historyId.toString()
+                + "/"
+                + UUID.randomUUID()
+                + fileExtension;
+    }
 
     private String changeJpgToJpeg(String fileExtension) {
         if (fileExtension.equals("jpg")) {

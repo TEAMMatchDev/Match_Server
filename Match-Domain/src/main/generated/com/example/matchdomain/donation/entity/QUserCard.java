@@ -2,7 +2,6 @@ package com.example.matchdomain.donation.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.example.matchdomain.donation.entity.enums.CardAbleStatus;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -27,7 +26,7 @@ public class QUserCard extends EntityPathBase<UserCard> {
 
     public final StringPath bid = createString("bid");
 
-    public final EnumPath<CardAbleStatus> cardAbleStatus = createEnum("cardAbleStatus", CardAbleStatus.class);
+    public final EnumPath<com.example.matchdomain.donation.entity.enums.CardAbleStatus> cardAbleStatus = createEnum("cardAbleStatus", com.example.matchdomain.donation.entity.enums.CardAbleStatus.class);
 
     public final StringPath cardCode = createString("cardCode");
 

@@ -34,6 +34,13 @@ public class DonationHistory extends BaseEntity {
     private HistoryStatus historyStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "regularPaymentId",nullable = false, insertable=false, updatable=false)
+    private RegularPayment regularPayment;
+
+    @Column(name="regularPaymentId")
+    private Long regularPaymentId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "donationUserId",nullable = false, insertable=false, updatable=false)
     private DonationUser donationUser;
 

@@ -12,13 +12,16 @@ public interface DonationHistoryRepository extends JpaRepository<DonationHistory
     @Query(value = "SELECT DH FROM DonationHistory DH " +
             "LEFT JOIN FETCH DH.donationUser DU " +
             "LEFT JOIN FETCH DU.user " +
-            "WHERE DU.regularPaymentId = :regularPayId and DH.historyStatus != :historyStatus " +
+            "WHERE DU.regularPaymentId = :regularPayId or DU.regularPaymentId = :regularPayId2 or DH.projectId = :projectId and DH.historyStatus != :historyStatus " +
             "ORDER BY DH.createdAt ASC",
             countQuery = "SELECT COUNT(DH) FROM DonationHistory DH LEFT JOIN DH.donationUser DU " +
                     "LEFT JOIN DU.user " +
-                    "where DU.regularPaymentId =: regularPayId " +
-                    "and DH.historyStatus != :historyStatus")
-    Page<DonationHistory> findByDonationUser_RegularPaymentIdAndHistoryStatusNotOrderByCreatedAtAsc(@Param("regularPayId") Long regularPayId,@Param("historyStatus") HistoryStatus historyStatus, Pageable pageable);
+                    "WHERE DU.regularPaymentId = :regularPayId " +
+                    "or DU.regularPaymentId = :regularPayId2 " +
+                    "or DH.projectId = :projectId " +
+                    "and DH.historyStatus != :historyStatus "
+    )
+    Page<DonationHistory> findByDonationUser_RegularPaymentIdOrRegularPaymentIdOrProjectIdAndHistoryStatusNotOrderByCreatedAtAsc(@Param("regularPayId") Long regularPayId,@Param("regularPayId2") Long regularPayId2,@Param("projectId") Long projectId, @Param("historyStatus") HistoryStatus historyStatus, Pageable pageable);
 
 
     @Query(value = "SELECT DH FROM DonationHistory DH " +

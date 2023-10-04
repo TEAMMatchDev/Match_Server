@@ -2,7 +2,6 @@ package com.example.matchdomain.donation.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -40,7 +39,7 @@ public class QRegularPayment extends EntityPathBase<RegularPayment> {
 
     public final NumberPath<Long> projectId = createNumber("projectId", Long.class);
 
-    public final EnumPath<RegularPayStatus> regularPayStatus = createEnum("regularPayStatus", RegularPayStatus.class);
+    public final EnumPath<com.example.matchdomain.donation.entity.enums.RegularPayStatus> regularPayStatus = createEnum("regularPayStatus", com.example.matchdomain.donation.entity.enums.RegularPayStatus.class);
 
     public final ListPath<RequestPaymentHistory, QRequestPaymentHistory> requestPaymentHistory = this.<RequestPaymentHistory, QRequestPaymentHistory>createList("requestPaymentHistory", RequestPaymentHistory.class, QRequestPaymentHistory.class, PathInits.DIRECT2);
 

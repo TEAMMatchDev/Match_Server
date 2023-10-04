@@ -24,12 +24,12 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
         List<DonationHistory> donationHistories = queryFactory.select(donationHistory)
                 .from(donationHistory)
                 .leftJoin(donationUser).on(donationUser.id.eq(donationHistory.donationUserId))
-                .leftJoin(regularPayment).on(regularPayment.id.eq(donationUser.regularPaymentId))
                 .where(
-                        donationHistory.donationUserId.eq(donationId).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
-                                .or(regularPayment.id.eq(regularPaymentId).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE))
-                                        .or(donationHistory.projectId.eq(projectId)))
-                                .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON)).and(donationHistory.historyStatus.ne(HistoryStatus.START)).and(donationHistory.historyStatus.ne(HistoryStatus.FINISH))
+                        donationHistory.donationUserId.eq(donationId)
+                                .or(donationHistory.projectId.eq(projectId))
+                                .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON))
+                                .and(donationHistory.historyStatus.ne(HistoryStatus.START))
+                                .and(donationHistory.historyStatus.ne(HistoryStatus.FINISH))
                 )
                 .orderBy(donationHistory.createdAt.asc())
                 .offset(pageable.getOffset())
@@ -38,12 +38,12 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
 
         JPAQuery<DonationHistory> countQuery = queryFactory.selectFrom(donationHistory)
                 .leftJoin(donationUser).on(donationUser.id.eq(donationHistory.donationUserId))
-                .leftJoin(regularPayment).on(regularPayment.id.eq(donationUser.regularPaymentId))
                 .where(
-                        donationHistory.donationUserId.eq(donationId).and(donationHistory.historyStatus.eq(HistoryStatus.CREATE))
-                                .or(regularPayment.id.eq(regularPaymentId).and(donationHistory.historyStatus.ne(HistoryStatus.CREATE)))
+                        donationHistory.donationUserId.eq(donationId)
                                 .or(donationHistory.projectId.eq(projectId))
-                .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON)).and(donationHistory.historyStatus.ne(HistoryStatus.START)).and(donationHistory.historyStatus.ne(HistoryStatus.FINISH))
+                                .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON))
+                                .and(donationHistory.historyStatus.ne(HistoryStatus.START))
+                                .and(donationHistory.historyStatus.ne(HistoryStatus.FINISH))
                 )
                 .orderBy(donationHistory.createdAt.asc());
         return PageableExecutionUtils.getPage(donationHistories, pageable, countQuery::fetchCount);
