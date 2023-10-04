@@ -203,38 +203,6 @@ public class DonationService {
         return donationConvertor.DonationCount(donationUser);
     }
 
-    @Transactional
-    public DonationRes.DonationInfo getDonationInfo() {
-        LocalDate localDate = LocalDate.now();
-
-        List<DonationUser> donationUsers = donationUserRepository.findByDonationStatusNot(EXECUTION_REFUND);
-
-        int oneDayDonationAmount = 0;
-        int weekendDonationAmount = 0;
-        int monthlyDonationAmount = 0;
-        for (DonationUser donationUser : donationUsers) {
-            if(donationUser.getCreatedAt().isAfter(LocalDateTime.parse(localDate+FIRST_TIME))&&donationUser.getCreatedAt().isBefore(LocalDateTime.parse(localDate+LAST_TIME))){
-                oneDayDonationAmount += donationUser.getPrice();
-            }
-            if(donationUser.getCreatedAt().isAfter(LocalDateTime.parse(localDate.minusWeeks(1)+FIRST_TIME))&&donationUser.getCreatedAt().isBefore(LocalDateTime.parse(localDate+LAST_TIME))){
-                weekendDonationAmount += donationUser.getPrice();
-            }
-            if(donationUser.getCreatedAt().isAfter(LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME))&&donationUser.getCreatedAt().isBefore( LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME))){
-                monthlyDonationAmount += donationUser.getPrice();
-            }
-        }
-
-        return new DonationRes.DonationInfo(donationHelper.parsePriceComma(oneDayDonationAmount),donationHelper.parsePriceComma(weekendDonationAmount),donationHelper.parsePriceComma(monthlyDonationAmount));
-
-
-
-    }
-
-    public DonationRes.DonationDetail getDonationDetail(Long donationId) {
-        DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
-        return donationConvertor.getDonationDetail(donationUser);
-    }
-
     public PageResponse<List<DonationRes.BurningMatchRes>> getBurningMatch(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<DonationUserRepository.flameList> flameLists = donationUserRepository.getFlameList(user.getId(), pageable);

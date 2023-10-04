@@ -1,5 +1,6 @@
 package com.example.matchapi.admin.donation.controller;
 
+import com.example.matchapi.admin.donation.service.AdminDonationService;
 import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.service.DonationService;
@@ -19,12 +20,12 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "ADMIN-05-Donation💸 관리자 기부금 관련 API 입니다.", description = "기부금 관련 API 입니다.")
 @Slf4j
 public class AdminDonationController {
-    private final DonationService donationService;
+    private final AdminDonationService adminDonationService;
     @GetMapping("")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Operation(summary = "ADMIN-05-01💸 기부금 현황파악 API.",description = "기부금 현황파악 API 입니다.")
     public CommonResponse<DonationRes.DonationInfo> getDonationInfo(){
-        DonationRes.DonationInfo info = donationService.getDonationInfo();
+        DonationRes.DonationInfo info = adminDonationService.getDonationInfo();
         return CommonResponse.onSuccess(info);
     }
 
@@ -32,13 +33,14 @@ public class AdminDonationController {
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Operation(summary = "ADMIN-05-02 기부금 상세조회 API", description = "기부금 상세조회 API")
     public CommonResponse<DonationRes.DonationDetail> getDonationDetail(@PathVariable Long donationId){
-        return CommonResponse.onSuccess(donationService.getDonationDetail(donationId));
+        return CommonResponse.onSuccess(adminDonationService.getDonationDetail(donationId));
     }
 
     @PostMapping("/enforce")
     @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class})
     @Operation(summary = "ADMIN-05-03 기부금 집행 내역 POST API", description = "기부금 집행 API")
     public CommonResponse<String> enforceDonation(@RequestBody DonationReq.EnforceDonation enforceDonation){
+        adminDonationService.enforceDonation(enforceDonation);
         return CommonResponse.onSuccess("성공");
     }
 }

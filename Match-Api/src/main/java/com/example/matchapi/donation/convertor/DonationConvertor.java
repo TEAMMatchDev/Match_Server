@@ -78,23 +78,6 @@ public class DonationConvertor {
                 .build();
     }
 
-    public DonationRes.DonationDetail getDonationDetail(DonationUser donationUser) {
-        return DonationRes.DonationDetail
-                .builder()
-                .donationId(donationUser.getId())
-                .userId(donationUser.getUserId())
-                .name(donationUser.getUser().getName())
-                .email(donationUser.getUser().getEmail())
-                .phoneNumber(donationUser.getUser().getPhoneNumber())
-                .amount(donationUser.getPrice())
-                .inherenceName(donationUser.getInherenceName())
-                .inherenceNumber(donationUser.getInherenceNumber())
-                .payMethod(donationUser.getPayMethod().getValue())
-                .donationStatus(donationUser.getDonationStatus())
-                .regularStatus(donationUser.getRegularStatus().getName())
-                .donationDate(donationUser.getCreatedAt().toString())
-                .build();
-    }
 
     public DonationHistory DonationHistory(Long id, HistoryStatus historyStatus) {
         return DonationHistory.builder()
