@@ -1,6 +1,7 @@
 package com.example.matchdomain.user.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.user.entity.enums.AddressType;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;

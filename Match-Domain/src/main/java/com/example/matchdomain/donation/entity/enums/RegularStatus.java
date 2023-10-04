@@ -1,4 +1,4 @@
-package com.example.matchdomain.donation.entity;
+package com.example.matchdomain.donation.entity.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;

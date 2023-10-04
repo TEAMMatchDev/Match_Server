@@ -1,13 +1,9 @@
 package com.example.matchapi.user.dto;
 
-import com.example.matchapi.order.dto.OrderRes;
-import com.example.matchapi.project.dto.ProjectRes;
-import com.example.matchdomain.user.entity.SocialType;
+import com.example.matchdomain.user.entity.enums.SocialType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.List;
 
 public class UserRes {
     @Getter

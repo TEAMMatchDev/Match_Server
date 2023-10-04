@@ -2,9 +2,9 @@ package com.example.matchdomain.donation.repository;
 
 
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.donation.entity.DonationStatus;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.project.entity.ImageRepresentStatus;
+import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import com.example.matchdomain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

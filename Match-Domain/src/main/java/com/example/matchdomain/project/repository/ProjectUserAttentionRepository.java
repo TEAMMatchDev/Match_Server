@@ -1,13 +1,10 @@
 package com.example.matchdomain.project.repository;
 
-import com.example.matchdomain.project.entity.ImageRepresentStatus;
-import com.example.matchdomain.project.entity.ProjectImage;
+import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.ProjectUserAttention;
 import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
-import com.example.matchdomain.user.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;

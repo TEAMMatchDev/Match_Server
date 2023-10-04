@@ -7,9 +7,11 @@ import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.UserHelper;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchcommon.properties.AligoProperties;
-import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
+import com.example.matchdomain.user.entity.enums.AddressType;
+import com.example.matchdomain.user.entity.enums.AuthorityEnum;
+import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.aligo.dto.SendReq;
@@ -19,7 +21,6 @@ import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Collections;
 import java.util.List;
 
 import static com.example.matchcommon.constants.MatchStatic.BASE_PROFILE;

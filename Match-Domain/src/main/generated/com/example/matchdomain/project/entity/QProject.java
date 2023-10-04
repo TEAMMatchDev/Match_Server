@@ -2,6 +2,10 @@ package com.example.matchdomain.project.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
+import com.example.matchdomain.project.entity.enums.ProjectStatus;
+import com.example.matchdomain.project.entity.enums.TodayStatus;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -43,7 +47,7 @@ public class QProject extends EntityPathBase<Project> {
 
     public final ListPath<com.example.matchdomain.donation.entity.RegularPayment, com.example.matchdomain.donation.entity.QRegularPayment> regularPayments = this.<com.example.matchdomain.donation.entity.RegularPayment, com.example.matchdomain.donation.entity.QRegularPayment>createList("regularPayments", com.example.matchdomain.donation.entity.RegularPayment.class, com.example.matchdomain.donation.entity.QRegularPayment.class, PathInits.DIRECT2);
 
-    public final EnumPath<com.example.matchdomain.donation.entity.RegularStatus> regularStatus = createEnum("regularStatus", com.example.matchdomain.donation.entity.RegularStatus.class);
+    public final EnumPath<RegularStatus> regularStatus = createEnum("regularStatus", RegularStatus.class);
 
     public final StringPath searchKeyword = createString("searchKeyword");
 

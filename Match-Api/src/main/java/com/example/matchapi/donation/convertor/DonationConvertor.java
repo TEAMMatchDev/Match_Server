@@ -5,6 +5,7 @@ import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.HistoryImageRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.stream.Stream;
 
 import static com.example.matchcommon.constants.MatchStatic.MATCH_NAME;
 import static com.example.matchcommon.constants.MatchStatic.MATCH_PROFILE;
-import static com.example.matchdomain.donation.entity.DonationStatus.*;
+import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
 
 @Convertor
 @RequiredArgsConstructor

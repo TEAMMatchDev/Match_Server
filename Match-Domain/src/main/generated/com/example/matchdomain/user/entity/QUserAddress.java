@@ -2,6 +2,7 @@ package com.example.matchdomain.user.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.example.matchdomain.user.entity.enums.AddressType;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;

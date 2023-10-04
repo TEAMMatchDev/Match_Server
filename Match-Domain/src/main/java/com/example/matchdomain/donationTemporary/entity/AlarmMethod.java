@@ -1,6 +1,5 @@
 package com.example.matchdomain.donationTemporary.entity;
 
-import com.example.matchdomain.donation.entity.RegularStatus;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

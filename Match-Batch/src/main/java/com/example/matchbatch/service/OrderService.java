@@ -5,6 +5,7 @@ import com.example.matchbatch.convertor.DonationConvertor;
 import com.example.matchbatch.convertor.OrderConvertor;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.donation.repository.DonationHistoryRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
@@ -24,9 +25,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.example.matchcommon.constants.MatchStatic.REGULAR;
-import static com.example.matchdomain.donation.entity.HistoryStatus.CREATE;
-import static com.example.matchdomain.donation.entity.PaymentStatus.COMPLETE;
-import static com.example.matchdomain.donation.entity.PaymentStatus.FAIL;
+import static com.example.matchdomain.donation.entity.enums.HistoryStatus.CREATE;
+import static com.example.matchdomain.donation.entity.enums.PaymentStatus.COMPLETE;
+import static com.example.matchdomain.donation.entity.enums.PaymentStatus.FAIL;
 
 @Service
 @RequiredArgsConstructor

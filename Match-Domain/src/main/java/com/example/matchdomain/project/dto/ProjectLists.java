@@ -1,8 +1,8 @@
 package com.example.matchdomain.project.dto;
 
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.project.entity.ProjectKind;
-import com.example.matchdomain.project.entity.ProjectStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
+import com.example.matchdomain.project.entity.enums.ProjectStatus;
 import lombok.Getter;
 import lombok.Setter;
 

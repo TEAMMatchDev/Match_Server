@@ -2,10 +2,8 @@ package com.example.matchdomain.donation.repository;
 
 
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.donation.entity.DonationStatus;
-import com.example.matchdomain.donation.entity.RegularPayStatus;
+import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.donation.entity.RegularPayment;
-import com.example.matchdomain.project.entity.ProjectStatus;
 import com.example.matchdomain.user.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;

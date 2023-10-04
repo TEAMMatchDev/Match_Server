@@ -1,7 +1,6 @@
 package com.example.matchapi.project.dto;
 
-import com.example.matchapi.donation.dto.DonationRes;
-import com.example.matchdomain.donation.entity.HistoryStatus;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 

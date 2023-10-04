@@ -2,7 +2,7 @@ package com.example.matchbatch.convertor;
 
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.DonationHistory;
-import com.example.matchdomain.donation.entity.HistoryStatus;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 
 @Convertor
 public class DonationConvertor {

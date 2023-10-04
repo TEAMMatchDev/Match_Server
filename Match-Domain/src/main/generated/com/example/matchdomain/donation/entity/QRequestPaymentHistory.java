@@ -2,6 +2,7 @@ package com.example.matchdomain.donation.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.example.matchdomain.donation.entity.enums.PaymentStatus;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;

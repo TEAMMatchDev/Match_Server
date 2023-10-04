@@ -1,10 +1,9 @@
-package com.example.matchdomain.user.entity;
+package com.example.matchdomain.user.entity.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 @Getter

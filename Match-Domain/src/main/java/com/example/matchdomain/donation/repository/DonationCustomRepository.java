@@ -1,7 +1,7 @@
 package com.example.matchdomain.donation.repository;
 
 import com.example.matchdomain.donation.entity.DonationHistory;
-import com.example.matchdomain.donation.entity.HistoryStatus;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

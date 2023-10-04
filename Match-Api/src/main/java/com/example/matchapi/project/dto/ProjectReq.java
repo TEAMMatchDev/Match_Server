@@ -1,8 +1,8 @@
 package com.example.matchapi.project.dto;
 
 import com.example.matchcommon.annotation.Enum;
-import com.example.matchdomain.donation.entity.RegularStatus;
-import com.example.matchdomain.project.entity.ProjectKind;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;

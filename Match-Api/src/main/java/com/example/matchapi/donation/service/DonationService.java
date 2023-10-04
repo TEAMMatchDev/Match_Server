@@ -10,6 +10,8 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.repository.DonationHistoryRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
@@ -30,15 +32,15 @@ import java.util.List;
 import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
 import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
 import static com.example.matchdomain.common.model.Status.ACTIVE;
-import static com.example.matchdomain.donation.entity.DonationStatus.*;
-import static com.example.matchdomain.donation.entity.HistoryStatus.CREATE;
-import static com.example.matchdomain.donation.entity.RegularPayStatus.USER_CANCEL;
+import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
+import static com.example.matchdomain.donation.entity.enums.HistoryStatus.CREATE;
+import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.USER_CANCEL;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_CORRECT_USER;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationListErrorCode.FILTER_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationRefundErrorCode.*;
 import static com.example.matchdomain.donation.exception.GetRegularErrorCode.REGULAR_NOT_EXIST;
-import static com.example.matchdomain.project.entity.ImageRepresentStatus.REPRESENT;
+import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.REPRESENT;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +69,7 @@ public class DonationService {
             donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(userId,DonationStatus.EXECUTION_SUCCESS, ACTIVE, pageable);
 
         }else if(filter == 3){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(userId,DonationStatus.EXECUTION_SUCCESS, ACTIVE, pageable);
+            donationUsers = donationUserRepository.findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(userId, DonationStatus.EXECUTION_SUCCESS, ACTIVE, pageable);
 
         }else{
             throw new BadRequestException(FILTER_NOT_EXIST);

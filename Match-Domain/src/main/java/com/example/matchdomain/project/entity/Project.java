@@ -3,7 +3,10 @@ package com.example.matchdomain.project.entity;
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.RegularPayment;
-import com.example.matchdomain.donation.entity.RegularStatus;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
+import com.example.matchdomain.project.entity.enums.ProjectStatus;
+import com.example.matchdomain.project.entity.enums.TodayStatus;
 import lombok.*;
 import org.hibernate.annotations.*;
 

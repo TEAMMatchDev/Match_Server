@@ -8,13 +8,16 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.donation.entity.HistoryStatus;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.repository.DonationHistoryRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.entity.*;
+import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
+import com.example.matchdomain.project.entity.enums.ProjectStatus;
+import com.example.matchdomain.project.entity.enums.ReportReason;
 import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
 import com.example.matchdomain.project.repository.*;
 import com.example.matchdomain.user.entity.User;
@@ -23,22 +26,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.common.model.Status.INACTIVE;
-import static com.example.matchdomain.project.entity.ImageRepresentStatus.NORMAL;
-import static com.example.matchdomain.project.entity.ImageRepresentStatus.REPRESENT;
-import static com.example.matchdomain.project.entity.ProjectStatus.PROCEEDING;
-import static com.example.matchdomain.project.entity.TodayStatus.TODAY;
+import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.NORMAL;
+import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.REPRESENT;
+import static com.example.matchdomain.project.entity.enums.ProjectStatus.PROCEEDING;
+import static com.example.matchdomain.project.entity.enums.TodayStatus.TODAY;
 import static com.example.matchdomain.project.exception.CommentDeleteErrorCode.COMMENT_DELETE_ERROR_CODE;
 import static com.example.matchdomain.project.exception.CommentGetErrorCode.COMMENT_NOT_EXIST;
 import static com.example.matchdomain.project.exception.PatchProjectImageErrorCode.PROJECT_IMAGE_NOT_EXIST;
@@ -142,7 +143,7 @@ public class ProjectService {
 
         }
         else{
-            Page<Project> projects = projectRepository.searchProject(content,content,content, PROCEEDING,LocalDateTime.now(),ImageRepresentStatus.REPRESENT,pageable, ACTIVE);
+            Page<Project> projects = projectRepository.searchProject(content,content,content, PROCEEDING,LocalDateTime.now(), ImageRepresentStatus.REPRESENT,pageable, ACTIVE);
 
             projects.getContent().forEach(
                     result -> {

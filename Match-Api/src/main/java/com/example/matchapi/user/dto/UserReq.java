@@ -1,7 +1,7 @@
 package com.example.matchapi.user.dto;
 
 
-import com.example.matchdomain.user.entity.Gender;
+import com.example.matchdomain.user.entity.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import com.example.matchcommon.annotation.Enum;
 import lombok.*;

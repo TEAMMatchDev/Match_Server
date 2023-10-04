@@ -1,6 +1,7 @@
 package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.project.entity.Project;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;

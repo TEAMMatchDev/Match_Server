@@ -7,10 +7,14 @@ import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
+import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.dto.ProjectList;
 import com.example.matchdomain.project.entity.*;
+import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
+import com.example.matchdomain.project.entity.enums.ReportReason;
 import com.example.matchdomain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -20,8 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.example.matchdomain.donation.entity.HistoryStatus.FINISH;
-import static com.example.matchdomain.project.entity.ProjectStatus.BEFORE_START;
+import static com.example.matchdomain.project.entity.enums.ProjectStatus.BEFORE_START;
 
 @Convertor
 @RequiredArgsConstructor

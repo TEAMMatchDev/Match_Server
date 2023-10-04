@@ -1,14 +1,11 @@
 package com.example.matchapi.donation.dto;
 
-import com.example.matchdomain.donation.entity.DonationStatus;
-import com.example.matchdomain.donation.entity.HistoryStatus;
-import com.example.matchdomain.donation.entity.RegularPayStatus;
-import com.example.matchdomain.donation.entity.RegularStatus;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
+import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class DonationRes {

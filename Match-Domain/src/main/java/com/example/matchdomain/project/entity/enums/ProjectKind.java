@@ -1,6 +1,5 @@
-package com.example.matchdomain.project.entity;
+package com.example.matchdomain.project.entity.enums;
 
-import com.example.matchdomain.donation.entity.RegularStatus;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

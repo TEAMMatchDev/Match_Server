@@ -2,6 +2,7 @@ package com.example.matchdomain.project.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;

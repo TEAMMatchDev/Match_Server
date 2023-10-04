@@ -1,11 +1,10 @@
 package com.example.matchdomain.project.repository;
 
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.donation.entity.RegularStatus;
-import com.example.matchdomain.project.entity.ImageRepresentStatus;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.Project;
-import com.example.matchdomain.project.entity.ProjectStatus;
-import com.example.matchdomain.project.entity.TodayStatus;
+import com.example.matchdomain.project.entity.enums.ProjectStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

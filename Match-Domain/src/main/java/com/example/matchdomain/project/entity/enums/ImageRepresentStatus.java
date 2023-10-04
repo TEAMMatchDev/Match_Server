@@ -1,4 +1,4 @@
-package com.example.matchdomain.project.entity;
+package com.example.matchdomain.project.entity.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

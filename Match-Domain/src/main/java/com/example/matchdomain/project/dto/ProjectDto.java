@@ -1,12 +1,7 @@
 package com.example.matchdomain.project.dto;
 
-import com.example.matchdomain.donation.entity.RegularPayment;
-import com.example.matchdomain.project.entity.Project;
-import com.example.matchdomain.project.entity.ProjectKind;
-import com.example.matchdomain.user.entity.User;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Setter

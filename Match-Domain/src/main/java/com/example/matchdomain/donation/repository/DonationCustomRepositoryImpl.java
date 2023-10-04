@@ -1,6 +1,7 @@
 package com.example.matchdomain.donation.repository;
 
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

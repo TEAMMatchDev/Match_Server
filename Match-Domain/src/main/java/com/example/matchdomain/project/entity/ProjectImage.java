@@ -1,6 +1,7 @@
 package com.example.matchdomain.project.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
