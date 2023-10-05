@@ -32,6 +32,8 @@ public class NicepayController {
     private final NicePayProperties nicePayProperties;
     @Value("${web.return.url}")
     private String redirectUrl;
+    @Value("${server.host}")
+    private String serverHost;
 
     @RequestMapping("")
     public String indexDemo(
@@ -45,6 +47,7 @@ public class NicepayController {
         model.addAttribute("productName", productName);
         model.addAttribute("amount", amount);
         model.addAttribute("clientId", nicePayProperties.getClient());
+        model.addAttribute("returnUrl",serverHost+"/serverAuth");
         return "/index";
     }
 
