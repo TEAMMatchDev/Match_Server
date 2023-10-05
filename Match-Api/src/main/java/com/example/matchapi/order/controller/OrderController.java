@@ -56,6 +56,7 @@ public class OrderController {
     public CommonResponse<String> requestPay(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "프로젝트 ID", example = "1") @PathVariable("projectId") Long projectId){
+        log.info("결제 요청");
         String orderId = orderService.saveRequest(user, projectId);
         return CommonResponse.onSuccess(orderId);
     }
@@ -66,6 +67,7 @@ public class OrderController {
             @RequestParam String tid,
             @RequestParam Long amount) throws IOException {
         log.info("04-01 Order 결제 인증용 API 결제 ID: " + tid + " 결제 금액 " + amount);
+        log.info("URL : " + redirectUrl);
         orderService.requestPaymentAuth(tid, amount);
         RedirectView redirectView = new RedirectView();
         redirectView.setUrl(redirectUrl+"/auth/payComplete/once");
