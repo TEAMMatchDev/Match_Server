@@ -61,19 +61,6 @@ public class OrderController {
         return CommonResponse.onSuccess(orderId);
     }
 
-    @RequestMapping("/serverAuth")
-    @Operation(summary= "04-01 Order💸 결제 인증용",description = "결제 요청용 API 입니다")
-    public RedirectView requestPaymentAuth(
-            @RequestParam String tid,
-            @RequestParam Long amount) throws IOException {
-        log.info("04-01 Order 결제 인증용 API 결제 ID: " + tid + " 결제 금액 " + amount);
-        log.info("URL : " + redirectUrl);
-        orderService.requestPaymentAuth(tid, amount);
-        RedirectView redirectView = new RedirectView();
-        redirectView.setUrl(redirectUrl+"/auth/payComplete/once");
-        return redirectView;
-    }
-
     @Deprecated
     @PostMapping("/test/pay")
     @ApiErrorCodeExample(OtherServerErrorCode.class)
