@@ -48,7 +48,7 @@ public class NicepayController {
         model.addAttribute("amount", amount);
         model.addAttribute("clientId", nicePayProperties.getClient());
         model.addAttribute("returnUrl",serverHost+"/serverAuth");
-        return "/index";
+        return "index";
     }
 
     @RequestMapping("/serverAuth")
