@@ -55,8 +55,6 @@ jobs:
           aligo.key: ${{ secrets.ALIGO_KEY }}
           web.return.url: ${{ secrets.DEV_RETURN_URL }}
           match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
-          web.return.url: ${{ secrets.DEV_RETURN_URL }}
-
 
       - name: Set Environment Domain - Domain DEV Yml
         uses: microsoft/variable-substitution@v1
