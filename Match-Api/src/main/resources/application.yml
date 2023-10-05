@@ -4,6 +4,9 @@ server:
     context-path: /
 
 spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
   profiles:
     include:
       - infrastructure
