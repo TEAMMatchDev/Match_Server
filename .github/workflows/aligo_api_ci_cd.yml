@@ -55,6 +55,10 @@ jobs:
           aligo.key: ${{ secrets.ALIGO_KEY }}
           web.return.url: ${{ secrets.DEV_RETURN_URL }}
           match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
+          portone.code: ${{ secrets.PORTONE_CODE }}
+          portone.key: ${{ secrets.PORTONE_KEY }}
+          portone.secret: ${{ secrets.PORTONE_SECRET }}
+          portone.billmid: ${{ secrets.PROD_PORTONE_BILL_MID}}
 
       - name: Set Environment Domain - Domain Prod Yml
         uses: microsoft/variable-substitution@v1

@@ -58,6 +58,11 @@ jobs:
           spring.password: ${{ secrets.APP_PASSWORD}}
           aligo.username: ${{ secrets.ALIGO_USERNAME }}
           aligo.key: ${{ secrets.ALIGO_KEY }}
+          portone.code: ${{ secrets.PORTONE_CODE }}
+          portone.key: ${{ secrets.PORTONE_KEY }}
+          portone.secret: ${{ secrets.PORTONE_SECRET }}
+          portone.billmid: ${{ secrets.PROD_PORTONE_BILL_MID}}
+
 
 
       - name: Set Environment Domain - Domain Prod Yml
