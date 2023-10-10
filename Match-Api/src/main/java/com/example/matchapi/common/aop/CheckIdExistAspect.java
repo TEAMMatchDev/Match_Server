@@ -57,13 +57,6 @@ public class CheckIdExistAspect {
                 }
                 break;
             }
-            if ("cardId".equals(parameterNames[i])) {
-                Long cardId = (Long) args[i];
-                UserCard userCard = userCardRepository.findByIdAndStatus(cardId, Status.ACTIVE).orElseThrow(() -> new NotFoundException(CARD_NOT_EXIST));
-                if(!userCard.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
-                if(!userCard.getCardAbleStatus().equals(CardAbleStatus.ABLE)) throw new BadRequestException(CARD_NOT_ABLE);
-                break;
-            }
         }
     }
 

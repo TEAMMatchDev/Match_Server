@@ -4,6 +4,7 @@ import com.example.matchapi.user.convertor.UserConvertor;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchdomain.redis.entity.AccessToken;
+import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.redis.repository.AccessTokenRepository;
 import com.example.matchdomain.redis.repository.RefreshTokenRepository;
 import com.example.matchdomain.user.entity.User;
@@ -101,7 +102,7 @@ public class JwtService {
                 .signWith(encodedRefreshKey)
                 .compact();
 
-        //refreshTokenRepository.save(userConvertor.RefreshToken(userId,refreshToken,jwtProperties.getRefreshTokenSeconds()));
+        refreshTokenRepository.save(RefreshToken.builder().userId(userId.toString()).token(refreshToken).ttl(jwtProperties.getRefreshTokenSeconds()).build());
 
         return new UserRes.Token(accessToken,refreshToken);
     }

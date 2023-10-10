@@ -202,6 +202,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
             "GROUP BY P.id ", nativeQuery = true)
     ProjectDetail getProjectAppDetail(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
+    Optional<Project> findByIdAndStatusAndRegularStatus(Long projectId, Status status, RegularStatus regular);
+
     interface ProjectList {
         Long getId();
         String getImgUrl();
