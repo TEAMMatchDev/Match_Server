@@ -3,6 +3,11 @@ feign:
     config:
       default:
         loggerLevel: FULL
+spring:
+  cache:
+    cache-names: portOneTokenCache
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=1700s # 30분마다 갱신
 ---
 spring:
   config:
