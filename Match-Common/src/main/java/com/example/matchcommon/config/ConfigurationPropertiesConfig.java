@@ -18,7 +18,8 @@ import org.springframework.context.annotation.Configuration;
         EmailPasswordProperties.class,
         MatchAligoUrl.class,
         ServerHostProperties.class,
-        WebReturnUrl.class
+        WebReturnUrl.class,
+        PortOneProperties.class
 })
 @Configuration
 public class ConfigurationPropertiesConfig {}

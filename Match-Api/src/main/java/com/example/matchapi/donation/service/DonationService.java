@@ -4,6 +4,7 @@ import com.example.matchapi.donation.convertor.DonationConvertor;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.order.service.OrderService;
+import com.example.matchapi.portone.service.PaymentService;
 import com.example.matchapi.project.convertor.ProjectConvertor;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchcommon.exception.BadRequestException;
@@ -52,6 +53,7 @@ public class DonationService {
     private final DonationHelper donationHelper;
     private final ProjectConvertor projectConvertor;
     private final DonationHistoryRepository donationHistoryRepository;
+    private final PaymentService paymentService;
 
     public PageResponse<List<DonationRes.DonationList>> getDonationList(Long userId, int filter, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -93,7 +95,7 @@ public class DonationService {
         DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(() -> new NotFoundException(DONATION_NOT_EXIST));
         if(!donationUser.getUserId().equals(user.getId())) throw new BadRequestException(DONATION_NOT_CORRECT_USER);
         if(!donationUser.getDonationStatus().equals(EXECUTION_BEFORE)) throw new BadRequestException(CANNOT_DELETE_DONATION_STATUS);
-        orderService.cancelPayment(donationUser.getTid(), donationUser.getOrderId());
+        paymentService.refundPayment(donationUser.getTid());
         donationUser.setDonationStatus(EXECUTION_REFUND);
     }
 

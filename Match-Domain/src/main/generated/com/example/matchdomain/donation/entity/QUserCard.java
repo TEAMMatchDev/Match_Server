@@ -28,7 +28,7 @@ public class QUserCard extends EntityPathBase<UserCard> {
 
     public final EnumPath<com.example.matchdomain.donation.entity.enums.CardAbleStatus> cardAbleStatus = createEnum("cardAbleStatus", com.example.matchdomain.donation.entity.enums.CardAbleStatus.class);
 
-    public final StringPath cardCode = createString("cardCode");
+    public final EnumPath<com.example.matchdomain.donation.entity.enums.CardCode> cardCode = createEnum("cardCode", com.example.matchdomain.donation.entity.enums.CardCode.class);
 
     public final StringPath cardName = createString("cardName");
 
@@ -38,6 +38,8 @@ public class QUserCard extends EntityPathBase<UserCard> {
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
+    public final StringPath customerId = createString("customerId");
 
     public final StringPath expMonth = createString("expMonth");
 

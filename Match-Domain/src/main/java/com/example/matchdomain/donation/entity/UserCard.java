@@ -2,6 +2,7 @@ package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.enums.CardAbleStatus;
+import com.example.matchdomain.donation.entity.enums.CardCode;
 import com.example.matchdomain.user.entity.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -42,6 +43,8 @@ public class UserCard extends BaseEntity {
     //빌키 번호
     private String bid;
 
+    private String customerId;
+
     private String cardNo;
 
     private String expYear;
@@ -52,7 +55,7 @@ public class UserCard extends BaseEntity {
 
     private String cardPw;
 
-    private String cardCode;
+    private CardCode cardCode;
 
     private String cardName;
 

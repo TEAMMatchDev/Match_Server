@@ -1,5 +1,6 @@
 package com.example.matchapi.common;
 
+import com.example.matchapi.order.helper.DataEncrypt;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchcommon.properties.NicePayProperties;
 import com.example.matchdomain.redis.entity.OrderRequest;
@@ -34,7 +35,9 @@ public class NicepayController {
     private String redirectUrl;
     @Value("${server.host}")
     private String serverHost;
+    private final DataEncrypt dataEncrypt;
 
+    /*
     @RequestMapping("")
     public String indexDemo(
             @RequestParam String method,
@@ -51,6 +54,26 @@ public class NicepayController {
         return "index";
     }
 
+    @RequestMapping("/goPay")
+    public String goPay(
+            @RequestParam(required = false) String method,
+            @RequestParam String orderId,
+            @RequestParam int amount,
+            Model model
+    ){
+        String ediDate 			= orderService.getyyyyMMddHHmmss();
+        String hashString 		= dataEncrypt.encrypt(ediDate + orderId + amount + nicePayProperties.getKey());
+        model.addAttribute("payMethod", "CreditCard");
+        model.addAttribute("goodsName", "Sample Product");
+        model.addAttribute("Amt", amount);
+        model.addAttribute("mid", nicePayProperties.getMid());
+        model.addAttribute("moid", orderId);
+        model.addAttribute("EdiDate", ediDate);
+        model.addAttribute("signData", hashString);
+       // model.addAttribute("ReturnURL", "http://localhost:8080/nicepay3.0_utf-8/payResult_utf.jsp");
+        return "gopay";
+    }
+
     @RequestMapping("/serverAuth")
     public RedirectView requestPaymentAuth(
             @RequestParam String tid,
@@ -62,4 +85,6 @@ public class NicepayController {
         redirectView.setUrl(redirectUrl+"/auth/payComplete/once");
         return redirectView;
     }
+
+     */
 }

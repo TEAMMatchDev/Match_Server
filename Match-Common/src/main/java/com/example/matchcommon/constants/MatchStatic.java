@@ -25,5 +25,7 @@ public class MatchStatic {
 
     public static final String MATCH_NAME = "매치";
 
+    public static final String PORT_ONE = "port_one";
+
 
 }
