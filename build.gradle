@@ -10,6 +10,7 @@ allprojects{
     sourceCompatibility = "16"
 
     repositories {
+        maven { url 'https://jitpack.io' }
         mavenCentral()
     }
 }
