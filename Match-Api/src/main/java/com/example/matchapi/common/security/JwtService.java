@@ -1,6 +1,5 @@
-package com.example.matchapi.security;
+package com.example.matchapi.common.security;
 
-import com.example.matchapi.user.convertor.UserConvertor;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchdomain.redis.entity.AccessToken;
@@ -28,9 +27,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-
-import static com.example.matchapi.security.JwtFilter.AUTHORIZATION_HEADER;
-import static com.example.matchapi.security.JwtFilter.REFRESH_TOKEN_HEADER;
 
 @RequiredArgsConstructor
 @Component
@@ -168,12 +164,12 @@ public class JwtService {
 
     public String getJwt(){
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        return request.getHeader(AUTHORIZATION_HEADER);
+        return request.getHeader(JwtFilter.AUTHORIZATION_HEADER);
     }
 
     public String getRefreshToken(){
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        return request.getHeader(REFRESH_TOKEN_HEADER);
+        return request.getHeader(JwtFilter.REFRESH_TOKEN_HEADER);
     }
 
     public Date getExpiredTime(String token){

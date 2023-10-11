@@ -1,6 +1,6 @@
 package com.example.matchapi.user.service;
 
-import com.example.matchapi.security.JwtService;
+import com.example.matchapi.common.security.JwtService;
 import com.example.matchapi.user.convertor.UserConvertor;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;

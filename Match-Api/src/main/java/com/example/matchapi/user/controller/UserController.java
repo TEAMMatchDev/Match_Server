@@ -1,6 +1,6 @@
 package com.example.matchapi.user.controller;
 
-import com.example.matchapi.security.JwtService;
+import com.example.matchapi.common.security.JwtService;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.service.UserService;
@@ -25,7 +25,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static com.example.matchdomain.user.exception.UserAuthErrorCode.INVALID_REFRESH_TOKEN;
 

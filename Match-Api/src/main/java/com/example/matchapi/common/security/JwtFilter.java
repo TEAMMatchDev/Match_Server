@@ -1,4 +1,4 @@
-package com.example.matchapi.security;
+package com.example.matchapi.common.security;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

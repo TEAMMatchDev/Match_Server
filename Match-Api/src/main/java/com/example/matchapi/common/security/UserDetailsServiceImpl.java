@@ -1,4 +1,4 @@
-package com.example.matchapi.security;
+package com.example.matchapi.common.security;
 
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;

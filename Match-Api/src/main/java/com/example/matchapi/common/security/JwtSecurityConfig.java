@@ -1,4 +1,4 @@
-package com.example.matchapi.security;
+package com.example.matchapi.common.security;
 
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
