@@ -4,6 +4,7 @@ import com.example.matchapi.common.aop.CheckIdExist;
 import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
+import com.example.matchapi.project.enums.FILTER;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
@@ -91,10 +92,11 @@ public class ProjectController {
             @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size,
             @Parameter(description = "후원종류") @RequestParam(required = false)ProjectKind projectKind,
-            @Parameter(description = "검색어")  @RequestParam(required = false) String content
-    ) {
+            @Parameter(description = "검색어")  @RequestParam(required = false) String content,
+            @Parameter(description = "필터종류 \n최신순 = LATEST \n추천순 RECOMMEND ") @RequestParam(required = false, defaultValue = "LATEST") FILTER filter
+            ) {
         log.info("03-05 프로젝트 리스트 조회");
-        return CommonResponse.onSuccess(projectService.getProjectLists(user, page, size, projectKind, content));
+        return CommonResponse.onSuccess(projectService.getProjectLists(user, page, size, projectKind, content, filter));
     }
 
     @Operation(summary = "03-06💻 프로젝트 관심설정/관심삭제 API #FRAME_프로젝트 리스트 조회.",description = "프로젝트 관심 설정/삭제 API 입니다.")
