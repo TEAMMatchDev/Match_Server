@@ -1,5 +1,6 @@
 package com.example.matchapi.donation.convertor;
 
+import com.example.matchapi.common.util.TimeHelper;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.project.dto.ProjectRes;
@@ -8,7 +9,9 @@ import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.HistoryImageRepository;
+import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +26,7 @@ import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
 @RequiredArgsConstructor
 public class DonationConvertor {
     private final DonationHelper donationHelper;
+    private final TimeHelper timeHelper;
     private final HistoryImageRepository historyImageRepository;
     public DonationRes.FlameList Flame(DonationUser result) {
         return DonationRes.FlameList.builder()
@@ -60,7 +64,7 @@ public class DonationConvertor {
 
     }
 
-    public DonationRes.DonationList DonationList(DonationUser result) {
+    public DonationRes.DonationList DonationListDetail(DonationUser result) {
         String payDate="";
         if(result.getRegularPayment()!=null) {
             payDate = "매월 " + result.getRegularPayment().getPayDate() + "일 " + donationHelper.parsePriceComma(Math.toIntExact(result.getRegularPayment().getAmount()));
@@ -97,7 +101,7 @@ public class DonationConvertor {
                 .build();
     }
 
-    public DonationRes.DonationRegularList DonationRegularList(DonationHistory result) {
+    public DonationRes.DonationRegularList DonationRegularListDetail(DonationHistory result) {
         String histories = "";
         String flameImage = null;
         List<DonationRes.DonationHistoryImage> donationHistoryImages = new ArrayList<>();
@@ -142,21 +146,21 @@ public class DonationConvertor {
         return donationHistoryImages;
     }
 
-    public DonationRes.PayList PayList(DonationUser result) {
+    public DonationRes.PayList PayListDetail(DonationUser result) {
         String payStatus = "결제완료";
         if(result.getDonationStatus() == EXECUTION_REFUND){
             payStatus = "환불";
         }
         return DonationRes.PayList
                 .builder()
-                .payDate(donationHelper.timeFormat(result.getCreatedAt()))
+                .payDate(timeHelper.timeFormat(result.getCreatedAt()))
                 .payMethod(result.getPayMethod().getName())
                 .payStatus(payStatus)
                 .amount(donationHelper.parsePriceComma(Math.toIntExact(result.getPrice())))
                 .build();
     }
 
-    public DonationRes.BurningMatchRes BurningMatch(DonationUserRepository.flameList result) {
+    public DonationRes.BurningMatchRes BurningMatchDetail(DonationUserRepository.flameList result) {
         List<String> imgUrlList = null;
         if(result.getImgUrlList()!=null){
             imgUrlList = Stream.of(result.getImgUrlList().split(",")).collect(Collectors.toList());
@@ -195,7 +199,7 @@ public class DonationConvertor {
                 .build();
     }
 
-    public ProjectRes.MatchHistory MatchHistory(DonationHistory result) {
+    public ProjectRes.MatchHistory MatchHistoryDetail(DonationHistory result) {
         String histories = "";
         String profileImgUrl = "";
         String nickname = "";
@@ -234,7 +238,7 @@ public class DonationConvertor {
                 .profileImageUrl(profileImgUrl)
                 .nickname(nickname)
                 .historyStatus(result.getHistoryStatus())
-                .historyDate(donationHelper.dayTimeFormat(result.getCreatedAt()))
+                .historyDate(timeHelper.dayTimeFormat(result.getCreatedAt()))
                 .build();
     }
 
@@ -244,4 +248,76 @@ public class DonationConvertor {
                 .historyStatus(historyStatus)
                 .build();
     }
+
+    public List<DonationRes.DonationList> DonationList(Page<DonationUser> donationUsers) {
+        List<DonationRes.DonationList> donationLists = new ArrayList<>();
+        donationUsers.getContent().forEach(
+                result ->{
+                    donationLists.add(
+                            DonationListDetail(result)
+                    );
+                }
+        );
+
+        return donationLists;
+    }
+
+    public List<DonationRes.BurningMatchRes> BurningMatch(List<DonationUserRepository.flameList> flameLists) {
+        List<DonationRes.BurningMatchRes> burningMatchRes = new ArrayList<>();
+        flameLists.forEach(
+                result -> {
+                    burningMatchRes.add(BurningMatchDetail(result));
+                }
+        );
+
+        return burningMatchRes;
+    }
+
+    public List<DonationRes.DonationRegularList> DonationRegularList(List<DonationHistory> donationHistories){
+        List<DonationRes.DonationRegularList> donationRegularLists = new ArrayList<>();
+        donationHistories.forEach(
+                result -> donationRegularLists.add(
+                        DonationRegularListDetail(result)
+                )
+        );
+        return donationRegularLists;
+    }
+
+    public List<ProjectRes.MatchHistory> MatchHistory(List<DonationHistory> donationHistories){
+        List<ProjectRes.MatchHistory> matchHistories = new ArrayList<>();
+
+        donationHistories.forEach(
+                result -> matchHistories.add(
+                        MatchHistoryDetail(result)
+                )
+        );
+
+        return matchHistories;
+    }
+
+    public List<DonationRes.FlameProjectList> FlameProjectList(List<DonationUser> donationUsers){
+        List<DonationRes.FlameProjectList> flameProjectLists = new ArrayList<>();
+
+        donationUsers.forEach(
+                result -> flameProjectLists.add(
+                        FlameProject(result)
+                )
+        );
+
+        return flameProjectLists;
+    }
+
+    public List<DonationRes.PayList> PayList(List<DonationUser> donationUsers) {
+        List<DonationRes.PayList> payLists = new ArrayList<>();
+
+        donationUsers.forEach(
+                result -> payLists.add(
+                        PayListDetail(result)
+                )
+        );
+
+        return payLists;
+    }
+
+
 }

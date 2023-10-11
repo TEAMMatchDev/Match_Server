@@ -5,6 +5,8 @@ import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,4 +34,6 @@ public interface RegularPaymentRepository extends JpaRepository<RegularPayment,L
     List<RegularPayment> findByUser(User user);
 
     List<RegularPayment> findByUserCardId(Long cardId);
+
+    Page<RegularPayment> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
 }

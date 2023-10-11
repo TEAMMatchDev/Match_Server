@@ -1,5 +1,6 @@
 package com.example.matchapi.project.convertor;
 
+import com.example.matchapi.common.util.TimeHelper;
 import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
@@ -31,7 +32,7 @@ import static com.example.matchdomain.project.entity.enums.ProjectStatus.BEFORE_
 public class ProjectConvertor {
     private final ProjectHelper projectHelper;
     private final RegularPaymentRepository regularPaymentRepository;
-    private final DonationHelper donationHelper;
+    private final TimeHelper timeHelper;
     private static final String FIRST_TIME = "T00:00:00";
     private static final String LAST_TIME = "T23:59:59";
     public ProjectRes.ProjectDetail projectImgList(List<ProjectImage> projectImage) {
@@ -86,7 +87,7 @@ public class ProjectConvertor {
         return ProjectRes.CommentList.builder()
                 .commentId(result.getId())
                 .comment(result.getComment())
-                .commentDate(donationHelper.dayTimeFormat(result.getCreatedAt()))
+                .commentDate(timeHelper.dayTimeFormat(result.getCreatedAt()))
                 .nickname(result.getUser().getNickname())
                 .userId(result.getUserId())
                 .isMy(result.getUserId().equals(userId))

@@ -15,20 +15,4 @@ public class DonationHelper {
         return decimalFormat.format(amount)+"원";
     }
 
-    public String timeFormat(LocalDateTime createdAt) {
-        return createdAt.getYear() + "." + createdAt.getMonthValue() + "." + createdAt.getDayOfMonth();
-    }
-
-    public String dayTimeFormat(LocalDateTime createdAt) {
-        return createdAt.getYear() + "." + createdAt.getMonthValue() + "." + createdAt.getDayOfMonth() + " " + checkTimes(createdAt.getHour()) + ":" + checkTimes(createdAt.getMinute());
-    }
-
-    public String checkTimes(int time){
-        if(time < 10){
-            return  "0" + time;
-        }
-        else{
-            return String.valueOf(time);
-        }
-    }
 }
