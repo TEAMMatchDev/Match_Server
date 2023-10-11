@@ -4,6 +4,7 @@ import com.example.matchcommon.properties.RedisProperties;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +24,11 @@ import java.time.Duration;
 @EnableRedisRepositories(
         basePackages = "com.example")
 @RequiredArgsConstructor
+@Slf4j
 public class RedisConfig {
     private final RedisProperties redisProperties;
+    @Value("${spring.config.activate.on-profile}")
+    private String profile;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -37,8 +41,13 @@ public class RedisConfig {
                         .build())
                 .commandTimeout(Duration.ofSeconds(1000L)).build();
 
-        //return new LettuceConnectionFactory(clusterConfiguration, clientConfiguration);
-        return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
+        if(profile.equals("prod")){
+            log.info(profile + " profile");
+            return new LettuceConnectionFactory(clusterConfiguration, clientConfiguration);
+        }else {
+            log.info(profile + " profile");
+            return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
+        }
     }
 
     @Bean
