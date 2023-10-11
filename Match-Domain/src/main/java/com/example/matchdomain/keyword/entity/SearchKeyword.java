@@ -24,5 +24,7 @@ public class SearchKeyword extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private int priority;
+
     private String keyword;
 }
