@@ -4,6 +4,9 @@ server:
     context-path: /
 
 spring:
+  cache:
+    ehcache:
+      config: classpath:ehcache.xml
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
