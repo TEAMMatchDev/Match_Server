@@ -1,7 +1,6 @@
 package com.example.matchapi.config;
 
 import com.example.matchapi.common.security.*;
-import com.example.matchapi.security.*;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
