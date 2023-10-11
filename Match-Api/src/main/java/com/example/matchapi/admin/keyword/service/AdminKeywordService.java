@@ -1,5 +1,6 @@
-package com.example.matchapi.keword.service;
+package com.example.matchapi.admin.keyword.service;
 
+import com.example.matchapi.admin.keyword.convertor.AdminKeywordConvertor;
 import com.example.matchapi.admin.keyword.dto.AdminKeywordReq;
 import com.example.matchapi.keword.convertor.KeywordConvertor;
 import com.example.matchapi.keword.dto.KeywordRes;
@@ -11,22 +12,26 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class KeywordService {
-    private final KeywordConvertor keywordConvertor;
+public class AdminKeywordService {
     private final SearchKeywordRepository searchKeywordRepository;
+    private final KeywordConvertor keywordConvertor;
+    private final AdminKeywordConvertor adminKeywordConvertor;
 
-
-    @Cacheable(cacheNames = "keywordList", key = "'all'")
-    public List<KeywordRes.KeywordList> getKeywordList() {
-        return getKeyword();
+    @Transactional
+    @CachePut(cacheNames = "keywordList", key = "'all'")
+    public List<KeywordRes.KeywordList> postKeyword(AdminKeywordReq.KeywordUpload keyword) {
+        searchKeywordRepository.save(adminKeywordConvertor.Keyword(keyword));
+        return cachingKeywordList();
     }
 
-    public List<KeywordRes.KeywordList> getKeyword(){
+    @CacheEvict(cacheNames = "keywordList")
+    public List<KeywordRes.KeywordList> cachingKeywordList(){
         List<SearchKeyword> searchKeywords = searchKeywordRepository.findAllByOrderByPriorityAsc();
         List<KeywordRes.KeywordList> keywordLists = new ArrayList<>();
 

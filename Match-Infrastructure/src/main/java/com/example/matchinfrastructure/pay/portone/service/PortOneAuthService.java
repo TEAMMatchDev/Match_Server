@@ -18,30 +18,16 @@ public class PortOneAuthService {
     private final PortOneFeignClient portOneFeignClient;
     private final PortOneProperties portOneProperties;
 
+    @Cacheable(value = "portOneTokenCache")
     public String getToken() {
         String token =  fetchPortOneToken();
-        System.out.println(token);
+        System.out.println("request : " + token);
         return token;
     }
 
-    @CachePut(value = "portOneTokenCache")
     public String fetchPortOneToken() {
-        PortOneResponse<PortOneAuth> portOneResponse = portOneFeignClient.getAccessToken(PortOneAuthReq.builder().imp_key(portOneProperties.getKey()).imp_secret(portOneProperties.getSecret()).build());
-        return portOneResponse.getResponse().getAccess_token();
-    }
-
-    @CachePut(value = "portOneTokenCache")
-    public String refreshToken() {
-        String newToken = fetchPortOneToken();
-        System.out.println("refresh Token");
-        return newToken;
-    }
-
-    //@Scheduled(fixedRate = 100)
-    @Scheduled(fixedRate = 1700000) // 30분마다 실행 (1800초)
-    public void scheduleTokenRefresh() {
-        System.out.println("refresh token Schedule");
-        String refreshToken = refreshToken();
+        System.out.println("request token");
+        return getTokens();
     }
 
     public String getTokens() {
