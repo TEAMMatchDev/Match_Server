@@ -2,6 +2,7 @@ package com.example.matchapi.donation.controller;
 
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.service.DonationService;
+import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
@@ -36,6 +37,7 @@ public class DonationController {
         return CommonResponse.onSuccess("기부금 환불 성공");
     }
 
+    /*
     @GetMapping("/flame/filter")
     @Deprecated
     @ApiErrorCodeExample(UserAuthErrorCode.class)
@@ -50,6 +52,8 @@ public class DonationController {
     ) {
         return CommonResponse.onSuccess(donationService.getFlameList(user, page, size, flame, order, content));
     }
+
+     */
 
     @DeleteMapping("/{regularId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, CancelRegularPayErrorCode.class})
@@ -154,6 +158,18 @@ public class DonationController {
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
     ) {
         return CommonResponse.onSuccess(donationService.getFlameRegularList(donationId, user, page, size));
+    }
+
+    @Operation(summary = "05-11 진행 중인 매치 조회 ",description = "진행중인 매치 조회 API 입니다.")
+    @GetMapping("/match")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    public CommonResponse<PageResponse<List<DonationRes.MatchList>>> getUserMatchList(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size
+    ){
+        PageResponse<List<DonationRes.MatchList>> matchLists = donationService.getUserMatchList(user, page, size);
+        return CommonResponse.onSuccess(matchLists);
     }
 
 }

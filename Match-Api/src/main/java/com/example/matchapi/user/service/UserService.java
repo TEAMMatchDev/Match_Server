@@ -93,6 +93,7 @@ public class UserService {
         return userConvertor.UserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
     }
 
+    @Transactional
     public PageResponse<List<UserRes.UserList>> getUserList(int page, int size, Status status, String content) {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserRepository.UserList> userList = null;
@@ -133,6 +134,7 @@ public class UserService {
         return userConvertor.UserProfile(user);
     }
 
+    @Transactional
     public void modifyUserProfile(User user, UserReq.ModifyProfile modifyProfile) {
         if(modifyProfile.getName() == null && modifyProfile.getMultipartFile()!=null){
             String beforeProfileImg = user.getProfileImgUrl();

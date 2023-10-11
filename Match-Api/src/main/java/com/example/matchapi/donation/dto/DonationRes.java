@@ -259,4 +259,21 @@ public class DonationRes {
 
         private String imgUrl;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class MatchList {
+        private String projectTitle;
+
+        private String regularDate;
+
+        private RegularPayStatus regularPayStatus;
+
+        private int payDate;
+
+        private String amount;
+    }
 }
