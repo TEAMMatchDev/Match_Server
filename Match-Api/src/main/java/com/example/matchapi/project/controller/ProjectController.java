@@ -4,7 +4,7 @@ import com.example.matchapi.common.aop.CheckIdExist;
 import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
-import com.example.matchapi.project.enums.FILTER;
+import com.example.matchcommon.constants.enums.FILTER;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
@@ -70,18 +70,6 @@ public class ProjectController {
             ){
         log.info("03-03 프로젝트 검색 조회 projectId : "+ content);
         return CommonResponse.onSuccess(projectService.searchProjectList(user, content, page, size));
-    }
-
-    @Operation(summary = "03-04💻 프로젝트 댓글 조회",description = "프로젝트 댓글 조회 API 입니다.")
-    @GetMapping("/comment/{projectId}")
-    public CommonResponse<PageResponse<List<ProjectRes.CommentList>>> getProjectComment(
-            @Parameter(hidden = true) @AuthenticationPrincipal User user,
-            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
-            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size,
-            @Parameter(description = "프로젝트 id")  @PathVariable("projectId") Long projectId
-    ){
-        log.info("03-04 프로젝트 댓글 조회 projectId : "+ projectId);
-        return CommonResponse.onSuccess(projectService.getProjectComment(user, projectId, page, size));
     }
 
     @Operation(summary = "03-05💻 프로젝트 리스트 조회 API #FRAME_프로젝트 리스트 조회.",description = "프로젝트 리스트 조회 API 입니다.")

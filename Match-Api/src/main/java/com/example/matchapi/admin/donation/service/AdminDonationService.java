@@ -74,7 +74,7 @@ public class AdminDonationService {
     public void enforceDonation(List<MultipartFile> imageLists, DonationReq.EnforceDonation enforceDonation) {
         donationHistoryRepository.save(adminDonationConvertor.DonationHistoryChange(enforceDonation));
 
-        DonationHistory donationHistory = donationHistoryRepository.save(adminDonationConvertor.DonationHistoryComplete(enforceDonation.getProjectId()));
+        DonationHistory donationHistory = donationHistoryRepository.save(adminDonationConvertor.DonationHistoryComplete(enforceDonation.getProjectId(), enforceDonation.getDonationUserLists()));
 
         saveDonationHistoryImages(imageLists, donationHistory.getId());
 

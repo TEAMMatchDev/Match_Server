@@ -24,7 +24,11 @@ public class QDonationHistory extends EntityPathBase<DonationHistory> {
 
     public final com.example.matchdomain.common.model.QBaseEntity _super = new com.example.matchdomain.common.model.QBaseEntity(this);
 
+    public final ListPath<Long, NumberPath<Long>> changeIdLists = this.<Long, NumberPath<Long>>createList("changeIdLists", Long.class, NumberPath.class, PathInits.DIRECT2);
+
     public final NumberPath<Integer> cnt = createNumber("cnt", Integer.class);
+
+    public final ListPath<Long, NumberPath<Long>> completeIdLists = this.<Long, NumberPath<Long>>createList("completeIdLists", Long.class, NumberPath.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
@@ -32,8 +36,6 @@ public class QDonationHistory extends EntityPathBase<DonationHistory> {
     public final QDonationUser donationUser;
 
     public final NumberPath<Long> donationUserId = createNumber("donationUserId", Long.class);
-
-    public final StringPath flameImage = createString("flameImage");
 
     public final ListPath<HistoryImage, QHistoryImage> historyImages = this.<HistoryImage, QHistoryImage>createList("historyImages", HistoryImage.class, QHistoryImage.class, PathInits.DIRECT2);
 

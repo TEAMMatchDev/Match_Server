@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -70,5 +69,17 @@ public class DonationAdaptor {
         Pageable pageable = PageRequest.of(page, size);
 
         return donationUserRepository.findByUserAndInherenceNameContainingAndProject_ProjectImg_RepresentStatusOrderByCreatedAtDesc(user, content, REPRESENT, pageable);
+    }
+
+    public Page<DonationUser> findDonationUsers(Long projectId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return donationUserRepository.findByProjectId(projectId, pageable);
+    }
+
+    public Page<DonationUser> findByUser(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return donationUserRepository.findByUserAndDonationStatusNotOrderByCreatedAtDesc(user, EXECUTION_REFUND, pageable);
     }
 }

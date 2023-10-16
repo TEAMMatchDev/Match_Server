@@ -6,6 +6,7 @@ import com.example.matchapi.portone.dto.PaymentReq;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.entity.enums.*;
+import com.example.matchdomain.donation.entity.flameEnum.FlameImage;
 import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchinfrastructure.pay.nice.dto.*;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
@@ -31,6 +32,7 @@ public class OrderConvertor {
                 .inherenceName(flameName)
                 .inherenceNumber(inherenceNumber)
                 .regularStatus(RegularStatus.ONE_TIME)
+                .flameImage(FlameImage.NORMAL_IMG.getImg())
                 .build();
     }
     public DonationUser donationUserV2(NicePaymentAuth nicePaymentAuth, Long id, Long amount, String projectId, String flameName, String inherenceNumber) {
@@ -45,6 +47,7 @@ public class OrderConvertor {
                 .inherenceName(flameName)
                 .inherenceNumber(inherenceNumber)
                 .regularStatus(RegularStatus.ONE_TIME)
+                .flameImage(FlameImage.NORMAL_IMG.getImg())
                 .build();
     }
 
@@ -73,6 +76,7 @@ public class OrderConvertor {
                 .amount(regularDonation.getAmount())
                 .userCardId(userCardId)
                 .projectId(projectId)
+                .regularPayStatus(RegularPayStatus.PROCEEDING)
                 .build();
     }
 
@@ -148,6 +152,7 @@ public class OrderConvertor {
                 .inherenceName(flameName)
                 .inherenceNumber(inherenceNumber)
                 .regularStatus(RegularStatus.ONE_TIME)
+                .flameImage(FlameImage.NORMAL_IMG.getImg())
                 .build();
     }
 
@@ -180,6 +185,7 @@ public class OrderConvertor {
                 .inherenceNumber(inherenceNumber)
                 .regularStatus(regularStatus)
                 .regularPaymentId(regularPaymentId)
+                .flameImage(FlameImage.NORMAL_IMG.getImg())
                 .build();
     }
 }

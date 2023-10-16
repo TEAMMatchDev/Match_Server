@@ -86,7 +86,7 @@ public class DonationController {
         return CommonResponse.onSuccess(donationService.getDonationList(user.getId(), filter, page, size));
     }
 
-    @GetMapping("/burning-match")
+/*    @GetMapping("/burning-match")
     @ApiErrorCodeExample({UserAuthErrorCode.class})
     @Operation(summary = "05-06 유저의 불타는 매치 #FRAME_홈_불타는 매치")
     public CommonResponse<PageResponse<List<DonationRes.BurningMatchRes>>> getBurningMatch(
@@ -95,9 +95,9 @@ public class DonationController {
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
     ) {
         return CommonResponse.onSuccess(donationService.getBurningMatch(user, page, size));
-    }
+    }*/
 
-    @GetMapping("/top/{regularPayId}")
+  /*  @GetMapping("/top/{regularPayId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
     @Operation(summary = "05-07-01 후원 상세 보기 조회 #FRAME_불타는 매치_후원_상세_보기_상단조회")
     public CommonResponse<DonationRes.DonationRegular> getDonationRegular(@PathVariable Long regularPayId,
@@ -116,7 +116,7 @@ public class DonationController {
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
     ) {
         return CommonResponse.onSuccess(donationService.getDonationRegularList(regularPayId, user, page, size));
-    }
+    }*/
 
     @GetMapping("/pay/{regularPayId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, GetRegularErrorCode.class})
@@ -170,6 +170,17 @@ public class DonationController {
     ){
         PageResponse<List<DonationRes.MatchList>> matchLists = donationService.getUserMatchList(user, page, size);
         return CommonResponse.onSuccess(matchLists);
+    }
+
+    @Operation(summary = "05-12 타오르는 불꽃이 리스트 조회 #FRAME_불꽃이_둘러보기", description = "타오르는 불꽃이 리스트 조회입니다, 후원중인 곳이 없을 때 빈 리스트가 반환됩니다.")
+    @GetMapping("/burning-flame")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    public CommonResponse<PageResponse<List<DonationRes.BurningFlameDto>>> getBurningFlameList(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size
+    ){
+        return CommonResponse.onSuccess(donationService.getBurningFlameList(user, page, size));
     }
 
 }

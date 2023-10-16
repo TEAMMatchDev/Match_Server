@@ -11,6 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.PROCEEDING;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.GetRegularErrorCode.REGULAR_NOT_EXIST;
 
@@ -29,5 +33,21 @@ public class RegularPaymentAdaptor {
     public Page<RegularPayment> findByUser(User user, int page, int size){
         Pageable pageable = PageRequest.of(page, size);
         return regularPaymentRepository.findByUserOrderByCreatedAtDesc(user, pageable);
+    }
+
+    public Page<RegularPayment> findBurningFlameList(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return regularPaymentRepository.findRegularListCustom(user, PROCEEDING, pageable);
+    }
+
+    public Page<RegularPaymentRepository.RegularPaymentFlame> getBurningFlameList(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return regularPaymentRepository.getBurningFlameListCustom(user.getId(), PROCEEDING.getValue(), pageable);
+    }
+
+    public List<Long> findByIdList(Long regularPayId, User user){
+        return regularPaymentRepository.findByIdAndUserOrderByCreatedAtDesc(regularPayId, user).stream()
+                .map(RegularPayment :: getId)
+                .collect(Collectors.toList());
     }
 }

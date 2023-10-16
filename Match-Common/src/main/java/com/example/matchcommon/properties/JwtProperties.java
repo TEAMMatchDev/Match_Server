@@ -20,6 +20,4 @@ public class JwtProperties {
     private String refresh;
     private Long accessTokenSeconds;
     private Long refreshTokenSeconds;
-
-
 }

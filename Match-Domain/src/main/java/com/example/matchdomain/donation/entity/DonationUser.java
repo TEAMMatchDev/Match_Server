@@ -4,6 +4,7 @@ import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.enums.PayMethod;
 import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.donation.entity.flameEnum.FlameType;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
 import lombok.*;
@@ -70,6 +71,11 @@ public class DonationUser extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private RegularStatus regularStatus;
+
+    private String flameImage;
+
+    @Enumerated(EnumType.STRING)
+    private FlameType flameType = FlameType.NORMAL_FLAME;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "donationUserId")

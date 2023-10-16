@@ -9,7 +9,6 @@ import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.HistoryImageRepository;
-import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 
@@ -101,27 +100,27 @@ public class DonationConvertor {
                 .build();
     }
 
-    public DonationRes.DonationRegularList DonationRegularListDetail(DonationHistory result) {
+    public DonationRes.DonationRegularList DonationRegularListDetail(DonationHistory result, String inherenceName) {
         String histories = "";
         String flameImage = null;
         List<DonationRes.DonationHistoryImage> donationHistoryImages = new ArrayList<>();
         System.out.println("분기");
         if(result.getHistoryStatus() == HistoryStatus.CREATE){
             System.out.println("CREATE");
-            histories = result.getDonationUser().getUser().getName() + "님의 불꽃이 탄생했습니다.";
-            flameImage= result.getFlameImage();
+            histories = inherenceName + "가 생성되었습니다.";
+            flameImage= result.getDonationUser().getFlameImage();
         }else if(result.getHistoryStatus() == HistoryStatus.COMPLETE) {
             System.out.println("COMPLETE");
             histories = "'후원품'을 '후원처'에 전달했습니다.";
             donationHistoryImages = DonationHistoryImage(result.getHistoryImages());
         }else{
-            histories = result.getCnt() + "명의 불꽃이 후원품으로 변했습니다.";
+            histories = inherenceName + " 외 " + (result.getCnt()-1) + "마리의 불꽃이들이 '후원품'으로 변했습니다.";
         }
 
         return DonationRes.DonationRegularList
                 .builder()
                 .historyId(result.getId())
-                .historyDate(result.getCreatedAt().getYear()+"."+result.getCreatedAt().getMonthValue()+"."+result.getCreatedAt().getDayOfMonth())
+                .historyDate(timeHelper.matchTimeFormat(result.getCreatedAt()))
                 .histories(histories)
                 .flameImage(flameImage)
                 .historyStatus(result.getHistoryStatus())
@@ -187,15 +186,15 @@ public class DonationConvertor {
                 .build();
     }
 
-    public DonationRes.DonationFlame DonationFlame(RegularPayment regularPayment, DonationUser donationUser) {
+    public DonationRes.DonationFlame DonationFlame(int sequence, DonationUser donationUser) {
         return DonationRes.DonationFlame
                 .builder()
+                .imgUrl(donationUser.getFlameImage())
+                .flameType(donationUser.getFlameType().getType())
                 .inherenceName(donationUser.getInherenceName())
-                .regularPayStatus(regularPayment.getRegularPayStatus())
-                .imgUrl(regularPayment.getProject().getProjectImage().get(0).getUrl())
-                .regularPayId(regularPayment.getId())
-                .payDate(regularPayment.getPayDate())
-                .amount(Math.toIntExact(regularPayment.getAmount()))
+                .usages(donationUser.getProject().getUsages())
+                .amount(Math.toIntExact(donationUser.getPrice()))
+                .sequence(sequence)
                 .build();
     }
 
@@ -273,11 +272,11 @@ public class DonationConvertor {
         return burningMatchRes;
     }
 
-    public List<DonationRes.DonationRegularList> DonationRegularList(List<DonationHistory> donationHistories){
+    public List<DonationRes.DonationRegularList> DonationRegularList(List<DonationHistory> donationHistories, String inherenceName){
         List<DonationRes.DonationRegularList> donationRegularLists = new ArrayList<>();
         donationHistories.forEach(
                 result -> donationRegularLists.add(
-                        DonationRegularListDetail(result)
+                        DonationRegularListDetail(result, inherenceName)
                 )
         );
         return donationRegularLists;

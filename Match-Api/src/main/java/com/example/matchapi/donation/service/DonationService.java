@@ -3,9 +3,9 @@ package com.example.matchapi.donation.service;
 import com.example.matchapi.donation.convertor.DonationConvertor;
 import com.example.matchapi.donation.convertor.RegularPaymentConvertor;
 import com.example.matchapi.donation.dto.DonationRes;
+import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.portone.service.PaymentService;
 import com.example.matchapi.project.dto.ProjectRes;
-import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
@@ -13,24 +13,18 @@ import com.example.matchdomain.donation.adaptor.DonationHistoryAdaptor;
 import com.example.matchdomain.donation.adaptor.RegularPaymentAdaptor;
 import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
-import com.example.matchdomain.donation.repository.DonationHistoryRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
-import static com.example.matchdomain.donation.entity.enums.HistoryStatus.CREATE;
 import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.USER_CANCEL;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_CORRECT_USER;
 import static com.example.matchdomain.donation.exception.DonationRefundErrorCode.*;
@@ -45,6 +39,7 @@ public class DonationService {
     private final DonationAdaptor donationAdaptor;
     private final DonationHistoryAdaptor donationHistoryAdaptor;
     private final RegularPaymentConvertor regularPaymentConvertor;
+    private final DonationHelper donationHelper;
 
 
     public PageResponse<List<DonationRes.DonationList>> getDonationList(Long userId, int filter, int page, int size) {
@@ -100,7 +95,7 @@ public class DonationService {
         Page<DonationHistory> donationHistories = donationHistoryAdaptor.findDonationRegularList(regularPayId, regularPayment.getProjectId(), HistoryStatus.TURN_ON ,page, size);
 
 
-        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.DonationRegularList(donationHistories.getContent()));
+        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.DonationRegularList(donationHistories.getContent(), ""));
     }
 
     public List<DonationRes.PayList> getPayList(User user, Long regularPayId) {
@@ -120,13 +115,13 @@ public class DonationService {
 
         Page<DonationHistory> donationHistories = donationHistoryAdaptor.findDonationHistory(donationUser, donationId, page, size);
 
-        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.DonationRegularList(donationHistories.getContent()));
+        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.DonationRegularList(donationHistories.getContent(), donationUser.getInherenceName()));
     }
 
     public DonationRes.DonationFlame getFlameRegular(Long donationId, User user) {
         DonationUser donationUser = donationAdaptor.findById(donationId);
-
-        return donationConvertor.DonationFlame(regularPaymentAdaptor.findById(donationUser.getRegularPaymentId()), donationUser);
+        int sequence = donationHelper.getDonationSequence(donationUser, donationId);
+        return donationConvertor.DonationFlame(sequence, donationUser);
     }
 
     public PageResponse<List<ProjectRes.MatchHistory>> getMatchHistory(User user, Long projectId, int page, int size) {
@@ -139,5 +134,10 @@ public class DonationService {
         Page<RegularPayment> regularPayments = regularPaymentAdaptor.findByUser(user, page, size);
 
         return new PageResponse<>(regularPayments.isLast(), regularPayments.getTotalElements(), regularPaymentConvertor.MatchList(regularPayments.getContent()));
+    }
+
+    public PageResponse<List<DonationRes.BurningFlameDto>> getBurningFlameList(User user, int page, int size) {
+        Page<DonationUser> donationUsers = donationAdaptor.findByUser(user, page, size);
+        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), regularPaymentConvertor.BurningFlameList(donationUsers.getContent()));
     }
 }

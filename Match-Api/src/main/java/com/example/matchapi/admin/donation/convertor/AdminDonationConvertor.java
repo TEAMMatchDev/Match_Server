@@ -8,6 +8,8 @@ import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.HistoryImage;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 
+import java.util.List;
+
 @Convertor
 public class AdminDonationConvertor {
     public DonationRes.DonationDetail getDonationDetail(DonationUser donationUser) {
@@ -28,11 +30,12 @@ public class AdminDonationConvertor {
                 .build();
     }
 
-    public DonationHistory DonationHistoryComplete(Long projectId) {
+    public DonationHistory DonationHistoryComplete(Long projectId, List<Long> donationUserLists) {
         return DonationHistory
                 .builder()
                 .projectId(projectId)
                 .historyStatus(HistoryStatus.COMPLETE)
+                .completeIdLists(donationUserLists)
                 .build();
     }
 
@@ -50,6 +53,7 @@ public class AdminDonationConvertor {
                 .projectId(enforceDonation.getProjectId())
                 .cnt(enforceDonation.getDonationUserLists().size())
                 .historyStatus(HistoryStatus.CHANGE)
+                .changeIdLists(enforceDonation.getDonationUserLists())
                 .build();
     }
 }

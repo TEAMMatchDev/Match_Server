@@ -11,6 +11,8 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
+import static com.example.matchdomain.donation.entity.enums.HistoryStatus.COMPLETE;
+
 @RequiredArgsConstructor
 public class DonationCustomRepositoryImpl implements DonationCustomRepository{
     private final JPAQueryFactory queryFactory;
@@ -30,6 +32,15 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
                                 .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON))
                                 .and(donationHistory.historyStatus.ne(HistoryStatus.START))
                                 .and(donationHistory.historyStatus.ne(HistoryStatus.FINISH))
+                                .and(
+                                        donationHistory.historyStatus.eq(HistoryStatus.COMPLETE)
+                                                .and(donationHistory.completeIdLists.contains(donationId))
+                                                .or(donationHistory.historyStatus.ne(HistoryStatus.COMPLETE)))
+                                .and(
+                                        donationHistory.historyStatus.eq(HistoryStatus.CHANGE)
+                                                .and(donationHistory.changeIdLists.contains(donationId))
+                                                .or(donationHistory.historyStatus.ne(HistoryStatus.CHANGE)))
+
                 )
                 .orderBy(donationHistory.createdAt.asc())
                 .offset(pageable.getOffset())
@@ -44,6 +55,15 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
                                 .and(donationHistory.historyStatus.ne(HistoryStatus.TURN_ON))
                                 .and(donationHistory.historyStatus.ne(HistoryStatus.START))
                                 .and(donationHistory.historyStatus.ne(HistoryStatus.FINISH))
+                                .and(
+                                        donationHistory.historyStatus.eq(HistoryStatus.COMPLETE)
+                                                .and(donationHistory.completeIdLists.contains(donationId))
+                                                .or(donationHistory.historyStatus.ne(HistoryStatus.COMPLETE)))
+                                .and(
+                                        donationHistory.historyStatus.eq(HistoryStatus.CHANGE)
+                                                .and(donationHistory.changeIdLists.contains(donationId))
+                                                .or(donationHistory.historyStatus.ne(HistoryStatus.CHANGE)))
+
                 )
                 .orderBy(donationHistory.createdAt.asc());
         return PageableExecutionUtils.getPage(donationHistories, pageable, countQuery::fetchCount);
