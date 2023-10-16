@@ -48,6 +48,7 @@ public class RedisConfig {
             log.info(profile + " profile");
             return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
         }
+
     }
 
     @Bean

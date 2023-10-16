@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsUtils;
+import org.springframework.http.HttpMethod;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
