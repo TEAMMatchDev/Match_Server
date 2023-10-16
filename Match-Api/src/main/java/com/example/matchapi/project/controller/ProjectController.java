@@ -38,7 +38,7 @@ import java.util.List;
 public class ProjectController {
     private final ProjectService projectService;
     private final DonationService donationService;
-    @Operation(summary = "03-01💻 프로젝트 리스트 조회 API.",description = "프로젝트 리스트 조회 API 입니다.")
+    @Operation(summary = "03-01💻 프로젝트 리스트 조회 API. #Web version",description = "프로젝트 리스트 조회 API 입니다.")
     @GetMapping("")
     public CommonResponse<PageResponse<List<ProjectRes.ProjectList>>> getProjectList(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
@@ -48,7 +48,7 @@ public class ProjectController {
         return CommonResponse.onSuccess(projectService.getProjectList(user, page, size));
     }
 
-    @Operation(summary = "03-02💻 프로젝트 상세조회 API.",description = "프로젝트 상세조회 API 입니다.")
+    @Operation(summary = "03-02💻 프로젝트 상세조회 API.  #Web version",description = "프로젝트 상세조회 API 입니다.")
     @GetMapping("/{projectId}")
     @CheckIdExist
     @ApiErrorCodeExample({ProjectOneTimeErrorCode.class})
@@ -60,7 +60,7 @@ public class ProjectController {
     }
 
 
-    @Operation(summary = "03-03💻 프로젝트 검색 조회",description = "프로젝트 검색 조회 API 입니다.")
+    @Operation(summary = "03-03💻 프로젝트 검색 조회  #Web version",description = "프로젝트 검색 조회 API 입니다.")
     @GetMapping("/search")
     public CommonResponse<PageResponse<List<ProjectRes.ProjectList>>> searchProjectList(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
