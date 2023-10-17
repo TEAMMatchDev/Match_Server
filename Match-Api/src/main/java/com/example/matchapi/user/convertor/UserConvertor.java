@@ -50,7 +50,7 @@ public class UserConvertor {
                 .birth(authHelper.birthConversion(kakaoUserInfoDto.getBirthYear(), kakaoUserInfoDto.getBirthDay()))
                 .gender(authHelper.genderConversion(kakaoUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(kakaoUserInfoDto.getProperties().getNickname())
+                .nickname(userHelper.createRandomNickName())
                 .build();
     }
 
@@ -77,7 +77,7 @@ public class UserConvertor {
                 .birth(authHelper.birthConversion(naverUserInfoDto.getBirthyear(), naverUserInfoDto.getBirthday()))
                 .gender(authHelper.genderConversion(naverUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(naverUserInfoDto.getNickname())
+                .nickname(userHelper.createRandomNickName())
                 .build();
     }
 
@@ -93,7 +93,7 @@ public class UserConvertor {
                 .birth(authHelper.birthConversionToLocalDate(signUpUser.getBirthDate()))
                 .gender(signUpUser.getGender())
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(signUpUser.getName())
+                .nickname(userHelper.createRandomNickName())
                 .build();
     }
 
