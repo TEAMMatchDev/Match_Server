@@ -22,6 +22,9 @@ import com.example.matchdomain.user.entity.UserAddress;
 import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.match_aligo.client.MatchAligoFeignClient;
+import com.example.matchinfrastructure.oauth.apple.client.AppleFeignClient;
+import com.example.matchinfrastructure.oauth.apple.dto.ApplePublicResponse;
+import com.example.matchinfrastructure.oauth.apple.service.AppleAuthService;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoLoginFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoLoginTokenRes;
@@ -74,6 +77,7 @@ public class AuthService {
     private final MailService mailService;
     private final CodeAuthRepository codeAuthRepository;
     private final MatchAligoFeignClient matchAligoFeignClient;
+    private final AppleAuthService authService;
 
 
     @Transactional
@@ -253,5 +257,12 @@ public class AuthService {
     public void checkPhoneAuth(UserReq.UserPhoneAuth phone) {
         CodeAuth codeAuth = codeAuthRepository.findById(phone.getPhone()).orElseThrow(()->new BadRequestException(NOT_CORRECT_AUTH));
         if(!codeAuth.getCode().equals(phone.getCode()))throw new BadRequestException(NOT_CORRECT_CODE);
+    }
+
+    public UserRes.UserToken appleLogin(UserReq.SocialLoginToken socialLoginToken) {
+        authService.appleLogin(socialLoginToken.getAccessToken());
+
+
+        return null;
     }
 }
