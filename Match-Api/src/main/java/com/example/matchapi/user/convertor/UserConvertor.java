@@ -15,6 +15,7 @@ import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.aligo.dto.SendReq;
+import com.example.matchinfrastructure.oauth.apple.dto.AppleUserRes;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
@@ -214,6 +215,20 @@ public class UserConvertor {
                                 .deviceId(token.getDeviceId())
                                 .build())
                 .fcmToken(token.getFcmToken())
+                .build();
+    }
+
+    public User AppleUserSignUp(AppleUserRes appleUserRes) {
+        return User.builder()
+                .username(appleUserRes.getSocialId())
+                .password(authHelper.createRandomPassword())
+                .profileImgUrl(BASE_PROFILE)
+                .name(userHelper.createRandomNickName())
+                .email(appleUserRes.getEmail())
+                .socialId(appleUserRes.getSocialId())
+                .socialType(SocialType.APPLE)
+                .role(AuthorityEnum.ROLE_USER.getValue())
+                .nickname(userHelper.createRandomNickName())
                 .build();
     }
 }
