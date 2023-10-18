@@ -38,5 +38,5 @@ public class Banner extends BaseEntity {
 
     private String bannerImg;
 
-    private String url;
+    private String contentsUrl;
 }
