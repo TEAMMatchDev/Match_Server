@@ -6,15 +6,15 @@ import com.google.firebase.FirebaseOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
 @Configuration
 @Slf4j
-public class FirebaseConfig {
+public class FirebaseService {
 
     @PostConstruct
     public void init() {
@@ -31,8 +31,12 @@ public class FirebaseConfig {
             }
         } catch (IOException e) {
             log.info(e.getMessage());
+            log.info("FireBase Config Failed");
             // spring 뜰때 알림 서버가 잘 동작하지 않는 것이므로 바로 죽임
             throw new RuntimeException(e.getMessage());
+
         }
     }
+
+
 }
