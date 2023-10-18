@@ -50,6 +50,7 @@ jobs:
           discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
           discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
           server.host: ${{ secrets.DEV_SERVER_HOST}}
+
           spring.password: ${{ secrets.APP_PASSWORD}}
           aligo.username: ${{ secrets.ALIGO_USERNAME }}
           aligo.key: ${{ secrets.ALIGO_KEY }}
@@ -59,6 +60,7 @@ jobs:
           portone.key: ${{ secrets.PORTONE_KEY }}
           portone.secret : ${{ secrets.PORTONE_SECRET }}
           portone.billmid: ${{ secrets.DEV_PORTONE_BILL_MID}}
+
 
       - name: Set Environment Domain - Domain DEV Yml
         uses: microsoft/variable-substitution@v1

@@ -173,4 +173,24 @@ public class S3UploadService {
         }
         return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
     }
+
+    public String uploadBannerImage(MultipartFile bannerImage) {
+        String fileName = getForBannerFileName(getFileExtension(bannerImage.getOriginalFilename()));
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(bannerImage.getSize());
+        objectMetadata.setContentType(bannerImage.getContentType());
+
+        try (InputStream inputStream = bannerImage.getInputStream()) {
+            amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+        } catch (IOException e) {
+            throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
+        }
+        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
+    }
+
+    private String getForBannerFileName(String fileExtension) {
+        return "banner/"
+                + UUID.randomUUID()
+                + fileExtension;
+    }
 }
