@@ -16,6 +16,7 @@ import com.example.matchcommon.service.MailService;
 import com.example.matchdomain.redis.entity.CodeAuth;
 import com.example.matchdomain.redis.repository.CodeAuthRepository;
 import com.example.matchdomain.redis.repository.RefreshTokenRepository;
+import com.example.matchdomain.user.adaptor.UserAdaptor;
 import com.example.matchdomain.user.entity.Authority;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
@@ -24,6 +25,7 @@ import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.match_aligo.client.MatchAligoFeignClient;
 import com.example.matchinfrastructure.oauth.apple.client.AppleFeignClient;
 import com.example.matchinfrastructure.oauth.apple.dto.ApplePublicResponse;
+import com.example.matchinfrastructure.oauth.apple.dto.AppleUserRes;
 import com.example.matchinfrastructure.oauth.apple.service.AppleAuthService;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoFeignClient;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoLoginFeignClient;
@@ -46,8 +48,7 @@ import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
 import static com.example.matchdomain.user.entity.enums.AuthorityEnum.ROLE_ADMIN;
-import static com.example.matchdomain.user.entity.enums.SocialType.KAKAO;
-import static com.example.matchdomain.user.entity.enums.SocialType.NAVER;
+import static com.example.matchdomain.user.entity.enums.SocialType.*;
 import static com.example.matchdomain.user.exception.AdminLoginErrorCode.NOT_ADMIN;
 import static com.example.matchdomain.user.exception.CodeAuthErrorCode.NOT_CORRECT_AUTH;
 import static com.example.matchdomain.user.exception.CodeAuthErrorCode.NOT_CORRECT_CODE;
@@ -78,6 +79,7 @@ public class AuthService {
     private final CodeAuthRepository codeAuthRepository;
     private final MatchAligoFeignClient matchAligoFeignClient;
     private final AppleAuthService authService;
+    private final UserAdaptor userAdaptor;
 
 
     @Transactional
@@ -260,9 +262,22 @@ public class AuthService {
     }
 
     public UserRes.UserToken appleLogin(UserReq.SocialLoginToken socialLoginToken) {
-        authService.appleLogin(socialLoginToken.getAccessToken());
+        AppleUserRes appleUserRes = authService.appleLogin(socialLoginToken.getAccessToken());
 
+        if(userRepository.existsByEmail(appleUserRes.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        Optional<User> user = userAdaptor.existsSocialUser(appleUserRes.getSocialId(), APPLE);
 
-        return null;
+        Long userId;
+        if (user.isEmpty()) userId = appleSignUp(appleUserRes);
+
+        else userId = user.get().getId();
+
+        UserRes.Token token = createToken(userId);
+
+        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
+    }
+
+    private Long appleSignUp(AppleUserRes appleUserRes) {
+        return userRepository.save(userConvertor.AppleUserSignUp(appleUserRes)).getId();
     }
 }
