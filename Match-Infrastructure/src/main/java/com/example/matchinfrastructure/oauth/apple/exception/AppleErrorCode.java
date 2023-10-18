@@ -18,7 +18,8 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 public enum AppleErrorCode implements BaseErrorCode {
     @ExplainError("공개키 에러 관리자에게 문위")
     MISMATCH_APPLE_KEY(BAD_REQUEST,"APPLE_001","공개 키중 일치하는 키 값이 존재하지 않습니다."),
-    FAIL_MAKE_PUBLIC_KEY(BAD_REQUEST,"APPLE_002", "공개키를 만드는데 실패했습니다.");
+    FAIL_MAKE_PUBLIC_KEY(BAD_REQUEST,"APPLE_002", "공개키를 만드는데 실패했습니다."),
+    APPLE_BAD_REQUEST(BAD_REQUEST,"APPLE_003","인증에 실패했습니다.");
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;

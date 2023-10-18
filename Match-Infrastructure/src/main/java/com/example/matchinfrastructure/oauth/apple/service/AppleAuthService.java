@@ -3,6 +3,7 @@ package com.example.matchinfrastructure.oauth.apple.service;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchinfrastructure.oauth.apple.client.AppleFeignClient;
 import com.example.matchinfrastructure.oauth.apple.dto.ApplePublicResponse;
+import com.example.matchinfrastructure.oauth.apple.dto.AppleUserRes;
 import com.example.matchinfrastructure.oauth.apple.dto.Key;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -19,17 +20,19 @@ import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
-import static com.example.matchinfrastructure.oauth.apple.exception.AppleErrorCode.FAIL_MAKE_PUBLIC_KEY;
-import static com.example.matchinfrastructure.oauth.apple.exception.AppleErrorCode.MISMATCH_APPLE_KEY;
+import static com.example.matchinfrastructure.oauth.apple.exception.AppleErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
 public class AppleAuthService {
     private final AppleFeignClient appleFeignClient;
-    public void appleLogin(String identityToken) {
+    public AppleUserRes appleLogin(String identityToken) {
         JsonParser parser = new JsonParser();
         ApplePublicResponse applePublicResponse = appleFeignClient.getPublicKey();
+
+        System.out.println(applePublicResponse.getKeys().get(0).getKid());
 
         String headerOfIdentityToken = identityToken.substring(0, identityToken.indexOf("."));
 
@@ -47,8 +50,20 @@ public class AppleAuthService {
         String iss = userInfoObject.get("iss").getAsString();
         String aud = userInfoObject.get("aud").getAsString();
 
+        checkValidationInfo(iss, aud);
+
         String appleId  = userInfoObject.get("sub").getAsString();
         String email = userInfoObject.get("email").getAsString();
+
+        return new AppleUserRes(email, appleId);
+    }
+
+    private void checkValidationInfo(String iss, String aud) {
+        if (!Objects.equals(iss, "https://appleid.apple.com"))
+            throw new BadRequestException(APPLE_BAD_REQUEST);
+
+        if (!Objects.equals(aud, "com.dev.match"))
+            throw new BadRequestException(APPLE_BAD_REQUEST);
     }
 
 
