@@ -4,12 +4,11 @@ import com.example.matchapi.common.aop.CheckIdExist;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.service.MailService;
+import com.example.matchinfrastructure.fcm.dto.FCMNotificationRequestDto;
+import com.example.matchinfrastructure.fcm.service.FcmNotificationService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,6 +20,7 @@ import java.io.IOException;
 public class TestController {
     private final OrderHelper orderHelper;
     private final MailService mailService;
+    private final FcmNotificationService fcmNotificationService;
 
     @GetMapping("")
     public void exRedirect3(HttpServletResponse httpServletResponse) throws IOException {
@@ -31,6 +31,14 @@ public class TestController {
     @GetMapping("/{projectId}/{userId}/{donationId}")
     public CommonResponse<String> getTest(@PathVariable Long projectId, @PathVariable Long userId, @PathVariable Long donationId){
         return CommonResponse.onSuccess("성공");
+    }
+
+    @PostMapping("/fcm")
+    public String fcmTest(
+            @RequestBody FCMNotificationRequestDto fcmNotificationRequestDto
+            ){
+        fcmNotificationService.testNotification(fcmNotificationRequestDto);
+        return "성공";
     }
     /*
 
