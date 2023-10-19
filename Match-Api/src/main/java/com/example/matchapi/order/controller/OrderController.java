@@ -3,6 +3,7 @@ package com.example.matchapi.order.controller;
 import com.example.matchapi.common.aop.CheckIdExist;
 import com.example.matchapi.common.aop.CheckOneTimeProject;
 import com.example.matchapi.common.aop.CheckRegularProject;
+import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
@@ -101,25 +102,23 @@ public class OrderController {
     @PostMapping("/pay/card/{cardId}/{projectId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, OtherServerErrorCode.class, ProjectRegualrErrorCode.class, DeleteCardErrorCode.class})
     @Operation(summary = "04-05 Order💸 정기 결제 등록 api #FRAME 결제 화면 - 정기 결제",description = "정기 결제 신청하기 API 입니다.")
-    public CommonResponse<String> regularDonation(
+    public CommonResponse<OrderRes.CompleteDonation> regularDonation(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "카드 id",example = "1") @PathVariable Long cardId,
             @Parameter(description = "프로젝트 id", example = "2") @PathVariable Long projectId,
             @Valid @RequestBody OrderReq.RegularDonation regularDonation){
-        orderService.regularDonation(user, regularDonation, cardId, projectId);
-        return CommonResponse.onSuccess("정기 결제 등록 성공");
+        return CommonResponse.onSuccess(orderService.regularDonation(user, regularDonation, cardId, projectId));
     }
 
     @PostMapping("/pay/one/card/{cardId}/{projectId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, OtherServerErrorCode.class, ProjectOneTimeErrorCode.class, DeleteCardErrorCode.class})
     @Operation(summary = "04-06 Order💸 빌키로 단기 결제 api #FRAME 결제 화면 - 단기 결제",description = "단 결제 신청하기 API 입니다.")
-    public CommonResponse<String> oneTimeDonationCard(
+    public CommonResponse<OrderRes.CompleteDonation> oneTimeDonationCard(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "카드 id",example = "1") @PathVariable Long cardId,
             @Parameter(description = "프로젝트 id", example = "2") @PathVariable Long projectId,
             @Valid @RequestBody OrderReq.OneTimeDonation oneTimeDonation){
-        orderService.oneTimeDonationCard(user, oneTimeDonation, cardId, projectId);
-        return CommonResponse.onSuccess("단기 결제 성공");
+        return CommonResponse.onSuccess(orderService.oneTimeDonationCard(user, oneTimeDonation, cardId, projectId));
     }
 
     @PostMapping("/user")

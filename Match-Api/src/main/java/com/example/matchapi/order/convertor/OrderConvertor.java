@@ -1,12 +1,16 @@
 package com.example.matchapi.order.convertor;
 
+import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.order.dto.OrderReq;
+import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.portone.dto.PaymentReq;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.entity.enums.*;
 import com.example.matchdomain.donation.entity.flameEnum.FlameImage;
+import com.example.matchdomain.donation.entity.flameEnum.FlameType;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchinfrastructure.pay.nice.dto.*;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
@@ -20,6 +24,7 @@ import static java.lang.Integer.parseInt;
 @RequiredArgsConstructor
 public class OrderConvertor {
     private final OrderHelper orderHelper;
+    private final DonationHelper donationHelper;
     public DonationUser donationUser(NicePaymentAuth nicePaymentAuth, Long id, OrderReq.OrderDetail orderDetail, Long projectId, String flameName, String inherenceNumber) {
         return DonationUser.builder()
                 .userId(id)
@@ -186,6 +191,18 @@ public class OrderConvertor {
                 .regularStatus(regularStatus)
                 .regularPaymentId(regularPaymentId)
                 .flameImage(FlameImage.NORMAL_IMG.getImg())
+                .flameType(FlameType.NORMAL_FLAME)
+                .build();
+    }
+
+    public OrderRes.CompleteDonation CompleteDonation(String name, Project project, Long amount) {
+        return OrderRes.CompleteDonation
+                .builder()
+                .username(name)
+                .title(project.getProjectName())
+                .usages(project.getUsages())
+                .amount(donationHelper.parsePriceComma(Math.toIntExact(amount)))
+                .regularStatus(project.getRegularStatus().getName())
                 .build();
     }
 }

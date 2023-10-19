@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.REPRESENT;
@@ -115,5 +116,9 @@ public class ProjectAdaptor {
 
     public Project checkRegularProjects(Long projectId, RegularStatus regularStatus) {
         return projectRepository.findByIdAndStatusAndRegularStatus(projectId, Status.ACTIVE, regularStatus).orElseThrow(() -> new BadRequestException(ProjectOneTimeErrorCode.PROJECT_NOT_EXIST));
+    }
+
+    public Optional<Project> findByProjectId(Long projectId) {
+        return projectRepository.findById(projectId);
     }
 }

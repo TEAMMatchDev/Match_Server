@@ -96,7 +96,9 @@ public class OrderService {
 
         regularPaymentRepository.saveAll(regularPayments);
 
-        portOneFeignClient.deleteBillKey(portOneAuthService.getToken(), userCard.getBid());
+        String accessToken = portOneAuthService.getToken();
+
+        portOneFeignClient.deleteBillKey(accessToken, userCard.getBid());
 
         userCard.setStatus(Status.INACTIVE);
 
@@ -105,7 +107,7 @@ public class OrderService {
 
 
     @RedissonLock(LockName = "정기-기부-신청", key = "#cardId")
-    public void regularDonation(User user, OrderReq.RegularDonation regularDonation, Long cardId, Long projectId) {
+    public OrderRes.CompleteDonation regularDonation(User user, OrderReq.RegularDonation regularDonation, Long cardId, Long projectId) {
         UserCard card = userCardRepository.findByIdAndStatus(cardId,Status.ACTIVE).orElseThrow(() -> new NotFoundException(CARD_NOT_EXIST));
 
         if(!card.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
@@ -114,7 +116,8 @@ public class OrderService {
 
         Project project = projectService.checkProjectExists(projectId, RegularStatus.REGULAR);
 
-        PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(portOneAuthService.getToken(), portOneConvertor.PayWithBillKey(card.getBid(), createOrderId(REGULAR), regularDonation.getAmount(), project.getProjectName(), card.getCustomerId()));
+        String accessToken = portOneAuthService.getToken();
+        PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(accessToken,  portOneConvertor.PayWithBillKey(card.getBid(), createOrderId(REGULAR), regularDonation.getAmount(), project.getProjectName(), card.getCustomerId()));
 
         String flameName = orderHelper.createFlameName(user.getName());
 
@@ -127,15 +130,19 @@ public class OrderService {
         donationHistoryRepository.save(donationConvertor.DonationHistoryTurnOn(regularPayment.getId(), TURN_ON));
 
         donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE));
+
+        return orderConvertor.CompleteDonation(user.getName(), project, regularDonation.getAmount());
     }
 
     @RedissonLock(LockName = "빌키-단기-기부", key = "#cardId")
-    public void oneTimeDonationCard(User user, OrderReq.OneTimeDonation oneTimeDonation, Long cardId, Long projectId) {
+    public OrderRes.CompleteDonation oneTimeDonationCard(User user, OrderReq.OneTimeDonation oneTimeDonation, Long cardId, Long projectId) {
         UserCard card = userCardRepository.findByIdAndStatus(cardId,Status.ACTIVE).orElseThrow(() -> new NotFoundException(CARD_NOT_EXIST));
 
         Project project = projectService.checkProjectExists(projectId, RegularStatus.ONE_TIME);
 
-        PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(portOneAuthService.getToken(), portOneConvertor.PayWithBillKey(card.getBid(), createOrderId(ONE_TIME), oneTimeDonation.getAmount(), project.getProjectName(), card.getCustomerId()));
+        String accessToken = portOneAuthService.getToken();
+
+        PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(accessToken, portOneConvertor.PayWithBillKey(card.getBid(), createOrderId(ONE_TIME), oneTimeDonation.getAmount(), project.getProjectName(), card.getCustomerId()));
 
         String flameName = orderHelper.createFlameName(user.getName());
 
@@ -144,6 +151,8 @@ public class OrderService {
         DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillPayUser(portOneResponse.getResponse(), user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
 
         donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE));
+
+        return orderConvertor.CompleteDonation(user.getName(), project, oneTimeDonation.getAmount());
     }
 
     @Transactional

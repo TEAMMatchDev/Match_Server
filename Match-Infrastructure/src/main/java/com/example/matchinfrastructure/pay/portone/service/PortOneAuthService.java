@@ -18,7 +18,7 @@ public class PortOneAuthService {
     private final PortOneFeignClient portOneFeignClient;
     private final PortOneProperties portOneProperties;
 
-    @Cacheable(value = "portOneTokenCache")
+    @Cacheable(value = "portOneTokenCache", key = "'all'")
     public String getToken() {
         String token =  fetchPortOneToken();
         System.out.println("request : " + token);
@@ -30,6 +30,7 @@ public class PortOneAuthService {
         return getTokens();
     }
 
+    @CachePut(value = "portOneTokenCache", key = "'all'")
     public String getTokens() {
         PortOneResponse<PortOneAuth> portOneResponse = portOneFeignClient.getAccessToken(PortOneAuthReq.builder().imp_key(portOneProperties.getKey()).imp_secret(portOneProperties.getSecret()).build());
         return portOneResponse.getResponse().getAccess_token();
