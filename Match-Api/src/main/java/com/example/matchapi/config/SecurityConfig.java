@@ -89,6 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/order/serverAuth").permitAll()
                 .antMatchers("/projects").permitAll()
                 .antMatchers("/projects/**").permitAll()
+                .antMatchers("/projects/list").authenticated()
                 .antMatchers("/").permitAll()
                 .antMatchers("/serverAuth").permitAll()
                 .antMatchers(HttpMethod.GET,"/donation-temporaries").permitAll()
