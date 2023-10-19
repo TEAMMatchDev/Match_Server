@@ -204,15 +204,15 @@ public class DonationConvertor {
         String nickname = "";
         System.out.println(result.getHistoryStatus());
         if(result.getHistoryStatus().equals(HistoryStatus.CREATE)){
-            histories = result.getDonationUser().getUser().getName() + "님의 불꽃이 탄생했습니다.";
+            histories = result.getDonationUser().getInherenceName() + "가 여기에 나타났습니다.";
             profileImgUrl = result.getDonationUser().getUser().getProfileImgUrl();
             nickname = result.getDonationUser().getUser().getNickname();
         }else if(result.getHistoryStatus().equals(HistoryStatus.COMPLETE)) {
-            histories = "'후원품'을 '후원처'에 전달했습니다.";
+            histories = "'후원품'을 " + result.getProject().getUsages() + "에 전달했습니다.";
             profileImgUrl = MATCH_PROFILE;
             nickname = MATCH_NAME;
         }else if(result.getHistoryStatus().equals(HistoryStatus.CHANGE)){
-            histories = result.getCnt() + "명의 불꽃이 후원품으로 변했습니다.";
+            histories = result.getCnt() + "마리의 불꽃이 후원품으로 변했습니다.";
             profileImgUrl = MATCH_PROFILE;
             nickname = MATCH_NAME;
         }else if(result.getHistoryStatus().equals(HistoryStatus.TURN_ON)){
@@ -224,7 +224,7 @@ public class DonationConvertor {
             profileImgUrl = MATCH_PROFILE;
             nickname = MATCH_NAME;
         }else if(result.getHistoryStatus().equals(HistoryStatus.FINISH)){
-            histories = "매치가 종료되었습니다..";
+            histories = "매치가 종료되었습니다.";
             profileImgUrl = MATCH_PROFILE;
             nickname = MATCH_NAME;
         }

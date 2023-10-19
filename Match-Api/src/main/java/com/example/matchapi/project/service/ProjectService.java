@@ -12,13 +12,13 @@ import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
 import com.example.matchdomain.donation.repository.DonationHistoryRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.adaptor.ProjectAdaptor;
 import com.example.matchdomain.project.adaptor.ProjectImgAdaptor;
 import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.entity.*;
-import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.enums.ProjectKind;
 import com.example.matchdomain.project.entity.enums.ProjectStatus;
 import com.example.matchdomain.project.entity.enums.ReportReason;
@@ -43,7 +43,6 @@ import static com.example.matchdomain.common.model.Status.INACTIVE;
 import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.NORMAL;
 import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.REPRESENT;
 import static com.example.matchdomain.project.entity.enums.ProjectStatus.PROCEEDING;
-import static com.example.matchdomain.project.entity.enums.TodayStatus.TODAY;
 import static com.example.matchdomain.project.exception.CommentDeleteErrorCode.COMMENT_DELETE_ERROR_CODE;
 import static com.example.matchdomain.project.exception.CommentGetErrorCode.COMMENT_NOT_EXIST;
 import static com.example.matchdomain.project.exception.PatchProjectImageErrorCode.PROJECT_NOT_CORRECT_IMAGE;
@@ -60,7 +59,6 @@ public class ProjectService {
     private final AuthHelper authHelper;
     private final ProjectCommentRepository projectCommentRepository;
     private final S3UploadService s3UploadService;
-    private final DonationUserRepository donationUserRepository;
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
     private final DonationHistoryRepository donationHistoryRepository;
     private final CommentReportRepository commentReportRepository;
@@ -284,5 +282,9 @@ public class ProjectService {
         if(!projectComment.getUserId().equals(user.getId())) throw new BadRequestException(COMMENT_DELETE_ERROR_CODE);
         projectComment.setStatus(INACTIVE);
         projectCommentRepository.save(projectComment);
+    }
+
+    public Project checkProjectExists(Long projectId, RegularStatus regularStatus) {
+        return projectAdaptor.checkRegularProjects(projectId, regularStatus);
     }
 }

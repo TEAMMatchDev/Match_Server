@@ -2,23 +2,23 @@ package com.example.matchdomain.project.adaptor;
 
 import com.example.matchcommon.annotation.Adaptor;
 import com.example.matchcommon.constants.enums.FILTER;
+import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
-import com.example.matchcommon.reponse.PageResponse;
-import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
 import com.example.matchdomain.project.entity.Project;
-import com.example.matchdomain.project.entity.ProjectImage;
 import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.enums.ProjectKind;
+import com.example.matchdomain.project.exception.ProjectOneTimeErrorCode;
 import com.example.matchdomain.project.repository.ProjectRepository;
 import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.REPRESENT;
@@ -112,5 +112,13 @@ public class ProjectAdaptor {
         Pageable pageable = PageRequest.of(page, size);
 
         return projectRepository.findTodayProject(userId, PROCEEDING.getValue(), LocalDateTime.now(), REPRESENT.getValue(), ACTIVE.getValue(), TODAY.getValue(), pageable);
+    }
+
+    public Project checkRegularProjects(Long projectId, RegularStatus regularStatus) {
+        return projectRepository.findByIdAndStatusAndRegularStatus(projectId, Status.ACTIVE, regularStatus).orElseThrow(() -> new BadRequestException(ProjectOneTimeErrorCode.PROJECT_NOT_EXIST));
+    }
+
+    public Optional<Project> findByProjectId(Long projectId) {
+        return projectRepository.findById(projectId);
     }
 }

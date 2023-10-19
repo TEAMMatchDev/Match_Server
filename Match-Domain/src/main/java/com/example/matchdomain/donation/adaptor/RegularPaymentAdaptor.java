@@ -3,6 +3,7 @@ package com.example.matchdomain.donation.adaptor;
 import com.example.matchcommon.annotation.Adaptor;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.user.entity.User;
@@ -49,5 +50,9 @@ public class RegularPaymentAdaptor {
         return regularPaymentRepository.findByIdAndUserOrderByCreatedAtDesc(regularPayId, user).stream()
                 .map(RegularPayment :: getId)
                 .collect(Collectors.toList());
+    }
+
+    public List<RegularPayment> findByCardId(Long cardId) {
+        return regularPaymentRepository.findByUserCardIdAndRegularPayStatus(cardId, PROCEEDING);
     }
 }

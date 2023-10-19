@@ -24,7 +24,7 @@ public class DonationHistoryAdaptor {
 
     public Page<DonationHistory> findMatchHistory(Long projectId, int page, int size){
         Pageable pageable = PageRequest.of(page, size);
-        return donationHistoryRepository.findByDonationUser_ProjectOrProjectIdIdOrderByCreatedAtAsc(projectId, pageable);
+        return donationHistoryRepository.findByDonationUser_ProjectOrProjectIdIdOrderByCreatedAtDesc(projectId, pageable);
     }
 
     public Page<DonationHistory> findDonationHistory(DonationUser donationUser, Long donationId, int page, int size){

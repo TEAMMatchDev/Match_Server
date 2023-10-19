@@ -2,6 +2,7 @@ package com.example.matchdomain.donation.repository;
 
 
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.user.entity.User;
@@ -42,6 +43,8 @@ public interface RegularPaymentRepository extends JpaRepository<RegularPayment,L
                                                         Pageable pageable);
 
     List<RegularPayment> findByIdAndUserOrderByCreatedAtDesc(Long regularPayId, User user);
+
+    List<RegularPayment> findByUserCardIdAndRegularPayStatus(Long cardId, RegularPayStatus regularPayStatus);
 
     interface RegularPaymentFlame {
         Long getRegularPayId();

@@ -1,12 +1,16 @@
 package com.example.matchapi.portone.service;
 
 import com.example.matchapi.order.convertor.OrderConvertor;
+import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.portone.dto.PaymentReq;
+import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.properties.PortOneProperties;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
+import com.example.matchdomain.project.adaptor.ProjectAdaptor;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchdomain.redis.repository.OrderRequestRepository;
 import com.example.matchdomain.user.entity.User;
@@ -39,6 +43,7 @@ public class PaymentService {
     private final DonationUserRepository donationUserRepository;
     private final OrderConvertor orderConvertor;
     private final IamportClient iamportClient;
+    private final ProjectAdaptor projectAdaptor;
 
     @Autowired
     public PaymentService(PortOneProperties portOneProperties,
@@ -46,7 +51,7 @@ public class PaymentService {
                           UserRepository userRepository,
                           OrderHelper orderHelper,
                           DonationUserRepository donationUserRepository,
-                          OrderConvertor orderConvertor) {
+                          OrderConvertor orderConvertor, ProjectAdaptor projectAdaptor) {
         this.portOneProperties = portOneProperties;
         this.orderRequestRepository = orderRequestRepository;
         this.userRepository = userRepository;
@@ -54,16 +59,18 @@ public class PaymentService {
         this.donationUserRepository = donationUserRepository;
         this.orderConvertor = orderConvertor;
         this.iamportClient = new IamportClient(portOneProperties.getKey(), portOneProperties.getSecret());
+        this.projectAdaptor = projectAdaptor;
     }
 
-    public void checkPayment(PaymentReq.ValidatePayment validatePayment){
+    @RedissonLock(LockName = "결제-검증", key = "#validatePayment")
+    public OrderRes.CompleteDonation checkPayment(PaymentReq.ValidatePayment validatePayment){
         try {
             OrderRequest orderRequest = orderRequestRepository.findById(validatePayment.getOrderId()).orElseThrow(()->new BadRequestException(NOT_EXIST_ORDER_ID));
             IamportResponse<Payment> payment = iamportClient.paymentByImpUid(validatePayment.getImpUid());
             Optional<User> user = userRepository.findByIdAndStatus(Long.valueOf(orderRequest.getUserId()), Status.ACTIVE);
-            int paidAmount = payment.getResponse().getAmount().intValue(); //사용자가 결제한 금액
+            Optional<Project> project = projectAdaptor.findByProjectId(Long.valueOf(orderRequest.getProjectId()));
 
-            if(paidAmount!=validatePayment.getAmount()){
+            if(payment.getResponse().getAmount().intValue()!=validatePayment.getAmount()){
                 CancelData cancelData = createCancelData(payment, 0);
                 iamportClient.cancelPaymentByImpUid(cancelData);
                 throw new BadRequestException(FAILED_ERROR_AUTH_AMOUNT);
@@ -72,6 +79,7 @@ public class PaymentService {
                 String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
                 donationUserRepository.save(orderConvertor.donationUserPortone(payment.getResponse(), user.get().getId(), validatePayment, Long.valueOf(orderRequest.getProjectId()), flameName, inherenceNumber));
             }
+            return orderConvertor.CompleteDonation(user.get().getName(), project.get(), (long) validatePayment.getAmount());
         } catch (IamportResponseException | IOException e) {
             System.out.println(e.getMessage());
             throw new BadRequestException(FAILED_ERROR_AUTH);
