@@ -22,6 +22,9 @@ dependencies {
 
     api group: 'org.json', name: 'json', version: '20090211'
 
+    api 'org.redisson:redisson-spring-boot-starter:3.18.0'
+
+
     api 'org.springframework.boot:spring-boot-starter-mail:2.5.5'
 
     api group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
