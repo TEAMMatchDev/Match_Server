@@ -5,10 +5,7 @@ import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.pay.portone.config.PortOneFeignConfiguration;
 import com.example.matchinfrastructure.pay.portone.config.PortOneInfoConfig;
 import com.example.matchinfrastructure.pay.portone.config.PortOneInfoErrorDecoder;
-import com.example.matchinfrastructure.pay.portone.dto.PortOneAuth;
-import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
-import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
-import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
+import com.example.matchinfrastructure.pay.portone.dto.*;
 import com.example.matchinfrastructure.pay.portone.dto.req.PayWithBillKeyReq;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOneAuthReq;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOneBillReq;
@@ -36,4 +33,10 @@ public interface PortOneFeignClient {
             @RequestHeader("Authorization") String accessToken,
             @RequestBody PayWithBillKeyReq payWithBillKeyReq
             );
+
+    @DeleteMapping("/subscribe/customers/{customer_uid}")
+    public PortOneResponse<PortOneBillDeleteResponse> deleteBillKey(
+            @RequestHeader("Authorization") String accessToken,
+            @PathVariable("customer_uid") String customer_uid
+    );
 }

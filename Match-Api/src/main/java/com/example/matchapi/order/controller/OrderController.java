@@ -45,10 +45,7 @@ import java.util.List;
 @Tag(name = "04-Order💸",description = "NicePayment 결제 API")
 public class OrderController {
     private final OrderService orderService;
-    private final NicePayProperties nicePayProperties;
     private final UserService userService;
-    @Value("${web.return.url}")
-    private String redirectUrl;
 
     @PostMapping("/{projectId}")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
@@ -63,7 +60,7 @@ public class OrderController {
     }
 
 
-    @PostMapping("/pay/{projectId}")
+/*    @PostMapping("/pay/{projectId}")
     @ApiErrorCodeExample({OtherServerErrorCode.class, UserAuthErrorCode.class, RequestErrorCode.class, ProjectOneTimeErrorCode.class})
     @Operation(summary= "04-01 Order💸 단기 결제 API",description = "결제 API 입니다")
     @CheckRegularProject
@@ -73,7 +70,7 @@ public class OrderController {
             @Valid @RequestBody OrderReq.OrderDetail orderDetail){
         log.info("04-03 Order 결제 인증용 API 결제 ID: " + orderDetail.getTid() + " 결제 금액 " + orderDetail.getAmount() +" 기부 프로젝트 ID : " + projectId);
         return CommonResponse.onSuccess(orderService.requestPayment(user , orderDetail, projectId));
-    }
+    }*/
 
     @PostMapping("/pay/card")
     @ApiErrorCodeExample({UserAuthErrorCode.class, OtherServerErrorCode.class, RegistrationCardErrorCode.class, NicePayErrorCode.class})
@@ -135,14 +132,14 @@ public class OrderController {
     }
 
 
-    @DeleteMapping("/revoke/{cardId}")
+/*    @DeleteMapping("/revoke/{cardId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class})
-    @Operation(summary = "04-08 Order💸 간편결제 해지",description = "후원자 정보조회 API 입니다.")
+    @Operation(summary = "04-08 Order💸 간편결제 해지",description = "간편결제 해지 입니다.")
     public CommonResponse<String> revokePay(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @PathVariable Long cardId
     ) {
         orderService.revokePay(user, cardId);
         return CommonResponse.onSuccess("간편 결제 해지");
-    }
+    }*/
 }
