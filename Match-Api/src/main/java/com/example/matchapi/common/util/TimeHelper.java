@@ -2,7 +2,11 @@ package com.example.matchapi.common.util;
 
 import com.example.matchcommon.annotation.Helper;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static com.example.matchdomain.event.enums.EventStatus.FINISH;
+import static com.example.matchdomain.event.enums.EventStatus.UNDER;
 
 @Helper
 public class TimeHelper {
@@ -28,4 +32,15 @@ public class TimeHelper {
         }
     }
 
+    public String checkFinishStatus(LocalDate eventEndDate) {
+        LocalDate nowDate = LocalDate.now();
+
+        if(nowDate.isBefore(eventEndDate)){
+            return UNDER.getValue();
+        }
+        else{
+            return FINISH.getValue();
+        }
+
+    }
 }

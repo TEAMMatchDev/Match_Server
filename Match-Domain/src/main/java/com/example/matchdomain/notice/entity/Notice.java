@@ -1,47 +1,39 @@
-package com.example.matchdomain.event.entity;
+package com.example.matchdomain.notice.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
-import com.example.matchdomain.event.enums.EventType;
+import com.example.matchdomain.notice.enums.NoticeType;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "Event")
+@Table(name = "Notice")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @DynamicUpdate
-@BatchSize(size = 100)
+@BatchSize(size = 10)
 @DynamicInsert
-public class Event extends BaseEntity {
+public class Notice extends BaseEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "eventId")
-    private List<EventContent> eventContents = new ArrayList<>();
+    @JoinColumn(name = "noticeId")
+    private List<NoticeContent> noticeContents = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    private EventType eventType;
+    private NoticeType noticeType;
 
     private String title;
 
-    private String smallTitle;
-
-    private String thumbnail;
-
-    private LocalDate eventStartDate;
-
-    private LocalDate eventEndDate;
 }

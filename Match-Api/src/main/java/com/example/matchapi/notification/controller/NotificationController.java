@@ -22,11 +22,11 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/notifications")
-@Tag(name = "")
+@Tag(name = "10-Notification🔔 알림")
 public class NotificationController {
     private final NotificationService notificationService;
     @ApiErrorCodeExample(UserAuthErrorCode.class)
-    @Operation(summary = "Notification-01 알림 리스트 조회")
+    @Operation(summary = "10-01 알림 리스트 조회")
     @GetMapping("")
     public CommonResponse<PageResponse<NotificationRes.NotificationDetail>> getNotificationList(
             @AuthenticationPrincipal User user,
