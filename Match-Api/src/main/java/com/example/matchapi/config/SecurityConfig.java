@@ -89,6 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/order/serverAuth").permitAll()
                 .antMatchers("/projects").permitAll()
                 .antMatchers("/projects/**").permitAll()
+                .antMatchers("/projects/list").authenticated()
                 .antMatchers("/").permitAll()
                 .antMatchers("/serverAuth").permitAll()
                 .antMatchers(HttpMethod.GET,"/donation-temporaries").permitAll()
@@ -101,6 +102,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/donation-temporaries/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/order/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/auth/logIn").permitAll()
+                .antMatchers("/test/fcm/user").authenticated()
                 .anyRequest().authenticated()
 
                 .and()

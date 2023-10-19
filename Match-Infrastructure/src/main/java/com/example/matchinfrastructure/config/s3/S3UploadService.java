@@ -150,8 +150,6 @@ public class S3UploadService {
             boolean isObjectExist = amazonS3.doesObjectExist(awsS3Properties.getS3().getBucket(), fileRoute);
             if (isObjectExist) {
                 amazonS3.deleteObject(awsS3Properties.getS3().getBucket(),fileRoute);
-            } else {
-                throw new InternalServerException(IMAGE_DELETE_ERROR);
             }
         } catch (Exception e) {
             throw new InternalServerException(IMAGE_DELETE_ERROR);

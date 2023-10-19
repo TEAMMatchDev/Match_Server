@@ -25,8 +25,10 @@ import java.util.List;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
+import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.PROCEEDING;
 import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.USER_CANCEL;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_CORRECT_USER;
+import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_STATUS;
 import static com.example.matchdomain.donation.exception.DonationRefundErrorCode.*;
 
 @Service
@@ -65,7 +67,7 @@ public class DonationService {
         RegularPayment regularPayment = regularPaymentAdaptor.findRegularPaymentByStatus(regularId, ACTIVE);
 
         if(!regularPayment.getUserId().equals(user.getId())) throw new BadRequestException(REGULAR_PAY_NOT_CORRECT_USER);
-
+        if(!regularPayment.getRegularPayStatus().equals(PROCEEDING)) throw new BadRequestException(REGULAR_PAY_NOT_STATUS);
         regularPayment.setRegularPayStatus(USER_CANCEL);
 
         regularPaymentRepository.save(regularPayment);

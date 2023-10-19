@@ -1,5 +1,8 @@
 package com.example.matchdomain.notification.entity;
 
+import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.event.entity.Event;
 import com.example.matchdomain.notification.enums.NotificationType;
 import com.example.matchdomain.user.entity.User;
 import lombok.*;
@@ -19,7 +22,7 @@ import javax.persistence.*;
 @DynamicUpdate
 @DynamicInsert
 @BatchSize(size = 100)
-public class Notification {
+public class Notification extends BaseEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,4 +43,22 @@ public class Notification {
     private String body;
 
     private boolean isRead = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "eventId",nullable = false, insertable=false, updatable=false)
+    private Event event;
+
+    @Column(name="eventId")
+    private Long eventId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "donationUserId",nullable = false, insertable=false, updatable=false)
+    private DonationUser donationUser;
+
+    @Column(name="donationUserId")
+    private Long donationUserId;
+
+    public boolean getIsRead() {
+        return isRead;
+    }
 }
