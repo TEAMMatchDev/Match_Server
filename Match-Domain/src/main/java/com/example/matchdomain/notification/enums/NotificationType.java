@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum NotificationType {
     DONATION("DONATION", "기부"),
-    NOTICE("NOTICE", "공지");
+    NOTICE("NOTICE", "공지"),
+    TEST("TEST","테스트 알림");
 
     private final String value;
 

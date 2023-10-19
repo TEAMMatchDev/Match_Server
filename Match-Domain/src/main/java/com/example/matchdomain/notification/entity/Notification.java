@@ -1,5 +1,6 @@
 package com.example.matchdomain.notification.entity;
 
+import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.notification.enums.NotificationType;
 import com.example.matchdomain.user.entity.User;
 import lombok.*;
@@ -19,7 +20,7 @@ import javax.persistence.*;
 @DynamicUpdate
 @DynamicInsert
 @BatchSize(size = 100)
-public class Notification {
+public class Notification extends BaseEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,4 +41,8 @@ public class Notification {
     private String body;
 
     private boolean isRead = false;
+
+    public boolean getIsRead() {
+        return isRead;
+    }
 }
