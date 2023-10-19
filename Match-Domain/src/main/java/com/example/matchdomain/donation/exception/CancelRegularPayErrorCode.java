@@ -17,9 +17,11 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @AllArgsConstructor
 public enum CancelRegularPayErrorCode implements BaseErrorCode {
     @ExplainError("해당 도네이션이 존재하지 않습니다.")
-    REGULAR_PAY_NOT_EXIST(NOT_FOUND,"REGULAR001", "해당 정기기부 내역이 존재하지 않습니다."),
+    REGULAR_PAY_NOT_EXIST(NOT_FOUND,"REGULAR_CANCEL_001", "해당 정기기부 내역이 존재하지 않습니다."),
     @ExplainError("도네이션 환불 권한이 없습니다.")
-    REGULAR_PAY_NOT_CORRECT_USER(BAD_REQUEST,"REGULAR002","정기기부를 취소할 권한이 없습니다. 삭제권한이 없습니다.");
+    REGULAR_PAY_NOT_CORRECT_USER(BAD_REQUEST,"REGULAR_CANCEL_002","정기기부를 취소할 권한이 없습니다. 삭제권한이 없습니다."),
+    @ExplainError("현재 기부 상태가 진행중이 아니므로 취소할 수 없음")
+    REGULAR_PAY_NOT_STATUS(BAD_REQUEST,"REGULAR_CANCEL_003", "이미 정기기부를 취소한 상태입니다.");
 
 
     private final HttpStatus httpStatus;

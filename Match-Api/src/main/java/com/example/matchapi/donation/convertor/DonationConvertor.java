@@ -156,6 +156,7 @@ public class DonationConvertor {
                 .payMethod(result.getPayMethod().getName())
                 .payStatus(payStatus)
                 .amount(donationHelper.parsePriceComma(Math.toIntExact(result.getPrice())))
+                .inherenceNumber(result.getInherenceNumber())
                 .build();
     }
 

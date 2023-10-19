@@ -233,6 +233,8 @@ public class DonationRes {
         private String payMethod;
 
         private String amount;
+
+        private String inherenceNumber;
     }
 
     @Getter
