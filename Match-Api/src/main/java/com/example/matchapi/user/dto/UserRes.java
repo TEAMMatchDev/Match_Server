@@ -78,7 +78,8 @@ public class UserRes {
     @NoArgsConstructor
     @Schema(description ="02-01👤 유저 정보 조회 API Response")
     public static class MyPage {
-        private String username;
+        @Schema(description = "닉네임")
+        private String name;
 
         @Schema(description = "진행중 매치 갯수", required = true, example = "후원 집행 진행 중 갯수")
         private int underCnt;
