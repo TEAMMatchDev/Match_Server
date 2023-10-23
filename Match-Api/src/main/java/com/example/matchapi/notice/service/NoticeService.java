@@ -21,4 +21,9 @@ public class NoticeService {
         Page<Notice> notices = noticeAdapter.getNoticeList(page, size);
         return new PageResponse<>(notices.isLast(), notices.getTotalElements(), noticeConvertor.NoticeList(notices.getContent()));
     }
+
+    public NoticeRes.NoticeDetail getNoticeDetail(Long noticeId) {
+        Notice notice = noticeAdapter.findNoticeDetail(noticeId);
+        return noticeConvertor.NoticeDetail(notice);
+    }
 }
