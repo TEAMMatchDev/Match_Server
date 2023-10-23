@@ -148,6 +148,6 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setModifyProfile(String newProfileImg, String name) {
         this.profileImgUrl = newProfileImg;
-        this.name = name;
+        this.nickname = name;
     }
 }
