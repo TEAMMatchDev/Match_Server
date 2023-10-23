@@ -1,6 +1,7 @@
 package com.example.matchdomain.notification.adaptor;
 
 import com.example.matchcommon.annotation.Adaptor;
+import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchdomain.notification.entity.Notification;
 import com.example.matchdomain.notification.repository.NotificationRepository;
 import com.example.matchdomain.user.entity.User;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
+import static com.example.matchdomain.notification.exception.GetNotificationErrorCode.NOT_EXITS_NOTIFICATION;
 
 @Adaptor
 @RequiredArgsConstructor
@@ -25,6 +28,15 @@ public class NotificationAdaptor {
     }
 
     public void saveNotification(Notification notification) {
+        notificationRepository.save(notification);
+    }
+
+    public Notification findNotification(Long notificationId) {
+        return notificationRepository.findById(notificationId).orElseThrow(() -> new BadRequestException(NOT_EXITS_NOTIFICATION));
+    }
+
+    public void readNotification(Notification notification) {
+        notification.setRead(true);
         notificationRepository.save(notification);
     }
 }
