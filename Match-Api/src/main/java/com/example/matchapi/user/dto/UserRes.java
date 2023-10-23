@@ -1,5 +1,6 @@
 package com.example.matchapi.user.dto;
 
+import com.example.matchdomain.user.entity.enums.Alarm;
 import com.example.matchdomain.user.entity.enums.SocialType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -198,5 +199,16 @@ public class UserRes {
         private String email;;
 
         private String phone;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AlarmAgreeList {
+        private Alarm serviceAlarm;
+
+        private Alarm eventAlarm;
     }
 }
