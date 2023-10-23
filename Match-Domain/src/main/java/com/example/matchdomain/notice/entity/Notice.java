@@ -29,6 +29,7 @@ public class Notice extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "noticeId")
+    @BatchSize(size = 20)
     private List<NoticeContent> noticeContents = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
