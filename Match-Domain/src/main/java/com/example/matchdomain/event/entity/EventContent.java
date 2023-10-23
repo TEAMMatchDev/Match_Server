@@ -1,6 +1,7 @@
 package com.example.matchdomain.event.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.common.model.ContentsEntity;
 import com.example.matchdomain.common.model.ContentsType;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -19,14 +20,11 @@ import javax.persistence.*;
 @DynamicUpdate
 @BatchSize(size = 100)
 @DynamicInsert
-public class EventContent extends BaseEntity {
+public class EventContent extends ContentsEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Enumerated(EnumType.STRING)
-    private ContentsType contentsType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eventId",nullable = false, insertable=false, updatable=false)
@@ -35,5 +33,4 @@ public class EventContent extends BaseEntity {
     @Column(name="eventId")
     private Long eventId;
 
-    private String contents;
 }
