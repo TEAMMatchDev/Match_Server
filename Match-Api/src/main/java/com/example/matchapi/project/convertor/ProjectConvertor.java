@@ -1,5 +1,6 @@
 package com.example.matchapi.project.convertor;
 
+import com.example.matchapi.common.util.TimeHelper;
 import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
@@ -7,10 +8,14 @@ import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
+import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.dto.ProjectList;
 import com.example.matchdomain.project.entity.*;
+import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
+import com.example.matchdomain.project.entity.enums.ReportReason;
 import com.example.matchdomain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -20,15 +25,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.example.matchdomain.donation.entity.HistoryStatus.FINISH;
-import static com.example.matchdomain.project.entity.ProjectStatus.BEFORE_START;
+import static com.example.matchdomain.project.entity.enums.ProjectStatus.BEFORE_START;
 
 @Convertor
 @RequiredArgsConstructor
 public class ProjectConvertor {
     private final ProjectHelper projectHelper;
     private final RegularPaymentRepository regularPaymentRepository;
-    private final DonationHelper donationHelper;
+    private final TimeHelper timeHelper;
     private static final String FIRST_TIME = "T00:00:00";
     private static final String LAST_TIME = "T23:59:59";
     public ProjectRes.ProjectDetail projectImgList(List<ProjectImage> projectImage) {
@@ -71,7 +75,7 @@ public class ProjectConvertor {
         }
 
         return UserRes.MyPage.builder()
-                .username(name)
+                .name(name)
                 .likeCnt(Math.toIntExact(likeCnt))
                 .underCnt(underCnt)
                 .successCnt(successCnt)
@@ -83,7 +87,7 @@ public class ProjectConvertor {
         return ProjectRes.CommentList.builder()
                 .commentId(result.getId())
                 .comment(result.getComment())
-                .commentDate(donationHelper.dayTimeFormat(result.getCreatedAt()))
+                .commentDate(timeHelper.dayTimeFormat(result.getCreatedAt()))
                 .nickname(result.getUser().getNickname())
                 .userId(result.getUserId())
                 .isMy(result.getUserId().equals(userId))
@@ -159,7 +163,18 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public ProjectRes.DonationList DonationUserInfo(DonationUser result) {
+    public List<ProjectRes.DonationList> DonationUserInfo(List<DonationUser> donationUsers){
+        List<ProjectRes.DonationList> donationLists = new ArrayList<>();
+        donationUsers.forEach(
+                result -> donationLists.add(
+                        DonationUserInfoDetail(result)
+                )
+        );
+
+        return donationLists;
+    }
+
+    public ProjectRes.DonationList DonationUserInfoDetail(DonationUser result) {
         return ProjectRes.DonationList
                 .builder()
                 .donationId(result.getId())
@@ -178,7 +193,7 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public ProjectRes.ProjectLists ProjectLists(ProjectRepository.ProjectList result) {
+    public ProjectRes.ProjectLists ProjectListsDetail(ProjectRepository.ProjectList result) {
         List<String> imgUrlList = new ArrayList<>();
         if(result.getImgUrlList()!=null){
             imgUrlList = Stream.of(result.getImgUrlList().split(",")).collect(Collectors.toList());
@@ -197,6 +212,17 @@ public class ProjectConvertor {
                 .userProfileImages(imgUrlList)
                 .totalDonationCnt(result.getTotalDonationCnt())
                 .build();
+    }
+
+    public List<ProjectRes.ProjectLists> ProjectLists(List<ProjectRepository.ProjectList> projects){
+        List<ProjectRes.ProjectLists> projectLists = new ArrayList<>();
+        projects.forEach(
+                result -> {
+                    projectLists.add(ProjectListsDetail(result));
+                }
+        );
+
+        return projectLists;
     }
 
     public ProjectRes.ProjectLists ProjectListQueryDsl(ProjectList result) {
@@ -300,5 +326,43 @@ public class ProjectConvertor {
                 .commentId(commentId)
                 .reportReason(reportReason)
                 .build();
+    }
+
+    public List<ProjectRes.ProjectList> ProjectListWeb(List<ProjectRepository.ProjectList> projects) {
+        List<ProjectRes.ProjectList> projectLists = new ArrayList<>();
+
+        projects.forEach(
+                result -> {
+                    projectLists.add(new ProjectRes.ProjectList(
+                            result.getId(),
+                            result.getImgUrl(),
+                            result.getProjectName(),
+                            result.getUsages(),
+                            result.getProjectKind(),
+                            result.getLike()
+                    ));
+                }
+        );
+
+        return projectLists;
+    }
+
+    public List<ProjectRes.ProjectList> ProjectListWebForNotLogin(List<Project> projects) {
+        List<ProjectRes.ProjectList> projectLists = new ArrayList<>();
+
+        projects.forEach(
+                result -> {
+                    String imageUrl = result.getProjectImage().isEmpty() ? null : result.getProjectImage().get(0).getUrl();
+                    projectLists.add(new ProjectRes.ProjectList(
+                            result.getId(),
+                            imageUrl,
+                            result.getProjectName(),
+                            result.getUsages(),
+                            result.getProjectKind().getValue(),
+                            false
+                    ));
+                }
+        );
+        return projectLists;
     }
 }

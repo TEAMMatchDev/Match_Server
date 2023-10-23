@@ -2,8 +2,8 @@ package com.example.matchapi.user.helper;
 
 import com.example.matchcommon.annotation.Helper;
 import com.example.matchcommon.exception.BaseDynamicException;
-import com.example.matchdomain.user.entity.Gender;
-import com.example.matchdomain.user.entity.SocialType;
+import com.example.matchdomain.user.entity.enums.Gender;
+import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.matchdomain.user.exception.UserSignUpErrorCode.EXIST_USER_PHONENUMBER;
-import static com.example.matchdomain.user.entity.SocialType.*;
+import static com.example.matchdomain.user.entity.enums.SocialType.*;
 
 @Helper
 @RequiredArgsConstructor

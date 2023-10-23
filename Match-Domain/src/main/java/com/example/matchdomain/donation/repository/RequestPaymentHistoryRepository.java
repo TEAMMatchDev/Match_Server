@@ -1,7 +1,7 @@
 package com.example.matchdomain.donation.repository;
 
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.donation.entity.PaymentStatus;
+import com.example.matchdomain.donation.entity.enums.PaymentStatus;
 import com.example.matchdomain.donation.entity.RequestPaymentHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

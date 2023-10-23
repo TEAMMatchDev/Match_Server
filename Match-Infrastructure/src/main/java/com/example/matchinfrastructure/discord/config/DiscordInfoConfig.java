@@ -1,6 +1,5 @@
 package com.example.matchinfrastructure.discord.config;
 
-import com.example.matchinfrastructure.oauth.kakao.config.KakaoInfoErrorDecoder;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

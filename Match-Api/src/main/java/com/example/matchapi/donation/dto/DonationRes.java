@@ -1,14 +1,12 @@
 package com.example.matchapi.donation.dto;
 
-import com.example.matchdomain.donation.entity.DonationStatus;
-import com.example.matchdomain.donation.entity.HistoryStatus;
-import com.example.matchdomain.donation.entity.RegularPayStatus;
-import com.example.matchdomain.donation.entity.RegularStatus;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
+import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class DonationRes {
@@ -164,23 +162,23 @@ public class DonationRes {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class DonationFlame {
-        @Schema(description = "후원 대표 이미지", required = true, example = "이미지 url")
+        @Schema(description = "불꽃이 이미지", required = true, example = "이미지 url")
         private String imgUrl;
+
+        @Schema(description = "불꽃이 유형", required = true, example = "일반 불꽃")
+        private String flameType;
 
         @Schema(description = "고유 이름", required = true, example = "불꽃이 고유 이름")
         private String inherenceName;
 
-        @Schema(description = "PROCEEDING = 기부 진행중, PROJECT_FINISH = 프로젝트 마감으로 인한 매칭 종료, USER_CANCEL = 유저 후원 취소")
-        private RegularPayStatus regularPayStatus;
+        @Schema(description = "성심수녀회")
+        private String usages;
 
-        @Schema(description = "후원 금액" , required = true, example = "후원 금액")
+        @Schema(description = "후원 금액(전달된 온도)" , required = true, example = "1000")
         private int amount;
 
-        @Schema(description = "후원 id", required = true, example = "2")
-        private Long regularPayId;
-
-        @Schema(description = "후원 날짜", required = true, example = "2")
-        private int payDate;
+        @Schema(description = "생성 순서 0일시 단일 기부(즉 1회성 기부입니다) 생성 순서 표시 x", required = true, example = "2")
+        private int sequence;
     }
 
     @Getter
@@ -202,9 +200,11 @@ public class DonationRes {
         private String historyDate;
 
         @Schema(description = "불꽃이 이미지", required = true, example = "이미지 url")
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private String flameImage;
 
         @Schema(description = "전달 사진 리스트 COMPLETE 인 경우에 이미지가 들어갑니다.", required = true, example = "")
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private List<DonationHistoryImage> donationHistoryImages;
     }
     @Getter
@@ -233,6 +233,8 @@ public class DonationRes {
         private String payMethod;
 
         private String amount;
+
+        private String inherenceNumber;
     }
 
     @Getter
@@ -261,5 +263,44 @@ public class DonationRes {
         private String projectName;
 
         private String imgUrl;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class MatchList {
+        private String projectTitle;
+
+        private String regularDate;
+
+        private RegularPayStatus regularPayStatus;
+
+        private int payDate;
+
+        private String amount;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class BurningFlameDto {
+        @Schema(description = "불꽃이 id 상세조회시 필요", required = true, example = "2")
+        private Long donationId;
+
+        @Schema(description = "후원처 명")
+        private String usages;
+
+        @Schema(description = "고유 불꽃이 이름")
+        private String inherenceName;
+
+        @Schema(description = "불꽃이 이미지")
+        private String image;
+
+        @Schema(description = "랜덤 불꽃이 메세지")
+        private String randomMessage;
     }
 }

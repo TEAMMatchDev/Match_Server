@@ -1,6 +1,7 @@
 package com.example.matchdomain.project.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.project.entity.enums.ReportReason;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;

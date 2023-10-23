@@ -3,7 +3,7 @@ package com.example.matchapi.admin.order.controller;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.reponse.CommonResponse;
-import com.example.matchdomain.donation.entity.DonationStatus;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.exception.DonationGerErrorCode;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;

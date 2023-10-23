@@ -2,9 +2,9 @@ package com.example.matchdomain.donation.repository;
 
 
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.donation.entity.DonationStatus;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.project.entity.ImageRepresentStatus;
+import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import com.example.matchdomain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -108,6 +108,12 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
     countQuery = "select count(du) from DonationUser du where du.user = :user and du.inherenceName LIKE %:content%")
     Page<DonationUser> findByUserAndInherenceNameContainingAndProject_ProjectImg_RepresentStatusOrderByCreatedAtDesc(@Param("user") User user, @Param("content") String content, @Param("represent") ImageRepresentStatus represent, Pageable pageable);
 
+    List<DonationUser> findByIdIn(List<Long> donationUserLists);
+
+    @Query(value = "select du from DonationUser du join fetch du.project p " +
+            " where du.user = :user and du.donationStatus != :donationStatus order by du.createdAt asc",
+            countQuery = "select count(du) from DonationUser du where du.user = :user and du.donationStatus =:donationStatus")
+    Page<DonationUser> findByUserAndDonationStatusNotOrderByCreatedAtDesc(@Param("user") User user, @Param("donationStatus") DonationStatus donationStatus, Pageable pageable);
 
 
     interface flameList {

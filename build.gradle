@@ -10,6 +10,7 @@ allprojects{
     sourceCompatibility = "16"
 
     repositories {
+        maven { url 'https://jitpack.io' }
         mavenCentral()
     }
 }
@@ -41,6 +42,8 @@ subprojects{
 
         implementation 'org.springframework.boot:spring-boot-starter'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+        implementation 'net.sf.ehcache:ehcache:2.10.3'
 
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'

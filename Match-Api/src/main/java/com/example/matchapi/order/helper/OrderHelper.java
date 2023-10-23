@@ -3,13 +3,12 @@ package com.example.matchapi.order.helper;
 import com.example.matchcommon.annotation.Helper;
 import com.example.matchcommon.exception.BaseException;
 import com.example.matchcommon.properties.NicePayProperties;
-import com.example.matchdomain.donation.entity.PayMethod;
+import com.example.matchdomain.donation.entity.enums.PayMethod;
 import com.example.matchdomain.donation.entity.flameEnum.Adjective;
 import com.example.matchdomain.donation.entity.flameEnum.AdjectiveFlame;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
 import com.example.matchinfrastructure.pay.nice.dto.NicePayCancelRequest;
-import com.example.matchinfrastructure.pay.nice.dto.NicePaymentAuth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 

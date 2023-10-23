@@ -162,4 +162,11 @@ public class AuthController {
         return CommonResponse.onSuccess("핸드폰 인증 성공");
     }
 
+    @Operation(summary="01-11🔑 애플로그인 API", description= "애플로그인 API 입니다.")
+    @PostMapping("/apple")
+    @ApiErrorCodeExample({UserSignUpErrorCode.class, OtherServerErrorCode.class, RequestErrorCode.class})
+    public CommonResponse<UserRes.UserToken> appleLogin(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
+        return CommonResponse.onSuccess(authService.appleLogin(socialLoginToken));
+    }
+
 }

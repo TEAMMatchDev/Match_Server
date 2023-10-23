@@ -29,7 +29,7 @@ public class QProjectImage extends EntityPathBase<ProjectImage> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final EnumPath<ImageRepresentStatus> imageRepresentStatus = createEnum("imageRepresentStatus", ImageRepresentStatus.class);
+    public final EnumPath<com.example.matchdomain.project.entity.enums.ImageRepresentStatus> imageRepresentStatus = createEnum("imageRepresentStatus", com.example.matchdomain.project.entity.enums.ImageRepresentStatus.class);
 
     public final QProject project;
 

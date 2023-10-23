@@ -24,7 +24,11 @@ public class QDonationHistory extends EntityPathBase<DonationHistory> {
 
     public final com.example.matchdomain.common.model.QBaseEntity _super = new com.example.matchdomain.common.model.QBaseEntity(this);
 
+    public final ListPath<Long, NumberPath<Long>> changeIdLists = this.<Long, NumberPath<Long>>createList("changeIdLists", Long.class, NumberPath.class, PathInits.DIRECT2);
+
     public final NumberPath<Integer> cnt = createNumber("cnt", Integer.class);
+
+    public final ListPath<Long, NumberPath<Long>> completeIdLists = this.<Long, NumberPath<Long>>createList("completeIdLists", Long.class, NumberPath.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
@@ -33,17 +37,19 @@ public class QDonationHistory extends EntityPathBase<DonationHistory> {
 
     public final NumberPath<Long> donationUserId = createNumber("donationUserId", Long.class);
 
-    public final StringPath flameImage = createString("flameImage");
-
     public final ListPath<HistoryImage, QHistoryImage> historyImages = this.<HistoryImage, QHistoryImage>createList("historyImages", HistoryImage.class, QHistoryImage.class, PathInits.DIRECT2);
 
-    public final EnumPath<HistoryStatus> historyStatus = createEnum("historyStatus", HistoryStatus.class);
+    public final EnumPath<com.example.matchdomain.donation.entity.enums.HistoryStatus> historyStatus = createEnum("historyStatus", com.example.matchdomain.donation.entity.enums.HistoryStatus.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final com.example.matchdomain.project.entity.QProject project;
 
     public final NumberPath<Long> projectId = createNumber("projectId", Long.class);
+
+    public final QRegularPayment regularPayment;
+
+    public final NumberPath<Long> regularPaymentId = createNumber("regularPaymentId", Long.class);
 
     //inherited
     public final EnumPath<com.example.matchdomain.common.model.Status> status = _super.status;
@@ -71,6 +77,7 @@ public class QDonationHistory extends EntityPathBase<DonationHistory> {
         super(type, metadata, inits);
         this.donationUser = inits.isInitialized("donationUser") ? new QDonationUser(forProperty("donationUser"), inits.get("donationUser")) : null;
         this.project = inits.isInitialized("project") ? new com.example.matchdomain.project.entity.QProject(forProperty("project")) : null;
+        this.regularPayment = inits.isInitialized("regularPayment") ? new QRegularPayment(forProperty("regularPayment"), inits.get("regularPayment")) : null;
     }
 
 }

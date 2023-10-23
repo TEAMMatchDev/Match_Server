@@ -17,30 +17,39 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.SpringDocUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.method.HandlerMethod;
 import org.springdoc.core.customizers.OperationCustomizer;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.lang.Integer.parseInt;
-import static java.util.stream.Collectors.groupingBy;
-
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class SwaggerConfig {
     //jwt 토큰 인증을 위한 버튼까지 포함
+    static {
+        SpringDocUtils.getConfig().addAnnotationsToIgnore(AuthenticationPrincipal.class, CookieValue.class);
+    }
 
 
     private final ApplicationContext applicationContext;
+    @Value("${spring.config.activate.on-profile}")
+    private String profile;
+
 
     @Bean
     public OpenAPI openAPI() {
         Info info = new Info()
-                .title("Match Aligo Rest API 문서") // 타이틀
+                .title(profile + "환경 Match Rest API 문서") // 타이틀
                 .version("0.0.1") // 문서 버전
                 .description("잘못된 부분이나 오류 발생 시 바로 말씀해주세요.") // 문서 설명
                 .contact(new Contact() // 연락처

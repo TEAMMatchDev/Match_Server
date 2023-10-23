@@ -35,7 +35,7 @@ public class QRequestPaymentHistory extends EntityPathBase<RequestPaymentHistory
 
     public final NumberPath<Integer> payDate = createNumber("payDate", Integer.class);
 
-    public final EnumPath<PaymentStatus> paymentStatus = createEnum("paymentStatus", PaymentStatus.class);
+    public final EnumPath<com.example.matchdomain.donation.entity.enums.PaymentStatus> paymentStatus = createEnum("paymentStatus", com.example.matchdomain.donation.entity.enums.PaymentStatus.class);
 
     public final StringPath reason = createString("reason");
 

@@ -18,5 +18,7 @@ public class NicePayProperties {
     private String secret;
     private String client;
     private String url;
+    private String mid;
+    private String key;
 
 }

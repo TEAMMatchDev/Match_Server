@@ -91,6 +91,34 @@ public class S3UploadService {
         return imgUrlList;
     }
 
+    public List<String> listUploadCompleteFiles(Long historyId,List<MultipartFile> multipartFiles){
+        List<String> imgUrlList = new ArrayList<>();
+
+        for (MultipartFile file : multipartFiles) {
+            String fileName = getForHistoryFileName(historyId, getFileExtension(file.getOriginalFilename()));
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(file.getSize());
+            objectMetadata.setContentType(file.getContentType());
+
+            try (InputStream inputStream = file.getInputStream()) {
+                amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+                imgUrlList.add(amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString());
+            } catch (IOException e) {
+                log.info("파일 업로드 실패 프로젝트 ID : " + historyId);
+                throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
+            }
+        }
+
+        return imgUrlList;
+    }
+
+    private String getForHistoryFileName(Long historyId, String fileExtension) {
+        return "history/"
+                + historyId.toString()
+                + "/"
+                + UUID.randomUUID()
+                + fileExtension;
+    }
 
     private String changeJpgToJpeg(String fileExtension) {
         if (fileExtension.equals("jpg")) {
@@ -122,8 +150,6 @@ public class S3UploadService {
             boolean isObjectExist = amazonS3.doesObjectExist(awsS3Properties.getS3().getBucket(), fileRoute);
             if (isObjectExist) {
                 amazonS3.deleteObject(awsS3Properties.getS3().getBucket(),fileRoute);
-            } else {
-                throw new InternalServerException(IMAGE_DELETE_ERROR);
             }
         } catch (Exception e) {
             throw new InternalServerException(IMAGE_DELETE_ERROR);
@@ -144,5 +170,25 @@ public class S3UploadService {
             throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
         }
         return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
+    }
+
+    public String uploadBannerImage(MultipartFile bannerImage) {
+        String fileName = getForBannerFileName(getFileExtension(bannerImage.getOriginalFilename()));
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(bannerImage.getSize());
+        objectMetadata.setContentType(bannerImage.getContentType());
+
+        try (InputStream inputStream = bannerImage.getInputStream()) {
+            amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+        } catch (IOException e) {
+            throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
+        }
+        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
+    }
+
+    private String getForBannerFileName(String fileExtension) {
+        return "banner/"
+                + UUID.randomUUID()
+                + fileExtension;
     }
 }

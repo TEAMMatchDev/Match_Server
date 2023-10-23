@@ -1,6 +1,5 @@
 package com.example.matchapi.user.service;
 
-import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchapi.project.convertor.ProjectConvertor;
@@ -11,16 +10,12 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
-import com.example.matchdomain.project.entity.ImageRepresentStatus;
-import com.example.matchdomain.project.entity.ProjectUserAttention;
 import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
-import com.example.matchdomain.user.entity.UserFcmToken;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.exception.ModifyEmailCode;
 import com.example.matchdomain.user.repository.UserAddressRepository;
@@ -42,10 +37,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.*;
-import static com.example.matchdomain.donation.entity.DonationStatus.EXECUTION_REFUND;
 import static com.example.matchdomain.user.exception.ModifyEmailCode.NOT_CORRECT_EMAIL;
 import static com.example.matchdomain.user.exception.ModifyPhoneErrorCode.NOT_CORRECT_PHONE;
-import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_EMAIL;
 import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_PHONE;
 
 @Service
@@ -82,7 +75,7 @@ public class UserService {
         List<RegularPayment> regularPayments = regularPaymentRepository.findByUser(user);
         Long projectAttentionCnt = projectUserAttentionRepository.countById_userId(user.getId());
 
-        return projectConvertor.getMyPage(regularPayments,projectAttentionCnt, user.getName());
+        return projectConvertor.getMyPage(regularPayments,projectAttentionCnt, user.getNickname());
     }
 
     public OrderRes.UserDetail getUserInfo(User user) {
@@ -100,6 +93,7 @@ public class UserService {
         return userConvertor.UserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
     }
 
+    @Transactional
     public PageResponse<List<UserRes.UserList>> getUserList(int page, int size, Status status, String content) {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserRepository.UserList> userList = null;
@@ -140,6 +134,7 @@ public class UserService {
         return userConvertor.UserProfile(user);
     }
 
+    @Transactional
     public void modifyUserProfile(User user, UserReq.ModifyProfile modifyProfile) {
         if(modifyProfile.getName() == null && modifyProfile.getMultipartFile()!=null){
             String beforeProfileImg = user.getProfileImgUrl();
@@ -150,7 +145,8 @@ public class UserService {
             user.setProfileImgUrl(newProfileImg);
         }
         else if(modifyProfile.getMultipartFile() == null && modifyProfile.getName()!=null){
-            user.setName(modifyProfile.getName());
+            System.out.println("유저 닉네임 편집");
+            user.setNickname(modifyProfile.getName());
         }
         else if (modifyProfile.getMultipartFile() != null){
             String beforeProfileImg = user.getProfileImgUrl();

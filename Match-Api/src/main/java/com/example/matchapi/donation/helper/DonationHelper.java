@@ -1,10 +1,14 @@
 package com.example.matchapi.donation.helper;
 
 import com.example.matchcommon.annotation.Helper;
+import com.example.matchdomain.donation.entity.DonationUser;
 import lombok.RequiredArgsConstructor;
 
 import java.text.DecimalFormat;
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.example.matchdomain.donation.entity.enums.RegularStatus.ONE_TIME;
 
 @Helper
 @RequiredArgsConstructor
@@ -15,20 +19,21 @@ public class DonationHelper {
         return decimalFormat.format(amount)+"원";
     }
 
-    public String timeFormat(LocalDateTime createdAt) {
-        return createdAt.getYear() + "." + createdAt.getMonthValue() + "." + createdAt.getDayOfMonth();
+    public String createRandomMessage() {
+        return "하이";
     }
 
-    public String dayTimeFormat(LocalDateTime createdAt) {
-        return createdAt.getYear() + "." + createdAt.getMonthValue() + "." + createdAt.getDayOfMonth() + " " + checkTimes(createdAt.getHour()) + ":" + checkTimes(createdAt.getMinute());
-    }
+    public int getDonationSequence(DonationUser donationUser, Long donationId) {
 
-    public String checkTimes(int time){
-        if(time < 10){
-            return  "0" + time;
+        if(donationUser.getRegularStatus() == ONE_TIME){
+            return 0;
         }
         else{
-            return String.valueOf(time);
+            return donationIdLists(donationUser.getRegularPayment().getDonationUser()).indexOf(donationId) + 1;
         }
+    }
+
+    public List<Long> donationIdLists(List<DonationUser> donationUser) {
+        return donationUser.stream().map(DonationUser::getId).collect(Collectors.toList());
     }
 }

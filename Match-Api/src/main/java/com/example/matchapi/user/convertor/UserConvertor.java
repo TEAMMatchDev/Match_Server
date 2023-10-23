@@ -7,19 +7,21 @@ import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.UserHelper;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchcommon.properties.AligoProperties;
-import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
+import com.example.matchdomain.user.entity.enums.AddressType;
+import com.example.matchdomain.user.entity.enums.AuthorityEnum;
+import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.aligo.dto.SendReq;
+import com.example.matchinfrastructure.oauth.apple.dto.AppleUserRes;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Collections;
 import java.util.List;
 
 import static com.example.matchcommon.constants.MatchStatic.BASE_PROFILE;
@@ -49,7 +51,7 @@ public class UserConvertor {
                 .birth(authHelper.birthConversion(kakaoUserInfoDto.getBirthYear(), kakaoUserInfoDto.getBirthDay()))
                 .gender(authHelper.genderConversion(kakaoUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(kakaoUserInfoDto.getProperties().getNickname())
+                .nickname(userHelper.createRandomNickName())
                 .build();
     }
 
@@ -76,7 +78,7 @@ public class UserConvertor {
                 .birth(authHelper.birthConversion(naverUserInfoDto.getBirthyear(), naverUserInfoDto.getBirthday()))
                 .gender(authHelper.genderConversion(naverUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(naverUserInfoDto.getNickname())
+                .nickname(userHelper.createRandomNickName())
                 .build();
     }
 
@@ -92,7 +94,7 @@ public class UserConvertor {
                 .birth(authHelper.birthConversionToLocalDate(signUpUser.getBirthDate()))
                 .gender(signUpUser.getGender())
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(signUpUser.getName())
+                .nickname(userHelper.createRandomNickName())
                 .build();
     }
 
@@ -201,6 +203,7 @@ public class UserConvertor {
                 .name(user.getName())
                 .socialType(user.getSocialType())
                 .email(user.getEmail())
+                .nickName(user.getNickname())
                 .phone(user.getPhoneNumber())
                 .build();
     }
@@ -213,6 +216,20 @@ public class UserConvertor {
                                 .deviceId(token.getDeviceId())
                                 .build())
                 .fcmToken(token.getFcmToken())
+                .build();
+    }
+
+    public User AppleUserSignUp(AppleUserRes appleUserRes) {
+        return User.builder()
+                .username(appleUserRes.getSocialId())
+                .password(authHelper.createRandomPassword())
+                .profileImgUrl(BASE_PROFILE)
+                .name(userHelper.createRandomNickName())
+                .email(appleUserRes.getEmail())
+                .socialId(appleUserRes.getSocialId())
+                .socialType(SocialType.APPLE)
+                .role(AuthorityEnum.ROLE_USER.getValue())
+                .nickname(userHelper.createRandomNickName())
                 .build();
     }
 }

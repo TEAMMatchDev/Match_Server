@@ -1,8 +1,8 @@
 package com.example.matchdomain.user.repository;
 
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.user.entity.Gender;
-import com.example.matchdomain.user.entity.SocialType;
+import com.example.matchdomain.user.entity.enums.Gender;
+import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

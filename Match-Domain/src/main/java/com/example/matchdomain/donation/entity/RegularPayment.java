@@ -1,6 +1,7 @@
 package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
 import lombok.*;
@@ -12,7 +13,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.matchdomain.donation.entity.RegularPayStatus.PROCEEDING;
+import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.PROCEEDING;
 
 @Entity
 @Table(name = "RegularPayment")

@@ -53,7 +53,7 @@ public class MailService {
         return message;
     }
 
-    @Async
+    @Async("email")
     public void sendEmailMessage(String email, String code){
         try {
             MimeMessage message = emailSender.createMimeMessage();

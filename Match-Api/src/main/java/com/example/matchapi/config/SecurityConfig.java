@@ -1,12 +1,10 @@
 package com.example.matchapi.config;
 
-import com.example.matchapi.security.*;
+import com.example.matchapi.common.security.*;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -91,6 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/order/serverAuth").permitAll()
                 .antMatchers("/projects").permitAll()
                 .antMatchers("/projects/**").permitAll()
+                .antMatchers("/projects/list").authenticated()
                 .antMatchers("/").permitAll()
                 .antMatchers("/serverAuth").permitAll()
                 .antMatchers(HttpMethod.GET,"/donation-temporaries").permitAll()
@@ -103,6 +102,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/donation-temporaries/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/order/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/auth/logIn").permitAll()
+                .antMatchers("/test/fcm/user").authenticated()
                 .anyRequest().authenticated()
 
                 .and()

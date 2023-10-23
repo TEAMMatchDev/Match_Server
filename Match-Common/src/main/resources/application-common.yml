@@ -30,6 +30,8 @@ nice:
   secret: ${NICE_SECRET_KEY}
   client: ${NICE_CLIENT_KEY}
   url: ${NICE_URL}
+  mid: ${NICE_MID}
+  key: ${NICE_KEY}
 
 aws:
   access-key: ${AWS_ACCESS_KEY}
@@ -73,3 +75,10 @@ web:
 match:
   aligo:
     url: ${MATCH_ALIGO_URL}
+
+portone:
+  code: ${PORTONE_CODE}
+  key: ${PORTONE_KEY}
+  secret: ${PORTONE_SECRET}
+  billmid: ${PORTONE_BILL_MID}
+

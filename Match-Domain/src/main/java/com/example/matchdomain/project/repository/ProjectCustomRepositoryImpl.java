@@ -2,16 +2,17 @@ package com.example.matchdomain.project.repository;
 
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.QRegularPayment;
-import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.dto.ProjectList;
 import com.example.matchdomain.project.entity.*;
+import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
+import com.example.matchdomain.project.entity.enums.ProjectStatus;
 import com.example.matchdomain.user.entity.QUser;
 import com.example.matchdomain.user.entity.User;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,7 +25,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.example.matchdomain.donation.entity.RegularPayStatus.PROCEEDING;
+import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.PROCEEDING;
 
 
 @RequiredArgsConstructor
