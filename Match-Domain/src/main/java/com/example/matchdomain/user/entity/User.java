@@ -88,15 +88,14 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "logInAt")
     private LocalDateTime logInAt;
 
-
     @Column(name = "role")
     private String role;
 
     @Enumerated(EnumType.STRING)
-    private Alarm serviceAlarm = Alarm.INACTIVE;
+    private Alarm serviceAlarm = Alarm.ACTIVE;
 
     @Enumerated(EnumType.STRING)
-    private Alarm eventAlarm = Alarm.INACTIVE;
+    private Alarm eventAlarm = Alarm.ACTIVE;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

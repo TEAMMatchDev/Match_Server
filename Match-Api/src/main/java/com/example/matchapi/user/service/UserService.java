@@ -1,5 +1,6 @@
 package com.example.matchapi.user.service;
 
+import com.example.matchapi.common.model.AlarmType;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchapi.project.convertor.ProjectConvertor;
@@ -16,6 +17,7 @@ import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
+import com.example.matchdomain.user.entity.enums.Alarm;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.exception.ModifyEmailCode;
 import com.example.matchdomain.user.repository.UserAddressRepository;
@@ -36,7 +38,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.matchapi.common.model.AlarmType.EVENT;
 import static com.example.matchcommon.constants.MatchStatic.*;
+import static com.example.matchdomain.user.entity.enums.Alarm.ACTIVE;
+import static com.example.matchdomain.user.entity.enums.Alarm.INACTIVE;
 import static com.example.matchdomain.user.exception.ModifyEmailCode.NOT_CORRECT_EMAIL;
 import static com.example.matchdomain.user.exception.ModifyPhoneErrorCode.NOT_CORRECT_PHONE;
 import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_PHONE;
@@ -183,5 +188,34 @@ public class UserService {
         if(userRepository.existsByEmail(email.getNewEmail())) throw new BadRequestException(ModifyEmailCode.USERS_EXISTS_EMAIL);
         user.setEmail(email.getNewEmail());
         userRepository.save(user);
+    }
+
+    public UserRes.AlarmAgreeList getAlarmAgreeList(User user) {
+        System.out.println(user.getName());
+        return userConvertor.AlarmAgree(user);
+    }
+
+    public UserRes.AlarmAgreeList patchAlarm(User user, AlarmType alarmType) {
+        if(alarmType.equals(EVENT)){
+            Alarm alarm = user.getEventAlarm();
+            if(alarm == ACTIVE){
+                user.setEventAlarm(INACTIVE);
+            }
+            else{
+                user.setEventAlarm(ACTIVE);
+            }
+        }else{
+            Alarm alarm = user.getServiceAlarm();
+            if(alarm == ACTIVE){
+                user.setServiceAlarm(INACTIVE);
+            }
+            else{
+                user.setServiceAlarm(ACTIVE);
+            }
+        }
+
+        user = userRepository.save(user);
+
+        return userConvertor.AlarmAgree(user);
     }
 }
