@@ -1,9 +1,10 @@
 package com.example.matchapi.event.convetor;
 
+import com.example.matchapi.admin.event.dto.EventUploadReq;
 import com.example.matchapi.common.util.TimeHelper;
 import com.example.matchapi.event.dto.EventRes;
-import com.example.matchapi.notice.dto.NoticeRes;
 import com.example.matchcommon.annotation.Convertor;
+import com.example.matchdomain.common.model.ContentsType;
 import com.example.matchdomain.event.entity.Event;
 import com.example.matchdomain.event.entity.EventContent;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,27 @@ public class EventConvertor {
                 .smallTitle(event.getSmallTitle())
                 .startDate(event.getEventStartDate())
                 .endDate(event.getEventEndDate())
+                .build();
+    }
+
+    public Event convertToEventUpload(EventUploadReq eventUploadReq, String thumbnail) {
+        return Event
+                .builder()
+                .title(eventUploadReq.getTitle())
+                .eventType(eventUploadReq.getEventType())
+                .smallTitle(eventUploadReq.getSmallTitle())
+                .thumbnail(thumbnail)
+                .eventStartDate(eventUploadReq.getEventStartDate())
+                .eventEndDate(eventUploadReq.getEventEndDate())
+                .build();
+    }
+
+    public EventContent convertToEventContents(Long eventId, String contents, ContentsType contentsType) {
+        return EventContent
+                .builder()
+                .eventId(eventId)
+                .contentsType(contentsType)
+                .contents(contents)
                 .build();
     }
 }
