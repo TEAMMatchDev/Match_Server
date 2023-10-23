@@ -191,6 +191,8 @@ public class UserRes {
 
         private String name;
 
+        private String nickName;
+
         private SocialType socialType;
 
         private String email;;

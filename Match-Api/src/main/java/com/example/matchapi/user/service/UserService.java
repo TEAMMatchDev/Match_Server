@@ -145,8 +145,8 @@ public class UserService {
             user.setProfileImgUrl(newProfileImg);
         }
         else if(modifyProfile.getMultipartFile() == null && modifyProfile.getName()!=null){
-            System.out.println("유저 이름 편집");
-            user.setName(modifyProfile.getName());
+            System.out.println("유저 닉네임 편집");
+            user.setNickname(modifyProfile.getName());
         }
         else if (modifyProfile.getMultipartFile() != null){
             String beforeProfileImg = user.getProfileImgUrl();

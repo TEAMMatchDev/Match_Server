@@ -200,9 +200,10 @@ public class UserConvertor {
         return UserRes.Profile
                 .builder()
                 .profileImgUrl(user.getProfileImgUrl())
-                .name(user.getNickname())
+                .name(user.getName())
                 .socialType(user.getSocialType())
                 .email(user.getEmail())
+                .nickName(user.getNickname())
                 .phone(user.getPhoneNumber())
                 .build();
     }
