@@ -75,7 +75,7 @@ public class ProjectConvertor {
         }
 
         return UserRes.MyPage.builder()
-                .username(name)
+                .name(name)
                 .likeCnt(Math.toIntExact(likeCnt))
                 .underCnt(underCnt)
                 .successCnt(successCnt)

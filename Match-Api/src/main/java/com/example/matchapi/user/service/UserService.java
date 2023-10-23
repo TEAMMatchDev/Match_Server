@@ -75,7 +75,7 @@ public class UserService {
         List<RegularPayment> regularPayments = regularPaymentRepository.findByUser(user);
         Long projectAttentionCnt = projectUserAttentionRepository.countById_userId(user.getId());
 
-        return projectConvertor.getMyPage(regularPayments,projectAttentionCnt, user.getName());
+        return projectConvertor.getMyPage(regularPayments,projectAttentionCnt, user.getNickname());
     }
 
     public OrderRes.UserDetail getUserInfo(User user) {
@@ -145,6 +145,7 @@ public class UserService {
             user.setProfileImgUrl(newProfileImg);
         }
         else if(modifyProfile.getMultipartFile() == null && modifyProfile.getName()!=null){
+            System.out.println("유저 이름 편집");
             user.setName(modifyProfile.getName());
         }
         else if (modifyProfile.getMultipartFile() != null){
