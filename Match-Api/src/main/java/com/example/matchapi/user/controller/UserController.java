@@ -1,5 +1,6 @@
 package com.example.matchapi.user.controller;
 
+import com.example.matchapi.common.model.AlarmType;
 import com.example.matchapi.common.security.JwtService;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.dto.UserReq;
@@ -163,6 +164,20 @@ public class UserController {
         return CommonResponse.onSuccess("변경 성공");
     }
 
+    @Operation(summary = "02-09 알람 동의 항목 조회 👤",description = "알람 동의 항목 조회 입니다 ACTIVE 필드와 INACTIVE 필드가 있습니다.")
+    @GetMapping("/alarm")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    public CommonResponse<UserRes.AlarmAgreeList> getAlarmAgreeList(@AuthenticationPrincipal User user){
+        return CommonResponse.onSuccess(userService.getAlarmAgreeList(user));
+    }
+
+    @Operation(summary = "02-10 알람 동의 항목 수정 👤" , description = "알람 동의 항목 수정")
+    @PatchMapping("/alarm")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    public CommonResponse<UserRes.AlarmAgreeList> patchAlarmAgree(@AuthenticationPrincipal User user,
+                                                                    @RequestParam AlarmType alarmType){
+        return CommonResponse.onSuccess(userService.patchAlarm(user, alarmType));
+    }
 
 
 }

@@ -25,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 
 import static com.example.matchcommon.constants.MatchStatic.BASE_PROFILE;
+import static com.example.matchdomain.user.entity.enums.Alarm.ACTIVE;
 
 @Convertor
 @RequiredArgsConstructor
@@ -52,6 +53,8 @@ public class UserConvertor {
                 .gender(authHelper.genderConversion(kakaoUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
                 .nickname(userHelper.createRandomNickName())
+                .serviceAlarm(ACTIVE)
+                .eventAlarm(ACTIVE)
                 .build();
     }
 
@@ -79,6 +82,8 @@ public class UserConvertor {
                 .gender(authHelper.genderConversion(naverUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
                 .nickname(userHelper.createRandomNickName())
+                .serviceAlarm(ACTIVE)
+                .eventAlarm(ACTIVE)
                 .build();
     }
 
@@ -95,6 +100,8 @@ public class UserConvertor {
                 .gender(signUpUser.getGender())
                 .role(AuthorityEnum.ROLE_USER.getValue())
                 .nickname(userHelper.createRandomNickName())
+                .serviceAlarm(ACTIVE)
+                .eventAlarm(ACTIVE)
                 .build();
     }
 
@@ -230,6 +237,16 @@ public class UserConvertor {
                 .socialType(SocialType.APPLE)
                 .role(AuthorityEnum.ROLE_USER.getValue())
                 .nickname(userHelper.createRandomNickName())
+                .serviceAlarm(ACTIVE)
+                .eventAlarm(ACTIVE)
+                .build();
+    }
+
+    public UserRes.AlarmAgreeList AlarmAgree(User user) {
+        return UserRes.AlarmAgreeList
+                .builder()
+                .serviceAlarm(user.getServiceAlarm())
+                .eventAlarm(user.getEventAlarm())
                 .build();
     }
 }
