@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @DynamicUpdate
-@BatchSize(size = 100)
+@BatchSize(size = 20)
 @DynamicInsert
 public class Event extends BaseEntity {
     @Id
@@ -30,6 +30,7 @@ public class Event extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "eventId")
+    @BatchSize(size = 20)
     private List<EventContent> eventContents = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

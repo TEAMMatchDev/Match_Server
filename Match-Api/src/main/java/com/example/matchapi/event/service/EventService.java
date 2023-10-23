@@ -21,4 +21,9 @@ public class EventService {
         Page<Event> events = eventAdaptor.findEvent(page, size);
         return new PageResponse<>(events.isLast(), events.getTotalElements(), eventConvertor.EventList(events.getContent()));
     }
+
+    public EventRes.EventDetail getEventDetail(Long eventId) {
+        Event event = eventAdaptor.findByEvent(eventId);
+        return eventConvertor.EventDetail(event);
+    }
 }
