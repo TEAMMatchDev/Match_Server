@@ -5,6 +5,7 @@ import com.example.matchdomain.common.model.ContentsEntity;
 import com.example.matchdomain.common.model.ContentsType;
 import com.example.matchdomain.event.entity.Event;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -15,7 +16,7 @@ import javax.persistence.*;
 @Table(name = "NoticeContent")
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @DynamicUpdate

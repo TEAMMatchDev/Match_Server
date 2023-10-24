@@ -1,6 +1,7 @@
 package com.example.matchapi.admin.event.service;
 
 import com.example.matchapi.admin.event.dto.EventUploadReq;
+import com.example.matchapi.common.model.ContentsList;
 import com.example.matchapi.event.convetor.EventConvertor;
 import com.example.matchapi.event.dto.EventRes;
 import com.example.matchapi.event.service.EventService;
@@ -41,7 +42,7 @@ public class AdminEventService {
         Long eventId = event.getId();
 
         List<EventContent> eventContents = new ArrayList<>();
-        for(EventUploadReq.ContentsList content : eventUploadReq.getContentsList()){
+        for(ContentsList content : eventUploadReq.getContentsList()){
             if(content.getContentsType().equals(IMG)){
                 eventContents.add(eventConvertor.convertToEventContents(eventId, content.getContents(), IMG));
             }
