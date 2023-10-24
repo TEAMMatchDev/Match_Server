@@ -19,14 +19,9 @@ public class AdminEventController {
     private final AdminEventService adminEventService;
 
     @PostMapping("")
-    public CommonResponse<List<EventRes.EventList>> uploadEventList(@RequestBody EventUploadReq eventUploadReq){
-        return CommonResponse.onSuccess(adminEventService.uploadEventList(eventUploadReq));
+    public CommonResponse<String> uploadEventList(@RequestBody EventUploadReq eventUploadReq){
+        adminEventService.uploadEventList(eventUploadReq);
+        return CommonResponse.onSuccess("업로드 성공");
     }
 
-    @PostMapping(value = "/img",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResponse<String> imgUpload(@ModelAttribute MultipartFile imgFile){
-        String url = adminEventService.uploadEventImg(imgFile);
-        return CommonResponse.onSuccess(url);
-    }
 }

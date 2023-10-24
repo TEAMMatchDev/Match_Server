@@ -12,6 +12,9 @@ import com.example.matchdomain.event.repository.EventContentRepository;
 import com.example.matchdomain.event.repository.EventRepository;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,12 +28,13 @@ import static com.example.matchdomain.common.model.ContentsType.TEXT;
 @Service
 @RequiredArgsConstructor
 public class AdminEventService {
-    private final S3UploadService s3UploadService;
     private final EventRepository eventRepository;
     private final EventContentRepository eventContentRepository;
     private final EventConvertor eventConvertor;
+    private final EventService eventService;
     @RedissonLock(LockName = "이벤트 업로드", key = "#eventUploadReq")
-    public List<EventRes.EventList> uploadEventList(EventUploadReq eventUploadReq) {
+    @CacheEvict(value = "eventCache", allEntries = true)
+    public void uploadEventList(EventUploadReq eventUploadReq) {
 
         Event event  = eventRepository.save(eventConvertor.convertToEventUpload(eventUploadReq, eventUploadReq.getThumbnail()));
 
@@ -47,11 +51,6 @@ public class AdminEventService {
         }
 
         eventContentRepository.saveAll(eventContents);
-
-        return null;
     }
 
-    public String uploadEventImg(MultipartFile imgFile) {
-        return s3UploadService.uploadOneImg(EVENT_S3_DIR, imgFile);
-    }
 }
