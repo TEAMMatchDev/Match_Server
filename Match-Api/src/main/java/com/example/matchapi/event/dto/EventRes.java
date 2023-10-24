@@ -1,8 +1,11 @@
 package com.example.matchapi.event.dto;
 
 import com.example.matchdomain.common.model.ContentsType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,7 +15,7 @@ public class EventRes {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class EventList {
+    public static class EventList implements Serializable {
         private Long eventId;
 
         private String thumbnail;
@@ -23,8 +26,10 @@ public class EventRes {
 
         private String eventStatus;
 
+        @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate startDate;
 
+        @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate endDate;
     }
     @Getter
@@ -49,8 +54,11 @@ public class EventRes {
 
         private String smallTitle;
 
+
+        @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate startDate;
 
+        @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate endDate;
     }
     @Getter

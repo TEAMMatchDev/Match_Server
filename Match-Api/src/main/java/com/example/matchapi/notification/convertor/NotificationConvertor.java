@@ -51,4 +51,15 @@ public class NotificationConvertor {
                 .title(fcmNotificationRequestDto.getTitle())
                 .build();
     }
+
+    public NotificationRes.NotificationDetail convertNotificationDetail(Notification notification) {
+        return NotificationRes.NotificationDetail
+                .builder()
+                .notificationId(notification.getId())
+                .notificationType(notification.getNotificationType().getType())
+                .title(notification.getTitle())
+                .body(notification.getBody())
+                .notificationDate(timeHelper.matchTimeFormat(notification.getCreatedAt()))
+                .build();
+    }
 }

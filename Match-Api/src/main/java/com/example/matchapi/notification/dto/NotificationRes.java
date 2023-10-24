@@ -11,7 +11,7 @@ public class NotificationRes {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class NotificationDetail {
+    public static class NotificationListInfo {
         private int unReadCount;
 
         private List<NotificationList> notificationLists;
@@ -32,5 +32,23 @@ public class NotificationRes {
         private String notificationDate;
 
         private boolean isRead;
+    }
+
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class NotificationDetail {
+        private Long notificationId;
+
+        private String notificationType;
+
+        private String title;
+
+        private String body;
+
+        private String notificationDate;
     }
 }
