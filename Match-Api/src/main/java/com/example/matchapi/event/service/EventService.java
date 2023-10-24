@@ -35,9 +35,4 @@ public class EventService {
         Event event = eventAdaptor.findByEvent(eventId);
         return eventConvertor.EventDetail(event);
     }
-
-    public EventRes.EventDetail getEventDetail(Long eventId) {
-        Event event = eventAdaptor.findByEvent(eventId);
-        return eventConvertor.EventDetail(event);
-    }
 }
