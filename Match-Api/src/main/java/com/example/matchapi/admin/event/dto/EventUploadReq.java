@@ -1,5 +1,6 @@
 package com.example.matchapi.admin.event.dto;
 
+import com.example.matchapi.common.model.ContentsList;
 import com.example.matchdomain.common.model.ContentsType;
 import com.example.matchdomain.event.enums.EventType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,23 +25,10 @@ public class EventUploadReq {
 
     private EventType eventType;
 
-    private List<ContentsList> contentsList;
-
     private LocalDate eventStartDate;
 
     private LocalDate eventEndDate;
 
+    private List<ContentsList> contentsList;
 
-    @Getter
-    @Setter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ContentsList{
-        @NotBlank(message = "Contents 타입을 입력해주새요")
-        private ContentsType contentsType;
-
-        @Schema(description = "이미지 url or Text", required = false)
-        private String contents;
-    }
 }
