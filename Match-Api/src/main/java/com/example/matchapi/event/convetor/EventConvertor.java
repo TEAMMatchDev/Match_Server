@@ -3,6 +3,7 @@ package com.example.matchapi.event.convetor;
 import com.example.matchapi.admin.event.dto.EventUploadReq;
 import com.example.matchapi.common.util.TimeHelper;
 import com.example.matchapi.event.dto.EventRes;
+import com.example.matchapi.notice.dto.NoticeRes;
 import com.example.matchcommon.annotation.Convertor;
 import com.example.matchdomain.common.model.ContentsType;
 import com.example.matchdomain.event.entity.Event;
