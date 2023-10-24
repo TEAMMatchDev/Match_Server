@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class EventRes {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class EventList {
+    public static class EventList implements Serializable {
         private Long eventId;
 
         private String thumbnail;
