@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/notifications")
-@Tag(name = "10-Notification🔔 알림")
+@Tag(name = "10-Notification🔔 알림", description = "알림 관련 API 입니다.")
 public class NotificationController {
     private final NotificationService notificationService;
     @ApiErrorCodeExample(UserAuthErrorCode.class)
