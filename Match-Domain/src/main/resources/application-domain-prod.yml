@@ -9,9 +9,18 @@ spring:
     init:
       platform: mysql
   datasource:
-    url: ${PROD_DB_URL_HOST}
-    username: ${AWS_DB_USER_NAME}
-    password: ${AWS_DB_PASSWORD}
+    master:
+      hikari:
+        username: ${AWS_DB_USER_NAME}
+        password: ${AWS_DB_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: ${PROD_DB_URL_HOST}
+    slave:
+      hikari:
+        username: ${AWS_DB_USER_NAME}
+        password: ${AWS_DB_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: ${PROD_SLAVE_URL_HOST}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect

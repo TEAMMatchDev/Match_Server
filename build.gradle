@@ -45,6 +45,9 @@ subprojects{
 
         implementation 'net.sf.ehcache:ehcache:2.10.3'
 
+        implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
 
