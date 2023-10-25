@@ -67,9 +67,12 @@ jobs:
         with:
           files: ./Match-Domain/src/main/resources/application-domain-dev.yml
         env:
-          spring.datasource.url: ${{ secrets.DB_URL_HOST }}
-          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
-          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.datasource.master.hikari.jdbc-url: ${{ secrets.DB_URL_HOST }}
+          spring.datasource.master.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.master.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.datasource.slave.hikari.jdbc-url: ${{ secrets.DEV_SLAVE_URL_HOST }}
+          spring.datasource.slave.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.slave.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
           spring.redis.host : ${{ secrets.REDIS_DEV_HOST }}
 
       - name: create-fcm-json
