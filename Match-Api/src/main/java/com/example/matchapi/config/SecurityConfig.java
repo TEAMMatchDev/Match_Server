@@ -103,6 +103,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/order/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/auth/logIn").permitAll()
                 .antMatchers("/test/fcm/user").authenticated()
+                .antMatchers("/terms/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()
