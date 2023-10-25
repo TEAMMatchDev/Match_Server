@@ -6,39 +6,62 @@
     <diskStore path="java.io.tmpdir" />
 
     <cache name="keywordList"
-           maxEntriesLocalHeap="10000"
-           maxEntriesLocalDisk="1000"
+           maxEntriesLocalHeap="100"
+           maxEntriesLocalDisk="100"
            eternal="false"
-           diskSpoolBufferSizeMB="20"
-           timeToIdleSeconds="1500"
-           timeToLiveSeconds="1500"
+           diskSpoolBufferSizeMB="5"
+           timeToIdleSeconds="900"
+           timeToLiveSeconds="900"
            memoryStoreEvictionPolicy="LFU"
            transactionalMode="off">
         <persistence strategy="localTempSwap" />
     </cache>
 
     <cache name="portOneTokenCache"
-           maxEntriesLocalHeap="10000"
-           maxEntriesLocalDisk="1000"
+           maxEntriesLocalHeap="100"
+           maxEntriesLocalDisk="100"
            eternal="false"
-           diskSpoolBufferSizeMB="20"
-           timeToIdleSeconds="1500"
-           timeToLiveSeconds="1500"
+           diskSpoolBufferSizeMB="5"
+           timeToIdleSeconds="900"
+           timeToLiveSeconds="900"
            memoryStoreEvictionPolicy="LFU"
            transactionalMode="off">
         <persistence strategy="localTempSwap" />
     </cache>
 
     <cache name="bannerCache"
-           maxEntriesLocalHeap="10000"
-           maxEntriesLocalDisk="1000"
+           maxEntriesLocalHeap="100"
+           maxEntriesLocalDisk="100"
            eternal="false"
-           diskSpoolBufferSizeMB="20"
-           timeToIdleSeconds="1500"
-           timeToLiveSeconds="1500"
+           diskSpoolBufferSizeMB="5"
+           timeToIdleSeconds="900"
+           timeToLiveSeconds="900"
            memoryStoreEvictionPolicy="LFU"
            transactionalMode="off">
         <persistence strategy="localTempSwap" />
     </cache>
 
+    <cache name="eventCache"
+           maxEntriesLocalHeap="100"
+           maxEntriesLocalDisk="100"
+           eternal="false"
+           diskSpoolBufferSizeMB="5"
+           timeToIdleSeconds="900"
+           timeToLiveSeconds="900"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off">
+        <persistence strategy="localTempSwap" />
+    </cache>
+
+    <cache name="noticeCache"
+           maxEntriesLocalHeap="100"
+           maxEntriesLocalDisk="100"
+           eternal="false"
+           diskSpoolBufferSizeMB="5"
+           timeToIdleSeconds="900"
+           timeToLiveSeconds="900"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off">
+        <persistence strategy="localTempSwap" />
+    </cache>
 </ehcache>

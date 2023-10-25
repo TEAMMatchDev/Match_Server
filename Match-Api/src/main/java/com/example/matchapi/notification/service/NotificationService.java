@@ -19,15 +19,21 @@ public class NotificationService {
     private final NotificationAdaptor notificationAdaptor;
     private final NotificationConvertor notificationConvertor;
 
-    public PageResponse<NotificationRes.NotificationDetail> getNotificationList(User user, int page, int size) {
+    public PageResponse<NotificationRes.NotificationListInfo> getNotificationList(User user, int page, int size) {
         Page<Notification> notifications = notificationAdaptor.findByUser(user, page, size);
         int notificationCount = notificationAdaptor.countByUnRead(user);
-        return new PageResponse<>(notifications.isLast(), notifications.getTotalElements(), new NotificationRes.NotificationDetail(notificationCount, notificationConvertor.NotificationList(notifications.getContent())));
+        return new PageResponse<>(notifications.isLast(), notifications.getTotalElements(), new NotificationRes.NotificationListInfo(notificationCount, notificationConvertor.NotificationList(notifications.getContent())));
     }
 
     public void saveTestNotification(User user, FCMNotificationRequestDto fcmNotificationRequestDto) {
         Notification notification = notificationConvertor.NotificationTest(user, fcmNotificationRequestDto);
 
         notificationAdaptor.saveNotification(notification);
+    }
+
+    public NotificationRes.NotificationDetail getNotificationDetail(Long notificationId) {
+        Notification notification = notificationAdaptor.findNotification(notificationId);
+        notificationAdaptor.readNotification(notification);
+        return notificationConvertor.convertNotificationDetail(notification);
     }
 }

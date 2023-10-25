@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -42,7 +43,9 @@ public class Event extends BaseEntity {
 
     private String thumbnail;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate eventStartDate;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate eventEndDate;
 }

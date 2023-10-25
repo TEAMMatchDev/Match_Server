@@ -4,6 +4,7 @@ import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.common.model.ContentsEntity;
 import com.example.matchdomain.common.model.ContentsType;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -14,7 +15,7 @@ import javax.persistence.*;
 @Table(name = "EventContent")
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @DynamicUpdate
@@ -27,10 +28,9 @@ public class EventContent extends ContentsEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "eventId",nullable = false, insertable=false, updatable=false)
+    @JoinColumn(name = "eventId", nullable = false, insertable = false, updatable = false)
     private Event event;
 
-    @Column(name="eventId")
+    @Column(name = "eventId")
     private Long eventId;
-
 }

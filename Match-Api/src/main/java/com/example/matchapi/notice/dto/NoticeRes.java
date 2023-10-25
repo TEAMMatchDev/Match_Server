@@ -3,6 +3,7 @@ package com.example.matchapi.notice.dto;
 import com.example.matchdomain.common.model.ContentsType;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class NoticeRes {
@@ -11,7 +12,7 @@ public class NoticeRes {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class NoticeList {
+    public static class NoticeList implements Serializable {
         private Long noticeId;
 
         private String noticeType;
