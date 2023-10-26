@@ -196,7 +196,7 @@ public class DonationConvertor {
                 .usages(donationUser.getProject().getUsages())
                 .amount(Math.toIntExact(donationUser.getPrice()))
                 .sequence(sequence)
-                .randomMessage(donationHelper.createRandomMessage(donationUser.getDonationStatus()))
+                .randomMessage(donationHelper.createRandomMessage(donationUser))
                 .build();
     }
 

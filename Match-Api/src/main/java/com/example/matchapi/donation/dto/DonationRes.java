@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class DonationRes {
@@ -290,7 +291,7 @@ public class DonationRes {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class BurningFlameDto {
+    public static class BurningFlameDto implements Serializable {
         @Schema(description = "불꽃이 id 상세조회시 필요", required = true, example = "2")
         private Long donationId;
 

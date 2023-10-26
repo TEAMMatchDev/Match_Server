@@ -17,6 +17,7 @@ import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -138,6 +139,7 @@ public class DonationService {
         return new PageResponse<>(regularPayments.isLast(), regularPayments.getTotalElements(), regularPaymentConvertor.MatchList(regularPayments.getContent()));
     }
 
+    @Cacheable(value = "flameCache", key = "{#user.id, #page, #size}")
     public PageResponse<List<DonationRes.BurningFlameDto>> getBurningFlameList(User user, int page, int size) {
         Page<DonationUser> donationUsers = donationAdaptor.findByUser(user, page, size);
         return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), regularPaymentConvertor.BurningFlameList(donationUsers.getContent()));
