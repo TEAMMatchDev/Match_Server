@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -125,10 +126,11 @@ public class UserController {
 
     @Operation(summary = "02-06 프로필 편집 👤 FRAME MY",description = "이미지 파일 변경할 경우 multipart 에 넣어주시고, 이미지 변경 안할 시 multipart null 값으로 보내주세요 아이디는 기존 아이디값+변경할 아이디값 둘중 하나 보내시면 됩니다")
     @PatchMapping(value =  "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResponse<String> modifyUserProfile(@ModelAttribute UserReq.ModifyProfile modifyProfile,
-                                                    @AuthenticationPrincipal User user) throws IOException {
-        System.out.println(modifyProfile.getName());
-        userService.modifyUserProfile(user, modifyProfile);
+    public CommonResponse<String> modifyUserProfile(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestPart(value = "multipartFile", required = false) MultipartFile multipartFile,
+            @AuthenticationPrincipal User user){
+        userService.modifyUserProfile(user, new UserReq.ModifyProfile(name, multipartFile));
         return CommonResponse.onSuccess("변경 성공");
     }
 
