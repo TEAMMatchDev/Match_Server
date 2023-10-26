@@ -82,4 +82,8 @@ public class DonationAdaptor {
 
         return donationUserRepository.findByUserAndDonationStatusNotOrderByCreatedAtDesc(user, EXECUTION_REFUND, pageable);
     }
+
+    public List<DonationUser> findDonationListsByUser(User user) {
+        return donationUserRepository.findByUser(user);
+    }
 }

@@ -179,6 +179,9 @@ public class DonationRes {
 
         @Schema(description = "생성 순서 0일시 단일 기부(즉 1회성 기부입니다) 생성 순서 표시 x", required = true, example = "2")
         private int sequence;
+
+
+        private String randomMessage;
     }
 
     @Getter
