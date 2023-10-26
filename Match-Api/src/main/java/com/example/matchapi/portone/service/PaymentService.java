@@ -66,8 +66,11 @@ public class PaymentService {
     public OrderRes.CompleteDonation checkPayment(PaymentReq.ValidatePayment validatePayment){
         try {
             OrderRequest orderRequest = orderRequestRepository.findById(validatePayment.getOrderId()).orElseThrow(()->new BadRequestException(NOT_EXIST_ORDER_ID));
+
             IamportResponse<Payment> payment = iamportClient.paymentByImpUid(validatePayment.getImpUid());
+
             Optional<User> user = userRepository.findByIdAndStatus(Long.valueOf(orderRequest.getUserId()), Status.ACTIVE);
+
             Optional<Project> project = projectAdaptor.findByProjectId(Long.valueOf(orderRequest.getProjectId()));
 
             if(payment.getResponse().getAmount().intValue()!=validatePayment.getAmount()){
@@ -75,10 +78,11 @@ public class PaymentService {
                 iamportClient.cancelPaymentByImpUid(cancelData);
                 throw new BadRequestException(FAILED_ERROR_AUTH_AMOUNT);
             }else{
-                String flameName = orderHelper.createFlameName(user.get().getName());
+                String flameName = orderHelper.createFlameName(user.get());
                 String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
                 donationUserRepository.save(orderConvertor.donationUserPortone(payment.getResponse(), user.get().getId(), validatePayment, Long.valueOf(orderRequest.getProjectId()), flameName, inherenceNumber));
             }
+            orderRequestRepository.deleteById(validatePayment.getOrderId());
             return orderConvertor.CompleteDonation(user.get().getName(), project.get(), (long) validatePayment.getAmount());
         } catch (IamportResponseException | IOException e) {
             System.out.println(e.getMessage());

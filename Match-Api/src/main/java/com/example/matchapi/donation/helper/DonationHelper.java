@@ -2,6 +2,7 @@ package com.example.matchapi.donation.helper;
 
 import com.example.matchcommon.annotation.Helper;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import lombok.RequiredArgsConstructor;
 
 import java.text.DecimalFormat;
@@ -19,7 +20,7 @@ public class DonationHelper {
         return decimalFormat.format(amount)+"원";
     }
 
-    public String createRandomMessage() {
+    public String createRandomMessage(DonationStatus donationStatus) {
         return "하이";
     }
 
