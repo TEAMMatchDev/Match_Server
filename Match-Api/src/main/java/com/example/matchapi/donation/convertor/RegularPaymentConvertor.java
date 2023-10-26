@@ -58,7 +58,7 @@ public class RegularPaymentConvertor {
                 .usages(donationUser.getProject().getUsages())
                 .image(donationUser.getFlameImage())
                 .inherenceName(donationUser.getInherenceName())
-                .randomMessage(donationHelper.createRandomMessage(donationUser.getDonationStatus()))
+                .randomMessage(donationHelper.createRandomMessage(donationUser))
                 .build();
     }
 }
