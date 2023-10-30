@@ -15,12 +15,12 @@ public class DiscordService {
     private final DiscordConvertor discordConvertor;
     @Async("discord-message")
     public void sendUnKnownMessage(String username, Exception exception, HttpServletRequest request) {
-        discordFeignClient.errorMessage(discordConvertor.toConvertUnknownMessage(username, exception, request));
+        discordFeignClient.errorMessage(discordConvertor.convertToUnknownMessage(username, exception, request));
 
     }
 
     @Async("discord-message")
     public void sendKnownErrorMessage(String message) {
-        discordFeignClient.errorMessage(discordConvertor.toConverKnownMessage(message));
+        discordFeignClient.errorMessage(discordConvertor.convertToKnownMessage(message));
     }
 }

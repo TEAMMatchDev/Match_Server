@@ -32,7 +32,6 @@ import static com.example.matchdomain.project.entity.enums.ProjectStatus.BEFORE_
 public class ProjectConvertor {
     private final ProjectHelper projectHelper;
     private final RegularPaymentRepository regularPaymentRepository;
-    private final TimeHelper timeHelper;
     private static final String FIRST_TIME = "T00:00:00";
     private static final String LAST_TIME = "T23:59:59";
     public ProjectRes.ProjectDetail projectImgList(List<ProjectImage> projectImage) {
@@ -82,18 +81,6 @@ public class ProjectConvertor {
                 .build();
     }
 
-
-    public ProjectRes.CommentList projectComment(Long userId, ProjectComment result) {
-        return ProjectRes.CommentList.builder()
-                .commentId(result.getId())
-                .comment(result.getComment())
-                .commentDate(timeHelper.dayTimeFormat(result.getCreatedAt()))
-                .nickname(result.getUser().getNickname())
-                .userId(result.getUserId())
-                .isMy(result.getUserId().equals(userId))
-                .build();
-    }
-
     public Project postProject(ProjectReq.Project projects) {
         return Project.builder()
                 .projectName(projects.getProjectName())
@@ -118,7 +105,7 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public ProjectRes.ProjectAdminList ProjectList(ProjectRepository.ProjectAdminList result) {
+    public ProjectRes.ProjectAdminList convertToProjectList(ProjectRepository.ProjectAdminList result) {
         return ProjectRes.ProjectAdminList.builder()
                 .projectId(result.getProjectId())
                 .projectName(result.getProjectName())
@@ -131,7 +118,7 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public ProjectRes.ProjectAdminDetail ProjectAdminDetail(ProjectRepository.ProjectAdminDetail result, List<ProjectImage> projectImages) {
+    public ProjectRes.ProjectAdminDetail convertToProjectAdminDetail(ProjectRepository.ProjectAdminDetail result, List<ProjectImage> projectImages) {
         List<ProjectRes.ProjectImgList> projectImgLists = new ArrayList<>();
         projectImages.forEach(
                 results -> projectImgLists.add(
@@ -163,18 +150,18 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public List<ProjectRes.DonationList> DonationUserInfo(List<DonationUser> donationUsers){
+    public List<ProjectRes.DonationList> convertToDonationUserInfo(List<DonationUser> donationUsers){
         List<ProjectRes.DonationList> donationLists = new ArrayList<>();
         donationUsers.forEach(
                 result -> donationLists.add(
-                        DonationUserInfoDetail(result)
+                        convertToDonationUserInfoDetail(result)
                 )
         );
 
         return donationLists;
     }
 
-    public ProjectRes.DonationList DonationUserInfoDetail(DonationUser result) {
+    public ProjectRes.DonationList convertToDonationUserInfoDetail(DonationUser result) {
         return ProjectRes.DonationList
                 .builder()
                 .donationId(result.getId())
@@ -193,7 +180,7 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public ProjectRes.ProjectLists ProjectListsDetail(ProjectRepository.ProjectList result) {
+    public ProjectRes.ProjectLists convertToProjectListsDetail(ProjectRepository.ProjectList result) {
         List<String> imgUrlList = new ArrayList<>();
         if(result.getImgUrlList()!=null){
             imgUrlList = Stream.of(result.getImgUrlList().split(",")).collect(Collectors.toList());
@@ -214,37 +201,23 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public List<ProjectRes.ProjectLists> ProjectLists(List<ProjectRepository.ProjectList> projects){
+    public List<ProjectRes.ProjectLists> convertToProjectLists(List<ProjectRepository.ProjectList> projects){
         List<ProjectRes.ProjectLists> projectLists = new ArrayList<>();
         projects.forEach(
                 result -> {
-                    projectLists.add(ProjectListsDetail(result));
+                    projectLists.add(convertToProjectListsDetail(result));
                 }
         );
 
         return projectLists;
     }
 
-    public ProjectRes.ProjectLists ProjectListQueryDsl(ProjectList result) {
-        return ProjectRes.ProjectLists
-                .builder()
-                .projectId(result.getId())
-                .imgUrl(result.getImgUrl())
-                .title(result.getProjectName())
-                .usages(result.getUsages())
-                .kind(result.getProjectKind().getName())
-                .like(result.getLike())
-                .userProfileImages(result.getImgUrlList())
-                .totalDonationCnt(Math.toIntExact(result.getTotalDonationCnt()))
-                .build();
-    }
-
-    public ProjectRes.ProjectAppDetail ProjectAppDetail(ProjectRepository.ProjectDetail projects, List<ProjectImage> projectImages) {
+    public ProjectRes.ProjectAppDetail convertToProjectAppDetail(ProjectRepository.ProjectDetail projects, List<ProjectImage> projectImages) {
         List<ProjectRes.ProjectImgList> projectImgLists = new ArrayList<>();
         String thumbNail = "";
         for(ProjectImage projectImage : projectImages){
             if(projectImage.getImageRepresentStatus() == ImageRepresentStatus.NORMAL){
-                projectImgLists.add(ProjectImages(projectImage));
+                projectImgLists.add(convertToProjectImages(projectImage));
             }
             else {
                 thumbNail = projectImage.getUrl();
@@ -273,7 +246,7 @@ public class ProjectConvertor {
                 .build();
     }
 
-    private ProjectRes.ProjectImgList ProjectImages(ProjectImage projectImage) {
+    private ProjectRes.ProjectImgList convertToProjectImages(ProjectImage projectImage) {
         return ProjectRes.ProjectImgList
                 .builder()
                 .imgId(projectImage.getId())
@@ -282,7 +255,7 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public ProjectRes.ProjectLists ProjectToDto(ProjectDto result) {
+    public ProjectRes.ProjectLists convertToProjectToDto(ProjectDto result) {
         List<String> imgUrlList = new ArrayList<>();
         List<RegularPayment> regularPayments = regularPaymentRepository.findByProjectIdAndRegularPayStatus(result.getId(), RegularPayStatus.PROCEEDING);
 
@@ -303,7 +276,7 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public ProjectComment Comment(Long id, Long projectId, String comment) {
+    public ProjectComment convertToComment(Long id, Long projectId, String comment) {
         return ProjectComment
                 .builder()
                 .userId(id)
@@ -312,7 +285,7 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public DonationHistory DonationHistory(Long projectId, HistoryStatus historyStatus) {
+    public DonationHistory convertToDonationHistory(Long projectId, HistoryStatus historyStatus) {
         return DonationHistory
                 .builder()
                 .projectId(projectId)
@@ -320,7 +293,7 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public CommentReport ReportComment(Long commentId, ReportReason reportReason) {
+    public CommentReport convertToReportComment(Long commentId, ReportReason reportReason) {
         return CommentReport
                 .builder()
                 .commentId(commentId)
@@ -328,7 +301,7 @@ public class ProjectConvertor {
                 .build();
     }
 
-    public List<ProjectRes.ProjectList> ProjectListWeb(List<ProjectRepository.ProjectList> projects) {
+    public List<ProjectRes.ProjectList> convertToProjectListWeb(List<ProjectRepository.ProjectList> projects) {
         List<ProjectRes.ProjectList> projectLists = new ArrayList<>();
 
         projects.forEach(
@@ -347,7 +320,7 @@ public class ProjectConvertor {
         return projectLists;
     }
 
-    public List<ProjectRes.ProjectList> ProjectListWebForNotLogin(List<Project> projects) {
+    public List<ProjectRes.ProjectList> convertToProjectListWebForNotLogin(List<Project> projects) {
         List<ProjectRes.ProjectList> projectLists = new ArrayList<>();
 
         projects.forEach(

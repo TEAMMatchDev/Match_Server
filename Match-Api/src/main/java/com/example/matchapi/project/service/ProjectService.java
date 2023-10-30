@@ -73,11 +73,11 @@ public class ProjectService {
         if(!userId.equals(0L)){
             Page<ProjectRepository.ProjectList> projects = projectAdaptor.findLoginUserProjectList(userId, page, size);
 
-            return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.ProjectListWeb(projects.getContent()));
+            return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.convertToProjectListWeb(projects.getContent()));
         } else{
             Page<Project> projects = projectAdaptor.findNotLoginUserProjectList(page, size);
 
-            return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.ProjectListWebForNotLogin(projects.getContent()));
+            return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.convertToProjectListWebForNotLogin(projects.getContent()));
         }
 
     }
@@ -94,11 +94,11 @@ public class ProjectService {
         if(!userId.equals(0L)){
             Page<ProjectRepository.ProjectList> projects = projectAdaptor.findLoginUserSearchProjectList(userId, page, size, content);
 
-            return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.ProjectListWeb(projects.getContent()));
+            return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.convertToProjectListWeb(projects.getContent()));
         } else{
             Page<Project> projects = projectAdaptor.findNotLoginUserSearchProjectList(content, page, size);
 
-            return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.ProjectListWebForNotLogin(projects.getContent()));
+            return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.convertToProjectListWebForNotLogin(projects.getContent()));
         }
     }
 
@@ -113,7 +113,7 @@ public class ProjectService {
 
         saveImgList(project.getId(), url, imgUrlList);
 
-        donationHistoryRepository.save(projectConvertor.DonationHistory(project.getId(), HistoryStatus.TURN_ON));
+        donationHistoryRepository.save(projectConvertor.convertToDonationHistory(project.getId(), HistoryStatus.TURN_ON));
     }
 
     public PageResponse<List<ProjectRes.ProjectAdminList>> getProjectList(int page, int size) {
@@ -125,7 +125,7 @@ public class ProjectService {
 
         projectAdminLists.getContent().forEach(
                 result -> projectLists.add(
-                        projectConvertor.ProjectList(result)
+                        projectConvertor.convertToProjectList(result)
                 )
         );
 
@@ -138,7 +138,7 @@ public class ProjectService {
 
         project.setProjectStatus(projectStatus);
 
-        if(projectStatus.equals(ProjectStatus.DEADLINE)) donationHistoryRepository.save(projectConvertor.DonationHistory(projectId, HistoryStatus.FINISH));
+        if(projectStatus.equals(ProjectStatus.DEADLINE)) donationHistoryRepository.save(projectConvertor.convertToDonationHistory(projectId, HistoryStatus.FINISH));
 
         projectRepository.save(project);
     }
@@ -184,13 +184,13 @@ public class ProjectService {
 
         List<ProjectImage> projectImages = projectImgAdaptor.findProjectImages(projectId);
 
-        return projectConvertor.ProjectAdminDetail(projectAdminDetail,projectImages);
+        return projectConvertor.convertToProjectAdminDetail(projectAdminDetail,projectImages);
     }
 
     public PageResponse<List<ProjectRes.DonationList>> getDonationList(Long projectId, int page, int size) {
         Page<DonationUser> donationUsers = donationAdaptor.findDonationUsers(projectId, page, size);
 
-        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), projectConvertor.DonationUserInfo(donationUsers.getContent()));
+        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), projectConvertor.convertToDonationUserInfo(donationUsers.getContent()));
     }
 
     @Transactional
@@ -221,7 +221,7 @@ public class ProjectService {
     public PageResponse<List<ProjectRes.ProjectLists>> getProjectLists(User user, int page, int size, ProjectKind projectKind, String content, FILTER filter) {
         Page<ProjectRepository.ProjectList> projects = projectAdaptor.findProject(user, page, size, projectKind, content, filter);
 
-        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.ProjectLists(projects.getContent()));
+        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.convertToProjectLists(projects.getContent()));
     }
 
     @Transactional
@@ -239,14 +239,14 @@ public class ProjectService {
     public PageResponse<List<ProjectRes.ProjectLists>> getTodayProjectLists(User user, int page, int size) {
         Page<ProjectRepository.ProjectList> projects = projectAdaptor.getTodayProjectLists(user.getId(), page, size);
 
-        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.ProjectLists(projects.getContent()));
+        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConvertor.convertToProjectLists(projects.getContent()));
     }
 
     public ProjectRes.ProjectAppDetail getProjectAppDetail(User user, Long projectId) {
         ProjectRepository.ProjectDetail projects = projectRepository.getProjectAppDetail(user.getId(), projectId);
         List<ProjectImage> projectImages = projectImageRepository.findByProjectIdOrderBySequenceAsc(projectId);
 
-        return projectConvertor.ProjectAppDetail(projects, projectImages);
+        return projectConvertor.convertToProjectAppDetail(projects, projectImages);
     }
 
     public PageResponse<List<ProjectRes.ProjectLists>> projectList(User user, int page, int size, ProjectKind projectKind, String content) {
@@ -259,7 +259,7 @@ public class ProjectService {
 
         projects.getContent().forEach(
                 result -> {
-                    project.add(projectConvertor.ProjectToDto(result));
+                    project.add(projectConvertor.convertToProjectToDto(result));
                 }
         );
 
@@ -268,13 +268,13 @@ public class ProjectService {
 
 
     public void postComment(User user, Long projectId, ProjectReq.Comment comment) {
-        projectCommentRepository.save(projectConvertor.Comment(user.getId(), projectId, comment.getComment()));
+        projectCommentRepository.save(projectConvertor.convertToComment(user.getId(), projectId, comment.getComment()));
     }
 
     public void reportComment(Long commentId, ReportReason reportReason) {
         ProjectComment projectComment = projectCommentRepository.findByIdAndStatus(commentId, ACTIVE).orElseThrow(()-> new NotFoundException(COMMENT_NOT_EXIST));
 
-        commentReportRepository.save(projectConvertor.ReportComment(commentId, reportReason));
+        commentReportRepository.save(projectConvertor.convertToReportComment(commentId, reportReason));
     }
 
     public void deleteComment(User user, Long commentId) {

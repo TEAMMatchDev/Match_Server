@@ -6,7 +6,7 @@ import com.example.matchdomain.keyword.entity.SearchKeyword;
 
 @Convertor
 public class AdminKeywordConvertor {
-    public SearchKeyword Keyword(AdminKeywordReq.KeywordUpload keyword) {
+    public SearchKeyword convertToKeyword(AdminKeywordReq.KeywordUpload keyword) {
         return SearchKeyword.builder().keyword(keyword.getSearchKeyword()).priority(keyword.getPriority()).build();
     }
 }

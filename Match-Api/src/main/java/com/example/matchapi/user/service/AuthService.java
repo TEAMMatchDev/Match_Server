@@ -97,7 +97,7 @@ public class AuthService {
             if(!kakaoUserAddressDto.isShippingAddressesNeedsAgreement()){
                 List<UserAddress> userAddressList = new ArrayList<>();
                 for(KakaoUserAddressDto.ShippingAddresses shippingAddresses : kakaoUserAddressDto.getShippingAddresses()){
-                    UserAddress userAddress = userConvertor.AddUserAddress(userId,shippingAddresses);
+                    UserAddress userAddress = userConvertor.convertToAddUserAddress(userId,shippingAddresses);
                     userAddressList.add(userAddress);
                 }
                 userAddressRepository.saveAll(userAddressList);
@@ -117,15 +117,13 @@ public class AuthService {
 
     private UserRes.Token createToken(Long userId) {
         UserRes.Token token =  jwtService.createTokens(userId);
-        refreshTokenRepository.save(userConvertor.RefreshToken(userId,token.getRefreshToken(),jwtProperties.getRefreshTokenSeconds()));
+        refreshTokenRepository.save(userConvertor.convertToRefreshToken(userId,token.getRefreshToken(),jwtProperties.getRefreshTokenSeconds()));
         return token;
     }
 
 
     private Long kakaoSignUp(KakaoUserInfoDto kakaoUserInfoDto) {
-
-        Authority authority = userConvertor.PostAuthority();
-        User user = userConvertor.KakaoSignUpUser(kakaoUserInfoDto, KAKAO, authority);
+        User user = userConvertor.convertToKakaoSignUpUser(kakaoUserInfoDto, KAKAO);
 
         System.out.println(kakaoUserInfoDto.getPhoneNumber());
 
@@ -134,7 +132,7 @@ public class AuthService {
 
     @Transactional
     public Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
-        return userRepository.save(userConvertor.NaverSignUpUser(naverUserInfoDto, NAVER, userConvertor.PostAuthority())).getId();
+        return userRepository.save(userConvertor.convertToNaverSignUpUser(naverUserInfoDto, NAVER)).getId();
     }
     public KakaoLoginTokenRes getOauthToken(String code, String referer) {
         return kakaoLoginFeignClient.kakaoAuth(
@@ -177,9 +175,7 @@ public class AuthService {
         if(userRepository.existsByPhoneNumber(signUpUser.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
         if(userRepository.existsByEmail(signUpUser.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
 
-        Authority authority = userConvertor.PostAuthority();
-
-        Long userId = userRepository.save(userConvertor.SignUpUser(signUpUser,authority)).getId();
+        Long userId = userRepository.save(userConvertor.convertToSignUpUser(signUpUser)).getId();
 
         UserRes.Token token = createToken(userId);
 
@@ -278,6 +274,6 @@ public class AuthService {
     }
 
     private Long appleSignUp(AppleUserRes appleUserRes) {
-        return userRepository.save(userConvertor.AppleUserSignUp(appleUserRes)).getId();
+        return userRepository.save(userConvertor.convertToAppleUserSignUp(appleUserRes)).getId();
     }
 }

@@ -16,17 +16,17 @@ import java.util.List;
 public class RegularPaymentConvertor {
     private final TimeHelper timeHelper;
     private final DonationHelper donationHelper;
-    public List<DonationRes.MatchList> MatchList(List<RegularPayment> regularPayments) {
+    public List<DonationRes.MatchList> convertToMatchList(List<RegularPayment> regularPayments) {
         List<DonationRes.MatchList> matchLists = new ArrayList<>();
 
         regularPayments.forEach(
-                result -> matchLists.add(MatchListDetail(result))
+                result -> matchLists.add(convertToMatchListDetail(result))
         );
 
         return matchLists;
     }
 
-    private DonationRes.MatchList MatchListDetail(RegularPayment result) {
+    private DonationRes.MatchList convertToMatchListDetail(RegularPayment result) {
         return DonationRes.MatchList
                 .builder()
                 .regularDate(timeHelper.matchTimeFormat(result.getCreatedAt()))
@@ -37,12 +37,12 @@ public class RegularPaymentConvertor {
                 .build();
     }
 
-    public List<DonationRes.BurningFlameDto> BurningFlameList(List<DonationUser> donationUsers) {
+    public List<DonationRes.BurningFlameDto> convertToBurningFlameList(List<DonationUser> donationUsers) {
         List<DonationRes.BurningFlameDto> burningFlameDto = new ArrayList<>();
 
         donationUsers.forEach(
                 result -> burningFlameDto.add(
-                        BurningFlame(result)
+                        convertToBurningFlame(result)
                 )
         );
 
@@ -50,7 +50,7 @@ public class RegularPaymentConvertor {
 
     }
 
-    private DonationRes.BurningFlameDto BurningFlame(DonationUser donationUser) {
+    private DonationRes.BurningFlameDto convertToBurningFlame(DonationUser donationUser) {
 
         return DonationRes.BurningFlameDto
                 .builder()

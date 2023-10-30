@@ -31,7 +31,7 @@ public class AdminBannerService {
                                                    MultipartFile bannerImage,
                                                    BannerReq.BannerUpload bannerUploadDto) {
         String bannerImg = s3UploadService.uploadBannerImage(bannerImage);
-        bannerRepository.save(bannerConvertor.BannerUpload(bannerType, bannerImg, bannerUploadDto));
+        bannerRepository.save(bannerConvertor.convertToBannerUpload(bannerType, bannerImg, bannerUploadDto));
         return cachingBannerList();
     }
 
@@ -39,6 +39,6 @@ public class AdminBannerService {
     public List<BannerRes.BannerList> cachingBannerList() {
         List<Banner> banners = bannerAdaptor.getBannerList();
 
-        return bannerConvertor.BannerList(banners);
+        return bannerConvertor.convertToBannerList(banners);
     }
 }

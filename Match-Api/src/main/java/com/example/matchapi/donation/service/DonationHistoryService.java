@@ -16,9 +16,9 @@ public class DonationHistoryService {
     private final DonationConvertor donationConvertor;
 
     public void postRegularDonationHistory(Long regularPaymentId, Long donationId) {
-        saveDonationHistory(donationConvertor.DonationHistoryTurnOn(regularPaymentId, TURN_ON));
+        saveDonationHistory(donationConvertor.convertToDonationHistoryTurnOn(regularPaymentId, TURN_ON));
 
-        saveDonationHistory(donationConvertor.DonationHistory(donationId, CREATE));
+        saveDonationHistory(donationConvertor.convertToDonationHistory(donationId, CREATE));
     }
 
     public void saveDonationHistory(DonationHistory donationHistory){
@@ -26,6 +26,6 @@ public class DonationHistoryService {
     }
 
     public void oneTimeDonationHistory(Long donationId){
-        saveDonationHistory(donationConvertor.DonationHistory(donationId, CREATE));
+        saveDonationHistory(donationConvertor.convertToDonationHistory(donationId, CREATE));
     }
 }

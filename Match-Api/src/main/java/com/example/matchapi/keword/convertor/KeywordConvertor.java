@@ -7,7 +7,7 @@ import com.example.matchdomain.keyword.entity.SearchKeyword;
 
 @Convertor
 public class KeywordConvertor {
-    public KeywordRes.KeywordList KeywordList(SearchKeyword result) {
+    public KeywordRes.KeywordList convertToKeywordList(SearchKeyword result) {
         return KeywordRes.KeywordList
                 .builder()
                 .keywordId(result.getId())

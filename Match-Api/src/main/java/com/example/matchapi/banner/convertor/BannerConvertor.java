@@ -12,7 +12,7 @@ import java.util.List;
 @Convertor
 public class BannerConvertor {
 
-    public Banner BannerUpload(BannerType bannerType, String bannerImg, BannerReq.BannerUpload bannerUploadDto) {
+    public Banner convertToBannerUpload(BannerType bannerType, String bannerImg, BannerReq.BannerUpload bannerUploadDto) {
         if(bannerType.equals(BannerType.EVENT)){
             return Banner
                     .builder()
@@ -31,20 +31,20 @@ public class BannerConvertor {
         }
     }
 
-    public List<BannerRes.BannerList> BannerList(List<Banner> banners) {
+    public List<BannerRes.BannerList> convertToBannerList(List<Banner> banners) {
         List<BannerRes.BannerList> bannerLists = new ArrayList<>();
 
         banners.forEach(
                 result ->
                         bannerLists.add(
-                                BannerInfo(result)
+                                convertToBannerInfo(result)
                         )
         );
 
         return bannerLists;
     }
 
-    private BannerRes.BannerList BannerInfo(Banner result) {
+    private BannerRes.BannerList convertToBannerInfo(Banner result) {
         return BannerRes.BannerList
                 .builder()
                 .bannerId(result.getId())

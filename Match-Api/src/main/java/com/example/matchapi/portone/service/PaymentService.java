@@ -10,6 +10,7 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.properties.PortOneProperties;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.UserCard;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.adaptor.ProjectAdaptor;
 import com.example.matchdomain.project.entity.Project;
@@ -17,6 +18,12 @@ import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchdomain.redis.repository.OrderRequestRepository;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
+import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
+import com.example.matchinfrastructure.pay.portone.convertor.PortOneConvertor;
+import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
+import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
+import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
+import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
@@ -29,10 +36,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+import static com.example.matchcommon.constants.MatchStatic.ONE_TIME;
 import static com.example.matchdomain.order.exception.PortOneAuthErrorCode.*;
 import static com.example.matchdomain.project.exception.ProjectOneTimeErrorCode.PROJECT_NOT_EXIST;
 import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_EXIST_USER;
@@ -50,6 +56,10 @@ public class PaymentService {
     private final ProjectAdaptor projectAdaptor;
     private final DonationHistoryService donationHistoryService;
     private final PortOneProperties portOneProperties;
+    private final PortOneConvertor portOneConvertor;
+    private final PortOneFeignClient portOneFeignClient;
+    private final PortOneAuthService portOneAuthService;
+
 
     @Autowired
     public PaymentService(PortOneProperties portOneProperties,
@@ -57,7 +67,7 @@ public class PaymentService {
                           UserRepository userRepository,
                           OrderHelper orderHelper,
                           DonationUserRepository donationUserRepository,
-                          OrderConvertor orderConvertor, ProjectAdaptor projectAdaptor, DonationHistoryService donationHistoryService) {
+                          OrderConvertor orderConvertor, ProjectAdaptor projectAdaptor, DonationHistoryService donationHistoryService, PortOneConvertor portOneConvertor, PortOneFeignClient portOneFeignClient, PortOneAuthService portOneAuthService) {
         this.portOneProperties = portOneProperties;
         this.orderRequestRepository = orderRequestRepository;
         this.userRepository = userRepository;
@@ -67,6 +77,9 @@ public class PaymentService {
         this.iamportClient = new IamportClient(portOneProperties.getKey(), portOneProperties.getSecret());
         this.projectAdaptor = projectAdaptor;
         this.donationHistoryService = donationHistoryService;
+        this.portOneConvertor = portOneConvertor;
+        this.portOneFeignClient = portOneFeignClient;
+        this.portOneAuthService = portOneAuthService;
     }
 
     @RedissonLock(LockName = "결제-검증", key = "#validatePayment.orderId")
@@ -88,7 +101,7 @@ public class PaymentService {
 
             orderRequestRepository.deleteById(validatePayment.getOrderId());
 
-            return orderConvertor.CompleteDonation(user.getName(), project, (long) validatePayment.getAmount());
+            return orderConvertor.convertToCompleteDonation(user.getName(), project, (long) validatePayment.getAmount());
         } catch (BadRequestException | IamportResponseException | IOException e) {
             try {
                 refundPayment(validatePayment.getImpUid());
@@ -120,8 +133,14 @@ public class PaymentService {
 
     public void saveDonationUser(User user, PaymentReq.ValidatePayment validatePayment, Project project) {
         String flameName = orderHelper.createFlameName(user);
-        String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
-        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationUserPortone(user.getId(), validatePayment, project.getId(), flameName, inherenceNumber));
+        String inherenceNumber = orderHelper.createFlameName(user);
+        DonationUser donationUser = donationUserRepository.save(orderConvertor.convertToDonationUserPortone(user.getId(), validatePayment, project.getId(), flameName, inherenceNumber));
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
+    }
+
+    public PortOneResponse<PortOneBillPayResponse> payBillKey(UserCard card, Long amount, String projectName, String type) {
+        String orderId = orderHelper.createOrderId(type);
+        String accessToken = portOneAuthService.getToken();
+        return portOneFeignClient.payWithBillKey(accessToken, portOneConvertor.convertPayWithBillKey(card.getBid(), orderId, amount, projectName, card.getCustomerId()));
     }
 }
