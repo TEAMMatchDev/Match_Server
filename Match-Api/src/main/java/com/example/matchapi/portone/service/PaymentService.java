@@ -78,9 +78,7 @@ public class PaymentService {
 
             IamportResponse<Payment> payment = iamportClient.paymentByImpUid(validatePayment.getImpUid());
 
-            if(payment.getResponse().getAmount().intValue()!=validatePayment.getAmount()){
-                throw new BadRequestException(FAILED_ERROR_AUTH_AMOUNT);
-            }
+            if(payment.getResponse().getAmount().intValue()!=validatePayment.getAmount()) throw new BadRequestException(FAILED_ERROR_AUTH_AMOUNT);
 
             User user = userRepository.findByIdAndStatus(Long.valueOf(orderRequest.getUserId()), Status.ACTIVE).orElseThrow(()->new BadRequestException(NOT_EXIST_USER));
 
@@ -93,9 +91,6 @@ public class PaymentService {
             return orderConvertor.CompleteDonation(user.getName(), project, (long) validatePayment.getAmount());
         } catch (BadRequestException | IamportResponseException | IOException e) {
             try {
-                log.info(e.getMessage());
-                log.info(e.getLocalizedMessage());
-                log.info(String.valueOf(e));
                 refundPayment(validatePayment.getImpUid());
             } catch(Exception ex) {
                 System.out.println(ex.getMessage());

@@ -4,6 +4,7 @@ import com.example.matchinfrastructure.discord.config.DiscordFeignConfiguration;
 import com.example.matchinfrastructure.discord.config.DiscordInfoConfig;
 import com.example.matchinfrastructure.discord.dto.Message;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 
