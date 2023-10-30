@@ -1,5 +1,8 @@
 # BackendMatch
-##
+## 아키텍쳐
+<img width="1572" alt="image" src="https://github.com/TEAMMatchDev/Match_Server/assets/81962309/0702623a-116a-4ea1-ba24-67eca721455d">
+
+
 
 ## 📂 멀티 모듈 구조 
 
