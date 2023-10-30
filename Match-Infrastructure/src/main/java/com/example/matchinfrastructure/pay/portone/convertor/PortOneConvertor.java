@@ -4,6 +4,7 @@ import com.example.matchcommon.annotation.Convertor;
 import com.example.matchcommon.properties.PortOneProperties;
 import com.example.matchinfrastructure.pay.portone.dto.req.PayWithBillKeyReq;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOneBillReq;
+import com.example.matchinfrastructure.pay.portone.dto.req.PortOnePrepareReq;
 import lombok.RequiredArgsConstructor;
 
 @Convertor
@@ -28,6 +29,14 @@ public class PortOneConvertor {
                 .merchant_uid(orderId)
                 .amount(amount)
                 .name(projectName)
+                .build();
+    }
+
+    public PortOnePrepareReq convertToRequestPrepare(String orderId, int amount) {
+        return PortOnePrepareReq
+                .builder()
+                .merchant_uid(orderId)
+                .amount(amount)
                 .build();
     }
 }

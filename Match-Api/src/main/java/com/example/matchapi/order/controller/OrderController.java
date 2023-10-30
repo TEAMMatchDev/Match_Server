@@ -50,13 +50,27 @@ public class OrderController {
 
     @PostMapping("/{projectId}")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
-    @Operation(summary= "04-00 Order💸 결제 요청용 처음 결제할 때 요청 보내기",description = "결제 요청용 API 입니다")
+    @Operation(summary= "04-00 Order💸 결제 요청용 처음 결제할 때 요청 보내기 Web Version",description = "결제 요청용 API 입니다")
     @CheckIdExist
     public CommonResponse<String> requestPay(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @Parameter(description = "프로젝트 ID", example = "1") @PathVariable("projectId") Long projectId){
         log.info("결제 요청");
         String orderId = orderService.saveRequest(user, projectId);
+        return CommonResponse.onSuccess(orderId);
+    }
+
+    @PostMapping("/v2/{projectId}")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    @Operation(summary= "04-00 Order💸 결제 요청용 처음 결제할 때 요청 보내기 V2 flutter 인 경우 여기로 요청 보내주세요",description = "결제 요청용 API 입니다")
+    @CheckIdExist
+    public CommonResponse<String> requestPayPrepare(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "프로젝트 ID", example = "1") @PathVariable("projectId") Long projectId,
+            @RequestParam int amount
+    ){
+        log.info("결제 준비 요청 v2");
+        String orderId = orderService.saveRequestPrepare(user, projectId, amount);
         return CommonResponse.onSuccess(orderId);
     }
 

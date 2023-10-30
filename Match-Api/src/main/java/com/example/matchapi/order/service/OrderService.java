@@ -27,6 +27,7 @@ import com.example.matchinfrastructure.pay.portone.convertor.PortOneConvertor;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
+import com.example.matchinfrastructure.pay.portone.dto.req.PortOnePrepareReq;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
 import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import lombok.RequiredArgsConstructor;
@@ -222,5 +223,17 @@ public class OrderService {
             regularPayment.setRegularPayStatus(RegularPayStatus.USER_CANCEL);
         }
         regularPaymentRepository.saveAll(regularPayments);
+    }
+
+    public String saveRequestPrepare(User user, Long projectId, int amount) {
+        String orderId = createOrderId(ONE_TIME);
+
+        orderRequestRepository.save(orderConvertor.convertToRequestPrepare(user.getId(), projectId, amount, orderId));
+
+        PortOnePrepareReq portOnePrepareReq = portOneConvertor.convertToRequestPrepare(orderId, amount);
+
+        portOneFeignClient.preparePayments(portOneAuthService.getToken(), portOnePrepareReq);
+
+        return orderId;
     }
 }

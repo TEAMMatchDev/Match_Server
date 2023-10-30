@@ -9,6 +9,7 @@ import com.example.matchinfrastructure.pay.portone.dto.*;
 import com.example.matchinfrastructure.pay.portone.dto.req.PayWithBillKeyReq;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOneAuthReq;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOneBillReq;
+import com.example.matchinfrastructure.pay.portone.dto.req.PortOnePrepareReq;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
@@ -39,4 +40,10 @@ public interface PortOneFeignClient {
             @RequestHeader("Authorization") String accessToken,
             @PathVariable("customer_uid") String customer_uid
     );
+
+    @PostMapping("/payments/prepare")
+    public PortOneResponse<PortOnePrepareReq> preparePayments(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestBody PortOnePrepareReq portOnePrepareReq
+            );
 }
