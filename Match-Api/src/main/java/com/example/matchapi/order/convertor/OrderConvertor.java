@@ -18,6 +18,9 @@ import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.lang.Integer.parseInt;
 
 @Convertor
@@ -114,7 +117,7 @@ public class OrderConvertor {
                 .userId(String.valueOf(userId))
                 .projectId(String.valueOf(projectId))
                 .orderId(orderId)
-                .ttl(2000L)
+                .ttl(480L)
                 .build();
     }
 
@@ -204,5 +207,24 @@ public class OrderConvertor {
                 .amount(donationHelper.parsePriceComma(Math.toIntExact(amount)))
                 .regularStatus(project.getRegularStatus().getName())
                 .build();
+    }
+
+    public List<OrderRes.UserBillCard> convertToUserCardLists(List<UserCard> userCards) {
+        List<OrderRes.UserBillCard> userBillCards = new ArrayList<>();
+
+        userCards.forEach(
+                result -> {
+                    userBillCards.add(
+                            new OrderRes.UserBillCard(
+                                    result.getId(),
+                                    result.getCardCode().getName(),
+                                    result.getCardName(),
+                                    orderHelper.maskMiddleNum(result.getCardNo()),
+                                    result.getCardAbleStatus().getName()
+                            )
+                    );
+                }
+        );
+        return userBillCards;
     }
 }

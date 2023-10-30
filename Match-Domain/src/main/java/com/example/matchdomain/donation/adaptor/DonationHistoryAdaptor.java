@@ -31,4 +31,8 @@ public class DonationHistoryAdaptor {
         Pageable pageable = PageRequest.of(page, size);
         return donationHistoryRepository.getDonationHistoryCustom(donationUser.getRegularPaymentId(), donationId, CREATE, pageable, donationUser.getProjectId());
     }
+
+    public void saveDonationHistory(DonationHistory donationHistory) {
+        donationHistoryRepository.save(donationHistory);
+    }
 }

@@ -16,4 +16,7 @@ public class HtmlController {
     public String showTermsConditions(){
         return "TermsConditions";
     }
+
+    @GetMapping("/marketing")
+    public String showMarketing(){ return "Marketing";}
 }

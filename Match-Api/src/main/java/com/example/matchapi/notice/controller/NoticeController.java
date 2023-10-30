@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/notices")
-@Tag(name = "11-Notice📝 공지사항 API")
+@Tag(name = "11-Notice📝 공지사항 API", description = "공지사항 관련 API 입니다.")
 public class NoticeController {
     private final NoticeService noticeService;
 

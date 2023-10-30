@@ -35,6 +35,7 @@ springdoc:
     path: demo-ui.html            # Swagger UI 경로 => localhost:8000/demo-ui.html
     tags-sorter: alpha            # alpha: 알파벳 순 태그 정렬, method: HTTP Method 순 정렬
     operations-sorter: alpha      # alpha: 알파벳 순 태그 정렬, method: HTTP Method 순 정렬
+    doc-expansion: none
   api-docs:
     path: /api-docs/json
     groups:
