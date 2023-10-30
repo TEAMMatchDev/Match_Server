@@ -15,7 +15,6 @@ import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchinfrastructure.pay.nice.dto.*;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
-import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
@@ -70,7 +69,7 @@ public class OrderConvertor {
     public NiceBillOkRequest niceBillOk(NicePayBillkeyResponse nicePayBillkeyResponse, String orderId) {
         return NiceBillOkRequest.builder()
                 .cardQuota(0)
-                .amount(10L)
+                .amount(480L)
                 .goodsName("카드 확인 용 결제")
                 .useShopInterest(false)
                 .orderId(orderId)
@@ -117,7 +116,7 @@ public class OrderConvertor {
                 .userId(String.valueOf(userId))
                 .projectId(String.valueOf(projectId))
                 .orderId(orderId)
-                .ttl(480L)
+                .ttl(10L)
                 .build();
     }
 
@@ -147,16 +146,16 @@ public class OrderConvertor {
                 .build();
     }
 
-    public DonationUser donationUserPortone(Payment payment, Long userId, PaymentReq.ValidatePayment validatePayment, Long projectId, String flameName, String inherenceNumber) {
+    public DonationUser donationUserPortone(Long userId, PaymentReq.ValidatePayment validatePayment, Long projectId, String flameName, String inherenceNumber) {
         return DonationUser.builder()
                 .userId(userId)
                 .payMethod(orderHelper.getPayMethod(validatePayment.getPayMethod()))
                 .projectId(projectId)
                 .price((long) validatePayment.getAmount())
-                .tid(payment.getImpUid())
-                .orderId(payment.getMerchantUid())
+                .tid(validatePayment.getImpUid())
+                .orderId(validatePayment.getOrderId())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
-                .payMethod(orderHelper.getPayMethod(payment.getPayMethod()))
+                .payMethod(orderHelper.getPayMethod(validatePayment.getPayMethod()))
                 .inherenceName(flameName)
                 .inherenceNumber(inherenceNumber)
                 .regularStatus(RegularStatus.ONE_TIME)
@@ -226,5 +225,16 @@ public class OrderConvertor {
                 }
         );
         return userBillCards;
+    }
+
+    public OrderRequest convertToRequestPrepare(Long userId, Long projectId, int amount, String orderId) {
+        return OrderRequest
+                .builder()
+                .orderId(orderId)
+                .userId(String.valueOf(userId))
+                .projectId(String.valueOf(projectId))
+                .amount(amount)
+                .ttl(480L)
+                .build();
     }
 }
