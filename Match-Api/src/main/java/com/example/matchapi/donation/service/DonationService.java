@@ -4,6 +4,7 @@ import com.example.matchapi.donation.convertor.DonationConvertor;
 import com.example.matchapi.donation.convertor.RegularPaymentConvertor;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
+import com.example.matchapi.portone.dto.PaymentReq;
 import com.example.matchapi.portone.service.PaymentService;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchcommon.exception.BadRequestException;
@@ -15,13 +16,17 @@ import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
+import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
@@ -144,4 +149,5 @@ public class DonationService {
         Page<DonationUser> donationUsers = donationAdaptor.findByUser(user, page, size);
         return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), regularPaymentConvertor.BurningFlameList(donationUsers.getContent()));
     }
+
 }
