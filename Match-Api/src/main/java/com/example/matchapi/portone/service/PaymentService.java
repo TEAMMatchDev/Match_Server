@@ -112,10 +112,6 @@ public class PaymentService {
         }
     }
 
-    public String createRandomUUID() {
-        return UUID.randomUUID().toString();
-    }
-
     private CancelData createCancelData(IamportResponse<Payment> response, int refundAmount) {
         if (refundAmount == 0) { //전액 환불일 경우
             return new CancelData(response.getResponse().getImpUid(), true);
@@ -132,9 +128,8 @@ public class PaymentService {
     }
 
     public void saveDonationUser(User user, PaymentReq.ValidatePayment validatePayment, Project project) {
-        String flameName = orderHelper.createFlameName(user);
-        String inherenceNumber = orderHelper.createFlameName(user);
-        DonationUser donationUser = donationUserRepository.save(orderConvertor.convertToDonationUserPortone(user.getId(), validatePayment, project.getId(), flameName, inherenceNumber));
+        OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
+        DonationUser donationUser = donationUserRepository.save(orderConvertor.convertToDonationUserPortone(user.getId(), validatePayment, project.getId(), createInherenceDto));
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
     }
 

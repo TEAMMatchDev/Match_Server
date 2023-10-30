@@ -47,7 +47,7 @@ public class OrderConvertor {
                 .ttl(10L)
                 .build();
     }
-    public DonationUser convertToDonationUserPortone(Long userId, PaymentReq.ValidatePayment validatePayment, Long projectId, String flameName, String inherenceNumber) {
+    public DonationUser convertToDonationUserPortone(Long userId, PaymentReq.ValidatePayment validatePayment, Long projectId, OrderRes.CreateInherenceDto createInherenceDto) {
         return DonationUser.builder()
                 .userId(userId)
                 .payMethod(orderHelper.getPayMethod(validatePayment.getPayMethod()))
@@ -57,8 +57,8 @@ public class OrderConvertor {
                 .orderId(validatePayment.getOrderId())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
                 .payMethod(orderHelper.getPayMethod(validatePayment.getPayMethod()))
-                .inherenceName(flameName)
-                .inherenceNumber(inherenceNumber)
+                .inherenceName(createInherenceDto.getInherenceName())
+                .inherenceNumber(createInherenceDto.getInherenceNumber())
                 .regularStatus(RegularStatus.ONE_TIME)
                 .flameImage(FlameImage.NORMAL_IMG.getImg())
                 .build();
@@ -80,7 +80,7 @@ public class OrderConvertor {
                 .build();
     }
 
-    public DonationUser donationBillPayUser(PortOneBillPayResponse response, Long id, Long amount, Long projectId, String flameName, String inherenceNumber, RegularStatus regularStatus, Long regularPaymentId) {
+    public DonationUser donationBillPayUser(PortOneBillPayResponse response, Long id, Long amount, Long projectId, OrderRes.CreateInherenceDto createInherenceDto, RegularStatus regularStatus, Long regularPaymentId) {
         return DonationUser.builder()
                 .userId(id)
                 .projectId(projectId)
@@ -89,8 +89,8 @@ public class OrderConvertor {
                 .orderId(response.getMerchant_uid())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
                 .payMethod(PayMethod.CARD)
-                .inherenceName(flameName)
-                .inherenceNumber(inherenceNumber)
+                .inherenceName(createInherenceDto.getInherenceName())
+                .inherenceNumber(createInherenceDto.getInherenceNumber())
                 .regularStatus(regularStatus)
                 .regularPaymentId(regularPaymentId)
                 .flameImage(FlameImage.NORMAL_IMG.getImg())

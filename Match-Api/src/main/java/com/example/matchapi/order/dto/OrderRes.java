@@ -53,4 +53,16 @@ public class OrderRes {
 
         private String regularStatus;
     }
+
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CreateInherenceDto {
+        private String inherenceName;
+
+        private String inherenceNumber;
+    }
 }
