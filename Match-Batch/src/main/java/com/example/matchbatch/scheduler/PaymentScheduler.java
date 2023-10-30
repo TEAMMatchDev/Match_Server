@@ -45,7 +45,7 @@ public class PaymentScheduler {
             jobLauncher.run(regularPaymentJob.regularPaymentJob(), jobParameters);
         } catch (JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException
                  | JobParametersInvalidException | org.springframework.batch.core.repository.JobRestartException e) {
-            discordFeignClient.errorMessage(discordConvertor.ErrorBatchServer("정기 결제 스케줄러", e.getMessage()));
+            discordFeignClient.errorMessage(discordConvertor.convertToErrorBatchServer("정기 결제 스케줄러", e.getMessage()));
             log.error(e.getMessage());
         }
 
@@ -66,7 +66,7 @@ public class PaymentScheduler {
             jobLauncher.run(donationFailedRetry.regularPaymentRetryJob(), jobParameters);
         } catch (JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException
                  | JobParametersInvalidException | org.springframework.batch.core.repository.JobRestartException e) {
-            discordFeignClient.errorMessage(discordConvertor.ErrorBatchServer("정기 결제 실패 재시도 스케줄러", e.getMessage()));
+            discordFeignClient.errorMessage(discordConvertor.convertToErrorBatchServer("정기 결제 실패 재시도 스케줄러", e.getMessage()));
             log.error(e.getMessage());
         }
     }

@@ -13,7 +13,7 @@ import java.util.List;
 
 @Convertor
 public class DonationTemporaryConvertor {
-    public DonationTemporaryRes.UserInfo UserInfo(User user) {
+    public DonationTemporaryRes.UserInfo convertToUserInfo(User user) {
         return DonationTemporaryRes.UserInfo
                 .builder()
                 .name(user.getName())
@@ -22,7 +22,7 @@ public class DonationTemporaryConvertor {
                 .build();
     }
 
-    public DonationTemporary DonationInfo(User user, DonationTemporaryReq.DonationInfo donationInfo) {
+    public DonationTemporary convertToDonationInfo(User user, DonationTemporaryReq.DonationInfo donationInfo) {
         return DonationTemporary
                 .builder()
                 .userId(user.getId())
@@ -34,17 +34,17 @@ public class DonationTemporaryConvertor {
                 .build();
     }
 
-    public DonationTemporaryRes.DonationList DonationList(DonationList result, String amount) {
+    public DonationTemporaryRes.DonationList convertToDonationList(DonationList result, String amount) {
         return DonationTemporaryRes.DonationList
                 .builder()
                 .name(result.getName())
                 .amount(amount)
                 .donationDate(result.getCreatedAt().getYear()+"."+result.getCreatedAt().getMonthValue()+"."+result.getCreatedAt().getDayOfMonth()+"."+result.getCreatedAt().getHour()+"."+result.getCreatedAt().getMinute())
-                .name(replaceMiddleWithAsterisk(result.getName()))
+                .name(convertToReplaceMiddleWithAsterisk(result.getName()))
                 .build();
     }
 
-    public String replaceMiddleWithAsterisk(String str) {
+    public String convertToReplaceMiddleWithAsterisk(String str) {
         int length = str.length();
 
         if (length == 2) {
@@ -56,17 +56,17 @@ public class DonationTemporaryConvertor {
         return str.substring(0, middle) + "*" + str.substring(middle + 1);
     }
 
-    public List<DonationTemporaryRes.DonationRequestAdminList> DonationRequestAdminList(List<DonationTemporary> content) {
+    public List<DonationTemporaryRes.DonationRequestAdminList> convertToDonationRequestAdminList(List<DonationTemporary> content) {
         List<DonationTemporaryRes.DonationRequestAdminList> donationRequestAdminLists = new ArrayList<>();
         content.forEach(
                 result -> donationRequestAdminLists.add(
-                        DonationInfoList(result)
+                        convertToDonationInfoList(result)
                 )
         );
         return donationRequestAdminLists;
     }
 
-    public DonationTemporaryRes.DonationRequestAdminList DonationInfoList(DonationTemporary result) {
+    public DonationTemporaryRes.DonationRequestAdminList convertToDonationInfoList(DonationTemporary result) {
         return DonationTemporaryRes.DonationRequestAdminList
                 .builder()
                 .donationRequestId(result.getId())
@@ -80,7 +80,7 @@ public class DonationTemporaryConvertor {
                 .build();
     }
 
-    public DonationList DonationDeposit(DonationTemporaryReq.DonationDeposit donationDeposit) {
+    public DonationList convertToDonationDeposit(DonationTemporaryReq.DonationDeposit donationDeposit) {
         return DonationList.builder()
                 .donationTemporaryId(donationDeposit.getDonationRequestId())
                 .amount(donationDeposit.getAmount())
@@ -88,7 +88,7 @@ public class DonationTemporaryConvertor {
                 .build();
     }
 
-    public DonationTemporaryRes.DonationDetail DonationInfoDetail(DonationTemporary donationTemporary) {
+    public DonationTemporaryRes.DonationDetail convertToDonationInfoDetail(DonationTemporary donationTemporary) {
         return DonationTemporaryRes.DonationDetail
                 .builder()
                 .donationRequestId(donationTemporary.getId())
@@ -103,7 +103,7 @@ public class DonationTemporaryConvertor {
                 .build();
     }
 
-    public DonationTemporary DonationInfoEmail(User user, DonationTemporaryReq.DonationInfo donationInfo) {
+    public DonationTemporary convertToDonationInfoEmail(User user, DonationTemporaryReq.DonationInfo donationInfo) {
         return DonationTemporary
                 .builder()
                 .userId(user.getId())

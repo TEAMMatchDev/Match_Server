@@ -26,7 +26,7 @@ public class AdminKeywordService {
     @Transactional
     @CachePut(cacheNames = "keywordList", key = "'all'")
     public List<KeywordRes.KeywordList> postKeyword(AdminKeywordReq.KeywordUpload keyword) {
-        searchKeywordRepository.save(adminKeywordConvertor.Keyword(keyword));
+        searchKeywordRepository.save(adminKeywordConvertor.convertToKeyword(keyword));
         return cachingKeywordList();
     }
 
@@ -36,7 +36,7 @@ public class AdminKeywordService {
         List<KeywordRes.KeywordList> keywordLists = new ArrayList<>();
 
         searchKeywords.forEach(
-                result -> keywordLists.add(keywordConvertor.KeywordList(result))
+                result -> keywordLists.add(keywordConvertor.convertToKeywordList(result))
         );
         return keywordLists;
     }

@@ -16,6 +16,7 @@ import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
 import com.example.matchinfrastructure.pay.nice.dto.NicePayCancelRequest;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -47,18 +48,6 @@ public class OrderHelper {
         return BASIC + Base64.getEncoder().encodeToString((nicePayProperties.getClient() + ":" + nicePayProperties.getSecret()).getBytes());
     }
 
-    public void checkNicePaymentsResult(String resultCode, String resultMessage) {
-        switch(resultCode){
-            case "0000":
-                break;
-            default:
-                throw new BaseException(HttpStatus.BAD_REQUEST,
-                        false,
-                        resultCode,
-                        resultMessage);
-        }
-    }
-
     public List<String> getInherenceName(List<DonationUser> donationUsers){
         return donationUsers.stream()
                 .map(DonationUser :: getInherenceName).collect(Collectors.toList());
@@ -84,19 +73,6 @@ public class OrderHelper {
         return values[random.nextInt(values.length)];
     }
 
-    public void checkBillResult(String resultCode, String resultMsg, String tid, String orderId) {
-        switch(resultCode){
-            case "0000":
-                niceAuthFeignClient.cancelPayment(getNicePaymentAuthorizationHeader(), tid, new NicePayCancelRequest("결재 확인 완료 취소", orderId));
-                break;
-            default:
-                throw new BaseException(HttpStatus.BAD_REQUEST,
-                        false,
-                        resultCode,
-                        resultMsg);
-        }
-    }
-
     public String maskMiddleNum(String cardNo) {
         String firstFourDigits = cardNo.substring(0, 4);
         String lastFourDigits = cardNo.substring(12);
@@ -104,4 +80,12 @@ public class OrderHelper {
 
         return firstFourDigits + middleDigitsMasked + lastFourDigits;
     }
+
+    public String createOrderId(String type){
+        boolean useLetters = true;
+        boolean useNumbers = true;
+        String randomStr = RandomStringUtils.random(12, useLetters, useNumbers);
+        return type + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "-" + randomStr;
+    }
+
 }

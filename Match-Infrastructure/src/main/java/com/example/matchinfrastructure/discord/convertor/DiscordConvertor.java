@@ -18,7 +18,7 @@ public class DiscordConvertor {
     private final Environment environment;
 
 
-    public Message toConvertUnknownMessage(String username, Exception exception, HttpServletRequest request) {
+    public Message convertToUnknownMessage(String username, Exception exception, HttpServletRequest request) {
         List<Message.Embeds> embedsList = new ArrayList<>();
 
         embedsList.add(Message.Embeds.builder().title("실행중인 환경").description(Arrays.toString(environment.getActiveProfiles())).build());
@@ -35,7 +35,7 @@ public class DiscordConvertor {
                 .build();
     }
 
-    public Message AlertBatchMessage(String title, int size) {
+    public Message convertToAlertBatchMessage(String title, int size) {
         LocalDateTime localDateTime = LocalDateTime.now();
         List<Message.Embeds> embedsList = new ArrayList<>();
         embedsList.add(Message.Embeds.builder().title("총 결제 예정 수").description(String.valueOf(size)).build());
@@ -58,7 +58,7 @@ public class DiscordConvertor {
                 .build();
     }
 
-    public Message AlertFinishMessage(String title, int amount, int size, int successCnt, int trueCnt) {
+    public Message convertToAlertFinishMessage(String title, int amount, int size, int successCnt, int trueCnt) {
         LocalDateTime localDateTime = LocalDateTime.now();
         List<Message.Embeds> embedsList = new ArrayList<>();
         DecimalFormat decimalFormat = new DecimalFormat("#,###"); // 포맷을 설정합니다.
@@ -89,7 +89,7 @@ public class DiscordConvertor {
                 .build();
     }
 
-    public Message ErrorBatchServer(String title, String message) {
+    public Message convertToErrorBatchServer(String title, String message) {
         List<Message.Embeds> embedsList = new ArrayList<>();
 
         embedsList.add(Message.Embeds.builder().title("실행중인 환경").description(Arrays.toString(environment.getActiveProfiles())).build());
@@ -105,7 +105,7 @@ public class DiscordConvertor {
                 .build();
     }
 
-    public Message toConverKnownMessage(String message) {
+    public Message convertToKnownMessage(String message) {
         List<Message.Embeds> embedsList = new ArrayList<>();
 
         embedsList.add(Message.Embeds.builder().title("실행중인 환경").description(Arrays.toString(environment.getActiveProfiles())).build());

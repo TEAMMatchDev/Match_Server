@@ -53,7 +53,7 @@ public class DonationService {
     public PageResponse<List<DonationRes.DonationList>> getDonationList(Long userId, int filter, int page, int size) {
         Page<DonationUser> donationUsers = donationAdaptor.findDonationList(userId, filter, page ,size);
 
-        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(),  donationConvertor.DonationList(donationUsers));
+        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(),  donationConvertor.convertToDonationList(donationUsers));
     }
 
     @Transactional
@@ -82,7 +82,7 @@ public class DonationService {
     public DonationRes.DonationCount getDonationCount(User user) {
         List<DonationUser> donationUser = donationAdaptor.findByDonationCount(user);
 
-        return donationConvertor.DonationCount(donationUser);
+        return donationConvertor.convertToDonationCount(donationUser);
     }
 
     public PageResponse<List<DonationRes.BurningMatchRes>> getBurningMatch(User user, int page, int size) {
@@ -94,7 +94,7 @@ public class DonationService {
     @Transactional
     public DonationRes.DonationRegular getDonationRegular(Long regularPayId, User user) {
         RegularPayment regularPayment = regularPaymentAdaptor.findById(regularPayId);
-        return donationConvertor.DonationRegular(regularPayment);
+        return donationConvertor.convertToDonationRegular(regularPayment);
     }
 
     @Transactional
@@ -103,19 +103,19 @@ public class DonationService {
         Page<DonationHistory> donationHistories = donationHistoryAdaptor.findDonationRegularList(regularPayId, regularPayment.getProjectId(), HistoryStatus.TURN_ON ,page, size);
 
 
-        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.DonationRegularList(donationHistories.getContent(), ""));
+        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.convertToDonationRegularList(donationHistories.getContent(), ""));
     }
 
     public List<DonationRes.PayList> getPayList(User user, Long regularPayId) {
         List<DonationUser> donationUsers = donationAdaptor.findPayList(regularPayId);
 
-        return donationConvertor.PayList(donationUsers);
+        return donationConvertor.convertToPayList(donationUsers);
     }
 
     public PageResponse<List<DonationRes.FlameProjectList>> getFlameProjectList(User user, String content, int page, int size) {
         Page<DonationUser> donationUsers = donationAdaptor.getFlameProjectList(user, content, page, size);
 
-        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), donationConvertor.FlameProjectList(donationUsers.getContent()));
+        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), donationConvertor.convertToFlameProjectList(donationUsers.getContent()));
     }
 
     public PageResponse<List<DonationRes.DonationRegularList>> getFlameRegularList(Long donationId, User user, int page, int size) {
@@ -123,31 +123,31 @@ public class DonationService {
 
         Page<DonationHistory> donationHistories = donationHistoryAdaptor.findDonationHistory(donationUser, donationId, page, size);
 
-        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.DonationRegularList(donationHistories.getContent(), donationUser.getInherenceName()));
+        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.convertToDonationRegularList(donationHistories.getContent(), donationUser.getInherenceName()));
     }
 
     public DonationRes.DonationFlame getFlameRegular(Long donationId, User user) {
         DonationUser donationUser = donationAdaptor.findById(donationId);
         int sequence = donationHelper.getDonationSequence(donationUser, donationId);
-        return donationConvertor.DonationFlame(sequence, donationUser);
+        return donationConvertor.convertToDonationFlame(sequence, donationUser);
     }
 
     public PageResponse<List<ProjectRes.MatchHistory>> getMatchHistory(User user, Long projectId, int page, int size) {
         Page<DonationHistory> donationHistories = donationHistoryAdaptor.findMatchHistory(projectId, page, size);
 
-        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.MatchHistory(donationHistories.getContent()));
+        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.convertToMatchHistory(donationHistories.getContent()));
     }
 
     public PageResponse<List<DonationRes.MatchList>> getUserMatchList(User user, int page, int size) {
         Page<RegularPayment> regularPayments = regularPaymentAdaptor.findByUser(user, page, size);
 
-        return new PageResponse<>(regularPayments.isLast(), regularPayments.getTotalElements(), regularPaymentConvertor.MatchList(regularPayments.getContent()));
+        return new PageResponse<>(regularPayments.isLast(), regularPayments.getTotalElements(), regularPaymentConvertor.convertToMatchList(regularPayments.getContent()));
     }
 
     @Cacheable(value = "flameCache", key = "{#user.id, #page, #size}")
     public PageResponse<List<DonationRes.BurningFlameDto>> getBurningFlameList(User user, int page, int size) {
         Page<DonationUser> donationUsers = donationAdaptor.findByUser(user, page, size);
-        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), regularPaymentConvertor.BurningFlameList(donationUsers.getContent()));
+        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), regularPaymentConvertor.convertToBurningFlameList(donationUsers.getContent()));
     }
 
 }

@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PortOneConvertor {
     private final PortOneProperties portOneProperties;
-    public PortOneBillReq PortOneBill(String cardNo, String expiry, String idNo, String cardPw) {
+    public PortOneBillReq convertToPortOneBill(String cardNo, String expiry, String idNo, String cardPw) {
         return PortOneBillReq
                 .builder()
                 .pg("nice."+portOneProperties.getBillmid())
@@ -22,7 +22,7 @@ public class PortOneConvertor {
                 .build();
     }
 
-    public PayWithBillKeyReq PayWithBillKey(String bid, String orderId, Long amount, String projectName, String customerId) {
+    public PayWithBillKeyReq convertPayWithBillKey(String bid, String orderId, Long amount, String projectName, String customerId) {
         return PayWithBillKeyReq
                 .builder()
                 .customer_uid(bid)
