@@ -74,19 +74,6 @@ public class OrderController {
         return CommonResponse.onSuccess(orderId);
     }
 
-
-/*    @PostMapping("/pay/{projectId}")
-    @ApiErrorCodeExample({OtherServerErrorCode.class, UserAuthErrorCode.class, RequestErrorCode.class, ProjectOneTimeErrorCode.class})
-    @Operation(summary= "04-01 Order💸 단기 결제 API",description = "결제 API 입니다")
-    @CheckRegularProject
-    public CommonResponse<String> requestPayment(
-            @Parameter(hidden = true) @AuthenticationPrincipal User user,
-            @Parameter(description = "프로젝트 ID", example = "1") @PathVariable("projectId") Long projectId,
-            @Valid @RequestBody OrderReq.OrderDetail orderDetail){
-        log.info("04-03 Order 결제 인증용 API 결제 ID: " + orderDetail.getTid() + " 결제 금액 " + orderDetail.getAmount() +" 기부 프로젝트 ID : " + projectId);
-        return CommonResponse.onSuccess(orderService.requestPayment(user , orderDetail, projectId));
-    }*/
-
     @PostMapping("/pay/card")
     @ApiErrorCodeExample({UserAuthErrorCode.class, OtherServerErrorCode.class, RegistrationCardErrorCode.class, NicePayErrorCode.class})
     @Operation(summary = "04-02 Order💸 정기 결제용 카드 등록 api",description = "정기 결제를 위한 카드 등록 API 입니다.")
