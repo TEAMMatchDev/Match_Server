@@ -4,6 +4,8 @@ package com.example.matchapi.config;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.dto.ErrorReason;
 import com.example.matchcommon.exception.errorcode.BaseErrorCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.examples.Example;
@@ -45,6 +47,10 @@ public class SwaggerConfig {
     @Value("${spring.config.activate.on-profile}")
     private String profile;
 
+    @Bean
+    public ModelResolver modelResolver(ObjectMapper objectMapper) {
+        return new ModelResolver(objectMapper);
+    }
 
     @Bean
     public OpenAPI openAPI() {

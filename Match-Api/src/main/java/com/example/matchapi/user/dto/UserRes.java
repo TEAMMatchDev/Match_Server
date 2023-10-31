@@ -96,6 +96,7 @@ public class UserRes {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema(description = "토큰 재발급", name = "ReIssueToken")
     public static class ReIssueToken {
         private String accessToken;
     }
