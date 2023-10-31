@@ -19,13 +19,13 @@ public enum CardCode {
     JEJU("제주카드", "373"),
     HANA("하나SK카드", "374"),
     KB("KB국민카드", "381"),
-    KDB("KDB산업은행카드", "2"),
-    WOORI("우리카드", "41"),
-    SAEMAUL("새마을금고카드", "45"),
-    SHINHYUP("신협카드", "48"),
-    UCEHGUG("우체국", "71"),
-    KBANK("케이뱅크카드", "89"),
-    KAKAOBANK("카카오뱅크카드", "90");
+    KDB("KDB산업은행카드", "002"),
+    WOORI("우리카드", "041"),
+    SAEMAUL("새마을금고카드", "045"),
+    SHINHYUP("신협카드", "048"),
+    UCEHGUG("우체국", "071"),
+    KBANK("케이뱅크카드", "089"),
+    KAKAOBANK("카카오뱅크카드", "090");
 
     private final String name;
     private final String code;
