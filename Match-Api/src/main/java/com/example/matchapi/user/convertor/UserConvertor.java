@@ -35,7 +35,7 @@ public class UserConvertor {
     private final PasswordEncoder passwordEncoder;
     private final AligoProperties aligoProperties;
 
-    public User KakaoSignUpUser(KakaoUserInfoDto kakaoUserInfoDto, SocialType authType, Authority authority) {
+    public User convertToKakaoSignUpUser(KakaoUserInfoDto kakaoUserInfoDto, SocialType authType) {
         String profileImg = BASE_PROFILE;
         if(kakaoUserInfoDto.getProfileUrl() != null){
             profileImg = kakaoUserInfoDto.getProfileUrl();
@@ -58,13 +58,13 @@ public class UserConvertor {
                 .build();
     }
 
-    public Authority PostAuthority() {
+    public Authority convertToPostAuthority() {
         return Authority.builder()
                 .authorityName("ROLE_USER")
                 .build();
     }
 
-    public User NaverSignUpUser(NaverUserInfoDto naverUserInfoDto, SocialType authType, Authority authority) {
+    public User convertToNaverSignUpUser(NaverUserInfoDto naverUserInfoDto, SocialType authType) {
         String profileImg = BASE_PROFILE;
         if(naverUserInfoDto.getProfileImage() != null){
             profileImg = naverUserInfoDto.getProfileImage();
@@ -87,7 +87,7 @@ public class UserConvertor {
                 .build();
     }
 
-    public User SignUpUser(UserReq.SignUpUser signUpUser, Authority authority) {
+    public User convertToSignUpUser(UserReq.SignUpUser signUpUser) {
         return User.builder()
                 .username(signUpUser.getEmail())
                 .profileImgUrl(BASE_PROFILE)
@@ -105,7 +105,7 @@ public class UserConvertor {
                 .build();
     }
 
-    public UserRes.EditMyPage toMyPage(User user) {
+    public UserRes.EditMyPage convertToMyPage(User user) {
         return UserRes.EditMyPage.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
@@ -116,7 +116,7 @@ public class UserConvertor {
                 .build();
     }
 
-    public UserAddress AddUserAddress(Long userId, KakaoUserAddressDto.ShippingAddresses shippingAddresses) {
+    public UserAddress convertToAddUserAddress(Long userId, KakaoUserAddressDto.ShippingAddresses shippingAddresses) {
         return UserAddress.builder()
                 .userId(userId)
                 .name(shippingAddresses.getName())
@@ -131,7 +131,7 @@ public class UserConvertor {
                 .build();
     }
 
-    public RefreshToken RefreshToken(Long userId, String refreshToken, Long refreshTokenSeconds) {
+    public RefreshToken convertToRefreshToken(Long userId, String refreshToken, Long refreshTokenSeconds) {
         return RefreshToken.builder()
                 .userId(String.valueOf(userId))
                 .token(refreshToken)
@@ -139,14 +139,14 @@ public class UserConvertor {
                 .build();
     }
 
-    public OrderRes.UserDetail userInfo(User user) {
+    public OrderRes.UserDetail convertToUserInfo(User user) {
         return OrderRes.UserDetail.builder()
                 .name(user.getName())
                 .birthDay(user.getBirth().toString())
                 .phoneNumber(user.getPhoneNumber()).build();
     }
 
-    public UserRes.SignUpInfo UserSignUpInfo(Long oneDayUser, Long weekUser, Long monthUser, Long totalUser) {
+    public UserRes.SignUpInfo convertToUserSignUpInfo(Long oneDayUser, Long weekUser, Long monthUser, Long totalUser) {
         return UserRes.SignUpInfo.builder()
                 .totalUserCnt(totalUser)
                 .oneDayUserCnt(oneDayUser)
@@ -155,7 +155,7 @@ public class UserConvertor {
                 .build();
     }
 
-    public UserRes.UserList UserList(UserRepository.UserList result) {
+    public UserRes.UserList convertToUserList(UserRepository.UserList result) {
         return UserRes.UserList
                 .builder()
                 .userId(result.getUserId())
@@ -173,7 +173,7 @@ public class UserConvertor {
                 .build();
     }
 
-    public UserRes.UserAdminDetail UserAdminDetail(UserRepository.UserList userDetail, List<OrderRes.UserBillCard> userCards) {
+    public UserRes.UserAdminDetail convertToUserAdminDetail(UserRepository.UserList userDetail, List<OrderRes.UserBillCard> userCards) {
         return UserRes.UserAdminDetail
                 .builder()
                 .userId(userDetail.getUserId())
@@ -203,7 +203,7 @@ public class UserConvertor {
                 .build();
     }
 
-    public UserRes.Profile UserProfile(User user) {
+    public UserRes.Profile convertToUserProfile(User user) {
         return UserRes.Profile
                 .builder()
                 .profileImgUrl(user.getProfileImgUrl())
@@ -215,7 +215,7 @@ public class UserConvertor {
                 .build();
     }
 
-    public UserFcmToken UserFcm(User user, UserReq.FcmToken token) {
+    public UserFcmToken convertToUserFcm(User user, UserReq.FcmToken token) {
         return UserFcmToken.builder()
                 .userFcmPk(
                         UserFcmPk.builder()
@@ -226,7 +226,7 @@ public class UserConvertor {
                 .build();
     }
 
-    public User AppleUserSignUp(AppleUserRes appleUserRes) {
+    public User convertToAppleUserSignUp(AppleUserRes appleUserRes) {
         return User.builder()
                 .username(appleUserRes.getSocialId())
                 .password(authHelper.createRandomPassword())
@@ -242,7 +242,7 @@ public class UserConvertor {
                 .build();
     }
 
-    public UserRes.AlarmAgreeList AlarmAgree(User user) {
+    public UserRes.AlarmAgreeList convertToAlarmAgree(User user) {
         return UserRes.AlarmAgreeList
                 .builder()
                 .serviceAlarm(user.getServiceAlarm())

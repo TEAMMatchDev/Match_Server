@@ -27,12 +27,12 @@ public class EventService {
     }
 
     public List<EventRes.EventList> cachingEventLists(List<Event> content) {
-        return eventConvertor.EventList(content);
+        return eventConvertor.convertToEventList(content);
     }
 
 
     public EventRes.EventDetail getEventDetail(Long eventId) {
         Event event = eventAdaptor.findByEvent(eventId);
-        return eventConvertor.EventDetail(event);
+        return eventConvertor.convertToEventDetail(event);
     }
 }

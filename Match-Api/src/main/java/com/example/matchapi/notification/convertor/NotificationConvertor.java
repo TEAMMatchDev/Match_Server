@@ -18,19 +18,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationConvertor {
     private final TimeHelper timeHelper;
-    public List<NotificationRes.NotificationList> NotificationList(List<Notification> notifications) {
+    public List<NotificationRes.NotificationList> convertToNotificationList(List<Notification> notifications) {
         List<NotificationRes.NotificationList> notificationLists = new ArrayList<>();
 
         notifications.forEach(
                 result -> notificationLists.add(
-                        NotificationDetail(result)
+                        convertToNotificationDetail(result)
                 )
         );
 
         return notificationLists;
     }
 
-    private NotificationRes.NotificationList NotificationDetail(Notification result) {
+    private NotificationRes.NotificationList convertToNotificationDetail(Notification result) {
 
         return NotificationRes.NotificationList
                 .builder()
@@ -42,7 +42,7 @@ public class NotificationConvertor {
                 .build();
     }
 
-    public Notification NotificationTest(User user, FCMNotificationRequestDto fcmNotificationRequestDto) {
+    public Notification convertToNotificationTest(User user, FCMNotificationRequestDto fcmNotificationRequestDto) {
         return Notification
                 .builder()
                 .body(fcmNotificationRequestDto.getBody())

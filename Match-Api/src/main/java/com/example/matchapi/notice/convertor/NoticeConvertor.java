@@ -14,19 +14,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NoticeConvertor {
     private final TimeHelper timeHelper;
-    public List<NoticeRes.NoticeList> NoticeList(List<Notice> content) {
+    public List<NoticeRes.NoticeList> convertToNoticeList(List<Notice> content) {
         List<NoticeRes.NoticeList> noticeLists = new ArrayList<>();
 
         content.forEach(
                 result -> noticeLists.add(
-                        NoticeListDetail(result)
+                        convertToNoticeListDetail(result)
                 )
         );
 
         return noticeLists;
     }
 
-    private NoticeRes.NoticeList NoticeListDetail(Notice result) {
+    private NoticeRes.NoticeList convertToNoticeListDetail(Notice result) {
         return NoticeRes.NoticeList
                 .builder()
                 .noticeId(result.getId())
@@ -36,13 +36,13 @@ public class NoticeConvertor {
                 .build();
     }
 
-    public NoticeRes.NoticeDetail NoticeDetail(Notice notice) {
-        NoticeRes.NoticeList noticeInfo = NoticeListDetail(notice);
+    public NoticeRes.NoticeDetail convertToNoticeDetail(Notice notice) {
+        NoticeRes.NoticeList noticeInfo = convertToNoticeListDetail(notice);
         List<NoticeRes.NoticeContents> noticeContents = new ArrayList<>();
 
         notice.getNoticeContents().forEach(
                 result -> noticeContents.add(
-                        NoticeContentsDetail(result)
+                        convertToNoticeContentsDetail(result)
                 )
         );
         return NoticeRes.NoticeDetail
@@ -52,7 +52,7 @@ public class NoticeConvertor {
                 .build();
     }
 
-    private NoticeRes.NoticeContents NoticeContentsDetail(NoticeContent result) {
+    private NoticeRes.NoticeContents convertToNoticeContentsDetail(NoticeContent result) {
         return NoticeRes.NoticeContents
                 .builder()
                 .contentId(result.getId())

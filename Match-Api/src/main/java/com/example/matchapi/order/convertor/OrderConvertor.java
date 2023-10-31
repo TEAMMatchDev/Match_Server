@@ -27,56 +27,8 @@ import static java.lang.Integer.parseInt;
 public class OrderConvertor {
     private final OrderHelper orderHelper;
     private final DonationHelper donationHelper;
-    public DonationUser donationUser(NicePaymentAuth nicePaymentAuth, Long id, OrderReq.OrderDetail orderDetail, Long projectId, String flameName, String inherenceNumber) {
-        return DonationUser.builder()
-                .userId(id)
-                .projectId(projectId)
-                .price(orderDetail.getAmount())
-                .tid(nicePaymentAuth.getTid())
-                .orderId(nicePaymentAuth.getOrderId())
-                .donationStatus(DonationStatus.EXECUTION_BEFORE)
-                .payMethod(orderHelper.getPayMethod(nicePaymentAuth.getPayMethod()))
-                .inherenceName(flameName)
-                .inherenceNumber(inherenceNumber)
-                .regularStatus(RegularStatus.ONE_TIME)
-                .flameImage(FlameImage.NORMAL_IMG.getImg())
-                .build();
-    }
-    public DonationUser donationUserV2(NicePaymentAuth nicePaymentAuth, Long id, Long amount, String projectId, String flameName, String inherenceNumber) {
-        return DonationUser.builder()
-                .userId(id)
-                .projectId(Long.valueOf(projectId))
-                .price(amount)
-                .tid(nicePaymentAuth.getTid())
-                .orderId(nicePaymentAuth.getOrderId())
-                .donationStatus(DonationStatus.EXECUTION_BEFORE)
-                .payMethod(orderHelper.getPayMethod(nicePaymentAuth.getPayMethod()))
-                .inherenceName(flameName)
-                .inherenceNumber(inherenceNumber)
-                .regularStatus(RegularStatus.ONE_TIME)
-                .flameImage(FlameImage.NORMAL_IMG.getImg())
-                .build();
-    }
 
-    public String createPlainText(OrderReq.RegistrationCard registrationCard) {
-        return "cardNo=" + registrationCard.getCardNo() + "&"
-                + "expYear=" + registrationCard.getExpYear() + "&"
-                + "expMonth=" + registrationCard.getExpMonth() + "&"
-                + "idNo=" + registrationCard.getIdNo() + "&"
-                + "cardPw=" + registrationCard.getCardPw();
-    }
-
-    public NiceBillOkRequest niceBillOk(NicePayBillkeyResponse nicePayBillkeyResponse, String orderId) {
-        return NiceBillOkRequest.builder()
-                .cardQuota(0)
-                .amount(480L)
-                .goodsName("카드 확인 용 결제")
-                .useShopInterest(false)
-                .orderId(orderId)
-                .build();
-    }
-
-    public RegularPayment RegularPayment(Long id, OrderReq.RegularDonation regularDonation, Long userCardId, Long projectId) {
+    public RegularPayment convertToRegularPayment(Long id, OrderReq.RegularDonation regularDonation, Long userCardId, Long projectId) {
         return RegularPayment.builder()
                 .userId(id)
                 .payDate(regularDonation.getPayDate())
@@ -84,30 +36,6 @@ public class OrderConvertor {
                 .userCardId(userCardId)
                 .projectId(projectId)
                 .regularPayStatus(RegularPayStatus.PROCEEDING)
-                .build();
-    }
-
-    public UserCard UserCard(Long id, OrderReq.RegistrationCard registrationCard, NicePayBillkeyResponse nicePayBillkeyResponse){
-        return UserCard.builder()
-                .userId(id)
-                .bid(nicePayBillkeyResponse.getBid())
-                .cardNo(registrationCard.getCardNo())
-                .expYear(registrationCard.getExpYear())
-                .expMonth(registrationCard.getExpMonth())
-                .idNo(registrationCard.getIdNo())
-                .cardPw(registrationCard.getCardPw())
-                .cardName(nicePayBillkeyResponse.getCardName())
-                .orderId(nicePayBillkeyResponse.getOrderId())
-                .build();
-    }
-
-    public RequestPaymentHistory recordHistory(Long userId, String orderId, String tid, Long amount, String reason) {
-        return RequestPaymentHistory.builder()
-                .userId(userId)
-                .tid(tid)
-                .orderId(orderId)
-                .amount(amount)
-                .reason(reason)
                 .build();
     }
 
@@ -119,34 +47,7 @@ public class OrderConvertor {
                 .ttl(10L)
                 .build();
     }
-
-    public NiceBillOkRequest billCardOneTime(Long amount, String orderId) {
-        return NiceBillOkRequest.builder()
-                .cardQuota(0)
-                .amount(amount)
-                .goodsName("매치 기부금 결제")
-                .useShopInterest(false)
-                .orderId(orderId)
-                .build();
-    }
-
-    public DonationUser donationBillUser(NiceBillOkResponse niceBillOkResponse, Long id, Long amount, Long projectId, String flameName, String inherenceNumber, RegularStatus regularStatus, Long regularPaymentId) {
-        return DonationUser.builder()
-                .userId(id)
-                .projectId(projectId)
-                .price(amount)
-                .tid(niceBillOkResponse.getTid())
-                .orderId(niceBillOkResponse.getOrderId())
-                .donationStatus(DonationStatus.EXECUTION_BEFORE)
-                .payMethod(orderHelper.getPayMethod(niceBillOkResponse.getPayMethod()))
-                .inherenceName(flameName)
-                .inherenceNumber(inherenceNumber)
-                .regularStatus(regularStatus)
-                .regularPaymentId(regularPaymentId)
-                .build();
-    }
-
-    public DonationUser donationUserPortone(Long userId, PaymentReq.ValidatePayment validatePayment, Long projectId, String flameName, String inherenceNumber) {
+    public DonationUser convertToDonationUserPortone(Long userId, PaymentReq.ValidatePayment validatePayment, Long projectId, OrderRes.CreateInherenceDto createInherenceDto) {
         return DonationUser.builder()
                 .userId(userId)
                 .payMethod(orderHelper.getPayMethod(validatePayment.getPayMethod()))
@@ -156,14 +57,14 @@ public class OrderConvertor {
                 .orderId(validatePayment.getOrderId())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
                 .payMethod(orderHelper.getPayMethod(validatePayment.getPayMethod()))
-                .inherenceName(flameName)
-                .inherenceNumber(inherenceNumber)
+                .inherenceName(createInherenceDto.getInherenceName())
+                .inherenceNumber(createInherenceDto.getInherenceNumber())
                 .regularStatus(RegularStatus.ONE_TIME)
                 .flameImage(FlameImage.NORMAL_IMG.getImg())
                 .build();
     }
 
-    public UserCard UserBillCard(Long id, OrderReq.RegistrationCard registrationCard, PortOneBillResponse portOneBillResponse) {
+    public UserCard convertToUserBillCard(Long id, OrderReq.RegistrationCard registrationCard, PortOneBillResponse portOneBillResponse) {
         return UserCard.builder()
                 .userId(id)
                 .bid(portOneBillResponse.getCustomer_uid())
@@ -179,7 +80,7 @@ public class OrderConvertor {
                 .build();
     }
 
-    public DonationUser donationBillPayUser(PortOneBillPayResponse response, Long id, Long amount, Long projectId, String flameName, String inherenceNumber, RegularStatus regularStatus, Long regularPaymentId) {
+    public DonationUser donationBillPayUser(PortOneBillPayResponse response, Long id, Long amount, Long projectId, OrderRes.CreateInherenceDto createInherenceDto, RegularStatus regularStatus, Long regularPaymentId) {
         return DonationUser.builder()
                 .userId(id)
                 .projectId(projectId)
@@ -188,8 +89,8 @@ public class OrderConvertor {
                 .orderId(response.getMerchant_uid())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
                 .payMethod(PayMethod.CARD)
-                .inherenceName(flameName)
-                .inherenceNumber(inherenceNumber)
+                .inherenceName(createInherenceDto.getInherenceName())
+                .inherenceNumber(createInherenceDto.getInherenceNumber())
                 .regularStatus(regularStatus)
                 .regularPaymentId(regularPaymentId)
                 .flameImage(FlameImage.NORMAL_IMG.getImg())
@@ -197,7 +98,7 @@ public class OrderConvertor {
                 .build();
     }
 
-    public OrderRes.CompleteDonation CompleteDonation(String name, Project project, Long amount) {
+    public OrderRes.CompleteDonation convertToCompleteDonation(String name, Project project, Long amount) {
         return OrderRes.CompleteDonation
                 .builder()
                 .username(name)

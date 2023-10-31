@@ -29,13 +29,9 @@ import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOnePrepareReq;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
-import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.example.matchcommon.constants.MatchStatic.*;
@@ -59,7 +55,6 @@ public class OrderService {
     private final ProjectService projectService;
     private final RegularPaymentAdaptor regularPaymentAdaptor;
     private final UserCardAdaptor userCardAdaptor;
-    private final PortOneService portOneService;
     private final DonationHistoryService donationHistoryService;
 
     @Transactional
@@ -94,19 +89,17 @@ public class OrderService {
 
         Project project = projectService.checkProjectExists(projectId, RegularStatus.REGULAR);
 
-        PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneService.payBillKey(card.getBid(), createOrderId(REGULAR), regularDonation.getAmount(), project.getProjectName(), card.getCustomerId());
+        PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, regularDonation.getAmount(), project.getProjectName(), REGULAR);
 
-        String flameName = orderHelper.createFlameName(user);
+        OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
 
-        String inherenceNumber = createRandomUUID();
+        RegularPayment regularPayment = regularPaymentRepository.save(orderConvertor.convertToRegularPayment(user.getId(), regularDonation, cardId, projectId));
 
-        RegularPayment regularPayment = regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId, projectId));
-
-        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillPayUser(portOneResponse.getResponse(), user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
+        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillPayUser(portOneResponse.getResponse(), user.getId(), regularDonation.getAmount(), projectId, createInherenceDto, RegularStatus.REGULAR, regularPayment.getId()));
 
         donationHistoryService.postRegularDonationHistory(regularPayment.getId(), donationUser.getId());
 
-        return orderConvertor.CompleteDonation(user.getName(), project, regularDonation.getAmount());
+        return orderConvertor.convertToCompleteDonation(user.getName(), project, regularDonation.getAmount());
     }
 
 
@@ -118,30 +111,33 @@ public class OrderService {
 
     @RedissonLock(LockName = "빌키-단기-기부", key = "#cardId")
     public OrderRes.CompleteDonation oneTimeDonationCard(User user, OrderReq.OneTimeDonation oneTimeDonation, Long cardId, Long projectId) {
-        UserCard card = userCardAdaptor.findCardByCardId(cardId);
+        try {
+            UserCard card = userCardAdaptor.findCardByCardId(cardId);
 
-        validateCard(card, user);
+            validateCard(card, user);
 
-        Project project = projectService.checkProjectExists(projectId, RegularStatus.ONE_TIME);
+            Project project = projectService.checkProjectExists(projectId, RegularStatus.ONE_TIME);
 
-        String accessToken = portOneAuthService.getToken();
+            PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, oneTimeDonation.getAmount(), project.getProjectName(), ONE_TIME);
 
-        PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(accessToken, portOneConvertor.PayWithBillKey(card.getBid(), createOrderId(ONE_TIME), oneTimeDonation.getAmount(), project.getProjectName(), card.getCustomerId()));
+            OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
 
-        String flameName = orderHelper.createFlameName(user);
+            DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillPayUser(portOneResponse.getResponse(), user.getId(), oneTimeDonation.getAmount(), projectId,
+                    createInherenceDto, RegularStatus.ONE_TIME, null));
 
-        String inherenceNumber = createRandomUUID();
+            donationHistoryService.oneTimeDonationHistory(donationUser.getId());
 
-        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillPayUser(portOneResponse.getResponse(), user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
+            return orderConvertor.convertToCompleteDonation(user.getName(), project, oneTimeDonation.getAmount());
+        }catch (Exception e){
+            //paymentService.refundPayment();
+        }
 
-        donationHistoryService.oneTimeDonationHistory(donationUser.getId());
-
-        return orderConvertor.CompleteDonation(user.getName(), project, oneTimeDonation.getAmount());
+        return null;
     }
 
     @Transactional
     public String saveRequest(User user, Long projectId) {
-        String orderId = createOrderId(ONE_TIME);
+        String orderId = orderHelper.createOrderId(ONE_TIME);
 
         orderRequestRepository.save(orderConvertor.CreateRequest(user.getId(), projectId, orderId));
 
@@ -179,44 +175,23 @@ public class OrderService {
     @RedissonLock(LockName = "유저-카드-등록", key = "#user")
     public PortOneBillResponse postCard(User user, OrderReq.RegistrationCard registrationCard) {
         String accessToken = portOneAuthService.getToken();
-        String cardNo = formatString(registrationCard.getCardNo(), 4);
+        String cardNo = orderHelper.formatString(registrationCard.getCardNo(), 4);
         String expiry = "20" + registrationCard.getExpYear() + "-" + registrationCard.getExpMonth();
         PortOneResponse<PortOneBillResponse> portOneResponse = portOneFeignClient.getBillKey(
                 accessToken,
-                createOrderId(BILL),
-                portOneConvertor.PortOneBill(cardNo, expiry, registrationCard.getIdNo(), registrationCard.getCardPw())
+                orderHelper.createOrderId(BILL),
+                portOneConvertor.convertToPortOneBill(cardNo, expiry, registrationCard.getIdNo(), registrationCard.getCardPw())
         );
+
         if(portOneResponse.getCode()!=0){
             throw new BaseException(BAD_REQUEST, false, "PORT_ONE_BILL_AUTH_001", portOneResponse.getMessage());
         }
-        userCardRepository.save(orderConvertor.UserBillCard(user.getId(), registrationCard, portOneResponse.getResponse()));
+        userCardRepository.save(orderConvertor.convertToUserBillCard(user.getId(), registrationCard, portOneResponse.getResponse()));
 
         return portOneResponse.getResponse();
     }
 
-    public String formatString(String input, int length) {
-        StringBuilder formatted = new StringBuilder();
 
-        for (int i = 0; i < input.length(); i++) {
-            if (i > 0 && i % length == 0) {
-                formatted.append('-');
-            }
-            formatted.append(input.charAt(i));
-        }
-
-        return formatted.toString();
-    }
-
-    public String createRandomUUID() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + UUID.randomUUID().toString();
-    }
-
-    public String createOrderId(String type){
-        boolean useLetters = true;
-        boolean useNumbers = true;
-        String randomStr = RandomStringUtils.random(12, useLetters, useNumbers);
-        return type + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "-" + randomStr;
-    }
 
     private void cancelRegularPayment(List<RegularPayment> regularPayments) {
         for(RegularPayment regularPayment : regularPayments){
@@ -226,7 +201,7 @@ public class OrderService {
     }
 
     public String saveRequestPrepare(User user, Long projectId, int amount) {
-        String orderId = createOrderId(ONE_TIME);
+        String orderId = orderHelper.createOrderId(ONE_TIME);
 
         orderRequestRepository.save(orderConvertor.convertToRequestPrepare(user.getId(), projectId, amount, orderId));
 

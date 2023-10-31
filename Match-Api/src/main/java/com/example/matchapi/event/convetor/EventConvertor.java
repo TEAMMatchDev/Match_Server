@@ -17,18 +17,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventConvertor {
     private final TimeHelper timeHelper;
-    public List<EventRes.EventList> EventList(List<Event> content) {
+    public List<EventRes.EventList> convertToEventList(List<Event> content) {
         List<EventRes.EventList> eventLists = new ArrayList<>();
 
         content.forEach(
                 result -> {
-                    eventLists.add(EventListDetail(result));
+                    eventLists.add(convertToEventListDetail(result));
                 }
         );
         return eventLists;
     }
 
-    private EventRes.EventList EventListDetail(Event result) {
+    private EventRes.EventList convertToEventListDetail(Event result) {
         return EventRes.EventList
                 .builder()
                 .eventId(result.getId())
@@ -41,12 +41,12 @@ public class EventConvertor {
                 .build();
     }
 
-    public EventRes.EventDetail EventDetail(Event event) {
-        EventRes.EventInfo eventInfo = EventInfo(event);
+    public EventRes.EventDetail convertToEventDetail(Event event) {
+        EventRes.EventInfo eventInfo = convertToEventInfo(event);
         List<EventRes.EventContents> eventContents = new ArrayList<>();
 
         event.getEventContents().forEach(
-                result -> eventContents.add(EventContents(result))
+                result -> eventContents.add(convertToEventContents(result))
         );
 
         return EventRes.EventDetail
@@ -56,7 +56,7 @@ public class EventConvertor {
                 .build();
     }
 
-    private EventRes.EventContents EventContents(EventContent result) {
+    private EventRes.EventContents convertToEventContents(EventContent result) {
         return EventRes.EventContents
                 .builder()
                 .contentId(result.getId())
@@ -65,7 +65,7 @@ public class EventConvertor {
                 .build();
     }
 
-    private EventRes.EventInfo EventInfo(Event event) {
+    private EventRes.EventInfo convertToEventInfo(Event event) {
         return EventRes.EventInfo
                 .builder()
                 .eventId(event.getId())

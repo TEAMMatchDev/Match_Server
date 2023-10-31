@@ -53,9 +53,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserAddressRepository userAddressRepository;
     private final UserConvertor userConvertor;
-    private final DonationUserRepository donationUserRepository;
     private final ProjectConvertor projectConvertor;
-    private final ProjectHelper projectHelper;
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
     private final OrderService orderService;
     private final RegularPaymentRepository regularPaymentRepository;
@@ -73,7 +71,7 @@ public class UserService {
     }
 
     public UserRes.EditMyPage getEditMyPage(User user) {
-        return userConvertor.toMyPage(user);
+        return userConvertor.convertToMyPage(user);
     }
 
     public UserRes.MyPage getMyPage(User user) {
@@ -84,18 +82,17 @@ public class UserService {
     }
 
     public OrderRes.UserDetail getUserInfo(User user) {
-        return userConvertor.userInfo(user);
+        return userConvertor.convertToUserInfo(user);
     }
 
     public UserRes.SignUpInfo getUserSignUpInfo() {
         LocalDate localDate = LocalDate.now();
-        LocalDateTime localDateTime = LocalDateTime.now();
         Long totalUser = userRepository.countBy();
         Long oneDayUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate+FIRST_TIME), LocalDateTime.parse(localDate+LAST_TIME));
         Long weekUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.minusWeeks(1)+FIRST_TIME) , LocalDateTime.parse(localDate+LAST_TIME));
         Long monthUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME), LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME));
 
-        return userConvertor.UserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
+        return userConvertor.convertToUserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
     }
 
     @Transactional
@@ -119,7 +116,7 @@ public class UserService {
 
         userList.getContent().forEach(
                 result -> userLists.add(
-                        userConvertor.UserList(result)
+                        userConvertor.convertToUserList(result)
                 )
         );
 
@@ -132,11 +129,11 @@ public class UserService {
         List<OrderRes.UserBillCard> userCards = orderService.getUserBillCard(userId);
 
 
-        return userConvertor.UserAdminDetail(userDetail,userCards);
+        return userConvertor.convertToUserAdminDetail(userDetail,userCards);
     }
 
     public UserRes.Profile getProfile(User user) {
-        return userConvertor.UserProfile(user);
+        return userConvertor.convertToUserProfile(user);
     }
 
     @Transactional
@@ -166,7 +163,7 @@ public class UserService {
     }
 
     public void saveFcmToken(User user, UserReq.FcmToken token) {
-        userFcmTokenRepository.save(userConvertor.UserFcm(user, token));
+        userFcmTokenRepository.save(userConvertor.convertToUserFcm(user, token));
     }
 
     public void deleteFcmToken(Long userId, String deviceId) {
@@ -192,7 +189,7 @@ public class UserService {
 
     public UserRes.AlarmAgreeList getAlarmAgreeList(User user) {
         System.out.println(user.getName());
-        return userConvertor.AlarmAgree(user);
+        return userConvertor.convertToAlarmAgree(user);
     }
 
     public UserRes.AlarmAgreeList patchAlarm(User user, AlarmType alarmType) {
@@ -216,6 +213,6 @@ public class UserService {
 
         user = userRepository.save(user);
 
-        return userConvertor.AlarmAgree(user);
+        return userConvertor.convertToAlarmAgree(user);
     }
 }

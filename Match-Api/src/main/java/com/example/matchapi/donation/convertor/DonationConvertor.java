@@ -26,22 +26,8 @@ import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
 public class DonationConvertor {
     private final DonationHelper donationHelper;
     private final TimeHelper timeHelper;
-    private final HistoryImageRepository historyImageRepository;
-    public DonationRes.FlameList Flame(DonationUser result) {
-        return DonationRes.FlameList.builder()
-                .donationId(result.getId())
-                .amount(result.getPrice())
-                .donationStatus(result.getDonationStatus().getName())
-                .flameName(result.getInherenceName())
-                .createdAt(result.getCreatedAt().getYear()+"년 "
-                        +result.getCreatedAt().getMonthValue()+"월 "
-                        +result.getCreatedAt().getDayOfMonth()+"일 "
-                        +result.getCreatedAt().getHour()+"시 "
-                        +result.getCreatedAt().getMinute()+"분")
-                .build();
-    }
 
-    public DonationRes.DonationCount DonationCount(List<DonationUser> donationUserList) { int beforeCnt=0;
+    public DonationRes.DonationCount convertToDonationCount(List<DonationUser> donationUserList) { int beforeCnt=0;
         int underCnt=0;
         int successCnt=0;
 
@@ -63,7 +49,7 @@ public class DonationConvertor {
 
     }
 
-    public DonationRes.DonationList DonationListDetail(DonationUser result) {
+    public DonationRes.DonationList convertToDonationListDetail(DonationUser result) {
         String payDate="";
         if(result.getRegularPayment()!=null) {
             payDate = "매월 " + result.getRegularPayment().getPayDate() + "일 " + donationHelper.parsePriceComma(Math.toIntExact(result.getRegularPayment().getAmount()));
@@ -82,14 +68,14 @@ public class DonationConvertor {
     }
 
 
-    public DonationHistory DonationHistory(Long id, HistoryStatus historyStatus) {
+    public DonationHistory convertToDonationHistory(Long id, HistoryStatus historyStatus) {
         return DonationHistory.builder()
                 .donationUserId(id)
                 .historyStatus(historyStatus)
                 .build();
     }
 
-    public DonationRes.DonationRegular DonationRegular(RegularPayment regularPayment) {
+    public DonationRes.DonationRegular convertToDonationRegular(RegularPayment regularPayment) {
         return DonationRes.DonationRegular
                 .builder()
                 .projectTitle(regularPayment.getProject().getProjectName())
@@ -100,7 +86,7 @@ public class DonationConvertor {
                 .build();
     }
 
-    public DonationRes.DonationRegularList DonationRegularListDetail(DonationHistory result, String inherenceName) {
+    public DonationRes.DonationRegularList convertToDonationRegularListDetail(DonationHistory result, String inherenceName) {
         String histories = "";
         String flameImage = null;
         List<DonationRes.DonationHistoryImage> donationHistoryImages = new ArrayList<>();
@@ -112,7 +98,7 @@ public class DonationConvertor {
         }else if(result.getHistoryStatus() == HistoryStatus.COMPLETE) {
             System.out.println("COMPLETE");
             histories = "'후원품'을 '후원처'에 전달했습니다.";
-            donationHistoryImages = DonationHistoryImage(result.getHistoryImages());
+            donationHistoryImages = convertToDonationHistoryImage(result.getHistoryImages());
         }else{
             histories = inherenceName + " 외 " + (result.getCnt()-1) + "마리의 불꽃이들이 '후원품'으로 변했습니다.";
         }
@@ -128,7 +114,7 @@ public class DonationConvertor {
                 .build();
     }
 
-    private List<DonationRes.DonationHistoryImage> DonationHistoryImage(List<HistoryImage> historyImages) {
+    private List<DonationRes.DonationHistoryImage> convertToDonationHistoryImage(List<HistoryImage> historyImages) {
         List<DonationRes.DonationHistoryImage> donationHistoryImages = new ArrayList<>();
 
         System.out.println(historyImages.size());
@@ -145,7 +131,7 @@ public class DonationConvertor {
         return donationHistoryImages;
     }
 
-    public DonationRes.PayList PayListDetail(DonationUser result) {
+    public DonationRes.PayList convertToPayListDetail(DonationUser result) {
         String payStatus = "결제완료";
         if(result.getDonationStatus() == EXECUTION_REFUND){
             payStatus = "환불";
@@ -160,7 +146,7 @@ public class DonationConvertor {
                 .build();
     }
 
-    public DonationRes.BurningMatchRes BurningMatchDetail(DonationUserRepository.flameList result) {
+    public DonationRes.BurningMatchRes convertToBurningMatchDetail(DonationUserRepository.flameList result) {
         List<String> imgUrlList = null;
         if(result.getImgUrlList()!=null){
             imgUrlList = Stream.of(result.getImgUrlList().split(",")).collect(Collectors.toList());
@@ -176,7 +162,7 @@ public class DonationConvertor {
                 .build();
     }
 
-    public DonationRes.FlameProjectList FlameProject(DonationUser result) {
+    public DonationRes.FlameProjectList convertToFlameProject(DonationUser result) {
         return DonationRes.FlameProjectList
                 .builder()
                 .donationId(result.getId())
@@ -187,7 +173,7 @@ public class DonationConvertor {
                 .build();
     }
 
-    public DonationRes.DonationFlame DonationFlame(int sequence, DonationUser donationUser) {
+    public DonationRes.DonationFlame convertToDonationFlame(int sequence, DonationUser donationUser) {
         return DonationRes.DonationFlame
                 .builder()
                 .imgUrl(donationUser.getFlameImage())
@@ -200,7 +186,7 @@ public class DonationConvertor {
                 .build();
     }
 
-    public ProjectRes.MatchHistory MatchHistoryDetail(DonationHistory result) {
+    public ProjectRes.MatchHistory convertToMatchHistoryDetail(DonationHistory result) {
         String histories = "";
         String profileImgUrl = "";
         String nickname = "";
@@ -243,19 +229,19 @@ public class DonationConvertor {
                 .build();
     }
 
-    public DonationHistory DonationHistoryTurnOn(Long id, HistoryStatus historyStatus) {
+    public DonationHistory convertToDonationHistoryTurnOn(Long id, HistoryStatus historyStatus) {
         return DonationHistory.builder()
                 .regularPaymentId(id)
                 .historyStatus(historyStatus)
                 .build();
     }
 
-    public List<DonationRes.DonationList> DonationList(Page<DonationUser> donationUsers) {
+    public List<DonationRes.DonationList> convertToDonationList(Page<DonationUser> donationUsers) {
         List<DonationRes.DonationList> donationLists = new ArrayList<>();
         donationUsers.getContent().forEach(
                 result ->{
                     donationLists.add(
-                            DonationListDetail(result)
+                            convertToDonationListDetail(result)
                     );
                 }
         );
@@ -267,53 +253,53 @@ public class DonationConvertor {
         List<DonationRes.BurningMatchRes> burningMatchRes = new ArrayList<>();
         flameLists.forEach(
                 result -> {
-                    burningMatchRes.add(BurningMatchDetail(result));
+                    burningMatchRes.add(convertToBurningMatchDetail(result));
                 }
         );
 
         return burningMatchRes;
     }
 
-    public List<DonationRes.DonationRegularList> DonationRegularList(List<DonationHistory> donationHistories, String inherenceName){
+    public List<DonationRes.DonationRegularList> convertToDonationRegularList(List<DonationHistory> donationHistories, String inherenceName){
         List<DonationRes.DonationRegularList> donationRegularLists = new ArrayList<>();
         donationHistories.forEach(
                 result -> donationRegularLists.add(
-                        DonationRegularListDetail(result, inherenceName)
+                        convertToDonationRegularListDetail(result, inherenceName)
                 )
         );
         return donationRegularLists;
     }
 
-    public List<ProjectRes.MatchHistory> MatchHistory(List<DonationHistory> donationHistories){
+    public List<ProjectRes.MatchHistory> convertToMatchHistory(List<DonationHistory> donationHistories){
         List<ProjectRes.MatchHistory> matchHistories = new ArrayList<>();
 
         donationHistories.forEach(
                 result -> matchHistories.add(
-                        MatchHistoryDetail(result)
+                        convertToMatchHistoryDetail(result)
                 )
         );
 
         return matchHistories;
     }
 
-    public List<DonationRes.FlameProjectList> FlameProjectList(List<DonationUser> donationUsers){
+    public List<DonationRes.FlameProjectList> convertToFlameProjectList(List<DonationUser> donationUsers){
         List<DonationRes.FlameProjectList> flameProjectLists = new ArrayList<>();
 
         donationUsers.forEach(
                 result -> flameProjectLists.add(
-                        FlameProject(result)
+                        convertToFlameProject(result)
                 )
         );
 
         return flameProjectLists;
     }
 
-    public List<DonationRes.PayList> PayList(List<DonationUser> donationUsers) {
+    public List<DonationRes.PayList> convertToPayList(List<DonationUser> donationUsers) {
         List<DonationRes.PayList> payLists = new ArrayList<>();
 
         donationUsers.forEach(
                 result -> payLists.add(
-                        PayListDetail(result)
+                        convertToPayListDetail(result)
                 )
         );
 

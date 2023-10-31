@@ -31,7 +31,7 @@ public class KeywordService {
         List<KeywordRes.KeywordList> keywordLists = new ArrayList<>();
 
         searchKeywords.forEach(
-                result -> keywordLists.add(keywordConvertor.KeywordList(result))
+                result -> keywordLists.add(keywordConvertor.convertToKeywordList(result))
         );
         return keywordLists;
     }
