@@ -4,7 +4,6 @@ import com.example.matchcommon.annotation.Convertor;
 import com.example.matchinfrastructure.discord.dto.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
-import org.springframework.security.core.userdetails.User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.DecimalFormat;
@@ -19,12 +18,8 @@ public class DiscordConvertor {
     private final Environment environment;
 
 
-    public Message Message(User user, Exception exception, HttpServletRequest request) {
+    public Message convertToUnknownMessage(String username, Exception exception, HttpServletRequest request) {
         List<Message.Embeds> embedsList = new ArrayList<>();
-        String username = "로그인 되지 않은 유저";
-        if(user!=null){
-            username = user.getUsername();
-        }
 
         embedsList.add(Message.Embeds.builder().title("실행중인 환경").description(Arrays.toString(environment.getActiveProfiles())).build());
         embedsList.add(Message.Embeds.builder().title("에러 내용").description(exception.getMessage()).build());
@@ -40,7 +35,7 @@ public class DiscordConvertor {
                 .build();
     }
 
-    public Message AlertBatchMessage(String title, int size) {
+    public Message convertToAlertBatchMessage(String title, int size) {
         LocalDateTime localDateTime = LocalDateTime.now();
         List<Message.Embeds> embedsList = new ArrayList<>();
         embedsList.add(Message.Embeds.builder().title("총 결제 예정 수").description(String.valueOf(size)).build());
@@ -63,7 +58,7 @@ public class DiscordConvertor {
                 .build();
     }
 
-    public Message AlertFinishMessage(String title, int amount, int size, int successCnt, int trueCnt) {
+    public Message convertToAlertFinishMessage(String title, int amount, int size, int successCnt, int trueCnt) {
         LocalDateTime localDateTime = LocalDateTime.now();
         List<Message.Embeds> embedsList = new ArrayList<>();
         DecimalFormat decimalFormat = new DecimalFormat("#,###"); // 포맷을 설정합니다.
@@ -94,7 +89,7 @@ public class DiscordConvertor {
                 .build();
     }
 
-    public Message ErrorBatchServer(String title, String message) {
+    public Message convertToErrorBatchServer(String title, String message) {
         List<Message.Embeds> embedsList = new ArrayList<>();
 
         embedsList.add(Message.Embeds.builder().title("실행중인 환경").description(Arrays.toString(environment.getActiveProfiles())).build());
@@ -105,6 +100,19 @@ public class DiscordConvertor {
                 .content("==================================================\n"+
                         "🚨 Match Batch Server 실행중인 스케줄러 : "+ title + "가 실행중에 에러가 나타났어요 ! 🚨\n\n" +
                         "호스팅 서버 : " + environment.getProperty("server.host") + "\n\n" )
+                .tts(false)
+                .embeds(embedsList)
+                .build();
+    }
+
+    public Message convertToKnownMessage(String message) {
+        List<Message.Embeds> embedsList = new ArrayList<>();
+
+        embedsList.add(Message.Embeds.builder().title("실행중인 환경").description(Arrays.toString(environment.getActiveProfiles())).build());
+
+        return Message
+                .builder()
+                .content(message)
                 .tts(false)
                 .embeds(embedsList)
                 .build();

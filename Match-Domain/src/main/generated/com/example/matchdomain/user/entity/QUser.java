@@ -67,6 +67,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final ListPath<com.example.matchdomain.donation.entity.UserCard, com.example.matchdomain.donation.entity.QUserCard> userCard = this.<com.example.matchdomain.donation.entity.UserCard, com.example.matchdomain.donation.entity.QUserCard>createList("userCard", com.example.matchdomain.donation.entity.UserCard.class, com.example.matchdomain.donation.entity.QUserCard.class, PathInits.DIRECT2);
 
+    public final ListPath<UserFcmToken, QUserFcmToken> userFcmTokens = this.<UserFcmToken, QUserFcmToken>createList("userFcmTokens", UserFcmToken.class, QUserFcmToken.class, PathInits.DIRECT2);
+
     public final StringPath username = createString("username");
 
     public QUser(String variable) {

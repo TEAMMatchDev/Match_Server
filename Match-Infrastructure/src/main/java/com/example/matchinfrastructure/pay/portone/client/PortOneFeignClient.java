@@ -5,13 +5,11 @@ import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.pay.portone.config.PortOneFeignConfiguration;
 import com.example.matchinfrastructure.pay.portone.config.PortOneInfoConfig;
 import com.example.matchinfrastructure.pay.portone.config.PortOneInfoErrorDecoder;
-import com.example.matchinfrastructure.pay.portone.dto.PortOneAuth;
-import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
-import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
-import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
+import com.example.matchinfrastructure.pay.portone.dto.*;
 import com.example.matchinfrastructure.pay.portone.dto.req.PayWithBillKeyReq;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOneAuthReq;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOneBillReq;
+import com.example.matchinfrastructure.pay.portone.dto.req.PortOnePrepareReq;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
@@ -35,5 +33,17 @@ public interface PortOneFeignClient {
     public PortOneResponse<PortOneBillPayResponse> payWithBillKey(
             @RequestHeader("Authorization") String accessToken,
             @RequestBody PayWithBillKeyReq payWithBillKeyReq
+            );
+
+    @DeleteMapping("/subscribe/customers/{customer_uid}")
+    public PortOneResponse<PortOneBillDeleteResponse> deleteBillKey(
+            @RequestHeader("Authorization") String accessToken,
+            @PathVariable("customer_uid") String customer_uid
+    );
+
+    @PostMapping("/payments/prepare")
+    public PortOneResponse<PortOnePrepareReq> preparePayments(
+            @RequestHeader("Authorization") String accessToken,
+            @RequestBody PortOnePrepareReq portOnePrepareReq
             );
 }

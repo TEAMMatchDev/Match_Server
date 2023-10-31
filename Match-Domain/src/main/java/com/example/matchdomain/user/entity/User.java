@@ -80,18 +80,22 @@ public class User extends BaseEntity implements UserDetails {
     @JoinColumn(name = "userId")
     private List<UserCard> userCard = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "userId")
+    @BatchSize(size = 10)
+    private List<UserFcmToken> userFcmTokens = new ArrayList<>();
+
     @Column(name = "logInAt")
     private LocalDateTime logInAt;
-
 
     @Column(name = "role")
     private String role;
 
     @Enumerated(EnumType.STRING)
-    private Alarm serviceAlarm = Alarm.INACTIVE;
+    private Alarm serviceAlarm = Alarm.ACTIVE;
 
     @Enumerated(EnumType.STRING)
-    private Alarm eventAlarm = Alarm.INACTIVE;
+    private Alarm eventAlarm = Alarm.ACTIVE;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -143,6 +147,6 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setModifyProfile(String newProfileImg, String name) {
         this.profileImgUrl = newProfileImg;
-        this.name = name;
+        this.nickname = name;
     }
 }

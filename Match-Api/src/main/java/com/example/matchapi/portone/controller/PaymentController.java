@@ -1,5 +1,6 @@
 package com.example.matchapi.portone.controller;
 
+import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.portone.dto.PaymentReq;
 import com.example.matchapi.portone.service.PaymentService;
 import com.example.matchapi.project.dto.ProjectReq;
@@ -17,9 +18,8 @@ public class PaymentController {
     private final PaymentService paymentService;
     @PostMapping("/validate")
     @Operation(summary = "08-01 Payment 가격 검증💸")
-    public CommonResponse<String> validatePayment(@RequestBody PaymentReq.ValidatePayment validatePayment){
-        paymentService.checkPayment(validatePayment);
-        return CommonResponse.onSuccess("결제 성공");
+    public CommonResponse<OrderRes.CompleteDonation> validatePayment(@RequestBody PaymentReq.ValidatePayment validatePayment){
+        return CommonResponse.onSuccess(paymentService.checkPayment(validatePayment));
     }
 
     @PostMapping("/refund")

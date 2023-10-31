@@ -47,8 +47,6 @@ public class DonationHistory extends BaseEntity {
     @Column(name="donationUserId")
     private Long donationUserId;
 
-    private String flameImage;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectId",nullable = false, insertable=false, updatable=false)
     private Project project;
@@ -59,5 +57,14 @@ public class DonationHistory extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "donationHistoryId")
     private List<HistoryImage> historyImages = new ArrayList<>();
+
+    @Column
+    @ElementCollection
+    private List<Long> completeIdLists;
+
+    @Column
+    @ElementCollection
+    private List<Long> changeIdLists;
+
 
 }

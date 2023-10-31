@@ -72,9 +72,9 @@ public class AdminDonationService {
 
     @Transactional
     public void enforceDonation(List<MultipartFile> imageLists, DonationReq.EnforceDonation enforceDonation) {
-        donationHistoryRepository.save(adminDonationConvertor.DonationHistoryChange(enforceDonation));
+        donationHistoryRepository.save(adminDonationConvertor.convertToDonationHistoryChange(enforceDonation));
 
-        DonationHistory donationHistory = donationHistoryRepository.save(adminDonationConvertor.DonationHistoryComplete(enforceDonation.getProjectId()));
+        DonationHistory donationHistory = donationHistoryRepository.save(adminDonationConvertor.convertToDonationHistoryComplete(enforceDonation.getProjectId(), enforceDonation.getDonationUserLists()));
 
         saveDonationHistoryImages(imageLists, donationHistory.getId());
 
@@ -96,7 +96,7 @@ public class AdminDonationService {
         List<HistoryImage> historyImages = new ArrayList<>();
 
         for(String image : images){
-            historyImages.add(adminDonationConvertor.HistoryImage(image, historyId));
+            historyImages.add(adminDonationConvertor.convertToHistoryImage(image, historyId));
         }
         historyImageRepository.saveAll(historyImages);
     }

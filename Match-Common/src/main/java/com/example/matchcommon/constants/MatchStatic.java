@@ -27,5 +27,10 @@ public class MatchStatic {
 
     public static final String PORT_ONE = "port_one";
 
+    public static final String EVENT_S3_DIR = "event";
+
+    public static final String NOTICE_S3_DIR = "notice";
+
+
 
 }

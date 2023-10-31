@@ -7,6 +7,7 @@ import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.enums.PayMethod;
 import com.example.matchdomain.donation.entity.enums.PaymentStatus;
 import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.donation.entity.flameEnum.FlameImage;
 import com.example.matchinfrastructure.pay.nice.dto.NiceBillOkRequest;
 import com.example.matchinfrastructure.pay.nice.dto.NiceBillOkResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
@@ -43,6 +44,7 @@ public class OrderConvertor {
                 .regularStatus(RegularStatus.REGULAR)
                 .projectId(projectId)
                 .regularPaymentId(regularPaymentId)
+                .flameImage(FlameImage.NORMAL_IMG.getImg())
                 .build();
     }
 

@@ -1,28 +1,29 @@
 package com.example.matchapi.order.helper;
 
+import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchcommon.annotation.Helper;
-import com.example.matchcommon.exception.BaseException;
-import com.example.matchcommon.properties.NicePayProperties;
+import com.example.matchdomain.donation.adaptor.DonationAdaptor;
+import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.enums.PayMethod;
 import com.example.matchdomain.donation.entity.flameEnum.Adjective;
 import com.example.matchdomain.donation.entity.flameEnum.AdjectiveFlame;
-import com.example.matchdomain.donation.repository.DonationUserRepository;
-import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
-import com.example.matchinfrastructure.pay.nice.dto.NicePayCancelRequest;
+import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.apache.commons.lang3.RandomStringUtils;
 
-import java.util.Base64;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Random;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.example.matchcommon.constants.MatchStatic.BASIC;
 
 @Helper
 @RequiredArgsConstructor
 public class OrderHelper {
-    private final NicePayProperties nicePayProperties;
-    private final NiceAuthFeignClient niceAuthFeignClient;
-    private final DonationUserRepository donationUserRepository;
+    private final DonationAdaptor donationAdaptor;
 
     public PayMethod getPayMethod(String value) {
         for (PayMethod payMethod : PayMethod.values()) {
@@ -33,27 +34,20 @@ public class OrderHelper {
         return null;
     }
 
-    public String getNicePaymentAuthorizationHeader() {
-        return BASIC + Base64.getEncoder().encodeToString((nicePayProperties.getClient() + ":" + nicePayProperties.getSecret()).getBytes());
+    public List<String> getInherenceName(List<DonationUser> donationUsers){
+        return donationUsers.stream()
+                .map(DonationUser :: getInherenceName).collect(Collectors.toList());
     }
 
-    public void checkNicePaymentsResult(String resultCode, String resultMessage) {
-        switch(resultCode){
-            case "0000":
-                break;
-            default:
-                throw new BaseException(HttpStatus.BAD_REQUEST,
-                        false,
-                        resultCode,
-                        resultMessage);
-        }
-    }
+    public String createFlameName(User user) {
+        List<DonationUser> donationUsers = donationAdaptor.findDonationListsByUser(user);
 
-    public String createFlameName(String name) {
+        List<String> inherenceNames = getInherenceName(donationUsers);
+
         String randomName;
         do {
-            randomName = name + "님의 " + getRandomEnumValue(AdjectiveFlame.class).getValue() + " " + getRandomEnumValue(Adjective.class).getValue() +  " 불꽃이";
-        } while (donationUserRepository.existsByInherenceName(randomName));
+            randomName = user.getName() + "님의 " + getRandomEnumValue(AdjectiveFlame.class).getValue() + " " + getRandomEnumValue(Adjective.class).getValue() +  " 불꽃이";
+        } while (inherenceNames.contains(randomName));
 
         return randomName;
     }
@@ -65,24 +59,44 @@ public class OrderHelper {
         return values[random.nextInt(values.length)];
     }
 
-    public void checkBillResult(String resultCode, String resultMsg, String tid, String orderId) {
-        switch(resultCode){
-            case "0000":
-                niceAuthFeignClient.cancelPayment(getNicePaymentAuthorizationHeader(), tid, new NicePayCancelRequest("결재 확인 완료 취소", orderId));
-                break;
-            default:
-                throw new BaseException(HttpStatus.BAD_REQUEST,
-                        false,
-                        resultCode,
-                        resultMsg);
-        }
-    }
-
     public String maskMiddleNum(String cardNo) {
         String firstFourDigits = cardNo.substring(0, 4);
         String lastFourDigits = cardNo.substring(12);
         String middleDigitsMasked = "********";
 
         return firstFourDigits + middleDigitsMasked + lastFourDigits;
+    }
+
+    public String createOrderId(String type){
+        boolean useLetters = true;
+        boolean useNumbers = true;
+        String randomStr = RandomStringUtils.random(12, useLetters, useNumbers);
+        return type + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "-" + randomStr;
+    }
+
+    public OrderRes.CreateInherenceDto createInherence(User user) {
+
+        String flameName = createFlameName(user);
+
+        String inherenceNumber = createRandomUUID();
+
+        return new OrderRes.CreateInherenceDto(flameName, inherenceNumber);
+    }
+
+    public String createRandomUUID() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + UUID.randomUUID();
+    }
+
+    public String formatString(String input, int length) {
+        StringBuilder formatted = new StringBuilder();
+
+        for (int i = 0; i < input.length(); i++) {
+            if (i > 0 && i % length == 0) {
+                formatted.append('-');
+            }
+            formatted.append(input.charAt(i));
+        }
+
+        return formatted.toString();
     }
 }

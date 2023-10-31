@@ -27,10 +27,10 @@ public interface DonationHistoryRepository extends JpaRepository<DonationHistory
     @Query(value = "SELECT DH FROM DonationHistory DH " +
             "LEFT JOIN FETCH DH.donationUser DU " +
             "LEFT JOIN FETCH DU.user U " +
-            "where DU.projectId = :projectId or DH.projectId = :projectId ORDER BY DH.createdAt ASC",
+            "where DU.projectId = :projectId or DH.projectId = :projectId ORDER BY DH.createdAt DESC",
             countQuery = "SELECT COUNT(DH) FROM DonationHistory DH " +
                     "LEFT JOIN DH.donationUser DU " +
                     "LEFT JOIN DU.user U " +
                     "where DU.projectId = :projectId or DH.projectId = :projectId")
-    Page<DonationHistory> findByDonationUser_ProjectOrProjectIdIdOrderByCreatedAtAsc(@Param("projectId") Long projectId, Pageable pageable);
+    Page<DonationHistory> findByDonationUser_ProjectOrProjectIdIdOrderByCreatedAtDesc(@Param("projectId") Long projectId, Pageable pageable);
 }

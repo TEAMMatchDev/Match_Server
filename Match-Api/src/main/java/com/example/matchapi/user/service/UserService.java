@@ -1,5 +1,6 @@
 package com.example.matchapi.user.service;
 
+import com.example.matchapi.common.model.AlarmType;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchapi.project.convertor.ProjectConvertor;
@@ -16,6 +17,7 @@ import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
+import com.example.matchdomain.user.entity.enums.Alarm;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.exception.ModifyEmailCode;
 import com.example.matchdomain.user.repository.UserAddressRepository;
@@ -36,7 +38,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.matchapi.common.model.AlarmType.EVENT;
 import static com.example.matchcommon.constants.MatchStatic.*;
+import static com.example.matchdomain.user.entity.enums.Alarm.ACTIVE;
+import static com.example.matchdomain.user.entity.enums.Alarm.INACTIVE;
 import static com.example.matchdomain.user.exception.ModifyEmailCode.NOT_CORRECT_EMAIL;
 import static com.example.matchdomain.user.exception.ModifyPhoneErrorCode.NOT_CORRECT_PHONE;
 import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_PHONE;
@@ -48,9 +53,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserAddressRepository userAddressRepository;
     private final UserConvertor userConvertor;
-    private final DonationUserRepository donationUserRepository;
     private final ProjectConvertor projectConvertor;
-    private final ProjectHelper projectHelper;
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
     private final OrderService orderService;
     private final RegularPaymentRepository regularPaymentRepository;
@@ -68,31 +71,31 @@ public class UserService {
     }
 
     public UserRes.EditMyPage getEditMyPage(User user) {
-        return userConvertor.toMyPage(user);
+        return userConvertor.convertToMyPage(user);
     }
 
     public UserRes.MyPage getMyPage(User user) {
         List<RegularPayment> regularPayments = regularPaymentRepository.findByUser(user);
         Long projectAttentionCnt = projectUserAttentionRepository.countById_userId(user.getId());
 
-        return projectConvertor.getMyPage(regularPayments,projectAttentionCnt, user.getName());
+        return projectConvertor.getMyPage(regularPayments,projectAttentionCnt, user.getNickname());
     }
 
     public OrderRes.UserDetail getUserInfo(User user) {
-        return userConvertor.userInfo(user);
+        return userConvertor.convertToUserInfo(user);
     }
 
     public UserRes.SignUpInfo getUserSignUpInfo() {
         LocalDate localDate = LocalDate.now();
-        LocalDateTime localDateTime = LocalDateTime.now();
         Long totalUser = userRepository.countBy();
         Long oneDayUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate+FIRST_TIME), LocalDateTime.parse(localDate+LAST_TIME));
         Long weekUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.minusWeeks(1)+FIRST_TIME) , LocalDateTime.parse(localDate+LAST_TIME));
         Long monthUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME), LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME));
 
-        return userConvertor.UserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
+        return userConvertor.convertToUserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
     }
 
+    @Transactional
     public PageResponse<List<UserRes.UserList>> getUserList(int page, int size, Status status, String content) {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserRepository.UserList> userList = null;
@@ -113,7 +116,7 @@ public class UserService {
 
         userList.getContent().forEach(
                 result -> userLists.add(
-                        userConvertor.UserList(result)
+                        userConvertor.convertToUserList(result)
                 )
         );
 
@@ -126,13 +129,14 @@ public class UserService {
         List<OrderRes.UserBillCard> userCards = orderService.getUserBillCard(userId);
 
 
-        return userConvertor.UserAdminDetail(userDetail,userCards);
+        return userConvertor.convertToUserAdminDetail(userDetail,userCards);
     }
 
     public UserRes.Profile getProfile(User user) {
-        return userConvertor.UserProfile(user);
+        return userConvertor.convertToUserProfile(user);
     }
 
+    @Transactional
     public void modifyUserProfile(User user, UserReq.ModifyProfile modifyProfile) {
         if(modifyProfile.getName() == null && modifyProfile.getMultipartFile()!=null){
             String beforeProfileImg = user.getProfileImgUrl();
@@ -143,7 +147,8 @@ public class UserService {
             user.setProfileImgUrl(newProfileImg);
         }
         else if(modifyProfile.getMultipartFile() == null && modifyProfile.getName()!=null){
-            user.setName(modifyProfile.getName());
+            System.out.println("유저 닉네임 편집");
+            user.setNickname(modifyProfile.getName());
         }
         else if (modifyProfile.getMultipartFile() != null){
             String beforeProfileImg = user.getProfileImgUrl();
@@ -158,7 +163,7 @@ public class UserService {
     }
 
     public void saveFcmToken(User user, UserReq.FcmToken token) {
-        userFcmTokenRepository.save(userConvertor.UserFcm(user, token));
+        userFcmTokenRepository.save(userConvertor.convertToUserFcm(user, token));
     }
 
     public void deleteFcmToken(Long userId, String deviceId) {
@@ -180,5 +185,34 @@ public class UserService {
         if(userRepository.existsByEmail(email.getNewEmail())) throw new BadRequestException(ModifyEmailCode.USERS_EXISTS_EMAIL);
         user.setEmail(email.getNewEmail());
         userRepository.save(user);
+    }
+
+    public UserRes.AlarmAgreeList getAlarmAgreeList(User user) {
+        System.out.println(user.getName());
+        return userConvertor.convertToAlarmAgree(user);
+    }
+
+    public UserRes.AlarmAgreeList patchAlarm(User user, AlarmType alarmType) {
+        if(alarmType.equals(EVENT)){
+            Alarm alarm = user.getEventAlarm();
+            if(alarm == ACTIVE){
+                user.setEventAlarm(INACTIVE);
+            }
+            else{
+                user.setEventAlarm(ACTIVE);
+            }
+        }else{
+            Alarm alarm = user.getServiceAlarm();
+            if(alarm == ACTIVE){
+                user.setServiceAlarm(INACTIVE);
+            }
+            else{
+                user.setServiceAlarm(ACTIVE);
+            }
+        }
+
+        user = userRepository.save(user);
+
+        return userConvertor.convertToAlarmAgree(user);
     }
 }

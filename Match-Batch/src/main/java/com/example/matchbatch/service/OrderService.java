@@ -64,7 +64,7 @@ public class OrderService {
         int amount = 0;
         int successCnt = 0;
 
-        discordFeignClient.alertMessage(discordConvertor.AlertBatchMessage("정기 결제 스케줄러 시작", regularPayments.size()));
+        discordFeignClient.alertMessage(discordConvertor.convertToAlertBatchMessage("정기 결제 스케줄러 시작", regularPayments.size()));
 
         String accessToken = portOneAuthService.getTokens();
 
@@ -83,7 +83,7 @@ public class OrderService {
 
                     String orderId = REGULAR + createRandomOrderId();
 
-                    PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(accessToken, portOneConvertor.PayWithBillKey(userCard.getBid(), orderId, regularPayment.getAmount(), LocalDateTime.now().getDayOfMonth() + "월 달 " +"MATCH 기부금 정기 결제", userCard.getCustomerId()));
+                    PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(accessToken, portOneConvertor.convertPayWithBillKey(userCard.getBid(), orderId, regularPayment.getAmount(), LocalDateTime.now().getDayOfMonth() + "월 달 " +"MATCH 기부금 정기 결제", userCard.getCustomerId()));
 
 
                     String flameName = orderHelper.createFlameName(regularPayment.getUser().getName());
@@ -102,7 +102,7 @@ public class OrderService {
             }
             donationHistoryRepository.saveAll(donationHistories);
             regularPaymentHistoryRepository.saveAll(requestPaymentHistories);
-            discordFeignClient.alertMessage(discordConvertor.AlertFinishMessage("정기 결제 스케줄러 종료", amount, regularPayments.size(),successCnt, trueCnt));
+            discordFeignClient.alertMessage(discordConvertor.convertToAlertFinishMessage("정기 결제 스케줄러 종료", amount, regularPayments.size(),successCnt, trueCnt));
 
         }
     }
@@ -156,14 +156,14 @@ public class OrderService {
         int trueCnt = 0;
         int successCnt = 0 ;
         String accessToken = portOneAuthService.getTokens();
-        discordFeignClient.alertMessage(discordConvertor.AlertBatchMessage("정기 결제 실패 한 리스트 스케줄러가 시작",  requestPaymentHistories.size()));
+        discordFeignClient.alertMessage(discordConvertor.convertToAlertBatchMessage("정기 결제 실패 한 리스트 스케줄러가 시작",  requestPaymentHistories.size()));
 
         for(RequestPaymentHistory requestPaymentHistory : requestPaymentHistories){
             RegularPayment regularPayment = requestPaymentHistory.getRegularPayment();
             UserCard userCard = requestPaymentHistory.getUserCard();
             String orderId = REGULAR + createRandomOrderId();
 
-            PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(accessToken, portOneConvertor.PayWithBillKey(userCard.getBid(), orderId, regularPayment.getAmount(), LocalDateTime.now().getDayOfMonth() + "월 달 " +"MATCH 기부금 정기 결제", userCard.getCustomerId()));
+            PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(accessToken, portOneConvertor.convertPayWithBillKey(userCard.getBid(), orderId, regularPayment.getAmount(), LocalDateTime.now().getDayOfMonth() + "월 달 " +"MATCH 기부금 정기 결제", userCard.getCustomerId()));
 
             trueCnt +=1 ;
 
@@ -185,7 +185,7 @@ public class OrderService {
 
         donationUserRepository.saveAll(donationUsers);
 
-        discordFeignClient.alertMessage(discordConvertor.AlertFinishMessage("실패한 정기 결제 스케줄러가 종료", amount, requestPaymentHistories.size(),successCnt,trueCnt));
+        discordFeignClient.alertMessage(discordConvertor.convertToAlertFinishMessage("실패한 정기 결제 스케줄러가 종료", amount, requestPaymentHistories.size(),successCnt,trueCnt));
 
     }
 

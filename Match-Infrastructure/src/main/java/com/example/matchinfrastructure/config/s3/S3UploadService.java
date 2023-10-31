@@ -1,9 +1,7 @@
 package com.example.matchinfrastructure.config.s3;
 
 
-import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.*;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.ForbiddenException;
@@ -11,16 +9,15 @@ import com.example.matchcommon.exception.InternalServerException;
 import com.example.matchcommon.properties.AwsS3Properties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.example.matchcommon.exception.errorcode.FileUploadException.*;
@@ -150,8 +147,6 @@ public class S3UploadService {
             boolean isObjectExist = amazonS3.doesObjectExist(awsS3Properties.getS3().getBucket(), fileRoute);
             if (isObjectExist) {
                 amazonS3.deleteObject(awsS3Properties.getS3().getBucket(),fileRoute);
-            } else {
-                throw new InternalServerException(IMAGE_DELETE_ERROR);
             }
         } catch (Exception e) {
             throw new InternalServerException(IMAGE_DELETE_ERROR);
@@ -172,5 +167,64 @@ public class S3UploadService {
             throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
         }
         return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
+    }
+
+    public String uploadBannerImage(MultipartFile bannerImage) {
+        String fileName = getForBannerFileName(getFileExtension(bannerImage.getOriginalFilename()));
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(bannerImage.getSize());
+        objectMetadata.setContentType(bannerImage.getContentType());
+
+        try (InputStream inputStream = bannerImage.getInputStream()) {
+            amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+        } catch (IOException e) {
+            throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
+        }
+        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
+    }
+
+    private String getForBannerFileName(String fileExtension) {
+        return "banner/"
+                + UUID.randomUUID()
+                + fileExtension;
+    }
+
+    public String uploadByteCode(String s3FileName, byte[] thumbnailBytes) {
+        ObjectMetadata metadata = new ObjectMetadata();
+
+        metadata.setContentLength(thumbnailBytes.length);
+        metadata.setContentType("image/jpeg");
+
+        amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(),s3FileName,new ByteArrayInputStream(thumbnailBytes),metadata));
+
+        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(),s3FileName).toString();
+    }
+
+
+    public String uploadByteCodeOne(String dirName, byte[] thumbnailBytes) {
+        String s3FileName=dirName+"/"+UUID.randomUUID().toString()+".jpg";
+
+        return uploadByteCode(s3FileName, thumbnailBytes);
+    }
+
+    public String uploadOneImg(String dirName, MultipartFile imgFile) {
+        String fileName = getForOneFileName(dirName, getFileExtension(Objects.requireNonNull(imgFile.getOriginalFilename())));
+
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(imgFile.getSize());
+        objectMetadata.setContentType(imgFile.getContentType());
+
+        try (InputStream inputStream = imgFile.getInputStream()) {
+            amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+        } catch (IOException e) {
+            throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
+        }
+        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
+    }
+
+    private String getForOneFileName(String dirName, String fileExtension) {
+        return  dirName+"/"
+                + UUID.randomUUID()
+                + fileExtension;
     }
 }

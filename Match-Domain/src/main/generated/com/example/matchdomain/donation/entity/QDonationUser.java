@@ -31,6 +31,10 @@ public class QDonationUser extends EntityPathBase<DonationUser> {
 
     public final EnumPath<com.example.matchdomain.donation.entity.enums.DonationStatus> donationStatus = createEnum("donationStatus", com.example.matchdomain.donation.entity.enums.DonationStatus.class);
 
+    public final StringPath flameImage = createString("flameImage");
+
+    public final EnumPath<com.example.matchdomain.donation.entity.flameEnum.FlameType> flameType = createEnum("flameType", com.example.matchdomain.donation.entity.flameEnum.FlameType.class);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath inherenceName = createString("inherenceName");

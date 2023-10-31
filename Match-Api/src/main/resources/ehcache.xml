@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="false">
+
+    <diskStore path="java.io.tmpdir" />
+
+    <cache name="keywordList"
+           maxEntriesLocalHeap="100"
+           maxEntriesLocalDisk="100"
+           eternal="false"
+           diskSpoolBufferSizeMB="5"
+           timeToIdleSeconds="900"
+           timeToLiveSeconds="900"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off">
+        <persistence strategy="localTempSwap" />
+    </cache>
+
+    <cache name="portOneTokenCache"
+           maxEntriesLocalHeap="100"
+           maxEntriesLocalDisk="100"
+           eternal="false"
+           diskSpoolBufferSizeMB="5"
+           timeToIdleSeconds="900"
+           timeToLiveSeconds="900"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off">
+        <persistence strategy="localTempSwap" />
+    </cache>
+
+    <cache name="bannerCache"
+           maxEntriesLocalHeap="100"
+           maxEntriesLocalDisk="100"
+           eternal="false"
+           diskSpoolBufferSizeMB="5"
+           timeToIdleSeconds="900"
+           timeToLiveSeconds="900"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off">
+        <persistence strategy="localTempSwap" />
+    </cache>
+
+    <cache name="eventCache"
+           maxEntriesLocalHeap="100"
+           maxEntriesLocalDisk="100"
+           eternal="false"
+           diskSpoolBufferSizeMB="5"
+           timeToIdleSeconds="900"
+           timeToLiveSeconds="900"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off">
+        <persistence strategy="localTempSwap" />
+    </cache>
+
+    <cache name="noticeCache"
+           maxEntriesLocalHeap="100"
+           maxEntriesLocalDisk="100"
+           eternal="false"
+           diskSpoolBufferSizeMB="5"
+           timeToIdleSeconds="900"
+           timeToLiveSeconds="900"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off">
+        <persistence strategy="localTempSwap" />
+    </cache>
+
+    <cache name="flameCache"
+           maxEntriesLocalHeap="1000"
+           maxEntriesLocalDisk="1000"
+           eternal="false"
+           diskSpoolBufferSizeMB="10"
+           timeToIdleSeconds="30"
+           timeToLiveSeconds="30"
+           memoryStoreEvictionPolicy="LRU"
+           transactionalMode="off">
+        <persistence strategy="localTempSwap" />
+    </cache>
+</ehcache>
