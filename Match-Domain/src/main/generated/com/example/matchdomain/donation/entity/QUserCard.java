@@ -36,6 +36,8 @@ public class QUserCard extends EntityPathBase<UserCard> {
 
     public final StringPath cardPw = createString("cardPw");
 
+    public final StringPath code = createString("code");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 

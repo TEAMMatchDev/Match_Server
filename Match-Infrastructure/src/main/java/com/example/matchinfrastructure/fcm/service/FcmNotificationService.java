@@ -59,7 +59,8 @@ public class FcmNotificationService {
                 .setNotification(notification)
                 .build();
         try {
-            FirebaseMessaging.getInstance().send(message);
+            String result = FirebaseMessaging.getInstance().send(message);
+            System.out.println(result);
         } catch (FirebaseMessagingException e) {
             throw new RuntimeException(e);
         }
