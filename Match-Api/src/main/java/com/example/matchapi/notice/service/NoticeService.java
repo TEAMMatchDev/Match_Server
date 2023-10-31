@@ -19,7 +19,7 @@ public class NoticeService {
     private final NoticeAdapter noticeAdapter;
 
 
-    @Cacheable(value = "noticeCache", key = "{#page, #size}")
+    @Cacheable(value = "noticeCache", key = "{#page, #size}", cacheManager = "ehcacheManager")
     public PageResponse<List<NoticeRes.NoticeList>> getNoticeList(int page, int size) {
         Page<Notice> notices = noticeAdapter.getNoticeList(page, size);
         return new PageResponse<>(notices.isLast(), notices.getTotalElements(), noticeConvertor.convertToNoticeList(notices.getContent()));

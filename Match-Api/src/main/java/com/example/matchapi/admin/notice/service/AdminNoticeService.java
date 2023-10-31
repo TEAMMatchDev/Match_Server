@@ -16,7 +16,7 @@ public class AdminNoticeService {
     private final NoticeRepository noticeRepository;
     private final NoticeContentRepository noticeContentRepository;
 
-    @CacheEvict(value = "noticeCache", allEntries = true)
+    @CacheEvict(value = "noticeCache", allEntries = true, cacheManager = "ehcacheManager")
     public void uploadNoticeList(List<NoticeContent> noticeContents, Notice notice) {
         notice = noticeRepository.save(notice);
 

@@ -19,7 +19,7 @@ public class EventService {
     private final EventConvertor eventConvertor;
     private final EventAdaptor eventAdaptor;
 
-    @Cacheable(value = "eventCache", key = "{#page, #size}")
+    @Cacheable(value = "eventCache", key = "{#page, #size}", cacheManager = "ehcacheManager")
     public PageResponse<List<EventRes.EventList>> getEventList(int page, int size) {
         Page<Event> events = eventAdaptor.findEvent(page, size);
         List<EventRes.EventList> eventLists = cachingEventLists(events.getContent());

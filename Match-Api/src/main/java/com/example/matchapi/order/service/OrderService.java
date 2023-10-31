@@ -22,13 +22,13 @@ import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.redis.repository.OrderRequestRepository;
 import com.example.matchdomain.user.adaptor.UserCardAdaptor;
 import com.example.matchdomain.user.entity.User;
-import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import com.example.matchinfrastructure.pay.portone.convertor.PortOneConvertor;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOnePrepareReq;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
+import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
@@ -172,7 +172,7 @@ public class OrderService {
         regularPaymentRepository.saveAll(regularPayments);
     }
 
-    @RedissonLock(LockName = "유저-카드-등록", key = "#user")
+    @RedissonLock(LockName = "유저-카드-등록", key = "#user.id")
     public PortOneBillResponse postCard(User user, OrderReq.RegistrationCard registrationCard) {
         String accessToken = portOneAuthService.getToken();
         String cardNo = orderHelper.formatString(registrationCard.getCardNo(), 4);
@@ -186,6 +186,8 @@ public class OrderService {
         if(portOneResponse.getCode()!=0){
             throw new BaseException(BAD_REQUEST, false, "PORT_ONE_BILL_AUTH_001", portOneResponse.getMessage());
         }
+
+        System.out.println(portOneResponse.getResponse().getCard_code());
         userCardRepository.save(orderConvertor.convertToUserBillCard(user.getId(), registrationCard, portOneResponse.getResponse()));
 
         return portOneResponse.getResponse();

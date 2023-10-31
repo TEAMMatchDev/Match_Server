@@ -74,7 +74,7 @@ public class OrderConvertor {
                 .idNo(registrationCard.getIdNo())
                 .cardPw(registrationCard.getCardPw())
                 .cardCode(CardCode.getNameByCode(portOneBillResponse.getCard_code()))
-                .cardName(portOneBillResponse.getCard_name())
+                .cardName(portOneBillResponse.getCard_code())
                 .customerId(portOneBillResponse.getCustomer_id())
                 .cardAbleStatus(CardAbleStatus.ABLE)
                 .build();
@@ -115,14 +115,14 @@ public class OrderConvertor {
         userCards.forEach(
                 result -> {
                     userBillCards.add(
-                            new OrderRes.UserBillCard(
-                                    result.getId(),
-                                    result.getCardCode().getName(),
-                                    result.getCardName(),
-                                    orderHelper.maskMiddleNum(result.getCardNo()),
-                                    result.getCardAbleStatus().getName()
-                            )
-                    );
+                            OrderRes.UserBillCard
+                                    .builder()
+                                    .id(result.getId())
+                                    .cardCode(result.getCardCode().getCode())
+                                    .cardNo(orderHelper.maskMiddleNum(result.getCardNo()))
+                                    .cardAbleStatus(result.getCardAbleStatus().getName())
+                                    .build()
+                            );
                 }
         );
         return userBillCards;

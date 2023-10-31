@@ -24,13 +24,13 @@ public class AdminKeywordService {
     private final AdminKeywordConvertor adminKeywordConvertor;
 
     @Transactional
-    @CachePut(cacheNames = "keywordList", key = "'all'")
+    @CachePut(cacheNames = "keywordList", key = "'all'", cacheManager = "ehcacheManager")
     public List<KeywordRes.KeywordList> postKeyword(AdminKeywordReq.KeywordUpload keyword) {
         searchKeywordRepository.save(adminKeywordConvertor.convertToKeyword(keyword));
         return cachingKeywordList();
     }
 
-    @CacheEvict(cacheNames = "keywordList")
+    @CacheEvict(cacheNames = "keywordList", cacheManager = "ehcacheManager")
     public List<KeywordRes.KeywordList> cachingKeywordList(){
         List<SearchKeyword> searchKeywords = searchKeywordRepository.findAllByOrderByPriorityAsc();
         List<KeywordRes.KeywordList> keywordLists = new ArrayList<>();

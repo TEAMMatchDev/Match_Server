@@ -25,6 +25,7 @@ import com.example.matchdomain.user.repository.UserFcmTokenRepository;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -137,6 +138,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = "userCache", key = "#user.id", cacheManager = "redisCacheManager")
     public void modifyUserProfile(User user, UserReq.ModifyProfile modifyProfile) {
         if(modifyProfile.getName() == null && modifyProfile.getMultipartFile()!=null){
             String beforeProfileImg = user.getProfileImgUrl();
@@ -192,6 +194,7 @@ public class UserService {
         return userConvertor.convertToAlarmAgree(user);
     }
 
+    @CacheEvict(value = "userCache", key = "#user.id", cacheManager = "redisCacheManager")
     public UserRes.AlarmAgreeList patchAlarm(User user, AlarmType alarmType) {
         if(alarmType.equals(EVENT)){
             Alarm alarm = user.getEventAlarm();

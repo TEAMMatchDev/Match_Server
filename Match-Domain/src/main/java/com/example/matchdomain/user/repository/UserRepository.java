@@ -47,7 +47,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
             "FROM User U order by createdAt desc" ,nativeQuery = true, countQuery = "select count(*) from User")
     Page<UserList> getUserList(Pageable pageable);
 
-    Optional<User> findByIdAndStatus(Long aLong, Status status);
+    Optional<User> findByIdAndStatus(Long userId, Status status);
 
     @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email," +
             "If((select exists (select * from UserCard UC where UC.userId=U.id)),'true','false')'card'," +

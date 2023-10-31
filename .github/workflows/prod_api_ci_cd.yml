@@ -4,13 +4,14 @@ on:
   push:
     tags:
       - Api-Release-v*.*.*
-    #tags:
-    # - Dev-Api-v*.*.*
   workflow_dispatch: # 수동 실행 옵션 (생략)
 
 jobs:
   build:
     runs-on: ubuntu-latest # action 스크립트가 작동될 OS
+
+    outputs:
+      version: ${{ steps.get_version.outputs.BRANCH_NAME }}
 
     steps: # 작업 단계
       - name: Checkout source code #  단계별 이름, 구분자로 소스를 가져옴

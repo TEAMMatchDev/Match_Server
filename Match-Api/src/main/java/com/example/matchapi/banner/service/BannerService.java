@@ -16,7 +16,7 @@ public class BannerService {
     private final BannerAdaptor bannerAdaptor;
     private final BannerConvertor bannerConvertor;
 
-    @Cacheable(cacheNames = "bannerCache", key = "'all'")
+    @Cacheable(cacheNames = "bannerCache", key = "'all'", cacheManager = "ehcacheManager")
     public List<BannerRes.BannerList> getBannerList() {
         List<Banner> banners = bannerAdaptor.getBannerList();
         return bannerConvertor.convertToBannerList(banners);

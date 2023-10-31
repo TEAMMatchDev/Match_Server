@@ -1,15 +1,13 @@
 package com.example.matchinfrastructure.pay.portone.service;
 
 import com.example.matchcommon.properties.PortOneProperties;
-import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneAuth;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOneAuthReq;
+import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
