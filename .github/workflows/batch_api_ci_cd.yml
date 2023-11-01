@@ -21,43 +21,67 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Set Environment - Common Yml
+      - name: Set Environment - Common Prod Yml
         uses: microsoft/variable-substitution@v1
         with:
           files: ./Match-Common/src/main/resources/application-common.yml
         env:
-          oauth.kakao.base-url: ${{ secrets.KAKAO_BASE_URL }}
+          oauth.kakao.base-url: ${{ secrets.KAKAO_PROD_BASE_URL }}
           oauth.kakao.client-id: ${{ secrets.KAKAO_CLIENT }}
           oauth.kakao.client-secret: ${{ secrets.KAKAO_SECRET }}
-          oauth.kakao.redirect-url: ${{ secrets.KAKAO_REDIRECT }}
+          oauth.kakao.redirect-url: ${{ secrets.KAKAO_PROD_REDIRECT }}
           oauth.kakao.app-id: ${{ secrets.KAKAO_APP_ID }}
           oauth.kakao.admin-key: ${{ secrets.KAKAO_ADMIN_KEY }}
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
           jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
           oauth.naver.secret: ${{ secrets.NAVER_SECRET }}
           oauth.naver.client: ${{ secrets.NAVER_CLIENT }}
-          oauth.naver.redirect-url: ${{ secrets.NAVER_REDIRECT}}
+          oauth.naver.redirect-url: ${{ secrets.NAVER_PROD_REDIRECT}}
           sms.secret: ${{ secrets.SMS_SECRET_KEY }}
           sms.api: ${{ secrets.SMS_API_KEY }}
           sms.sender: ${{ secrets.SMS_SENDER }}
-          nice.secret: ${{ secrets.NICE_SECRET_KEY}}
-          nice.client: ${{ secrets.NICE_CLIENT_KEY }}
-          nice.url: ${{ secrets.NICE_DEV_URL}}
+          nice.secret: ${{ secrets.NICE_PROD_SECRET_KEY}}
+          nice.client: ${{ secrets.NICE_PROD_CLIENT_KEY }}
+          nice.url: ${{ secrets.NICE_PROD_URL}}
           aws.access-key: ${{ secrets.AWS_S3_ACCESS_KEY }}
           aws.secret-key: ${{ secrets.AWS_S3_SECRET_KEY }}
           aws.s3.bucket: ${{ secrets.AWS_S3_BUCKET }}
           aws.s3.bucket-url: ${{ secrets.AWS_S3_BASE_URL }}
+          discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
+          discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
+          web.return.url: ${{ secrets.PROD_RETURN_URL }}
+          match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
+          server.host: ${{ secrets.PROD_SERVER_HOST}}
+          spring.password: ${{ secrets.APP_PASSWORD}}
+          aligo.username: ${{ secrets.ALIGO_USERNAME }}
+          aligo.key: ${{ secrets.ALIGO_KEY }}
+          portone.code: ${{ secrets.PORTONE_CODE }}
+          portone.key: ${{ secrets.PORTONE_KEY }}
+          portone.secret: ${{ secrets.PORTONE_SECRET }}
+          portone.billmid: ${{ secrets.PROD_PORTONE_BILL_MID}}
 
 
-      - name: Set Environment Domain - Domain DEV Yml
+
+      - name: Set Environment Domain - Domain Prod Yml
         uses: microsoft/variable-substitution@v1
         with:
-          files: ./Match-Domain/src/main/resources/application-domain-dev.yml
+          files: ./Match-Domain/src/main/resources/application-domain-prod.yml
         env:
-          spring.datasource.url: ${{ secrets.DB_URL_HOST }}
-          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
-          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
-          spring.redis.host : ${{ secrets.REDIS_DEV_HOST }}
+          spring.datasource.master.hikari.jdbc-url: ${{ secrets.PROD_DB_URL_HOST }}
+          spring.datasource.master.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.master.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.datasource.slave.hikari.jdbc-url: ${{ secrets.PROD_SLAVE_URL_HOST }}
+          spring.datasource.slave.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.slave.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.redis.host : ${{ secrets.REDIS_PROD_HOST }}
+
+      - name: create-fcm-json
+        id: create-fcm-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "serviceAccountKey.json"
+          json: ${{ secrets.FCM_JSON }}
+          dir: "Match-Common/src/main/resources/"
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -74,23 +98,19 @@ jobs:
           format: YYYYMMDDTHHmm
           utcOffset: "+09:00"
 
-      - name: Generate deployment package
-        run: |
-          mkdir -p deploy
-          cp Match-Batch/build/libs/*.jar deploy/match-batch.jar
-          cp Procfile deploy/Procfile
-          cp -r .ebextensions-dev deploy/.ebextensions
-          cp -r .platform deploy/.platform
-          cd deploy && zip -r match-batch-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
+      - name: Set up Docker Login
+        uses: docker/setup-buildx-action@v2
 
-      - name: Deploy Consumer to EB
-        uses: einaregilsson/beanstalk-deploy@v19
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: match-batch
-          environment_name: Match-batch-env
-          version_label: match-batch-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
-          region: ap-northeast-2
-          deployment_package: deploy/match-batch-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
-          wait_for_deployment: false
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: trigger jenkins job.
+        uses: appleboy/jenkins-action@master
+        with:
+          url: ${{ secrets.WEBHOOK_URL }}
+          user: "matchadmin"
+          token: ${{ secrets.JENKINS_API_TOKEN }}
+          job: "match-batch"
