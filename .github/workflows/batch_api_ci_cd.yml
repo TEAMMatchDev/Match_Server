@@ -116,4 +116,4 @@ jobs:
           url: ${{ secrets.WEBHOOK_URL }}
           user: "matchadmin"
           token: ${{ secrets.JENKINS_API_TOKEN }}
-          job: "match-admin"
+          job: "match-batch"
