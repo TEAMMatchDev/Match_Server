@@ -21,8 +21,8 @@ public enum FileUploadException implements BaseErrorCode {
      */
     FILE_UPLOAD_EXCEPTION(BAD_REQUEST, "FILE001", "파일 형식이 잘못되었습니다."),
     FILE_UPLOAD_NOT_EMPTY(BAD_REQUEST, "FILE002", "파일이 비어있습니다."),
-    IMAGE_UPLOAD_ERROR(FORBIDDEN,"FILE003","파일 업로드에 실패했습니다.");
-
+    IMAGE_UPLOAD_ERROR(FORBIDDEN,"FILE003","파일 업로드에 실패했습니다."),
+    IMAGE_DELETE_ERROR(INTERNAL_SERVER_ERROR, "PROJECT_IMG005","이미지 삭제 실패");;
 
 
     private final HttpStatus httpStatus;

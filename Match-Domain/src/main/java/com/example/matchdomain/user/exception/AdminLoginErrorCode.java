@@ -15,7 +15,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @Getter
 @AllArgsConstructor
 public enum AdminLoginErrorCode implements BaseErrorCode {
-    NOT_AUTHORITY_USER(BAD_REQUEST, "ADMIN001", "관리자 권한을 갖고있지 않습니다.");
+    NOT_CORRECT_PASSWORD(BAD_REQUEST, "U002", "유저 비밀번호를 확인해주세요."),
+    NOT_EXIST_USER(BAD_REQUEST,"U009" , "해당 유저가 존재하지 않습니다."),
+    NOT_ADMIN(BAD_REQUEST,"U003","관리자 권한이 아닙니다.");
 
 
     private final HttpStatus httpStatus;

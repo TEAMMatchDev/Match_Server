@@ -3,8 +3,11 @@ package com.example.matchdomain.user.entity;
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.UserCard;
-import com.example.matchdomain.project.entity.ProjectUserAttention;
+import com.example.matchdomain.user.entity.enums.Alarm;
+import com.example.matchdomain.user.entity.enums.Gender;
+import com.example.matchdomain.user.entity.enums.SocialType;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,6 +27,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @DynamicUpdate
+@BatchSize(size = 100)
 @DynamicInsert
 public class User extends BaseEntity implements UserDetails {
     @Id
@@ -61,9 +65,6 @@ public class User extends BaseEntity implements UserDetails {
     private SocialType socialType = SocialType.NORMAL;
 
     @Enumerated(EnumType.STRING)
-    private UserStatus status = UserStatus.ACTIVE;
-
-    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -79,13 +80,22 @@ public class User extends BaseEntity implements UserDetails {
     @JoinColumn(name = "userId")
     private List<UserCard> userCard = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "userId")
+    @BatchSize(size = 10)
+    private List<UserFcmToken> userFcmTokens = new ArrayList<>();
+
     @Column(name = "logInAt")
     private LocalDateTime logInAt;
-
 
     @Column(name = "role")
     private String role;
 
+    @Enumerated(EnumType.STRING)
+    private Alarm serviceAlarm = Alarm.ACTIVE;
+
+    @Enumerated(EnumType.STRING)
+    private Alarm eventAlarm = Alarm.ACTIVE;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -130,6 +140,13 @@ public class User extends BaseEntity implements UserDetails {
         this.logInAt=now;
     }
 
+    public boolean isActivated() {
+        return true;
+    }
 
 
+    public void setModifyProfile(String newProfileImg, String name) {
+        this.profileImgUrl = newProfileImg;
+        this.nickname = name;
+    }
 }

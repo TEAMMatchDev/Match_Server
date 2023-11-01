@@ -2,12 +2,11 @@ package com.example.matchbatch;
 
 import com.example.matchcommon.annotation.Helper;
 import com.example.matchcommon.properties.NicePayProperties;
-import com.example.matchdomain.donation.entity.PayMethod;
+import com.example.matchdomain.donation.entity.enums.PayMethod;
 import com.example.matchdomain.donation.entity.flameEnum.Adjective;
 import com.example.matchdomain.donation.entity.flameEnum.AdjectiveFlame;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Base64;
 import java.util.Random;

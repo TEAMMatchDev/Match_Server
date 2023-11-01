@@ -9,10 +9,18 @@ spring:
     init:
       platform: mysql
   datasource:
-    url: ${DB_URL_HOST}
-    username: ${AWS_DB_USER_NAME}
-    password: ${AWS_DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    master:
+      hikari:
+        username: ${AWS_DB_USER_NAME}
+        password: ${AWS_DB_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: ${DB_URL_HOST}
+    slave:
+      hikari:
+        username: ${AWS_DB_USER_NAME}
+        password: ${AWS_DB_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: ${DEV_SLAVE_URL_HOST}
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     # create, update, create-drop, none 등의 옵션이 있습니다.
@@ -32,4 +40,5 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        default_batch_fetch_size: 1000
 

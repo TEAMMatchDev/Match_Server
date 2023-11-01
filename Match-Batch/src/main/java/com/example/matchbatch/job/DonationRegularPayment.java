@@ -24,14 +24,13 @@ public class DonationRegularPayment { // Job 정의
 
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
-    private final RegularPaymentRepository regularPaymentRepository;
     private final OrderService orderService;
     private static final String JOB_NAME = "정기 구독(기부) 결제";
 
 
     @Bean
     public Job regularPaymentJob() {
-        log.info("job start");
+        log.info(JOB_NAME + " job start");
 
         return jobBuilderFactory.get(JOB_NAME)
                 .start(regularPaymentStep())
@@ -42,7 +41,7 @@ public class DonationRegularPayment { // Job 정의
         return stepBuilderFactory.get(JOB_NAME+"step")
                 .tasklet((contribution, chunkContext) -> {
                     log.info("Step!");
-                    orderService.regularDonationPayment();
+                    //orderService.regularDonationPayment();
 
                     return RepeatStatus.FINISHED;
                 })

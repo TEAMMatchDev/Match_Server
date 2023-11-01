@@ -11,7 +11,15 @@ import org.springframework.context.annotation.Configuration;
         NaverProperties.class,
         CoolSmsProperties.class,
         NicePayProperties.class,
-        RedisProperties.class
+        RedisProperties.class,
+        DiscordProperties.class,
+        AligoProperties.class,
+        AwsS3Properties.class,
+        EmailPasswordProperties.class,
+        MatchAligoUrl.class,
+        ServerHostProperties.class,
+        WebReturnUrl.class,
+        PortOneProperties.class
 })
 @Configuration
 public class ConfigurationPropertiesConfig {}

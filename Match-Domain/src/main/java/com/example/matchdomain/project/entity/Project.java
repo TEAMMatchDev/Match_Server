@@ -2,14 +2,18 @@ package com.example.matchdomain.project.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.donation.entity.RegularStatus;
+import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
+import com.example.matchdomain.project.entity.enums.ProjectStatus;
+import com.example.matchdomain.project.entity.enums.TodayStatus;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +26,7 @@ import java.util.List;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
+@BatchSize(size = 100)
 public class Project extends BaseEntity {
     @Id
     @Column(name = "id")
@@ -49,14 +54,20 @@ public class Project extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProjectStatus projectStatus;
 
+    private String searchKeyword;
+
     @Enumerated(EnumType.STRING)
     private ProjectKind projectKind;
 
     @Enumerated(EnumType.STRING)
     private RegularStatus regularStatus;
 
+    @Enumerated(EnumType.STRING)
+    private TodayStatus todayStatus = TodayStatus.NOT_TODAY;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "projectId")
+    @BatchSize(size = 100)
     private List<DonationUser> donationUser = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -64,11 +75,25 @@ public class Project extends BaseEntity {
     @Fetch(FetchMode.JOIN)
     private List<ProjectImage> projectImage = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "projectId")
+    private List<RegularPayment> regularPayments = new ArrayList<>();
 
     public Project(Long id, String projectName, String usages, List<ProjectImage> projectImage) {
         this.id = id;
         this.usages = usages;
         this.projectName = projectName;
         this.projectImage = projectImage;
+    }
+
+    public void modifyProject(String projectName, String usages, String detail, RegularStatus regularStatus, LocalDateTime startDate, LocalDateTime endDate, ProjectKind projectKind, String searchKeyword) {
+        this.projectName = projectName;
+        this.usages = usages;
+        this.projectExplanation = detail;
+        this.regularStatus = regularStatus;
+        this.startedAt = startDate;
+        this.finishedAt = endDate;
+        this.projectKind = projectKind;
+        this.searchKeyword = searchKeyword;
     }
 }

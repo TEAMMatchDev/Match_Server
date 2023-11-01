@@ -1,174 +1,153 @@
 package com.example.matchapi.donation.service;
 
 import com.example.matchapi.donation.convertor.DonationConvertor;
+import com.example.matchapi.donation.convertor.RegularPaymentConvertor;
 import com.example.matchapi.donation.dto.DonationRes;
-import com.example.matchapi.order.service.OrderService;
+import com.example.matchapi.donation.helper.DonationHelper;
+import com.example.matchapi.portone.dto.PaymentReq;
+import com.example.matchapi.portone.service.PaymentService;
+import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchcommon.exception.BadRequestException;
-import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
-import com.example.matchdomain.donation.entity.DonationStatus;
-import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.adaptor.DonationAdaptor;
+import com.example.matchdomain.donation.adaptor.DonationHistoryAdaptor;
+import com.example.matchdomain.donation.adaptor.RegularPaymentAdaptor;
+import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
+import com.example.matchdomain.donation.repository.RegularPaymentRepository;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
+import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.example.matchdomain.donation.entity.DonationStatus.*;
-import static com.example.matchdomain.donation.exception.DonationListErrorCode.FILTER_NOT_EXIST;
+import static com.example.matchdomain.common.model.Status.ACTIVE;
+import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
+import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.PROCEEDING;
+import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.USER_CANCEL;
+import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_CORRECT_USER;
+import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_STATUS;
 import static com.example.matchdomain.donation.exception.DonationRefundErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
 public class DonationService {
-    private final DonationUserRepository donationUserRepository;
-    private final OrderService orderService;
     private final DonationConvertor donationConvertor;
+    private final RegularPaymentRepository regularPaymentRepository;
+    private final PaymentService paymentService;
+    private final RegularPaymentAdaptor regularPaymentAdaptor;
+    private final DonationAdaptor donationAdaptor;
+    private final DonationHistoryAdaptor donationHistoryAdaptor;
+    private final RegularPaymentConvertor regularPaymentConvertor;
+    private final DonationHelper donationHelper;
+
 
     public PageResponse<List<DonationRes.DonationList>> getDonationList(Long userId, int filter, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<DonationUser> donationUsers = null;
+        Page<DonationUser> donationUsers = donationAdaptor.findDonationList(userId, filter, page ,size);
 
-        List<DonationRes.DonationList> donationLists = new ArrayList<>();
-
-        if(filter == 0){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatusNot(userId, EXECUTION_REFUND, pageable);
-        }
-        else if(filter == 1){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatus(userId, DonationStatus.EXECUTION_BEFORE, pageable);
-        }
-        else if(filter == 2){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatus(userId, DonationStatus.EXECUTION_UNDER, pageable);
-
-        }else if(filter == 3){
-            donationUsers = donationUserRepository.findByUserIdAndDonationStatus(userId, DonationStatus.EXECUTION_SUCCESS, pageable);
-
-        }else{
-            throw new BadRequestException(FILTER_NOT_EXIST);
-        }
-
-        donationUsers.getContent().forEach(
-                result ->{
-                    donationLists.add(
-                            new DonationRes.DonationList(
-                                    result.getId(),
-                                    result.getDonationStatus().getName(),
-                                    result.getInherenceName(),
-                                    result.getRegularStatus().getName()
-                            )
-                    );
-                }
-        );
-
-
-
-        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), donationLists);
+        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(),  donationConvertor.convertToDonationList(donationUsers));
     }
 
     @Transactional
     public void refundDonation(User user, Long donationId) {
-        DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(() -> new NotFoundException(DONATION_NOT_EXIST));
+        DonationUser donationUser = donationAdaptor.findById(donationId);
+
         if(!donationUser.getUserId().equals(user.getId())) throw new BadRequestException(DONATION_NOT_CORRECT_USER);
+
         if(!donationUser.getDonationStatus().equals(EXECUTION_BEFORE)) throw new BadRequestException(CANNOT_DELETE_DONATION_STATUS);
-        orderService.cancelPayment(donationUser.getTid(), donationUser.getOrderId());
+
+        paymentService.refundPayment(donationUser.getTid());
+
         donationUser.setDonationStatus(EXECUTION_REFUND);
     }
 
-    //불꽃이 필터링 0 = 불꽃이 전체, 1 = 전달 전 불꽃이, 2 = 절달 중인 불꽃이, 3 = 전달 완료된 불꽃이
-    //정렬 필터링 0 = 최신순, 1 = 오래된 순, 2 = 기부금액 큰 순, 3 = 기부금액 작은 순
-    public PageResponse<List<DonationRes.FlameList>> getFlameList(User user, int page, int size, int flame, int order, String content) {
-        Pageable pageable = PageRequest.of(page, size);
+    public void cancelRegularPay(User user, Long regularId) {
+        RegularPayment regularPayment = regularPaymentAdaptor.findRegularPaymentByStatus(regularId, ACTIVE);
 
-        Page<DonationUser> donationUsers = null;
+        if(!regularPayment.getUserId().equals(user.getId())) throw new BadRequestException(REGULAR_PAY_NOT_CORRECT_USER);
+        if(!regularPayment.getRegularPayStatus().equals(PROCEEDING)) throw new BadRequestException(REGULAR_PAY_NOT_STATUS);
+        regularPayment.setRegularPayStatus(USER_CANCEL);
 
-        List<DonationRes.FlameList> flameLists = new ArrayList<>();
-
-        if(flame == 0){
-            if(content == null){
-                if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrderByCreatedAtAsc(user.getId(), EXECUTION_REFUND, pageable);
-                }
-                else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrderByCreatedAtDesc(user.getId(),EXECUTION_REFUND, pageable);
-                }
-                else if(order == 2){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrderByPriceDesc(user.getId(), EXECUTION_REFUND, pageable);
-                }
-                else if(order ==3){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrderByPriceAsc(user.getId(), EXECUTION_REFUND, pageable);
-                }
-            }
-            else{
-                if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByCreatedAtAsc(user.getId(), EXECUTION_REFUND, content, content, content, pageable);
-                }
-                else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByCreatedAtDesc(user.getId(), EXECUTION_REFUND, content, content, content, pageable);
-                }
-                else if(order == 2){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByPriceDesc(user.getId(), EXECUTION_REFUND, content, content, content, pageable);
-                }
-                else if(order ==3){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByPriceAsc(user.getId(), EXECUTION_REFUND, content, content, content, pageable);
-                }
-            }
-        }
-        else {
-            DonationStatus donationStatus = null;
-            if(flame == 1){
-                donationStatus = EXECUTION_BEFORE;
-            }
-            else if(flame ==2){
-                donationStatus = EXECUTION_UNDER;
-            }
-            else{
-                donationStatus = EXECUTION_SUCCESS;
-            }
-
-            if(content == null){
-                if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrderByCreatedAtAsc(user.getId(), donationStatus, pageable);
-                }
-                else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrderByCreatedAtDesc(user.getId(),donationStatus, pageable);
-                }
-                else if(order == 2){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrderByPriceDesc(user.getId(), donationStatus, pageable);
-                }
-                else if(order ==3){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrderByPriceAsc(user.getId(), donationStatus, pageable);
-                }
-            }
-            else{
-                if(order == 0 ){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByCreatedAtAsc(user.getId(), donationStatus, content, content, content, pageable);
-                }
-                else if(order == 1){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByCreatedAtDesc(user.getId(), donationStatus, content, content, content, pageable);
-                }
-                else if(order == 2){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByPriceDesc(user.getId(), donationStatus, content, content, content, pageable);
-                }
-                else if(order ==3){
-                    donationUsers = donationUserRepository.findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingOrderByPriceAsc(user.getId(), donationStatus, content, content, content, pageable);
-                }
-            }
-        }
-
-        donationUsers.getContent().forEach(
-                result -> flameLists.add(
-                        donationConvertor.Flame(result)
-                )
-        );
-
-
-        return new PageResponse<>(donationUsers.isLast(),donationUsers.getTotalElements(),flameLists);
+        regularPaymentRepository.save(regularPayment);
     }
+
+    public DonationRes.DonationCount getDonationCount(User user) {
+        List<DonationUser> donationUser = donationAdaptor.findByDonationCount(user);
+
+        return donationConvertor.convertToDonationCount(donationUser);
+    }
+
+    public PageResponse<List<DonationRes.BurningMatchRes>> getBurningMatch(User user, int page, int size) {
+        Page<DonationUserRepository.flameList> flameLists = donationAdaptor.findFlameList(user, page, size);
+
+        return new PageResponse<>(flameLists.isLast(), flameLists.getTotalElements(),  donationConvertor.BurningMatch(flameLists.getContent()));
+    }
+
+    @Transactional
+    public DonationRes.DonationRegular getDonationRegular(Long regularPayId, User user) {
+        RegularPayment regularPayment = regularPaymentAdaptor.findById(regularPayId);
+        return donationConvertor.convertToDonationRegular(regularPayment);
+    }
+
+    @Transactional
+    public PageResponse<List<DonationRes.DonationRegularList>> getDonationRegularList(Long regularPayId, User user, int page, int size) {
+        RegularPayment regularPayment = regularPaymentAdaptor.findById(regularPayId);
+        Page<DonationHistory> donationHistories = donationHistoryAdaptor.findDonationRegularList(regularPayId, regularPayment.getProjectId(), HistoryStatus.TURN_ON ,page, size);
+
+
+        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.convertToDonationRegularList(donationHistories.getContent(), ""));
+    }
+
+    public List<DonationRes.PayList> getPayList(User user, Long regularPayId) {
+        List<DonationUser> donationUsers = donationAdaptor.findPayList(regularPayId);
+
+        return donationConvertor.convertToPayList(donationUsers);
+    }
+
+    public PageResponse<List<DonationRes.FlameProjectList>> getFlameProjectList(User user, String content, int page, int size) {
+        Page<DonationUser> donationUsers = donationAdaptor.getFlameProjectList(user, content, page, size);
+
+        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), donationConvertor.convertToFlameProjectList(donationUsers.getContent()));
+    }
+
+    public PageResponse<List<DonationRes.DonationRegularList>> getFlameRegularList(Long donationId, User user, int page, int size) {
+        DonationUser donationUser = donationAdaptor.findById(donationId);
+
+        Page<DonationHistory> donationHistories = donationHistoryAdaptor.findDonationHistory(donationUser, donationId, page, size);
+
+        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.convertToDonationRegularList(donationHistories.getContent(), donationUser.getInherenceName()));
+    }
+
+    public DonationRes.DonationFlame getFlameRegular(Long donationId, User user) {
+        DonationUser donationUser = donationAdaptor.findById(donationId);
+        int sequence = donationHelper.getDonationSequence(donationUser, donationId);
+        return donationConvertor.convertToDonationFlame(sequence, donationUser);
+    }
+
+    public PageResponse<List<ProjectRes.MatchHistory>> getMatchHistory(User user, Long projectId, int page, int size) {
+        Page<DonationHistory> donationHistories = donationHistoryAdaptor.findMatchHistory(projectId, page, size);
+
+        return new PageResponse<>(donationHistories.isLast(), donationHistories.getTotalElements(), donationConvertor.convertToMatchHistory(donationHistories.getContent()));
+    }
+
+    public PageResponse<List<DonationRes.MatchList>> getUserMatchList(User user, int page, int size) {
+        Page<RegularPayment> regularPayments = regularPaymentAdaptor.findByUser(user, page, size);
+
+        return new PageResponse<>(regularPayments.isLast(), regularPayments.getTotalElements(), regularPaymentConvertor.convertToMatchList(regularPayments.getContent()));
+    }
+
+    @Cacheable(value = "flameCache", key = "{#user.id, #page, #size}", cacheManager = "ehcacheManager")
+    public PageResponse<List<DonationRes.BurningFlameDto>> getBurningFlameList(User user, int page, int size) {
+        Page<DonationUser> donationUsers = donationAdaptor.findByUser(user, page, size);
+        return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), regularPaymentConvertor.convertToBurningFlameList(donationUsers.getContent()));
+    }
+
 }

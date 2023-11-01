@@ -1,10 +1,11 @@
 package com.example.matchapi.user.dto;
 
 
-import com.example.matchdomain.user.entity.Gender;
+import com.example.matchdomain.user.entity.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import com.example.matchcommon.annotation.Enum;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.validation.constraints.*;
@@ -106,5 +107,82 @@ public class UserReq {
         @NotEmpty (message = "비밀번호를 입력해주세요")
         @Schema(description ="비밀번호",required = true,example = "1234")
         private String password;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class EditMyPage {
+        private String orgPassword;
+
+        private String newPassword;
+
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserEmailAuth {
+        private String email;
+
+        private String code;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserPhoneAuth {
+        private String phone;
+
+        private String code;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ModifyProfile {
+        @Schema(description = "이름", required = false, example = "이메누")
+        private String name;
+
+        @Schema(description="프로필 사진 변경",required =false,example = "프로필 사진 변경")
+        private MultipartFile multipartFile;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class FcmToken {
+        private String fcmToken;
+
+        private String deviceId;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ModifyPhone {
+        private String oldPhone;
+
+        private String newPhone;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ModifyEmail {
+        private String oldEmail;
+
+        private String newEmail;
     }
 }

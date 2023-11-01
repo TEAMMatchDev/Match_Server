@@ -41,7 +41,7 @@ public class NicePaymentAuth {
 
     private String payMethod;
 
-    private int amount;
+    private Long amount;
 
     private int balanceAmt;
 
@@ -72,7 +72,7 @@ public class NicePaymentAuth {
     private Card card;
     private Bank bank;
     private Vbank vbank;
-    private List<Coupon> coupon;
+    private Coupon coupon;
 
     private List<Cancels> cancels;
     @Getter
@@ -82,7 +82,7 @@ public class NicePaymentAuth {
     private static class Cancels{
         private String tid;
 
-        private int amount;
+        private Long amount;
 
         private String cancelledAt;
 
@@ -140,7 +140,7 @@ public class NicePaymentAuth {
 
         private String status;
 
-        private int amount;
+        private Long amount;
 
         private int taxFreeAmt;
 

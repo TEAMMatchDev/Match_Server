@@ -23,13 +23,11 @@ public class ProjectUserAttention extends BaseEntity {
     private ProjectUserAttentionPk id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId") // userId를 복합키와 매핑
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "userId", nullable = false, insertable = false, updatable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("projectId") // projectId를 복합키와 매핑
-    @JoinColumn(name = "projectId", nullable = false)
+    @JoinColumn(name = "projectId", nullable = false, insertable = false, updatable = false)
     private Project project;
 
 

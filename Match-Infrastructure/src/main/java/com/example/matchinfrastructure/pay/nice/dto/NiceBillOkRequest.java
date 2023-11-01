@@ -18,7 +18,7 @@ public class NiceBillOkRequest {
     //상품 이름
     private String goodsName;
     //결제금액
-    private int amount;
+    private Long amount;
     //고유번호
     private String orderId;
 

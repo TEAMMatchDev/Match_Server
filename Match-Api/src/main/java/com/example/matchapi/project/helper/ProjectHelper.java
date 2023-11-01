@@ -2,12 +2,14 @@ package com.example.matchapi.project.helper;
 
 import com.example.matchcommon.annotation.Helper;
 import com.example.matchdomain.project.entity.Project;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
-import static com.example.matchdomain.project.entity.ProjectStatus.PROCEEDING;
+import static com.example.matchdomain.project.entity.enums.ProjectStatus.PROCEEDING;
 
 @Helper
+@RequiredArgsConstructor
 public class ProjectHelper {
     public boolean checkDonationAble(Project project){
         boolean donationAble = true;
@@ -18,4 +20,5 @@ public class ProjectHelper {
 
         return donationAble;
     }
+
 }

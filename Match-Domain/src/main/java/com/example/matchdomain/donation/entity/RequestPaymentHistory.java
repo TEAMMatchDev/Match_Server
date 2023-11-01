@@ -1,6 +1,7 @@
 package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.donation.entity.enums.PaymentStatus;
 import com.example.matchdomain.user.entity.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -35,10 +36,25 @@ public class RequestPaymentHistory extends BaseEntity {
 
     private String orderId;
 
-    private int amount;
+    private Long amount;
 
     private String reason;
 
+    private int payDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "regularPaymentId",nullable = false, insertable=false, updatable=false)
+    private RegularPayment regularPayment;
+
+    private Long regularPaymentId;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userCardId",nullable = false, insertable=false, updatable=false)
+    private UserCard userCard;
+
+    @Column(name="userCardId")
+    private Long userCardId;
 }

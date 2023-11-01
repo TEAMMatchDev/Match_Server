@@ -1,5 +1,6 @@
 package com.example.matchcommon.reponse;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -21,11 +22,16 @@ public class CommonResponse<T> {
     private final String message;
     @Schema(description = "응답 코드", required = true, example = "1000")
     private final String code;
-    @Schema(description = "응답 결과", required = false, example = "응답 결과")
+    @Schema(description = "응답 결과", required = false)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T result;
 
-
+    @JsonCreator
+    public CommonResponse() {
+        this.isSuccess = null;
+        this.message = null;
+        this.code = null;
+    }
 
     // 요청에 성공한 경우11
 

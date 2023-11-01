@@ -2,7 +2,7 @@ package com.example.adminapi.security;
 
 import com.example.adminapi.user.dto.UserRes;
 import com.example.matchcommon.properties.JwtProperties;
-import com.example.matchdomain.user.entity.AuthorityEnum;
+import com.example.matchdomain.user.adaptor.UserAdaptor;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import io.jsonwebtoken.*;
@@ -36,6 +36,7 @@ public class JwtService {
 
     private final UserRepository userRepository;
     private final JwtProperties jwtProperties;
+    private final UserAdaptor userAdaptor;
 
 
     private Key getSecretKey() {
@@ -85,15 +86,9 @@ public class JwtService {
                     .parseClaimsJws(token);
 
             Long userId=claims.getBody().get("userId",Long.class);
-            Optional<User> users = userRepository.findById(userId);
-            /*
 
-            if(!users.get().getRole().equals(AuthorityEnum.ROLE_ADMIN)){
-                servletRequest.setAttribute("exception","NotAllowedAccess");
-                return null;
-            }
+            Optional<User> users = userAdaptor.findByUserId(userId);
 
-             */
             return new UsernamePasswordAuthenticationToken(users.get(),"",users.get().getAuthorities());
         }catch(NoSuchElementException e){
             servletRequest.setAttribute("exception","NoSuchElementException");
@@ -112,6 +107,8 @@ public class JwtService {
                     .parseClaimsJws(token);
 
             Long userId = claims.getBody().get("userId",Long.class);
+
+            log.info("userId : {}",userId);
 
             /*
 

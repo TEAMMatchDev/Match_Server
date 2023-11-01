@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public class OrderReq {
     @Getter
@@ -32,14 +33,17 @@ public class OrderReq {
 
         @NotEmpty(message = "카드 번호를 입력해주세요")
         @Schema(description = "카드 번호",example = "1234567890123456")
+        @Size(min = 16, max = 16, message = "카드는 16자리 이어야 합니다.")
         private String cardNo;
 
         @NotEmpty(message = "카드 만료 년도를 입력해주세요")
         @Schema(description = "카드 만료 년도 YY", example = "29")
+        @Size(min = 2, max = 2, message = "만료년도는 2자리 이어야 합니다.")
         private String expYear;
 
         @NotEmpty(message = "카드 만료 달을 입력해주세요")
         @Schema(description = "카드 만료 달 MM",example = "06")
+        @Size(min = 2, max = 2, message = "만료달은 2자리 이어야 합니다.")
         private String expMonth;
 
         @NotEmpty(message = "카드 계약옵션을 입력해주세요")
@@ -47,6 +51,7 @@ public class OrderReq {
         private String idNo;
 
         @NotEmpty(message = "카드 비밀번호 두자리를 입력해주세요")
+        @Size(min = 2, max = 2, message = "카드 비밀번호는 2자리 이어야 합니다.")
         @Schema(description = "카드 비밀번호 앞 두자리" ,example = "12")
         private String cardPw;
     }
@@ -61,7 +66,7 @@ public class OrderReq {
 
         @NotNull(message = "정기 후원 금액을 입력해주세요")
         @Schema(description = "1000",example = "결제 금액")
-        private int amount;
+        private Long amount;
 
         @NotNull(message = "정기 후원 날짜를 입력해주세요")
         @Schema(description = "15", example = "결제 예정 날")
@@ -78,7 +83,7 @@ public class OrderReq {
 
         @NotNull(message = "정기 후원 금액을 입력해주세요")
         @Schema(description = "1000",example = "결제 금액")
-        private int amount;
+        private Long amount;
 
 
     }

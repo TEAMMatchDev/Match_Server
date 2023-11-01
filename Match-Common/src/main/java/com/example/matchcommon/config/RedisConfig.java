@@ -1,11 +1,16 @@
 package com.example.matchcommon.config;
 
 import com.example.matchcommon.properties.RedisProperties;
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.SocketOptions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisKeyValueAdapter;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,16 +18,37 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
+
 @Configuration
 @EnableRedisRepositories(
         basePackages = "com.example")
 @RequiredArgsConstructor
+@Slf4j
 public class RedisConfig {
     private final RedisProperties redisProperties;
+    @Value("${spring.config.activate.on-profile}")
+    private String profile;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
+        RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
+        clusterConfiguration.clusterNode(redisProperties.getHost(), redisProperties.getPort());
+        LettuceClientConfiguration clientConfiguration = LettuceClientConfiguration.builder()
+                .clientOptions(ClientOptions.builder()
+                        .socketOptions(SocketOptions.builder()
+                                .connectTimeout(Duration.ofMillis(1000L)).build())
+                        .build())
+                .commandTimeout(Duration.ofSeconds(1000L)).build();
+
+        if(profile.equals("prod")){
+            log.info(profile + " profile");
+            return new LettuceConnectionFactory(clusterConfiguration, clientConfiguration);
+        }else {
+            log.info(profile + " profile");
+            return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
+        }
+
     }
 
     @Bean
