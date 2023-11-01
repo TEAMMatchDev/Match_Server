@@ -75,7 +75,7 @@ public class OrderController {
     }
 
     @PostMapping("/pay/card")
-    @ApiErrorCodeExample({UserAuthErrorCode.class, OtherServerErrorCode.class, RegistrationCardErrorCode.class, NicePayErrorCode.class})
+    @ApiErrorCodeExample({UserAuthErrorCode.class, OtherServerErrorCode.class, RegistrationCardErrorCode.class})
     @Operation(summary = "04-02 Order💸 정기 결제용 카드 등록 api",description = "정기 결제를 위한 카드 등록 API 입니다.")
     public CommonResponse<PortOneBillResponse> registrationCard(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,

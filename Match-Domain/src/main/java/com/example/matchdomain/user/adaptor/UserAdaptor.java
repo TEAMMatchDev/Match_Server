@@ -17,7 +17,6 @@ public class UserAdaptor {
         return userRepository.findBySocialIdAndSocialType(socialId, socialType);
     }
 
-    @Cacheable(value = "userCache", key = "#userId", cacheManager = "redisCacheManager")
     public Optional<User> findByUserId(Long userId) {
         System.out.println("캐싱 하자");
         return userRepository.findById(userId);

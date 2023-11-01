@@ -6,13 +6,16 @@ import com.example.matchdomain.redis.entity.AccessToken;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.redis.repository.AccessTokenRepository;
 import com.example.matchdomain.redis.repository.RefreshTokenRepository;
+import com.example.matchdomain.user.adaptor.UserAdaptor;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -25,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -32,12 +36,10 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class JwtService {
-
-
-    private final UserRepository userRepository;
     private final JwtProperties jwtProperties;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AccessTokenRepository accessTokenRepository;
+    private final UserAdaptor userAdaptor;
 
 
     private Key getSecretKey() {
@@ -112,7 +114,9 @@ public class JwtService {
                     .parseClaimsJws(token);
 
             Long userId=claims.getBody().get("userId",Long.class);
-            Optional<User> users = userRepository.findById(userId);
+            log.info("user find");
+            Optional<User> users = userAdaptor.findByUserId(userId);
+            log.info("user find");
             return new UsernamePasswordAuthenticationToken(users.get(),"",users.get().getAuthorities());
         }catch(NoSuchElementException e){
             servletRequest.setAttribute("exception","NoSuchElementException");

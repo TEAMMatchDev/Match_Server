@@ -41,7 +41,7 @@ public class DonationRegularPayment { // Job 정의
         return stepBuilderFactory.get(JOB_NAME+"step")
                 .tasklet((contribution, chunkContext) -> {
                     log.info("Step!");
-                    orderService.regularDonationPayment();
+                    //orderService.regularDonationPayment();
 
                     return RepeatStatus.FINISHED;
                 })
