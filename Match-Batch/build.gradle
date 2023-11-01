@@ -9,12 +9,8 @@ repositories {
     mavenCentral()
 }
 
-bootJar {
-    enabled = false
-}
-
 jar {
-    enabled = true
+    archivesBaseName = 'match-batch'
 }
 
 dependencies {
