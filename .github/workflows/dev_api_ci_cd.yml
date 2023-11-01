@@ -1,8 +1,8 @@
-name: Match batch Server CI/CD
+name: dev MATCH API Server CI/CD
 
 on:
   push:
-    branches: [batch]
+    branches: [dev]
     #tags:
     # - Dev-Api-v*.*.*
   workflow_dispatch: # 수동 실행 옵션 (생략)
@@ -21,59 +21,59 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Set Environment - Common Prod Yml
+      - name: Set Environment - Common Yml
         uses: microsoft/variable-substitution@v1
         with:
           files: ./Match-Common/src/main/resources/application-common.yml
         env:
-          oauth.kakao.base-url: ${{ secrets.KAKAO_PROD_BASE_URL }}
+          oauth.kakao.base-url: ${{ secrets.KAKAO_BASE_URL }}
           oauth.kakao.client-id: ${{ secrets.KAKAO_CLIENT }}
           oauth.kakao.client-secret: ${{ secrets.KAKAO_SECRET }}
-          oauth.kakao.redirect-url: ${{ secrets.KAKAO_PROD_REDIRECT }}
+          oauth.kakao.redirect-url: ${{ secrets.KAKAO_REDIRECT }}
           oauth.kakao.app-id: ${{ secrets.KAKAO_APP_ID }}
           oauth.kakao.admin-key: ${{ secrets.KAKAO_ADMIN_KEY }}
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
           jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
           oauth.naver.secret: ${{ secrets.NAVER_SECRET }}
           oauth.naver.client: ${{ secrets.NAVER_CLIENT }}
-          oauth.naver.redirect-url: ${{ secrets.NAVER_PROD_REDIRECT}}
+          oauth.naver.redirect-url: ${{ secrets.NAVER_REDIRECT}}
           sms.secret: ${{ secrets.SMS_SECRET_KEY }}
           sms.api: ${{ secrets.SMS_API_KEY }}
           sms.sender: ${{ secrets.SMS_SENDER }}
-          nice.secret: ${{ secrets.NICE_PROD_SECRET_KEY}}
-          nice.client: ${{ secrets.NICE_PROD_CLIENT_KEY }}
-          nice.url: ${{ secrets.NICE_PROD_URL}}
+          nice.secret: ${{ secrets.NICE_SECRET_KEY}}
+          nice.client: ${{ secrets.NICE_CLIENT_KEY }}
+          nice.url: ${{ secrets.NICE_DEV_URL}}
           aws.access-key: ${{ secrets.AWS_S3_ACCESS_KEY }}
           aws.secret-key: ${{ secrets.AWS_S3_SECRET_KEY }}
           aws.s3.bucket: ${{ secrets.AWS_S3_BUCKET }}
           aws.s3.bucket-url: ${{ secrets.AWS_S3_BASE_URL }}
           discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
           discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
-          web.return.url: ${{ secrets.PROD_RETURN_URL }}
-          match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
-          server.host: ${{ secrets.PROD_SERVER_HOST}}
+          server.host: ${{ secrets.DEV_SERVER_HOST}}
+
           spring.password: ${{ secrets.APP_PASSWORD}}
           aligo.username: ${{ secrets.ALIGO_USERNAME }}
           aligo.key: ${{ secrets.ALIGO_KEY }}
+          web.return.url: ${{ secrets.DEV_RETURN_URL }}
+          match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
           portone.code: ${{ secrets.PORTONE_CODE }}
           portone.key: ${{ secrets.PORTONE_KEY }}
-          portone.secret: ${{ secrets.PORTONE_SECRET }}
-          portone.billmid: ${{ secrets.PROD_PORTONE_BILL_MID}}
+          portone.secret : ${{ secrets.PORTONE_SECRET }}
+          portone.billmid: ${{ secrets.DEV_PORTONE_BILL_MID}}
 
 
-
-      - name: Set Environment Domain - Domain Prod Yml
+      - name: Set Environment Domain - Domain DEV Yml
         uses: microsoft/variable-substitution@v1
         with:
-          files: ./Match-Domain/src/main/resources/application-domain-prod.yml
+          files: ./Match-Domain/src/main/resources/application-domain-dev.yml
         env:
-          spring.datasource.master.hikari.jdbc-url: ${{ secrets.PROD_DB_URL_HOST }}
+          spring.datasource.master.hikari.jdbc-url: ${{ secrets.DB_URL_HOST }}
           spring.datasource.master.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
           spring.datasource.master.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
-          spring.datasource.slave.hikari.jdbc-url: ${{ secrets.PROD_SLAVE_URL_HOST }}
+          spring.datasource.slave.hikari.jdbc-url: ${{ secrets.DEV_SLAVE_URL_HOST }}
           spring.datasource.slave.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
           spring.datasource.slave.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
-          spring.redis.host : ${{ secrets.REDIS_PROD_HOST }}
+          spring.redis.host : ${{ secrets.REDIS_DEV_HOST }}
 
       - name: create-fcm-json
         id: create-fcm-json
@@ -87,14 +87,8 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
-      - name: Docker Login
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Build with Gradle
-        run: ./gradlew Match-Batch:bootJar
+        run: ./gradlew Match-Api:bootJar
         shell: bash
 
       - name: Get current time
@@ -104,18 +98,23 @@ jobs:
           format: YYYYMMDDTHHmm
           utcOffset: "+09:00"
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_REPO }}/match_batch_image:latest
+      - name: Generate deployment package
+        run: |
+          mkdir -p deploy
+          cp Match-Api/build/libs/*.jar deploy/match-dev-api.jar
+          cp Procfile deploy/Procfile
+          cp -r .ebextensions-dev deploy/.ebextensions
+          cp -r .platform deploy/.platform
+          cd deploy && zip -r match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
 
-      - name: trigger jenkins job.
-        uses: appleboy/jenkins-action@master
+      - name: Deploy Consumer to EB
+        uses: einaregilsson/beanstalk-deploy@v19
         with:
-          url: ${{ secrets.WEBHOOK_URL }}
-          user: "matchadmin"
-          token: ${{ secrets.JENKINS_API_TOKEN }}
-          job: "match-admin"
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: MatchServerApp
+          environment_name: match-dev-env
+          version_label: match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}
+          region: ap-northeast-2
+          deployment_package: deploy/match-server-api-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip
+          wait_for_deployment: false

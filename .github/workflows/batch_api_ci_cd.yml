@@ -3,8 +3,6 @@ name: Match batch Server CI/CD
 on:
   push:
     branches: [batch]
-      #tags:
-    # - Dev-Api-v*.*.*
   workflow_dispatch: # 수동 실행 옵션 (생략)
 
 jobs:
@@ -87,6 +85,12 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
+      - name: Docker Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Build with Gradle
         run: ./gradlew Match-Batch:bootJar
         shell: bash
@@ -98,18 +102,13 @@ jobs:
           format: YYYYMMDDTHHmm
           utcOffset: "+09:00"
 
-      - name: Set up Docker Login
-        uses: docker/setup-buildx-action@v2
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
           context: .
           file: Dockerfile
           push: true
-          tags: austinmenu/match_batch_image:latest
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          tags: ${{ secrets.DOCKER_REPO }}/match_batch_image:latest
 
       - name: trigger jenkins job.
         uses: appleboy/jenkins-action@master
