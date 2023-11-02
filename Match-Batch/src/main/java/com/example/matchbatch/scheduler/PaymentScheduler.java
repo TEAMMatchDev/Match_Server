@@ -35,6 +35,7 @@ public class PaymentScheduler {
     @Scheduled(fixedDelay = 10000)
     public void RegularPayScheduler(){
         log.info("정기 결제 스케줄러가 시작");
+        discordFeignClient.alertMessage(discordConvertor.convertToAlertBatchMessage("정기 결제 스케줄러 시작",20));
 
         Map<String, JobParameter> confMap = new HashMap<>();
         confMap.put("time", new JobParameter(System.currentTimeMillis()));
