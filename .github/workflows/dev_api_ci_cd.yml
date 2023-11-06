@@ -3,6 +3,8 @@ name: dev MATCH API Server CI/CD
 on:
   push:
     branches: [dev]
+    #tags:
+    # - Dev-Api-v*.*.*
   workflow_dispatch: # 수동 실행 옵션 (생략)
 
 jobs:
@@ -48,6 +50,7 @@ jobs:
           discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
           discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
           server.host: ${{ secrets.DEV_SERVER_HOST}}
+
           spring.password: ${{ secrets.APP_PASSWORD}}
           aligo.username: ${{ secrets.ALIGO_USERNAME }}
           aligo.key: ${{ secrets.ALIGO_KEY }}
@@ -70,7 +73,7 @@ jobs:
           spring.datasource.slave.hikari.jdbc-url: ${{ secrets.DEV_SLAVE_URL_HOST }}
           spring.datasource.slave.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
           spring.datasource.slave.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
-          spring.redis.host : ${{ secrets.REDIS_DEV_HOST }}
+          spring.redis.host : ${{ secrets.REDIS_PROD_HOST }}
 
       - name: create-fcm-json
         id: create-fcm-json
