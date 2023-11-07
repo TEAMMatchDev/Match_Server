@@ -1,6 +1,6 @@
 package com.example.matchbatch.service;
 
-import com.example.matchbatch.convertor.OrderConvertor;
+import com.example.matchbatch.converter.OrderConverter;
 import com.example.matchbatch.helper.OrderHelper;
 import com.example.matchbatch.helper.TimeUtils;
 import com.example.matchbatch.model.CalculateMonthLastDateDto;
@@ -11,7 +11,7 @@ import com.example.matchdomain.donation.adaptor.RequestFailedHistoryAdapter;
 import com.example.matchdomain.donation.entity.*;
 import com.example.matchinfrastructure.discord.service.DiscordService;
 import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
-import com.example.matchinfrastructure.pay.portone.convertor.PortOneConvertor;
+import com.example.matchinfrastructure.pay.portone.converter.PortOneConverter;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
@@ -34,10 +34,10 @@ public class OrderService {
     private final RegularPaymentAdaptor regularPaymentAdaptor;
     private final RequestFailedHistoryAdapter requestFailedHistoryAdapter;
     private final PortOneAuthService portOneAuthService;
-    private final PortOneConvertor portOneConvertor;
+    private final PortOneConverter portOneConverter;
     private final DiscordService discordService;
     private final DonationService donationService;
-    private final OrderConvertor orderConvertor;
+    private final OrderConverter orderConverter;
     private final TimeUtils timeUtils;
 
     public void regularDonationPayment() {
@@ -90,7 +90,7 @@ public class OrderService {
         }
 
 
-        return orderConvertor.convertToPaymentCnt(totalAmount, successCount);
+        return orderConverter.convertToPaymentCnt(totalAmount, successCount);
     }
 
     private void logPaymentSkipped(RegularPayment payment) {
@@ -119,7 +119,7 @@ public class OrderService {
 
     private void handlePaymentFailure(RegularPayment payment, String reason, String type) {
         if (REGULAR_PAYMENT.equals(type)) {
-            requestFailedHistoryAdapter.save(orderConvertor.convertToRequestFailedHistory(payment, reason));
+            requestFailedHistoryAdapter.save(orderConverter.convertToRequestFailedHistory(payment, reason));
         }
         log.error(String.format(FAILED_PAYMENT_LOG, payment.getId(), reason));
     }
@@ -128,13 +128,15 @@ public class OrderService {
         if (RETRY_PAYMENT.equals(type)) {
             requestFailedHistoryAdapter.deleteByRegularPaymentId(payment.getId());
         }
-        donationService.processSaveDonationPayment(response, payment);
+        DonationUser donationUser = donationService.processSaveDonationPayment(response, payment);
         log.info(String.format(SUCCESS_PAYMENT_LOG,
                 payment.getUserId(),
                 orderId,
                 payment.getUserCard().getBid(),
                 payment.getAmount(),
                 payment.getProjectId()));
+
+
     }
 
 
@@ -142,7 +144,7 @@ public class OrderService {
         UserCard userCard = payment.getUserCard();
         return portOneFeignClient.payWithBillKey(
                 accessToken,
-                portOneConvertor.convertPayWithBillKey(
+                portOneConverter.convertPayWithBillKey(
                         userCard.getBid(),
                         orderId,
                         payment.getAmount(),

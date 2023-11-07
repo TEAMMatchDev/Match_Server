@@ -1,7 +1,7 @@
 package com.example.matchapi.portone.service;
 
 import com.example.matchapi.donation.service.DonationHistoryService;
-import com.example.matchapi.order.convertor.OrderConvertor;
+import com.example.matchapi.order.converter.OrderConverter;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.portone.dto.PaymentReq;
@@ -19,7 +19,7 @@ import com.example.matchdomain.redis.repository.OrderRequestRepository;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
-import com.example.matchinfrastructure.pay.portone.convertor.PortOneConvertor;
+import com.example.matchinfrastructure.pay.portone.converter.PortOneConverter;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
@@ -51,12 +51,12 @@ public class PaymentService {
     private final UserRepository userRepository;
     private final OrderHelper orderHelper;
     private final DonationUserRepository donationUserRepository;
-    private final OrderConvertor orderConvertor;
+    private final OrderConverter orderConverter;
     private final IamportClient iamportClient;
     private final ProjectAdaptor projectAdaptor;
     private final DonationHistoryService donationHistoryService;
     private final PortOneProperties portOneProperties;
-    private final PortOneConvertor portOneConvertor;
+    private final PortOneConverter portOneConverter;
     private final PortOneFeignClient portOneFeignClient;
     private final PortOneAuthService portOneAuthService;
 
@@ -67,17 +67,17 @@ public class PaymentService {
                           UserRepository userRepository,
                           OrderHelper orderHelper,
                           DonationUserRepository donationUserRepository,
-                          OrderConvertor orderConvertor, ProjectAdaptor projectAdaptor, DonationHistoryService donationHistoryService, PortOneConvertor portOneConvertor, PortOneFeignClient portOneFeignClient, PortOneAuthService portOneAuthService) {
+                          OrderConverter orderConverter, ProjectAdaptor projectAdaptor, DonationHistoryService donationHistoryService, PortOneConverter portOneConverter, PortOneFeignClient portOneFeignClient, PortOneAuthService portOneAuthService) {
         this.portOneProperties = portOneProperties;
         this.orderRequestRepository = orderRequestRepository;
         this.userRepository = userRepository;
         this.orderHelper = orderHelper;
         this.donationUserRepository = donationUserRepository;
-        this.orderConvertor = orderConvertor;
+        this.orderConverter = orderConverter;
         this.iamportClient = new IamportClient(portOneProperties.getKey(), portOneProperties.getSecret());
         this.projectAdaptor = projectAdaptor;
         this.donationHistoryService = donationHistoryService;
-        this.portOneConvertor = portOneConvertor;
+        this.portOneConverter = portOneConverter;
         this.portOneFeignClient = portOneFeignClient;
         this.portOneAuthService = portOneAuthService;
     }
@@ -101,7 +101,7 @@ public class PaymentService {
 
             orderRequestRepository.deleteById(validatePayment.getOrderId());
 
-            return orderConvertor.convertToCompleteDonation(user.getName(), project, (long) validatePayment.getAmount());
+            return orderConverter.convertToCompleteDonation(user.getName(), project, (long) validatePayment.getAmount());
         } catch (BadRequestException | IamportResponseException | IOException e) {
             try {
                 refundPayment(validatePayment.getImpUid());
@@ -129,13 +129,13 @@ public class PaymentService {
 
     public void saveDonationUser(User user, PaymentReq.ValidatePayment validatePayment, Project project) {
         OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
-        DonationUser donationUser = donationUserRepository.save(orderConvertor.convertToDonationUserPortone(user.getId(), validatePayment, project.getId(), createInherenceDto));
+        DonationUser donationUser = donationUserRepository.save(orderConverter.convertToDonationUserPortone(user.getId(), validatePayment, project.getId(), createInherenceDto));
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
     }
 
     public PortOneResponse<PortOneBillPayResponse> payBillKey(UserCard card, Long amount, String projectName, String type) {
         String orderId = orderHelper.createOrderId(type);
         String accessToken = portOneAuthService.getToken();
-        return portOneFeignClient.payWithBillKey(accessToken, portOneConvertor.convertPayWithBillKey(card.getBid(), orderId, amount, projectName, card.getCustomerId()));
+        return portOneFeignClient.payWithBillKey(accessToken, portOneConverter.convertPayWithBillKey(card.getBid(), orderId, amount, projectName, card.getCustomerId()));
     }
 }
