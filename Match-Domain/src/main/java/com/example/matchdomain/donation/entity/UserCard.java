@@ -55,6 +55,7 @@ public class UserCard extends BaseEntity {
 
     private String cardPw;
 
+    @Enumerated(EnumType.STRING)
     private CardCode cardCode;
 
     private String cardName;

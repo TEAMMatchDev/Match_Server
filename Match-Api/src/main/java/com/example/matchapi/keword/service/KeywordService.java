@@ -21,7 +21,7 @@ public class KeywordService {
     private final SearchKeywordRepository searchKeywordRepository;
 
 
-    @Cacheable(cacheNames = "keywordList", key = "'all'")
+    @Cacheable(cacheNames = "keywordList", key = "'all'", cacheManager = "ehcacheManager")
     public List<KeywordRes.KeywordList> getKeywordList() {
         return getKeyword();
     }

@@ -23,4 +23,13 @@ public class DiscordService {
     public void sendKnownErrorMessage(String message) {
         discordFeignClient.errorMessage(discordConvertor.convertToKnownMessage(message));
     }
+
+    @Async("discord-message")
+    public void sendBatchStartAlert(String message, int size){
+        discordFeignClient.alertMessage(discordConvertor.convertToAlertBatchMessage(message,  size));
+    }
+
+    public void sendBatchFinishAlert(String message, int totalAmount, int totalPayments, int successCount, int trueCount) {
+        discordFeignClient.alertMessage(discordConvertor.convertToAlertFinishMessage(message, totalAmount, totalPayments, successCount, trueCount));
+    }
 }

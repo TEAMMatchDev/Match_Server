@@ -26,7 +26,7 @@ public class AdminBannerService {
     private final BannerAdaptor bannerAdaptor;
 
     @Transactional
-    @CachePut(cacheNames = "bannerCache", key = "'all'")
+    @CachePut(cacheNames = "bannerCache", key = "'all'", cacheManager = "ehcacheManager")
     public List<BannerRes.BannerList> uploadBanner(BannerType bannerType,
                                                    MultipartFile bannerImage,
                                                    BannerReq.BannerUpload bannerUploadDto) {

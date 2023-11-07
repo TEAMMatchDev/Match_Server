@@ -144,7 +144,7 @@ public class DonationService {
         return new PageResponse<>(regularPayments.isLast(), regularPayments.getTotalElements(), regularPaymentConvertor.convertToMatchList(regularPayments.getContent()));
     }
 
-    @Cacheable(value = "flameCache", key = "{#user.id, #page, #size}")
+    @Cacheable(value = "flameCache", key = "{#user.id, #page, #size}", cacheManager = "ehcacheManager")
     public PageResponse<List<DonationRes.BurningFlameDto>> getBurningFlameList(User user, int page, int size) {
         Page<DonationUser> donationUsers = donationAdaptor.findByUser(user, page, size);
         return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), regularPaymentConvertor.convertToBurningFlameList(donationUsers.getContent()));

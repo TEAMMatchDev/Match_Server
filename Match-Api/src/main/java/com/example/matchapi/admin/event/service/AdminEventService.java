@@ -34,7 +34,7 @@ public class AdminEventService {
     private final EventConvertor eventConvertor;
     private final EventService eventService;
     @RedissonLock(LockName = "이벤트 업로드", key = "#eventUploadReq")
-    @CacheEvict(value = "eventCache", allEntries = true)
+    @CacheEvict(value = "eventCache", allEntries = true, cacheManager = "ehcacheManager")
     public void uploadEventList(EventUploadReq eventUploadReq) {
 
         Event event  = eventRepository.save(eventConvertor.convertToEventUpload(eventUploadReq, eventUploadReq.getThumbnail()));

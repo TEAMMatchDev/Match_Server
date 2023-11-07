@@ -22,20 +22,16 @@ import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.redis.repository.OrderRequestRepository;
 import com.example.matchdomain.user.adaptor.UserCardAdaptor;
 import com.example.matchdomain.user.entity.User;
-import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import com.example.matchinfrastructure.pay.portone.convertor.PortOneConvertor;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOnePrepareReq;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
-import com.example.matchinfrastructure.pay.portone.service.PortOneService;
+import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.example.matchcommon.constants.MatchStatic.*;
@@ -59,7 +55,6 @@ public class OrderService {
     private final ProjectService projectService;
     private final RegularPaymentAdaptor regularPaymentAdaptor;
     private final UserCardAdaptor userCardAdaptor;
-    private final PortOneService portOneService;
     private final DonationHistoryService donationHistoryService;
 
     @Transactional
@@ -96,13 +91,11 @@ public class OrderService {
 
         PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, regularDonation.getAmount(), project.getProjectName(), REGULAR);
 
-        String flameName = orderHelper.createFlameName(user);
-
-        String inherenceNumber = createRandomUUID();
+        OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
 
         RegularPayment regularPayment = regularPaymentRepository.save(orderConvertor.convertToRegularPayment(user.getId(), regularDonation, cardId, projectId));
 
-        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillPayUser(portOneResponse.getResponse(), user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
+        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillPayUser(portOneResponse.getResponse(), user.getId(), regularDonation.getAmount(), projectId, createInherenceDto, RegularStatus.REGULAR, regularPayment.getId()));
 
         donationHistoryService.postRegularDonationHistory(regularPayment.getId(), donationUser.getId());
 
@@ -125,14 +118,12 @@ public class OrderService {
 
             Project project = projectService.checkProjectExists(projectId, RegularStatus.ONE_TIME);
 
-
             PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, oneTimeDonation.getAmount(), project.getProjectName(), ONE_TIME);
 
-            String flameName = orderHelper.createFlameName(user);
+            OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
 
-            String inherenceNumber = createRandomUUID();
-
-            DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillPayUser(portOneResponse.getResponse(), user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
+            DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillPayUser(portOneResponse.getResponse(), user.getId(), oneTimeDonation.getAmount(), projectId,
+                    createInherenceDto, RegularStatus.ONE_TIME, null));
 
             donationHistoryService.oneTimeDonationHistory(donationUser.getId());
 
@@ -181,10 +172,10 @@ public class OrderService {
         regularPaymentRepository.saveAll(regularPayments);
     }
 
-    @RedissonLock(LockName = "유저-카드-등록", key = "#user")
+    @RedissonLock(LockName = "유저-카드-등록", key = "#user.id")
     public PortOneBillResponse postCard(User user, OrderReq.RegistrationCard registrationCard) {
         String accessToken = portOneAuthService.getToken();
-        String cardNo = formatString(registrationCard.getCardNo(), 4);
+        String cardNo = orderHelper.formatString(registrationCard.getCardNo(), 4);
         String expiry = "20" + registrationCard.getExpYear() + "-" + registrationCard.getExpMonth();
         PortOneResponse<PortOneBillResponse> portOneResponse = portOneFeignClient.getBillKey(
                 accessToken,
@@ -195,27 +186,13 @@ public class OrderService {
         if(portOneResponse.getCode()!=0){
             throw new BaseException(BAD_REQUEST, false, "PORT_ONE_BILL_AUTH_001", portOneResponse.getMessage());
         }
+
+        System.out.println(portOneResponse.getResponse().getCard_code());
         userCardRepository.save(orderConvertor.convertToUserBillCard(user.getId(), registrationCard, portOneResponse.getResponse()));
 
         return portOneResponse.getResponse();
     }
 
-    public String formatString(String input, int length) {
-        StringBuilder formatted = new StringBuilder();
-
-        for (int i = 0; i < input.length(); i++) {
-            if (i > 0 && i % length == 0) {
-                formatted.append('-');
-            }
-            formatted.append(input.charAt(i));
-        }
-
-        return formatted.toString();
-    }
-
-    public String createRandomUUID() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + UUID.randomUUID().toString();
-    }
 
 
     private void cancelRegularPayment(List<RegularPayment> regularPayments) {

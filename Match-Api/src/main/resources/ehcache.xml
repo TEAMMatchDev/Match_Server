@@ -66,8 +66,8 @@
     </cache>
 
     <cache name="flameCache"
-           maxEntriesLocalHeap="1000"
-           maxEntriesLocalDisk="1000"
+           maxEntriesLocalHeap="100"
+           maxEntriesLocalDisk="100"
            eternal="false"
            diskSpoolBufferSizeMB="10"
            timeToIdleSeconds="30"
