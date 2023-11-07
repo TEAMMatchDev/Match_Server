@@ -1,7 +1,7 @@
 package com.example.matchbatch.service;
 
-import com.example.matchbatch.convertor.DonationConvertor;
-import com.example.matchbatch.convertor.OrderConvertor;
+import com.example.matchbatch.converter.DonationConverter;
+import com.example.matchbatch.converter.OrderConverter;
 import com.example.matchbatch.helper.OrderHelper;
 import com.example.matchcommon.annotation.RegularPaymentIntercept;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
@@ -25,26 +25,27 @@ public class DonationService {
     private final OrderHelper orderHelper;
     private final DonationAdaptor donationAdaptor;
     private final DonationHistoryAdaptor donationHistoryAdaptor;
-    private final OrderConvertor orderConvertor;
-    private final DonationConvertor donationConvertor;
+    private final OrderConverter orderConverter;
+    private final DonationConverter donationConverter;
 
     @RegularPaymentIntercept(key = "#portOneBillPayResponse.imp_uid")
     @Transactional
-    public void processSaveDonationPayment(PortOneBillPayResponse portOneBillPayResponse, RegularPayment payment) {
+    public DonationUser processSaveDonationPayment(PortOneBillPayResponse portOneBillPayResponse, RegularPayment payment) {
         DonationUser donationUser = createDonationUser(payment, portOneBillPayResponse);
         createDonationHistory(donationUser);
+        return donationUser;
     }
 
     public DonationUser createDonationUser(RegularPayment payment, PortOneBillPayResponse portOneResponse) {
         String flameName = orderHelper.createFlameName(payment.getUser());
         String inherenceNumber = getCurrentDateFormatted() + "." + createRandomUUID();
         return donationAdaptor.save(
-                orderConvertor.donationUser(portOneResponse, payment.getUserId(), flameName, inherenceNumber, payment.getProjectId(), payment.getId())
+                orderConverter.donationUser(portOneResponse, payment.getUserId(), flameName, inherenceNumber, payment.getProjectId(), payment.getId())
         );
     }
 
     public void createDonationHistory(DonationUser donationUser) {
-        donationHistoryAdaptor.saveDonationHistory(donationConvertor.convertToDonationHistory(donationUser));
+        donationHistoryAdaptor.saveDonationHistory(donationConverter.convertToDonationHistory(donationUser));
     }
 
     public String createRandomUUID() {

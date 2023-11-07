@@ -3,9 +3,9 @@ package com.example.matchapi.user.service;
 import com.example.matchapi.common.model.AlarmType;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
-import com.example.matchapi.project.convertor.ProjectConvertor;
+import com.example.matchapi.project.converter.ProjectConverter;
 import com.example.matchapi.project.helper.ProjectHelper;
-import com.example.matchapi.user.convertor.UserConvertor;
+import com.example.matchapi.user.converter.UserConverter;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.exception.BadRequestException;
@@ -53,8 +53,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserAddressRepository userAddressRepository;
-    private final UserConvertor userConvertor;
-    private final ProjectConvertor projectConvertor;
+    private final UserConverter userConverter;
+    private final ProjectConverter projectConverter;
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
     private final OrderService orderService;
     private final RegularPaymentRepository regularPaymentRepository;
@@ -72,18 +72,18 @@ public class UserService {
     }
 
     public UserRes.EditMyPage getEditMyPage(User user) {
-        return userConvertor.convertToMyPage(user);
+        return userConverter.convertToMyPage(user);
     }
 
     public UserRes.MyPage getMyPage(User user) {
         List<RegularPayment> regularPayments = regularPaymentRepository.findByUser(user);
         Long projectAttentionCnt = projectUserAttentionRepository.countById_userId(user.getId());
 
-        return projectConvertor.getMyPage(regularPayments,projectAttentionCnt, user.getNickname());
+        return projectConverter.getMyPage(regularPayments,projectAttentionCnt, user.getNickname());
     }
 
     public OrderRes.UserDetail getUserInfo(User user) {
-        return userConvertor.convertToUserInfo(user);
+        return userConverter.convertToUserInfo(user);
     }
 
     public UserRes.SignUpInfo getUserSignUpInfo() {
@@ -93,7 +93,7 @@ public class UserService {
         Long weekUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.minusWeeks(1)+FIRST_TIME) , LocalDateTime.parse(localDate+LAST_TIME));
         Long monthUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME), LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME));
 
-        return userConvertor.convertToUserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
+        return userConverter.convertToUserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
     }
 
     @Transactional
@@ -117,7 +117,7 @@ public class UserService {
 
         userList.getContent().forEach(
                 result -> userLists.add(
-                        userConvertor.convertToUserList(result)
+                        userConverter.convertToUserList(result)
                 )
         );
 
@@ -130,11 +130,11 @@ public class UserService {
         List<OrderRes.UserBillCard> userCards = orderService.getUserBillCard(userId);
 
 
-        return userConvertor.convertToUserAdminDetail(userDetail,userCards);
+        return userConverter.convertToUserAdminDetail(userDetail,userCards);
     }
 
     public UserRes.Profile getProfile(User user) {
-        return userConvertor.convertToUserProfile(user);
+        return userConverter.convertToUserProfile(user);
     }
 
     @Transactional
@@ -165,7 +165,7 @@ public class UserService {
     }
 
     public void saveFcmToken(User user, UserReq.FcmToken token) {
-        userFcmTokenRepository.save(userConvertor.convertToUserFcm(user, token));
+        userFcmTokenRepository.save(userConverter.convertToUserFcm(user, token));
     }
 
     public void deleteFcmToken(Long userId, String deviceId) {
@@ -191,7 +191,7 @@ public class UserService {
 
     public UserRes.AlarmAgreeList getAlarmAgreeList(User user) {
         System.out.println(user.getName());
-        return userConvertor.convertToAlarmAgree(user);
+        return userConverter.convertToAlarmAgree(user);
     }
 
     @CacheEvict(value = "userCache", key = "#user.id", cacheManager = "redisCacheManager")
@@ -216,6 +216,6 @@ public class UserService {
 
         user = userRepository.save(user);
 
-        return userConvertor.convertToAlarmAgree(user);
+        return userConverter.convertToAlarmAgree(user);
     }
 }

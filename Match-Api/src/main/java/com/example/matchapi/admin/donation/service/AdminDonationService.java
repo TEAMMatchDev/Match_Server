@@ -1,6 +1,6 @@
 package com.example.matchapi.admin.donation.service;
 
-import com.example.matchapi.admin.donation.convertor.AdminDonationConvertor;
+import com.example.matchapi.admin.donation.converter.AdminDonationConverter;
 import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
@@ -35,7 +35,7 @@ import static com.example.matchdomain.donation.exception.DonationRefundErrorCode
 public class AdminDonationService {
     private final DonationUserRepository donationUserRepository;
     private final DonationHelper donationHelper;
-    private final AdminDonationConvertor adminDonationConvertor;
+    private final AdminDonationConverter adminDonationConverter;
     private final DonationHistoryRepository donationHistoryRepository;
     private final S3UploadService s3UploadService;
     private final HistoryImageRepository historyImageRepository;
@@ -66,15 +66,15 @@ public class AdminDonationService {
 
     public DonationRes.DonationDetail getDonationDetail(Long donationId) {
         DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
-        return adminDonationConvertor.getDonationDetail(donationUser);
+        return adminDonationConverter.getDonationDetail(donationUser);
     }
 
 
     @Transactional
     public void enforceDonation(List<MultipartFile> imageLists, DonationReq.EnforceDonation enforceDonation) {
-        donationHistoryRepository.save(adminDonationConvertor.convertToDonationHistoryChange(enforceDonation));
+        donationHistoryRepository.save(adminDonationConverter.convertToDonationHistoryChange(enforceDonation));
 
-        DonationHistory donationHistory = donationHistoryRepository.save(adminDonationConvertor.convertToDonationHistoryComplete(enforceDonation.getProjectId(), enforceDonation.getDonationUserLists()));
+        DonationHistory donationHistory = donationHistoryRepository.save(adminDonationConverter.convertToDonationHistoryComplete(enforceDonation.getProjectId(), enforceDonation.getDonationUserLists()));
 
         saveDonationHistoryImages(imageLists, donationHistory.getId());
 
@@ -96,7 +96,7 @@ public class AdminDonationService {
         List<HistoryImage> historyImages = new ArrayList<>();
 
         for(String image : images){
-            historyImages.add(adminDonationConvertor.convertToHistoryImage(image, historyId));
+            historyImages.add(adminDonationConverter.convertToHistoryImage(image, historyId));
         }
         historyImageRepository.saveAll(historyImages);
     }
