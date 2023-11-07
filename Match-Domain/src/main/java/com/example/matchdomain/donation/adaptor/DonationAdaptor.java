@@ -86,4 +86,8 @@ public class DonationAdaptor {
     public List<DonationUser> findDonationListsByUser(User user) {
         return donationUserRepository.findByUser(user);
     }
+
+    public DonationUser save(DonationUser donationUser) {
+        return donationUserRepository.save(donationUser);
+    }
 }

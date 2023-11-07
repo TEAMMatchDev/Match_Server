@@ -32,9 +32,9 @@ public class PaymentScheduler {
     //@Scheduled(cron = "0 30 12 * * *")
     //매 1분마다 실행
     //@Scheduled(cron = "0,20,40 * * * * *", zone = "asia/seoul")
-    @Scheduled(fixedDelay = 10000)
+    //@Scheduled(fixedDelay = 10000)
     public void RegularPayScheduler(){
-        log.info("정기 결제 스케줄러가 시작");
+        log.info("정기 결제 스케줄러 시작");
         discordFeignClient.alertMessage(discordConvertor.convertToAlertBatchMessage("정기 결제 스케줄러 시작",20));
 
         Map<String, JobParameter> confMap = new HashMap<>();
@@ -48,12 +48,12 @@ public class PaymentScheduler {
                  | JobParametersInvalidException | org.springframework.batch.core.repository.JobRestartException e) {
             discordFeignClient.errorMessage(discordConvertor.convertToErrorBatchServer("정기 결제 스케줄러", e.getMessage()));
             log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
 
     }
-
-    @Scheduled(cron = "0 0 13/1 * * *")
-    //@Scheduled(fixedDelay = 10000)
+    //@Scheduled(cron = "0 0 13/1 * * *")
+    //@Scheduled(fixedDelay = 1)
     public void RegularFailedPayScheduler(){
         log.info("정기 결제 실패 한 결제들 재시도 시작");
 
@@ -69,6 +69,7 @@ public class PaymentScheduler {
                  | JobParametersInvalidException | org.springframework.batch.core.repository.JobRestartException e) {
             discordFeignClient.errorMessage(discordConvertor.convertToErrorBatchServer("정기 결제 실패 재시도 스케줄러", e.getMessage()));
             log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }
