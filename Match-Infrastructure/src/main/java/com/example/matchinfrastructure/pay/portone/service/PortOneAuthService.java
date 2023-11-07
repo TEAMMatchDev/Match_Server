@@ -33,5 +33,10 @@ public class PortOneAuthService {
         PortOneResponse<PortOneAuth> portOneResponse = portOneFeignClient.getAccessToken(PortOneAuthReq.builder().imp_key(portOneProperties.getKey()).imp_secret(portOneProperties.getSecret()).build());
         return portOneResponse.getResponse().getAccess_token();
     }
+
+    public String getAuthToken() {
+        PortOneResponse<PortOneAuth> portOneResponse = portOneFeignClient.getAccessToken(PortOneAuthReq.builder().imp_key(portOneProperties.getKey()).imp_secret(portOneProperties.getSecret()).build());
+        return portOneResponse.getResponse().getAccess_token();
+    }
 }
 
