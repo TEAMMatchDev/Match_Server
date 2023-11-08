@@ -117,6 +117,7 @@ public class OrderConverter {
                                     .builder()
                                     .id(result.getId())
                                     .cardCode(result.getCardCode().getCode())
+                                    .cardName(result.getCardCode().getName())
                                     .cardNo(orderHelper.maskMiddleNum(result.getCardNo()))
                                     .cardAbleStatus(result.getCardAbleStatus().getName())
                                     .build()
