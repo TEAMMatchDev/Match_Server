@@ -35,7 +35,7 @@ public class NotificationService {
         FCMNotificationRequestDto fcmNotificationRequestDto = fcmConverter.convertToDto(donationUser.getInherenceName());
         for(UserFcmToken userFcmToken : userFcmTokens) {
             fcmNotificationRequestDto.setToken(userFcmToken.getFcmToken());
-            fcmNotificationService.sendNotificationRegularPayments(fcmNotificationRequestDto, fcmNotificationService.convertToPayData());
+            fcmNotificationService.sendNotificationRegularPayments(fcmNotificationRequestDto, fcmConverter.convertToPayData());
         }
 
         notificationAdaptor.saveNotification(converter.convertToNotification(fcmNotificationRequestDto, donationUser));

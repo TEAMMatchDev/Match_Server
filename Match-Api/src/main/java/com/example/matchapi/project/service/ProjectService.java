@@ -1,5 +1,6 @@
 package com.example.matchapi.project.service;
 
+import com.example.matchapi.common.util.MessageHelper;
 import com.example.matchapi.project.converter.ProjectConverter;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
@@ -10,11 +11,10 @@ import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
+import com.example.matchdomain.donation.adaptor.DonationHistoryAdaptor;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.entity.enums.RegularStatus;
-import com.example.matchdomain.donation.repository.DonationHistoryRepository;
-import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.adaptor.ProjectAdaptor;
 import com.example.matchdomain.project.adaptor.ProjectImgAdaptor;
 import com.example.matchdomain.project.dto.ProjectDto;
@@ -26,6 +26,7 @@ import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
 import com.example.matchdomain.project.repository.*;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
+import com.example.matchcommon.constants.enums.Topic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.matchcommon.constants.MatchAlertStatic.PROJECT_UPLOAD_BODY;
 import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.common.model.Status.INACTIVE;
 import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.NORMAL;
@@ -60,10 +62,11 @@ public class ProjectService {
     private final ProjectCommentRepository projectCommentRepository;
     private final S3UploadService s3UploadService;
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
-    private final DonationHistoryRepository donationHistoryRepository;
+    private final DonationHistoryAdaptor donationHistoryAdaptor;
     private final CommentReportRepository commentReportRepository;
     private final ProjectImgAdaptor projectImgAdaptor;
     private final DonationAdaptor donationAdaptor;
+    private final MessageHelper messageHelper;
 
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(User user, int page, int size) {
         Long userId = 0L;
@@ -113,7 +116,10 @@ public class ProjectService {
 
         saveImgList(project.getId(), url, imgUrlList);
 
-        donationHistoryRepository.save(projectConverter.convertToDonationHistory(project.getId(), HistoryStatus.TURN_ON));
+        donationHistoryAdaptor.saveDonationHistory(projectConverter.convertToDonationHistory(project.getId(), HistoryStatus.TURN_ON));
+
+        messageHelper.helpFcmMessage(PROJECT_UPLOAD_BODY, Topic.PROJECT_UPLOAD, project.getId());
+
     }
 
     public PageResponse<List<ProjectRes.ProjectAdminList>> getProjectList(int page, int size) {
@@ -138,7 +144,7 @@ public class ProjectService {
 
         project.setProjectStatus(projectStatus);
 
-        if(projectStatus.equals(ProjectStatus.DEADLINE)) donationHistoryRepository.save(projectConverter.convertToDonationHistory(projectId, HistoryStatus.FINISH));
+        if(projectStatus.equals(ProjectStatus.DEADLINE)) donationHistoryAdaptor.saveDonationHistory(projectConverter.convertToDonationHistory(projectId, HistoryStatus.FINISH));
 
         projectRepository.save(project);
     }

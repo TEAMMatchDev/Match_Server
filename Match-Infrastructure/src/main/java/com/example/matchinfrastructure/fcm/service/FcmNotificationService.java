@@ -1,8 +1,9 @@
 package com.example.matchinfrastructure.fcm.service;
 
-import com.example.matchinfrastructure.fcm.dto.AlertType;
+import com.example.matchinfrastructure.fcm.converter.FcmConverter;
 import com.example.matchinfrastructure.fcm.dto.FCMNotificationRequestDto;
 import com.example.matchinfrastructure.fcm.dto.NotificationPayDto;
+import com.example.matchcommon.constants.enums.Topic;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -22,10 +23,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.matchinfrastructure.fcm.dto.AlertType.EVENT_SCREEN;
+import static com.example.matchinfrastructure.fcm.dto.AlertType.PROJECT_SCREEN;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class FcmNotificationService {
+    private final FcmConverter fcmConverter;
     @PostConstruct
     public void init() {
         log.info("init");
@@ -49,59 +54,61 @@ public class FcmNotificationService {
         }
     }
 
-    @Async("fcm")
     public void testNotification(FCMNotificationRequestDto fcmNotificationRequestDto){
-        Notification notification = Notification
-                .builder()
-                .setTitle(fcmNotificationRequestDto.getTitle())
-                .setBody(fcmNotificationRequestDto.getBody())
-                .build();
+        Notification notification = fcmConverter.convertToNotification(fcmNotificationRequestDto);
 
         Message message = Message
                 .builder()
                 .setToken(fcmNotificationRequestDto.getToken())
                 .setNotification(notification)
-                .putData("click_action","")
                 .build();
 
-        try {
-            String result = FirebaseMessaging.getInstance().send(message);
-            System.out.println(result);
-        } catch (FirebaseMessagingException e) {
-            throw new RuntimeException(e);
-        }
+        sendNotification(message);
 
     }
 
 
-    @Async("fcm")
     public void sendNotificationRegularPayments(FCMNotificationRequestDto fcmNotificationRequestDto, NotificationPayDto notificationPayDto){
-        Notification notification = Notification
-                .builder()
-                .setTitle(fcmNotificationRequestDto.getTitle())
-                .setBody(fcmNotificationRequestDto.getBody())
-                .build();
+        Notification notification = fcmConverter.convertToNotification(fcmNotificationRequestDto);
+
 
         Map<String, String> data = new HashMap<>();
         data.put("screen", notificationPayDto.getScreen().toString());
 
-        Message message = Message
-                .builder()
-                .setToken(fcmNotificationRequestDto.getToken())
-                .setNotification(notification)
-                .putAllData(data)
-                .build();
+        Message message = fcmConverter.convertToDataMessage(notification, data, fcmNotificationRequestDto);
 
-        try {
-            String result = FirebaseMessaging.getInstance().send(message);
-            System.out.println(result);
-        } catch (FirebaseMessagingException e) {
-            throw new RuntimeException(e);
+        sendNotification(message);
+
+
+    }
+
+    public void sendTopicNotification(FCMNotificationRequestDto fcmNotificationRequestDto, Topic topic, Long id){
+        Notification notification = fcmConverter.convertToNotification(fcmNotificationRequestDto);
+
+        Map<String, String> data = new HashMap<>();
+        if(topic.equals(Topic.PROJECT_UPLOAD)){
+            data.put("screen", String.valueOf(PROJECT_SCREEN));
+            data.put("projectId", String.valueOf(id));
+        }
+        else{
+            data.put("screen", String.valueOf(EVENT_SCREEN));
+            data.put("eventId", String.valueOf(id));
         }
 
+        Message message = fcmConverter.convertToTopicMessage(notification, topic, data);
+
+        sendNotification(message);
     }
 
-    public NotificationPayDto convertToPayData() {
-        return NotificationPayDto.builder().screen(AlertType.HOME_SCREEN).build();
+    @Async("fcm")
+    public void sendNotification(Message message){
+        try {
+            String result = FirebaseMessaging.getInstance().send(message);
+            log.info(result);
+        } catch (FirebaseMessagingException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
+
 }
