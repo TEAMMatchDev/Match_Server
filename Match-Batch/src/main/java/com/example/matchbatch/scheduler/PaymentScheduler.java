@@ -32,7 +32,7 @@ public class PaymentScheduler {
     //@Scheduled(cron = "0 30 12 * * *")
     //매 1분마다 실행
     //@Scheduled(cron = "0,20,40 * * * * *", zone = "asia/seoul")
-    //@Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 30000)
     public void RegularPayScheduler(){
         log.info("정기 결제 스케줄러 시작");
         discordFeignClient.alertMessage(discordConverter.convertToAlertBatchMessage("정기 결제 스케줄러 시작",20));
