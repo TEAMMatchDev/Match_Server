@@ -52,6 +52,7 @@ public class MatchStatic {
     public static final String RETRY_PAYMENT = "RETRY";
 
     public static final String PAY_TITLE = getCurrentDateFormatted() + " MATCH 기부금 정기 결제";
+
     private static String getCurrentDateFormatted() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(PAYMENT_DATE_FORMAT));
     }

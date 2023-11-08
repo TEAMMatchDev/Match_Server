@@ -1,6 +1,8 @@
 package com.example.matchinfrastructure.fcm.service;
 
+import com.example.matchinfrastructure.fcm.dto.AlertType;
 import com.example.matchinfrastructure.fcm.dto.FCMNotificationRequestDto;
+import com.example.matchinfrastructure.fcm.dto.NotificationPayDto;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -13,10 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import java.util.HashMap;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +61,9 @@ public class FcmNotificationService {
                 .builder()
                 .setToken(fcmNotificationRequestDto.getToken())
                 .setNotification(notification)
+                .putData("click_action","")
                 .build();
+
         try {
             String result = FirebaseMessaging.getInstance().send(message);
             System.out.println(result);
@@ -65,5 +71,37 @@ public class FcmNotificationService {
             throw new RuntimeException(e);
         }
 
+    }
+
+
+    @Async("fcm")
+    public void sendNotificationRegularPayments(FCMNotificationRequestDto fcmNotificationRequestDto, NotificationPayDto notificationPayDto){
+        Notification notification = Notification
+                .builder()
+                .setTitle(fcmNotificationRequestDto.getTitle())
+                .setBody(fcmNotificationRequestDto.getBody())
+                .build();
+
+        Map<String, String> data = new HashMap<>();
+        data.put("screen", notificationPayDto.getScreen().toString());
+
+        Message message = Message
+                .builder()
+                .setToken(fcmNotificationRequestDto.getToken())
+                .setNotification(notification)
+                .putAllData(data)
+                .build();
+
+        try {
+            String result = FirebaseMessaging.getInstance().send(message);
+            System.out.println(result);
+        } catch (FirebaseMessagingException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public NotificationPayDto convertToPayData() {
+        return NotificationPayDto.builder().screen(AlertType.HOME_SCREEN).build();
     }
 }

@@ -39,6 +39,7 @@ public class OrderService {
     private final DonationService donationService;
     private final OrderConverter orderConverter;
     private final TimeUtils timeUtils;
+    private final NotificationService notificationService;
 
     public void regularDonationPayment() {
         List<RegularPayment> regularPayments = calculateDay();
@@ -135,8 +136,7 @@ public class OrderService {
                 payment.getUserCard().getBid(),
                 payment.getAmount(),
                 payment.getProjectId()));
-
-
+        notificationService.sendPaymentSuccess(donationUser);
     }
 
 
