@@ -4,12 +4,11 @@ import com.example.matchapi.admin.donation.converter.AdminDonationConverter;
 import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
-import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchdomain.donation.adaptor.DonationAdaptor;
+import com.example.matchdomain.donation.adaptor.DonationHistoryAdaptor;
 import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.HistoryImage;
-import com.example.matchdomain.donation.repository.DonationHistoryRepository;
-import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.HistoryImageRepository;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +32,10 @@ import static com.example.matchdomain.donation.exception.DonationRefundErrorCode
 @Service
 @RequiredArgsConstructor
 public class AdminDonationService {
-    private final DonationUserRepository donationUserRepository;
+    private final DonationAdaptor donationAdaptor;
+    private final DonationHistoryAdaptor donationHistoryAdaptor;
     private final DonationHelper donationHelper;
     private final AdminDonationConverter adminDonationConverter;
-    private final DonationHistoryRepository donationHistoryRepository;
     private final S3UploadService s3UploadService;
     private final HistoryImageRepository historyImageRepository;
 
@@ -44,7 +43,7 @@ public class AdminDonationService {
     public DonationRes.DonationInfo getDonationInfo() {
         LocalDate localDate = LocalDate.now();
 
-        List<DonationUser> donationUsers = donationUserRepository.findByDonationStatusNot(EXECUTION_REFUND);
+        List<DonationUser> donationUsers = donationAdaptor.findByDonationNotRefund();
 
         int oneDayDonationAmount = 0;
         int weekendDonationAmount = 0;
@@ -65,16 +64,14 @@ public class AdminDonationService {
     }
 
     public DonationRes.DonationDetail getDonationDetail(Long donationId) {
-        DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
+        DonationUser donationUser = donationAdaptor.findById(donationId);
         return adminDonationConverter.getDonationDetail(donationUser);
     }
 
 
     @Transactional
     public void enforceDonation(List<MultipartFile> imageLists, DonationReq.EnforceDonation enforceDonation) {
-        donationHistoryRepository.save(adminDonationConverter.convertToDonationHistoryChange(enforceDonation));
-
-        DonationHistory donationHistory = donationHistoryRepository.save(adminDonationConverter.convertToDonationHistoryComplete(enforceDonation.getProjectId(), enforceDonation.getDonationUserLists()));
+        DonationHistory donationHistory = donationHistoryAdaptor.saveDonationHistory(adminDonationConverter.convertToDonationHistoryComplete(enforceDonation.getProjectId(), enforceDonation.getDonationUserLists()));
 
         saveDonationHistoryImages(imageLists, donationHistory.getId());
 
@@ -82,12 +79,11 @@ public class AdminDonationService {
     }
 
     private void executionSuccessDonation(List<Long> donationUserLists) {
-        List<DonationUser> donationUsers = donationUserRepository.findByIdIn(donationUserLists);
+        List<DonationUser> donationUsers = donationAdaptor.findByListIn(donationUserLists);
         for(DonationUser donationUser : donationUsers){
             donationUser.setDonationStatus(EXECUTION_SUCCESS);
         }
-
-        donationUserRepository.saveAll(donationUsers);
+        donationAdaptor.saveAll(donationUsers);
     }
 
     private void saveDonationHistoryImages(List<MultipartFile> imageLists, Long historyId) {
@@ -99,5 +95,9 @@ public class AdminDonationService {
             historyImages.add(adminDonationConverter.convertToHistoryImage(image, historyId));
         }
         historyImageRepository.saveAll(historyImages);
+    }
+
+    public void postExecution(DonationReq.EnforceDonation enforceDonation) {
+        donationHistoryAdaptor.saveDonationHistory(adminDonationConverter.convertToDonationHistoryChange(enforceDonation));
     }
 }

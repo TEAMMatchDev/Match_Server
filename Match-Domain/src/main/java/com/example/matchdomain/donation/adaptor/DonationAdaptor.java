@@ -90,4 +90,16 @@ public class DonationAdaptor {
     public DonationUser save(DonationUser donationUser) {
         return donationUserRepository.save(donationUser);
     }
+
+    public List<DonationUser> findByDonationNotRefund() {
+        return donationUserRepository.findByDonationStatusNot(EXECUTION_REFUND);
+    }
+
+    public List<DonationUser> findByListIn(List<Long> donationUserLists) {
+        return donationUserRepository.findByIdIn(donationUserLists);
+    }
+
+    public void saveAll(List<DonationUser> donationUsers) {
+        donationUserRepository.saveAll(donationUsers);
+    }
 }
