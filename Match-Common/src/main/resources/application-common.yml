@@ -82,3 +82,7 @@ portone:
   secret: ${PORTONE_SECRET}
   billmid: ${PORTONE_BILL_MID}
 
+private:
+  aes:
+    key: ${AES_PRIVATE_KEY}
+

@@ -1,6 +1,6 @@
 package com.example.matchapi.donation.service;
 
-import com.example.matchapi.donation.convertor.DonationConvertor;
+import com.example.matchapi.donation.converter.DonationConverter;
 import com.example.matchdomain.donation.adaptor.DonationHistoryAdaptor;
 import com.example.matchdomain.donation.entity.DonationHistory;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +13,12 @@ import static com.example.matchdomain.donation.entity.enums.HistoryStatus.TURN_O
 @RequiredArgsConstructor
 public class DonationHistoryService {
     private final DonationHistoryAdaptor donationHistoryAdaptor;
-    private final DonationConvertor donationConvertor;
+    private final DonationConverter donationConverter;
 
     public void postRegularDonationHistory(Long regularPaymentId, Long donationId) {
-        saveDonationHistory(donationConvertor.convertToDonationHistoryTurnOn(regularPaymentId, TURN_ON));
+        saveDonationHistory(donationConverter.convertToDonationHistoryTurnOn(regularPaymentId, TURN_ON));
 
-        saveDonationHistory(donationConvertor.convertToDonationHistory(donationId, CREATE));
+        saveDonationHistory(donationConverter.convertToDonationHistory(donationId, CREATE));
     }
 
     public void saveDonationHistory(DonationHistory donationHistory){
@@ -26,6 +26,6 @@ public class DonationHistoryService {
     }
 
     public void oneTimeDonationHistory(Long donationId){
-        saveDonationHistory(donationConvertor.convertToDonationHistory(donationId, CREATE));
+        saveDonationHistory(donationConverter.convertToDonationHistory(donationId, CREATE));
     }
 }

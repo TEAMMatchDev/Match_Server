@@ -42,9 +42,20 @@ public class AdminDonationController {
         return CommonResponse.onSuccess(adminDonationService.getDonationDetail(donationId));
     }
 
+    @PostMapping("/complete")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class})
+    @Operation(summary = "ADMIN-05-03 기부금 집행 완료 POST API", description = "기부금 집행 완료")
+    public CommonResponse<String> postExecution(
+            @RequestBody DonationReq.EnforceDonation enforceDonation
+    ){
+        adminDonationService.postExecution(enforceDonation);
+        return CommonResponse.onSuccess("집행 중 으로 변환 성공");
+    }
+
+
     @PostMapping(value = "/enforce", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class})
-    @Operation(summary = "ADMIN-05-03 기부금 집행 전달완료 POST API", description = "기부금 집행 API")
+    @Operation(summary = "ADMIN-05-04 기부금 전달완료 POST API", description = "기부금 집행 API")
     public CommonResponse<String> enforceDonation(
             @RequestPart("imageLists") List<MultipartFile> imageLists,
             @Parameter(

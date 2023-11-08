@@ -1,6 +1,6 @@
 package com.example.matchapi.admin.banner.service;
 
-import com.example.matchapi.banner.convertor.BannerConvertor;
+import com.example.matchapi.banner.converter.BannerConverter;
 import com.example.matchapi.banner.dto.BannerReq;
 import com.example.matchapi.banner.dto.BannerRes;
 import com.example.matchdomain.banner.adaptor.BannerAdaptor;
@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminBannerService {
     private final BannerRepository bannerRepository;
-    private final BannerConvertor bannerConvertor;
+    private final BannerConverter bannerConverter;
     private final S3UploadService s3UploadService;
     private final BannerAdaptor bannerAdaptor;
 
@@ -31,7 +31,7 @@ public class AdminBannerService {
                                                    MultipartFile bannerImage,
                                                    BannerReq.BannerUpload bannerUploadDto) {
         String bannerImg = s3UploadService.uploadBannerImage(bannerImage);
-        bannerRepository.save(bannerConvertor.convertToBannerUpload(bannerType, bannerImg, bannerUploadDto));
+        bannerRepository.save(bannerConverter.convertToBannerUpload(bannerType, bannerImg, bannerUploadDto));
         return cachingBannerList();
     }
 
@@ -39,6 +39,6 @@ public class AdminBannerService {
     public List<BannerRes.BannerList> cachingBannerList() {
         List<Banner> banners = bannerAdaptor.getBannerList();
 
-        return bannerConvertor.convertToBannerList(banners);
+        return bannerConverter.convertToBannerList(banners);
     }
 }

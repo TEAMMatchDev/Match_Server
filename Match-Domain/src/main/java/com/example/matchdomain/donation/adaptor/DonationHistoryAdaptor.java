@@ -32,7 +32,7 @@ public class DonationHistoryAdaptor {
         return donationHistoryRepository.getDonationHistoryCustom(donationUser.getRegularPaymentId(), donationId, CREATE, pageable, donationUser.getProjectId());
     }
 
-    public void saveDonationHistory(DonationHistory donationHistory) {
-        donationHistoryRepository.save(donationHistory);
+    public DonationHistory saveDonationHistory(DonationHistory donationHistory) {
+        return donationHistoryRepository.save(donationHistory);
     }
 }
