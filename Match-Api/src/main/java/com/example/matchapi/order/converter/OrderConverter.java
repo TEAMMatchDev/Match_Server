@@ -6,6 +6,7 @@ import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.portone.dto.PaymentReq;
 import com.example.matchcommon.annotation.Converter;
+import com.example.matchcommon.util.AesUtil;
 import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.entity.enums.*;
 import com.example.matchdomain.donation.entity.flameEnum.FlameImage;
@@ -27,6 +28,7 @@ import static java.lang.Integer.parseInt;
 public class OrderConverter {
     private final OrderHelper orderHelper;
     private final DonationHelper donationHelper;
+    private final AesUtil aesUtil;
 
     public RegularPayment convertToRegularPayment(Long id, OrderReq.RegularDonation regularDonation, Long userCardId, Long projectId) {
         return RegularPayment.builder()
@@ -68,11 +70,7 @@ public class OrderConverter {
         return UserCard.builder()
                 .userId(id)
                 .bid(portOneBillResponse.getCustomer_uid())
-                .cardNo(registrationCard.getCardNo())
-                .expYear(registrationCard.getExpYear())
-                .expMonth(registrationCard.getExpMonth())
-                .idNo(registrationCard.getIdNo())
-                .cardPw(registrationCard.getCardPw())
+                .cardNo(aesUtil.aesCBCEncode(registrationCard.getCardNo()))
                 .cardCode(CardCode.getNameByCode(portOneBillResponse.getCard_code()))
                 .cardName(portOneBillResponse.getCard_code())
                 .customerId(portOneBillResponse.getCustomer_id())
@@ -119,6 +117,7 @@ public class OrderConverter {
                                     .builder()
                                     .id(result.getId())
                                     .cardCode(result.getCardCode().getCode())
+                                    .cardName(result.getCardCode().getName())
                                     .cardNo(orderHelper.maskMiddleNum(result.getCardNo()))
                                     .cardAbleStatus(result.getCardAbleStatus().getName())
                                     .build()
