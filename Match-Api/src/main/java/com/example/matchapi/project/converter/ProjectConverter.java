@@ -338,4 +338,16 @@ public class ProjectConverter {
         );
         return projectLists;
     }
+
+    public ProjectRes.CommentList projectComment(Long userId, ProjectComment result) {
+        return ProjectRes.CommentList.builder()
+                .commentId(result.getId())
+                .comment(result.getComment())
+                .commentDate(result.getCreatedAt())
+                .nickname(result.getUser().getNickname())
+                .profileImgUrl(result.getUser().getProfileImgUrl())
+                .userId(result.getUserId())
+                .isMy(result.getUserId().equals(userId))
+                .build();
+    }
 }
