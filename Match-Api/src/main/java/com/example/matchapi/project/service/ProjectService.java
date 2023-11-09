@@ -293,4 +293,29 @@ public class ProjectService {
     public Project checkProjectExists(Long projectId, RegularStatus regularStatus) {
         return projectAdaptor.checkRegularProjects(projectId, regularStatus);
     }
+
+    public PageResponse<List<ProjectRes.CommentList>> getProjectComment(User user, Long projectId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Long userId;
+        if(authHelper.checkGuest(user)) userId = user.getId();
+        else {
+            userId = 0L;
+        }
+
+        Page<ProjectComment> projectComments = projectCommentRepository.findByProjectIdAndStatusOrderByCreatedAtAsc(projectId, ACTIVE,pageable);
+
+        List<ProjectRes.CommentList> commentLists = new ArrayList<>();
+        projectComments.getContent().forEach(
+                result-> {
+                    commentLists.add(
+                            projectConverter.projectComment(userId, result)
+                    );
+                }
+        );
+
+
+        return new PageResponse<>(projectComments.isLast(), projectComments.getTotalElements(), commentLists);
+    }
+
 }

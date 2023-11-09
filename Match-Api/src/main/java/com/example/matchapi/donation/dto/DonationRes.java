@@ -292,6 +292,9 @@ public class DonationRes {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BurningFlameDto implements Serializable {
+        @Schema(description = "프로젝트 id", example = "1")
+        private Long projectId;
+
         @Schema(description = "불꽃이 id 상세조회시 필요", required = true, example = "2")
         private Long donationId;
 

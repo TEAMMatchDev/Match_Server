@@ -55,6 +55,7 @@ public class RegularPaymentConverter {
         return DonationRes.BurningFlameDto
                 .builder()
                 .donationId(donationUser.getId())
+                .projectId(donationUser.getProjectId())
                 .usages(donationUser.getProject().getUsages())
                 .image(donationUser.getFlameImage())
                 .inherenceName(donationUser.getInherenceName())
