@@ -182,6 +182,13 @@ public class UserController {
                                                                     @RequestParam AlarmType alarmType){
         return CommonResponse.onSuccess(userService.patchAlarm(user, alarmType));
     }
-
+    @Operation(summary = "02-11 애플유저 결제화면 추가 정보 POST 👤" , description = "애플 유저 결제 화면 추가정보 POST")
+    @PostMapping("/apple")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    public CommonResponse<String> postAppleUserInfo(@AuthenticationPrincipal User user,
+                                                                  @RequestBody UserReq.AppleUserInfo appleUserInfo){
+        userService.postAppleUserInfo(user, appleUserInfo);
+        return CommonResponse.onSuccess("성공");
+    }
 
 }

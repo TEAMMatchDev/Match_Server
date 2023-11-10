@@ -218,4 +218,11 @@ public class UserService {
 
         return userConverter.convertToAlarmAgree(user);
     }
+
+    @Transactional
+    public void postAppleUserInfo(User user, UserReq.AppleUserInfo appleUserInfo) {
+        user.updateUserInfo(appleUserInfo.getBirthDate(), appleUserInfo.getName(), appleUserInfo.getPhone());
+
+        userRepository.save(user);
+    }
 }

@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.validation.constraints.*;
+import java.time.LocalDate;
 
 public class UserReq {
 
@@ -184,5 +185,18 @@ public class UserReq {
         private String oldEmail;
 
         private String newEmail;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AppleUserInfo {
+        private String name;
+
+        private LocalDate birthDate;
+
+        private String phone;
     }
 }
