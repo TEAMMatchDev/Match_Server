@@ -318,4 +318,8 @@ public class ProjectService {
         return new PageResponse<>(projectComments.isLast(), projectComments.getTotalElements(), commentLists);
     }
 
+    public PageResponse<List<ProjectRes.ProjectLists>> getLikeProjects(User user, int page, int size) {
+        Page<ProjectRepository.ProjectList> projects = projectAdaptor.findLikeProjects(user, page, size);
+        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConverter.convertToProjectLists(projects.getContent()));
+    }
 }
