@@ -231,7 +231,6 @@ public class UserConverter {
                 .username(appleUserRes.getSocialId())
                 .password(authHelper.createRandomPassword())
                 .profileImgUrl(BASE_PROFILE)
-                .name(userHelper.createRandomNickName())
                 .email(appleUserRes.getEmail())
                 .socialId(appleUserRes.getSocialId())
                 .socialType(SocialType.APPLE)
