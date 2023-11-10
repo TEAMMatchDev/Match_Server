@@ -260,7 +260,7 @@ public class AuthService {
     public UserRes.UserToken appleLogin(UserReq.SocialLoginToken socialLoginToken) {
         AppleUserRes appleUserRes = authService.appleLogin(socialLoginToken.getAccessToken());
 
-        if(userRepository.existsByEmail(appleUserRes.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        if(userRepository.existsByEmailAndSocialTypeNot(appleUserRes.getEmail(), APPLE)) throw new BadRequestException(USERS_EXISTS_EMAIL);
         Optional<User> user = userAdaptor.existsSocialUser(appleUserRes.getSocialId(), APPLE);
 
         Long userId;

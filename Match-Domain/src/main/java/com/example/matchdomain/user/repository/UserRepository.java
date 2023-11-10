@@ -82,6 +82,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     List<User> findByServiceAlarm(Alarm alarm);
 
+    boolean existsByEmailAndSocialTypeNot(String email, SocialType socialType);
+
     public interface UserList {
         Long getUserId();
         String getName();
