@@ -175,4 +175,14 @@ public class ProjectController {
         return CommonResponse.onSuccess("신고 성공");
     }
 
+    @Operation(summary = "03-13 내가 찜한 기부처 모아보기 ", description = "내가 찜한 기부처 모아보기")
+    @GetMapping("/like")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    public CommonResponse<PageResponse<List<ProjectRes.ProjectLists>>> getLikeProjects(
+            @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size
+    ){
+        return CommonResponse.onSuccess(projectService.getLikeProjects(user, page, size));
+    }
 }
