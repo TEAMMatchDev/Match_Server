@@ -10,6 +10,8 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.redis.repository.RefreshTokenRepository;
+import com.example.matchdomain.user.entity.enums.SocialType;
+import com.example.matchdomain.user.exception.DeleteUserErrorCode;
 import com.example.matchdomain.user.exception.ModifyEmailCode;
 import com.example.matchdomain.user.exception.ModifyPhoneErrorCode;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
@@ -29,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+import static com.example.matchdomain.user.exception.DeleteUserErrorCode.APPLE_USER_NOT_API;
 import static com.example.matchdomain.user.exception.UserAuthErrorCode.INVALID_REFRESH_TOKEN;
 
 @RestController
@@ -193,8 +196,11 @@ public class UserController {
 
     @Operation(summary = "02-12 유저 탈퇴 로직 구현")
     @DeleteMapping("")
-    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    @ApiErrorCodeExample({UserAuthErrorCode.class, DeleteUserErrorCode.class})
     public CommonResponse<String> deleteUserInfo(@AuthenticationPrincipal User user){
+        if(user.getSocialType().equals(SocialType.APPLE)){
+            throw new BadRequestException(APPLE_USER_NOT_API);
+        }
         userService.deleteUserInfo(user);
         return CommonResponse.onSuccess("탈퇴 성공");
     }
