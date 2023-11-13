@@ -103,6 +103,8 @@ public class PaymentService {
 
             return orderConverter.convertToCompleteDonation(user.getName(), project, (long) validatePayment.getAmount());
         } catch (BadRequestException | IamportResponseException | IOException e) {
+            log.error(e.getMessage());
+            log.error(String.valueOf(e));
             try {
                 refundPayment(validatePayment.getImpUid());
             } catch(Exception ex) {
