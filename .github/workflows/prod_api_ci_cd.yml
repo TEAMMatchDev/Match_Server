@@ -63,7 +63,7 @@ jobs:
           portone.key: ${{ secrets.PORTONE_KEY }}
           portone.secret: ${{ secrets.PORTONE_SECRET }}
           portone.billmid: ${{ secrets.PROD_PORTONE_BILL_MID}}
-
+          private.aes.key: ${{ secrets.AES_PRIVATE_KEY }}
 
 
       - name: Set Environment Domain - Domain Prod Yml
