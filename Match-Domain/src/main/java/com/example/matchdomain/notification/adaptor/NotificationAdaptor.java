@@ -39,4 +39,8 @@ public class NotificationAdaptor {
         notification.setRead(true);
         notificationRepository.save(notification);
     }
+
+    public void deleteByUserId(Long id) {
+        notificationRepository.deleteByUserId(id);
+    }
 }

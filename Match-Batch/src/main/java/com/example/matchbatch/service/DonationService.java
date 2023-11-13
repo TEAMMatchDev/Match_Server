@@ -8,6 +8,7 @@ import com.example.matchdomain.donation.adaptor.DonationAdaptor;
 import com.example.matchdomain.donation.adaptor.DonationHistoryAdaptor;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchdomain.user.entity.User;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -57,4 +58,7 @@ public class DonationService {
     }
 
 
+    public void deleteForDonation(User user) {
+
+    }
 }

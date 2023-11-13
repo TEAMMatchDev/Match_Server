@@ -64,4 +64,8 @@ public class RegularPaymentAdaptor {
     public List<RegularPayment> findByDate(int currentDay) {
         return regularPaymentRepository.findByPayDateAndStatusAndRegularPayStatus(currentDay, Status.ACTIVE, RegularPayStatus.PROCEEDING);
     }
+
+    public void saveAll(List<RegularPayment> regularPayments) {
+        regularPaymentRepository.saveAll(regularPayments);
+    }
 }

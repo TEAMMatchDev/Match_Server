@@ -150,4 +150,12 @@ public class DonationService {
         return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), regularPaymentConverter.convertToBurningFlameList(donationUsers.getContent()));
     }
 
+    public void deleteRegularPayment(User user) {
+        List<RegularPayment> regularPayments = regularPaymentRepository.findByUser(user);
+        for (RegularPayment regularPayment : regularPayments) {
+            regularPayment.setStatus(ACTIVE);
+            regularPayment.setRegularPayStatus(USER_CANCEL);
+        }
+        regularPaymentAdaptor.saveAll(regularPayments);
+    }
 }

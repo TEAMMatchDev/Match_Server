@@ -25,4 +25,6 @@ public interface ProjectUserAttentionRepository extends JpaRepository<ProjectUse
     List<ProjectUserAttention> findById_userId(Long id);
 
     Long countById_userId(Long id);
+
+    void deleteById_userId(Long id);
 }

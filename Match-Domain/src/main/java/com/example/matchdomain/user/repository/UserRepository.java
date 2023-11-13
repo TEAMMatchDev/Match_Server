@@ -84,6 +84,18 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     boolean existsByEmailAndSocialTypeNot(String email, SocialType socialType);
 
+    Optional<User> findBySocialIdAndSocialTypeAndStatus(String id, SocialType socialType, Status status);
+
+    Optional<User> findByPhoneNumberAndSocialTypeNotAndStatus(String s, SocialType socialType, Status status);
+
+    Optional<User> findByUsernameAndStatus(String email, Status status);
+
+    boolean existsByPhoneNumberAndStatus(String phone, Status status);
+
+    List<User> findByStatus(Status status);
+
+    boolean existsByEmailAndStatus(String email, Status status);
+
     public interface UserList {
         Long getUserId();
         String getName();

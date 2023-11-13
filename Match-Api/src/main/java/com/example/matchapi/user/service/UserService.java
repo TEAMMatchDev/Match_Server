@@ -1,18 +1,18 @@
 package com.example.matchapi.user.service;
 
 import com.example.matchapi.common.model.AlarmType;
+import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchapi.project.converter.ProjectConverter;
-import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.converter.UserConverter;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
+import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.RegularPayment;
-import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
 import com.example.matchdomain.user.entity.User;
@@ -24,6 +24,7 @@ import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserFcmTokenRepository;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
+import com.example.matchinfrastructure.oauth.apple.service.AppleAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
@@ -60,6 +62,8 @@ public class UserService {
     private final RegularPaymentRepository regularPaymentRepository;
     private final S3UploadService s3UploadService;
     private final UserFcmTokenRepository userFcmTokenRepository;
+    private final DonationService donationService;
+    private final AppleAuthService appleAuthService;
 
     public Optional<User> findUser(long id) {
         return userRepository.findById(id);
@@ -184,7 +188,7 @@ public class UserService {
     @Transactional
     public void modifyEmail(User user, UserReq.ModifyEmail email) {
         if(!user.getEmail().equals(email.getOldEmail())) throw new BadRequestException(NOT_CORRECT_EMAIL);
-        if(userRepository.existsByEmail(email.getNewEmail())) throw new BadRequestException(ModifyEmailCode.USERS_EXISTS_EMAIL);
+        if(userRepository.existsByEmailAndStatus(email.getNewEmail(), Status.ACTIVE)) throw new BadRequestException(ModifyEmailCode.USERS_EXISTS_EMAIL);
         user.setEmail(email.getNewEmail());
         userRepository.save(user);
     }
@@ -225,4 +229,17 @@ public class UserService {
 
         userRepository.save(user);
     }
+
+    @RedissonLock(LockName = "유저 탈퇴", key = "#user.id")
+    public void deleteUserInfo(User user) {
+        user.setStatus(Status.INACTIVE);
+        donationService.deleteRegularPayment(user);
+        userRepository.save(user);
+    }
+
+    public void deleteAppleUserInfo(User user, UserReq.AppleCode appleCode) {
+        appleAuthService.revokeUser(appleCode.getCode());
+        deleteUserInfo(user);
+    }
+
 }

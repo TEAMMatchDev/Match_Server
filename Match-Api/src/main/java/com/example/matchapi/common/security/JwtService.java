@@ -1,6 +1,7 @@
 package com.example.matchapi.common.security;
 
 import com.example.matchapi.user.dto.UserRes;
+import com.example.matchcommon.exception.NotUserActiveException;
 import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchdomain.redis.entity.AccessToken;
 import com.example.matchdomain.redis.entity.RefreshToken;
@@ -31,6 +32,8 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import static com.example.matchdomain.common.model.Status.INACTIVE;
 
 @RequiredArgsConstructor
 @Component
@@ -114,13 +117,22 @@ public class JwtService {
                     .parseClaimsJws(token);
 
             Long userId=claims.getBody().get("userId",Long.class);
-            log.info("user find");
             Optional<User> users = userAdaptor.findByUserId(userId);
-            log.info("user find");
+
+            if(users.isEmpty()){
+                throw new NoSuchElementException("NOT EXISTS USER");
+            }
+            if(users.get().getStatus().equals(INACTIVE)){
+                throw new NotUserActiveException("NOT ACTIVE USER");
+            }
+
             return new UsernamePasswordAuthenticationToken(users.get(),"",users.get().getAuthorities());
         }catch(NoSuchElementException e){
             servletRequest.setAttribute("exception","NoSuchElementException");
             log.info("유저가 존재하지 않습니다.");
+        }catch (NotUserActiveException e){
+            servletRequest.setAttribute("exception","NotUserActiveException");
+            log.info("유저가 비활성 상태입니다.");
         }
         return null;
     }
@@ -146,9 +158,6 @@ public class JwtService {
                     return false;
                 }
             }
-
-
-
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             servletRequest.setAttribute("exception","MalformedJwtException");

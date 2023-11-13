@@ -86,3 +86,10 @@ private:
   aes:
     key: ${AES_PRIVATE_KEY}
 
+apple:
+  key:
+    path: ${APPLE_KEY_PATH}
+  bundle:
+    id: ${APPLE_BUNDLE_ID}
+  team:
+    id: ${APPLE_TEAM_ID}
