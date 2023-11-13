@@ -64,6 +64,7 @@ public class UserService {
     private final UserFcmTokenRepository userFcmTokenRepository;
     private final DonationService donationService;
     private final AppleAuthService appleAuthService;
+    private final AuthService authService;
 
     public Optional<User> findUser(long id) {
         return userRepository.findById(id);
@@ -225,6 +226,7 @@ public class UserService {
 
     @Transactional
     public void postAppleUserInfo(User user, UserReq.AppleUserInfo appleUserInfo) {
+        authService.checkUserPhone(new UserReq.UserPhone(appleUserInfo.getPhone()));
         user.updateUserInfo(appleUserInfo.getBirthDate(), appleUserInfo.getName(), appleUserInfo.getPhone());
 
         userRepository.save(user);
