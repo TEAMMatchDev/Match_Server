@@ -1,8 +1,11 @@
 package com.example.matchapi.order.dto;
 
 import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
+import java.time.LocalDate;
 
 public class OrderRes {
     @Getter
@@ -31,7 +34,8 @@ public class OrderRes {
     public static class UserDetail {
         private String name;
 
-        private String birthDay;
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private LocalDate birthDay;
 
         private String phoneNumber;
     }

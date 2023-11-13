@@ -142,7 +142,7 @@ public class UserConverter {
     public OrderRes.UserDetail convertToUserInfo(User user) {
         return OrderRes.UserDetail.builder()
                 .name(user.getName())
-                .birthDay(user.getBirth().toString())
+                .birthDay(user.getBirth())
                 .phoneNumber(user.getPhoneNumber()).build();
     }
 
