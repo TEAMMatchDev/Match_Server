@@ -94,6 +94,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     List<User> findByStatus(Status status);
 
+    boolean existsByEmailAndStatus(String email, Status status);
+
     public interface UserList {
         Long getUserId();
         String getName();

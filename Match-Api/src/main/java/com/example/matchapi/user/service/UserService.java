@@ -187,7 +187,7 @@ public class UserService {
     @Transactional
     public void modifyEmail(User user, UserReq.ModifyEmail email) {
         if(!user.getEmail().equals(email.getOldEmail())) throw new BadRequestException(NOT_CORRECT_EMAIL);
-        if(userRepository.existsByEmail(email.getNewEmail())) throw new BadRequestException(ModifyEmailCode.USERS_EXISTS_EMAIL);
+        if(userRepository.existsByEmailAndStatus(email.getNewEmail(), Status.ACTIVE)) throw new BadRequestException(ModifyEmailCode.USERS_EXISTS_EMAIL);
         user.setEmail(email.getNewEmail());
         userRepository.save(user);
     }

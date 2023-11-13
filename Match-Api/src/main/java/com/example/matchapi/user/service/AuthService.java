@@ -190,7 +190,7 @@ public class AuthService {
     }
 
     public void checkUserEmail(UserReq.UserEmail userEmail) {
-        if(userRepository.existsByEmail(userEmail.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        if(userRepository.existsByEmailAndStatus(userEmail.getEmail(), ACTIVE)) throw new BadRequestException(USERS_EXISTS_EMAIL);
     }
 
     public UserRes.UserToken logIn(UserReq.LogIn logIn) {
