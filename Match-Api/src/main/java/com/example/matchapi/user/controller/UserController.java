@@ -191,4 +191,11 @@ public class UserController {
         return CommonResponse.onSuccess("성공");
     }
 
+    @Operation(summary = "02-12 유저 탈퇴 로직 구현")
+    @DeleteMapping("")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    public CommonResponse<String> deleteUserInfo(@AuthenticationPrincipal User user){
+        return CommonResponse.onSuccess("탈퇴 성공");
+    }
+
 }
