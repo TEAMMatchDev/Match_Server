@@ -92,6 +92,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     boolean existsByPhoneNumberAndStatus(String phone, Status status);
 
+    List<User> findByStatus(Status status);
+
     public interface UserList {
         Long getUserId();
         String getName();

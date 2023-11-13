@@ -16,4 +16,6 @@ public interface UserCardRepository extends JpaRepository<UserCard,Long> {
     Optional<UserCard> findByIdAndStatus(Long cardId, Status status);
 
     List<UserCard> findByUserIdAndStatus(Long userId, Status status);
+
+    void deleteByUserId(Long userId);
 }

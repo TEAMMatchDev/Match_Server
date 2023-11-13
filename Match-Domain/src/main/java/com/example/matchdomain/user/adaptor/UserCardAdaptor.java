@@ -23,4 +23,8 @@ public class UserCardAdaptor {
     public UserCard findCardByCardId(Long cardId) {
         return userCardRepository.findByIdAndStatus(cardId,Status.ACTIVE).orElseThrow(() -> new NotFoundException(CARD_NOT_EXIST));
     }
+
+    public void deleteByUser(Long userId) {
+        userCardRepository.deleteByUserId(userId);
+    }
 }

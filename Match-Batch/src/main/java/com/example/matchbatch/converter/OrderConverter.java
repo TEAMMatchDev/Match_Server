@@ -8,6 +8,7 @@ import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.enums.PayMethod;
 import com.example.matchdomain.donation.entity.enums.RegularStatus;
 import com.example.matchdomain.donation.entity.flameEnum.FlameImage;
+import com.example.matchdomain.donation.entity.flameEnum.FlameType;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -16,8 +17,6 @@ import static java.lang.Integer.parseInt;
 @Converter
 @RequiredArgsConstructor
 public class OrderConverter {
-    private final OrderHelper orderHelper;
-
     public DonationUser donationUser(PortOneBillPayResponse response, Long userId, String flameName, String inherenceNumber, Long projectId, Long regularPaymentId) {
         return DonationUser.builder()
                 .userId(userId)
@@ -32,6 +31,7 @@ public class OrderConverter {
                 .projectId(projectId)
                 .regularPaymentId(regularPaymentId)
                 .flameImage(FlameImage.NORMAL_IMG.getImg())
+                .flameType(FlameType.NORMAL_FLAME)
                 .build();
     }
 

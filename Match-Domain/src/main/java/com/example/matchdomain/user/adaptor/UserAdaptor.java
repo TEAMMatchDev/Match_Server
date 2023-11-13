@@ -1,6 +1,7 @@
 package com.example.matchdomain.user.adaptor;
 
 import com.example.matchcommon.annotation.Adaptor;
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.repository.UserRepository;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchdomain.user.entity.enums.Alarm.ACTIVE;
+import static com.example.matchdomain.user.entity.enums.Alarm.INACTIVE;
 
 @Adaptor
 @RequiredArgsConstructor
@@ -27,5 +29,9 @@ public class UserAdaptor {
 
     public List<User> findByServiceAlarm() {
         return userRepository.findByServiceAlarm(ACTIVE);
+    }
+
+    public List<User> findDeleteUsers() {
+        return userRepository.findByStatus(Status.INACTIVE);
     }
 }

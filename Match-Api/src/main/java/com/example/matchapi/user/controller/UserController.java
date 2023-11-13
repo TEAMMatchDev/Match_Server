@@ -195,6 +195,7 @@ public class UserController {
     @DeleteMapping("")
     @ApiErrorCodeExample({UserAuthErrorCode.class})
     public CommonResponse<String> deleteUserInfo(@AuthenticationPrincipal User user){
+        userService.deleteUserInfo(user);
         return CommonResponse.onSuccess("탈퇴 성공");
     }
 

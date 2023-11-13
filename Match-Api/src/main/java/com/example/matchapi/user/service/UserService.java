@@ -1,6 +1,7 @@
 package com.example.matchapi.user.service;
 
 import com.example.matchapi.common.model.AlarmType;
+import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchapi.project.converter.ProjectConverter;
@@ -8,6 +9,7 @@ import com.example.matchapi.project.helper.ProjectHelper;
 import com.example.matchapi.user.converter.UserConverter;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
+import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
@@ -60,6 +62,7 @@ public class UserService {
     private final RegularPaymentRepository regularPaymentRepository;
     private final S3UploadService s3UploadService;
     private final UserFcmTokenRepository userFcmTokenRepository;
+    private final DonationService donationService;
 
     public Optional<User> findUser(long id) {
         return userRepository.findById(id);
@@ -223,6 +226,13 @@ public class UserService {
     public void postAppleUserInfo(User user, UserReq.AppleUserInfo appleUserInfo) {
         user.updateUserInfo(appleUserInfo.getBirthDate(), appleUserInfo.getName(), appleUserInfo.getPhone());
 
+        userRepository.save(user);
+    }
+
+    @RedissonLock(LockName = "유저 탈퇴", key = "#user.id")
+    public void deleteUserInfo(User user) {
+        user.setStatus(Status.INACTIVE);
+        donationService.deleteRegularPayment(user);
         userRepository.save(user);
     }
 }
