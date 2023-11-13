@@ -39,6 +39,7 @@ public enum UserAuthErrorCode implements BaseErrorCode {
     NOT_EMPTY_TOKEN(UNAUTHORIZED,"AUTH010","토큰이 비어있습니다 토큰을 보내주세요"),
     @ExplainError("토큰에 담긴 유저가 없는 경우")
     NOT_EXISTS_USER_HAVE_TOKEN(UNAUTHORIZED,"AUTH011", "해당 토큰을 가진 유저가 존재하지 않습니다."),
+    NOT_USER_ACTIVE(UNAUTHORIZED,"AUTH012","유저가 비활성 상태입니다 로그인 할 수 없습니다."),
     @ExplainError("유저가 존재하지 않는 경우")
     NOT_EXIST_USER(UNAUTHORIZED,"U009" , "해당 유저가 존재하지 않습니다."),
 

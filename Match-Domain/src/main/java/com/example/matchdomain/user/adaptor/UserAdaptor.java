@@ -22,7 +22,6 @@ public class UserAdaptor {
     }
 
     public Optional<User> findByUserId(Long userId) {
-        System.out.println("캐싱 하자");
         return userRepository.findById(userId);
     }
 
