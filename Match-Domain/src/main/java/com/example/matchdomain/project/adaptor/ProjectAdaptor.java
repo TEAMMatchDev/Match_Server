@@ -121,4 +121,11 @@ public class ProjectAdaptor {
     public Optional<Project> findByProjectId(Long projectId) {
         return projectRepository.findById(projectId);
     }
+
+    public Page<ProjectRepository.ProjectList> findLikeProjects(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ProjectRepository.ProjectList> projects = projectRepository.findLikeProjects(user.getId(), pageable);
+        return projects;
+    }
 }

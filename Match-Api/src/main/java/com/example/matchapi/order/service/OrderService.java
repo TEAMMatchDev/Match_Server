@@ -1,7 +1,7 @@
 package com.example.matchapi.order.service;
 
 import com.example.matchapi.donation.service.DonationHistoryService;
-import com.example.matchapi.order.convertor.OrderConvertor;
+import com.example.matchapi.order.converter.OrderConverter;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
@@ -12,6 +12,7 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.BaseException;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.adaptor.RegularPaymentAdaptor;
+import com.example.matchdomain.donation.adaptor.RequestFailedHistoryAdapter;
 import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.entity.enums.CardAbleStatus;
 import com.example.matchdomain.donation.entity.enums.DonationStatus;
@@ -22,13 +23,13 @@ import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.redis.repository.OrderRequestRepository;
 import com.example.matchdomain.user.adaptor.UserCardAdaptor;
 import com.example.matchdomain.user.entity.User;
-import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
-import com.example.matchinfrastructure.pay.portone.convertor.PortOneConvertor;
+import com.example.matchinfrastructure.pay.portone.converter.PortOneConverter;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOnePrepareReq;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
+import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
@@ -43,25 +44,26 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @Service
 public class OrderService {
     private final DonationUserRepository donationUserRepository;
-    private final OrderConvertor orderConvertor;
+    private final OrderConverter orderConverter;
     private final OrderHelper orderHelper;
     private final RegularPaymentRepository regularPaymentRepository;
     private final UserCardRepository userCardRepository;
     private final OrderRequestRepository orderRequestRepository;
     private final PortOneFeignClient portOneFeignClient;
     private final PortOneAuthService portOneAuthService;
-    private final PortOneConvertor portOneConvertor;
+    private final PortOneConverter portOneConverter;
     private final PaymentService paymentService;
     private final ProjectService projectService;
     private final RegularPaymentAdaptor regularPaymentAdaptor;
     private final UserCardAdaptor userCardAdaptor;
     private final DonationHistoryService donationHistoryService;
+    private final RequestFailedHistoryAdapter failedHistoryAdapter;
 
     @Transactional
     public List<OrderRes.UserBillCard> getUserBillCard(Long userId) {
         List<UserCard> userCards = userCardAdaptor.findCardLists(userId);
 
-        return orderConvertor.convertToUserCardLists(userCards);
+        return orderConverter.convertToUserCardLists(userCards);
     }
 
     @RedissonLock(LockName = "카드-삭제", key = "#cardId")
@@ -93,13 +95,13 @@ public class OrderService {
 
         OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
 
-        RegularPayment regularPayment = regularPaymentRepository.save(orderConvertor.convertToRegularPayment(user.getId(), regularDonation, cardId, projectId));
+        RegularPayment regularPayment = regularPaymentRepository.save(orderConverter.convertToRegularPayment(user.getId(), regularDonation, cardId, projectId));
 
-        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillPayUser(portOneResponse.getResponse(), user.getId(), regularDonation.getAmount(), projectId, createInherenceDto, RegularStatus.REGULAR, regularPayment.getId()));
+        DonationUser donationUser = donationUserRepository.save(orderConverter.donationBillPayUser(portOneResponse.getResponse(), user.getId(), regularDonation.getAmount(), projectId, createInherenceDto, RegularStatus.REGULAR, regularPayment.getId()));
 
         donationHistoryService.postRegularDonationHistory(regularPayment.getId(), donationUser.getId());
 
-        return orderConvertor.convertToCompleteDonation(user.getName(), project, regularDonation.getAmount());
+        return orderConverter.convertToCompleteDonation(user.getName(), project, regularDonation.getAmount());
     }
 
 
@@ -122,12 +124,12 @@ public class OrderService {
 
             OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
 
-            DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillPayUser(portOneResponse.getResponse(), user.getId(), oneTimeDonation.getAmount(), projectId,
+            DonationUser donationUser = donationUserRepository.save(orderConverter.donationBillPayUser(portOneResponse.getResponse(), user.getId(), oneTimeDonation.getAmount(), projectId,
                     createInherenceDto, RegularStatus.ONE_TIME, null));
 
             donationHistoryService.oneTimeDonationHistory(donationUser.getId());
 
-            return orderConvertor.convertToCompleteDonation(user.getName(), project, oneTimeDonation.getAmount());
+            return orderConverter.convertToCompleteDonation(user.getName(), project, oneTimeDonation.getAmount());
         }catch (Exception e){
             //paymentService.refundPayment();
         }
@@ -139,7 +141,7 @@ public class OrderService {
     public String saveRequest(User user, Long projectId) {
         String orderId = orderHelper.createOrderId(ONE_TIME);
 
-        orderRequestRepository.save(orderConvertor.CreateRequest(user.getId(), projectId, orderId));
+        orderRequestRepository.save(orderConverter.CreateRequest(user.getId(), projectId, orderId));
 
         return orderId;
     }
@@ -172,7 +174,7 @@ public class OrderService {
         regularPaymentRepository.saveAll(regularPayments);
     }
 
-    @RedissonLock(LockName = "유저-카드-등록", key = "#user")
+    @RedissonLock(LockName = "유저-카드-등록", key = "#user.id")
     public PortOneBillResponse postCard(User user, OrderReq.RegistrationCard registrationCard) {
         String accessToken = portOneAuthService.getToken();
         String cardNo = orderHelper.formatString(registrationCard.getCardNo(), 4);
@@ -180,13 +182,15 @@ public class OrderService {
         PortOneResponse<PortOneBillResponse> portOneResponse = portOneFeignClient.getBillKey(
                 accessToken,
                 orderHelper.createOrderId(BILL),
-                portOneConvertor.convertToPortOneBill(cardNo, expiry, registrationCard.getIdNo(), registrationCard.getCardPw())
+                portOneConverter.convertToPortOneBill(cardNo, expiry, registrationCard.getIdNo(), registrationCard.getCardPw())
         );
 
         if(portOneResponse.getCode()!=0){
             throw new BaseException(BAD_REQUEST, false, "PORT_ONE_BILL_AUTH_001", portOneResponse.getMessage());
         }
-        userCardRepository.save(orderConvertor.convertToUserBillCard(user.getId(), registrationCard, portOneResponse.getResponse()));
+
+        System.out.println(portOneResponse.getResponse().getCard_code());
+        userCardRepository.save(orderConverter.convertToUserBillCard(user.getId(), registrationCard, portOneResponse.getResponse()));
 
         return portOneResponse.getResponse();
     }
@@ -196,6 +200,7 @@ public class OrderService {
     private void cancelRegularPayment(List<RegularPayment> regularPayments) {
         for(RegularPayment regularPayment : regularPayments){
             regularPayment.setRegularPayStatus(RegularPayStatus.USER_CANCEL);
+            failedHistoryAdapter.deleteByRegularPaymentId(regularPayment.getId());
         }
         regularPaymentRepository.saveAll(regularPayments);
     }
@@ -203,9 +208,9 @@ public class OrderService {
     public String saveRequestPrepare(User user, Long projectId, int amount) {
         String orderId = orderHelper.createOrderId(ONE_TIME);
 
-        orderRequestRepository.save(orderConvertor.convertToRequestPrepare(user.getId(), projectId, amount, orderId));
+        orderRequestRepository.save(orderConverter.convertToRequestPrepare(user.getId(), projectId, amount, orderId));
 
-        PortOnePrepareReq portOnePrepareReq = portOneConvertor.convertToRequestPrepare(orderId, amount);
+        PortOnePrepareReq portOnePrepareReq = portOneConverter.convertToRequestPrepare(orderId, amount);
 
         portOneFeignClient.preparePayments(portOneAuthService.getToken(), portOnePrepareReq);
 

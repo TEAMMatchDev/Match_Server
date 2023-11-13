@@ -24,7 +24,7 @@ public class RedissonConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         log.info("RedissonConfig " + profile + " profile");
-        if (profile.equals("prod")) {
+        if (profile.equals("prod")||profile.equals("dev")) {
             config.useClusterServers()
                     .addNodeAddress(REDISSON_HOST_PREFIX + redisProperties.getHost() + ":" + redisProperties.getPort())
                     // 다른 클러스터 노드도 필요에 따라 추가

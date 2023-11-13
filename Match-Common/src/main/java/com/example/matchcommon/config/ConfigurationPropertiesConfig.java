@@ -19,7 +19,8 @@ import org.springframework.context.annotation.Configuration;
         MatchAligoUrl.class,
         ServerHostProperties.class,
         WebReturnUrl.class,
-        PortOneProperties.class
+        PortOneProperties.class,
+        AppleProperties.class
 })
 @Configuration
 public class ConfigurationPropertiesConfig {}

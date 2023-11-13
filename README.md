@@ -1,5 +1,8 @@
 # BackendMatch
-##
+## 아키텍쳐
+![image](https://github.com/TEAMMatchDev/Match_Server/assets/81962309/66ff5856-b41e-4537-a579-62276b9f2743)
+
+
 
 ## 📂 멀티 모듈 구조 
 
@@ -30,7 +33,7 @@
 │        │           ├─ security
 │        │           └─ user
 │        │              ├─ controller
-│        │              ├─ convertor
+│        │              ├─ Converter
 │        │              ├─ dto
 │        │              ├─ service
 │        │              └─ utils

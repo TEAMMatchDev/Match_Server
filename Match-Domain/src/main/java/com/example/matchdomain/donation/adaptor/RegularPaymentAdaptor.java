@@ -5,6 +5,7 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -54,5 +55,17 @@ public class RegularPaymentAdaptor {
 
     public List<RegularPayment> findByCardId(Long cardId) {
         return regularPaymentRepository.findByUserCardIdAndRegularPayStatus(cardId, PROCEEDING);
+    }
+
+    public List<RegularPayment> findByLastDayRegularPayment(int currentDay) {
+        return regularPaymentRepository.findByPayDateGreaterThanEqualAndStatusAndRegularPayStatus(currentDay, Status.ACTIVE, RegularPayStatus.PROCEEDING);
+    }
+
+    public List<RegularPayment> findByDate(int currentDay) {
+        return regularPaymentRepository.findByPayDateAndStatusAndRegularPayStatus(currentDay, Status.ACTIVE, RegularPayStatus.PROCEEDING);
+    }
+
+    public void saveAll(List<RegularPayment> regularPayments) {
+        regularPaymentRepository.saveAll(regularPayments);
     }
 }

@@ -2,6 +2,7 @@ package com.example.matchapi.order.helper;
 
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchcommon.annotation.Helper;
+import com.example.matchcommon.util.AesUtil;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.enums.PayMethod;
@@ -24,6 +25,7 @@ import static com.example.matchcommon.constants.MatchStatic.BASIC;
 @RequiredArgsConstructor
 public class OrderHelper {
     private final DonationAdaptor donationAdaptor;
+    private final AesUtil aesUtil;
 
     public PayMethod getPayMethod(String value) {
         for (PayMethod payMethod : PayMethod.values()) {
@@ -60,6 +62,7 @@ public class OrderHelper {
     }
 
     public String maskMiddleNum(String cardNo) {
+        cardNo = aesUtil.aesCBCDecode(cardNo);
         String firstFourDigits = cardNo.substring(0, 4);
         String lastFourDigits = cardNo.substring(12);
         String middleDigitsMasked = "********";

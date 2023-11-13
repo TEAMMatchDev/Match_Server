@@ -63,7 +63,7 @@ jobs:
           portone.key: ${{ secrets.PORTONE_KEY }}
           portone.secret: ${{ secrets.PORTONE_SECRET }}
           portone.billmid: ${{ secrets.PROD_PORTONE_BILL_MID}}
-
+          private.aes.key: ${{ secrets.AES_PRIVATE_KEY }}
 
 
       - name: Set Environment Domain - Domain Prod Yml
@@ -86,6 +86,10 @@ jobs:
           name: "serviceAccountKey.json"
           json: ${{ secrets.FCM_JSON }}
           dir: "Match-Common/src/main/resources/"
+
+      - run: ./Match-Common/src/main/resources/AuthKey_HR7JU89RQ6.p8
+      - run: echo "${{ secrets.AUTH_KEY }}" > ./Match-Common/src/main/resources/AuthKey_HR7JU89RQ6.p8
+      - run: cat ./Match-Common/src/main/resources/AuthKey_HR7JU89RQ6.p8
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew

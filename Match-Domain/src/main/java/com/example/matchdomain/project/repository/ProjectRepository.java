@@ -160,7 +160,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
             "If((select exists (select * from ProjectUserAttention PUA where PUA.userId=:userId and P.id = PUA.projectId )),'true','false')'like', " +
             "GROUP_CONCAT(U.profileImgUrl SEPARATOR ',') AS 'imgUrlList', \n" +
             "count(RP.id)'totalDonationCnt' \n" +
-            "from Project P join ProjectImage PI on P.id = PI.projectId left join RegularPayment RP on RP.projectId=P.id and RP.regularPayStatus = 'PROCEEDING' " +
+            "from Project P join ProjectImage PI on P.id = PI.projectId " +
+            "left join RegularPayment RP on RP.projectId=P.id and RP.regularPayStatus = 'PROCEEDING' " +
             "left join User U on U.id = RP.userId " +
             "where PI.imageRepresentStatus = :imageRepresentStatus and P.projectStatus = :projectStatus and P.finishedAt>=:now and P.status = :status and P.projectKind =:projectKind group by P.id order by P.createdAt desc"
             , nativeQuery = true
@@ -287,6 +288,21 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
     ProjectDetail getProjectAppDetail(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
     Optional<Project> findByIdAndStatusAndRegularStatus(Long projectId, Status status, RegularStatus regular);
+
+    @Query(value = "select P.id as 'id', P.usages as 'usages', P.projectKind as 'projectKind', viewCnt, " +
+            "P.projectName as 'projectName', PI.url as 'imgUrl', " +
+            "If((select exists (select * from ProjectUserAttention PUA2 where PUA2.userId=:userId and P.id = PUA2.projectId )),'true','false')'like', " +
+            "GROUP_CONCAT(U.profileImgUrl SEPARATOR ',') AS 'imgUrlList', \n" +
+            "count(RP.id)'totalDonationCnt' \n" +
+            "from Project P join ProjectImage PI on P.id = PI.projectId and PI.imageRepresentStatus = 'REPRESENT'" +
+            "LEFT JOIN RegularPayment RP ON RP.projectId = P.id AND RP.regularPayStatus = 'PROCEEDING'\n" +
+            "left join User U on U.id = RP.userId " +
+            "join ProjectUserAttention PUA on PUA.projectId = P.id " +
+            "where PUA.userId = :userId " +
+            "group by P.id order by totalDonationCnt desc"
+            , nativeQuery = true
+            , countQuery = "select * from Project P join ProjectUserAttention PUA on PUA.userId = :userId and P.id = PUA.projectId")
+    Page<ProjectList> findLikeProjects(@Param("userId") Long userId, Pageable pageable);
 
     interface ProjectList {
         Long getId();

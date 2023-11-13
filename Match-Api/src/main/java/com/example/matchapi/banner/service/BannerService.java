@@ -1,6 +1,6 @@
 package com.example.matchapi.banner.service;
 
-import com.example.matchapi.banner.convertor.BannerConvertor;
+import com.example.matchapi.banner.converter.BannerConverter;
 import com.example.matchapi.banner.dto.BannerRes;
 import com.example.matchdomain.banner.adaptor.BannerAdaptor;
 import com.example.matchdomain.banner.entity.Banner;
@@ -14,11 +14,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BannerService {
     private final BannerAdaptor bannerAdaptor;
-    private final BannerConvertor bannerConvertor;
+    private final BannerConverter bannerConverter;
 
-    @Cacheable(cacheNames = "bannerCache", key = "'all'")
+    @Cacheable(cacheNames = "bannerCache", key = "'all'", cacheManager = "ehcacheManager")
     public List<BannerRes.BannerList> getBannerList() {
         List<Banner> banners = bannerAdaptor.getBannerList();
-        return bannerConvertor.convertToBannerList(banners);
+        return bannerConverter.convertToBannerList(banners);
     }
 }

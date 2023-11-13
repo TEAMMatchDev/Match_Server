@@ -1,9 +1,11 @@
 package com.example.matchapi.project.dto;
 
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ProjectRes {
@@ -99,7 +101,8 @@ public class ProjectRes {
 
         private String comment;
 
-        private String commentDate;
+        @JsonFormat(pattern = "yyyy.MM.dd HH.mm")
+        private LocalDateTime commentDate;
 
         @Schema(description = "이미지 URL", required = true, example = "imgUrl")
         private String profileImgUrl;

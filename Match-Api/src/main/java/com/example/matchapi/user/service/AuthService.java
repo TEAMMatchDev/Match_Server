@@ -1,7 +1,7 @@
 package com.example.matchapi.user.service;
 
 import com.example.matchapi.common.security.JwtService;
-import com.example.matchapi.user.convertor.UserConvertor;
+import com.example.matchapi.user.converter.UserConverter;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.helper.AuthHelper;
@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
+import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.user.entity.enums.AuthorityEnum.ROLE_ADMIN;
 import static com.example.matchdomain.user.entity.enums.SocialType.*;
 import static com.example.matchdomain.user.exception.AdminLoginErrorCode.NOT_ADMIN;
@@ -70,7 +71,7 @@ public class AuthService {
     private final UserAddressRepository userAddressRepository;
     private final JwtService jwtService;
     private final AuthHelper authHelper;
-    private final UserConvertor userConvertor;
+    private final UserConverter userConverter;
     private final PasswordEncoder passwordEncoder;
     private final SmsHelper smsHelper;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -87,7 +88,7 @@ public class AuthService {
         KakaoUserInfoDto kakaoUserInfoDto = kakaoFeignClient.getInfo(BEARER + socialLoginToken.getAccessToken());
 
         Long userId;
-        Optional<User> user = userRepository.findBySocialIdAndSocialType(kakaoUserInfoDto.getId(), KAKAO);
+        Optional<User> user = userRepository.findBySocialIdAndSocialTypeAndStatus(kakaoUserInfoDto.getId(), KAKAO, ACTIVE);
         authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
 
         //소셜 로그인 정보가 없을 시
@@ -97,7 +98,7 @@ public class AuthService {
             if(!kakaoUserAddressDto.isShippingAddressesNeedsAgreement()){
                 List<UserAddress> userAddressList = new ArrayList<>();
                 for(KakaoUserAddressDto.ShippingAddresses shippingAddresses : kakaoUserAddressDto.getShippingAddresses()){
-                    UserAddress userAddress = userConvertor.convertToAddUserAddress(userId,shippingAddresses);
+                    UserAddress userAddress = userConverter.convertToAddUserAddress(userId,shippingAddresses);
                     userAddressList.add(userAddress);
                 }
                 userAddressRepository.saveAll(userAddressList);
@@ -117,13 +118,13 @@ public class AuthService {
 
     private UserRes.Token createToken(Long userId) {
         UserRes.Token token =  jwtService.createTokens(userId);
-        refreshTokenRepository.save(userConvertor.convertToRefreshToken(userId,token.getRefreshToken(),jwtProperties.getRefreshTokenSeconds()));
+        refreshTokenRepository.save(userConverter.convertToRefreshToken(userId,token.getRefreshToken(),jwtProperties.getRefreshTokenSeconds()));
         return token;
     }
 
 
     private Long kakaoSignUp(KakaoUserInfoDto kakaoUserInfoDto) {
-        User user = userConvertor.convertToKakaoSignUpUser(kakaoUserInfoDto, KAKAO);
+        User user = userConverter.convertToKakaoSignUpUser(kakaoUserInfoDto, KAKAO);
 
         System.out.println(kakaoUserInfoDto.getPhoneNumber());
 
@@ -132,7 +133,7 @@ public class AuthService {
 
     @Transactional
     public Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
-        return userRepository.save(userConvertor.convertToNaverSignUpUser(naverUserInfoDto, NAVER)).getId();
+        return userRepository.save(userConverter.convertToNaverSignUpUser(naverUserInfoDto, NAVER)).getId();
     }
     public KakaoLoginTokenRes getOauthToken(String code, String referer) {
         return kakaoLoginFeignClient.kakaoAuth(
@@ -156,9 +157,10 @@ public class AuthService {
     public UserRes.UserToken naverLogIn(UserReq.SocialLoginToken socialLoginToken) {
         NaverUserInfoDto naverUserInfoDto = naverFeignClient.getInfo(BEARER + socialLoginToken.getAccessToken());
         Long userId;
+
         authHelper.checkUserExists(naverUserInfoDto.getMobile(), NAVER);
 
-        Optional<User> user = userRepository.findBySocialIdAndSocialType(naverUserInfoDto.getResponse().getId(), NAVER);
+        Optional<User> user = userRepository.findBySocialIdAndSocialTypeAndStatus(naverUserInfoDto.getResponse().getId(), NAVER, ACTIVE);
 
         if (user.isEmpty()) userId = naverSignUp(naverUserInfoDto);
 
@@ -175,7 +177,7 @@ public class AuthService {
         if(userRepository.existsByPhoneNumber(signUpUser.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
         if(userRepository.existsByEmail(signUpUser.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
 
-        Long userId = userRepository.save(userConvertor.convertToSignUpUser(signUpUser)).getId();
+        Long userId = userRepository.save(userConverter.convertToSignUpUser(signUpUser)).getId();
 
         UserRes.Token token = createToken(userId);
 
@@ -184,15 +186,15 @@ public class AuthService {
     }
 
     public void checkUserPhone(UserReq.UserPhone userPhone) {
-        if(userRepository.existsByPhoneNumber(userPhone.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
+        if(userRepository.existsByPhoneNumberAndStatus(userPhone.getPhone(),ACTIVE)) throw new BadRequestException(USERS_EXISTS_PHONE);
     }
 
     public void checkUserEmail(UserReq.UserEmail userEmail) {
-        if(userRepository.existsByEmail(userEmail.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        if(userRepository.existsByEmailAndStatus(userEmail.getEmail(), ACTIVE)) throw new BadRequestException(USERS_EXISTS_EMAIL);
     }
 
     public UserRes.UserToken logIn(UserReq.LogIn logIn) {
-        User user=userRepository.findByUsername(logIn.getEmail()).orElseThrow(() -> new UnauthorizedException(NOT_EXIST_USER));
+        User user=userRepository.findByUsernameAndStatus(logIn.getEmail(), ACTIVE).orElseThrow(() -> new UnauthorizedException(NOT_EXIST_USER));
 
         if(!passwordEncoder.matches(logIn.getPassword(),user.getPassword())) throw new BadRequestException(NOT_CORRECT_PASSWORD);
 
@@ -260,7 +262,7 @@ public class AuthService {
     public UserRes.UserToken appleLogin(UserReq.SocialLoginToken socialLoginToken) {
         AppleUserRes appleUserRes = authService.appleLogin(socialLoginToken.getAccessToken());
 
-        if(userRepository.existsByEmail(appleUserRes.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        if(userRepository.existsByEmailAndSocialTypeNot(appleUserRes.getEmail(), APPLE)) throw new BadRequestException(USERS_EXISTS_EMAIL);
         Optional<User> user = userAdaptor.existsSocialUser(appleUserRes.getSocialId(), APPLE);
 
         Long userId;
@@ -274,6 +276,6 @@ public class AuthService {
     }
 
     private Long appleSignUp(AppleUserRes appleUserRes) {
-        return userRepository.save(userConvertor.convertToAppleUserSignUp(appleUserRes)).getId();
+        return userRepository.save(userConverter.convertToAppleUserSignUp(appleUserRes)).getId();
     }
 }

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.user.exception.UserSignUpErrorCode.EXIST_USER_PHONENUMBER;
 import static com.example.matchdomain.user.entity.enums.SocialType.*;
 
@@ -46,7 +47,7 @@ public class AuthHelper {
 
     public void checkUserExists(String phoneNumber, SocialType socialType) {
         HashMap<String, String> errorType = new HashMap<>();
-        Optional<User> user = userRepository.findByPhoneNumberAndSocialTypeNot(phoneNumber.replaceAll("\\D+", "").replaceFirst("^82", "0"), socialType);
+        Optional<User> user = userRepository.findByPhoneNumberAndSocialTypeNotAndStatus(phoneNumber.replaceAll("\\D+", "").replaceFirst("^82", "0"), socialType, ACTIVE);
 
         if (user.isPresent()) {
             errorType.put("signUpType", socialTypeConversion(user.get().getSocialType()));

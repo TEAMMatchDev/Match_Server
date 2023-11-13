@@ -149,4 +149,10 @@ public class User extends BaseEntity implements UserDetails {
         this.profileImgUrl = newProfileImg;
         this.nickname = name;
     }
+
+    public void updateUserInfo(LocalDate birthDate, String name, String phone) {
+        this.birth = birthDate;
+        this.name = name;
+        this.phoneNumber = phone;
+    }
 }
