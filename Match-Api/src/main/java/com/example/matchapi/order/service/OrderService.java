@@ -12,6 +12,7 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.BaseException;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.adaptor.RegularPaymentAdaptor;
+import com.example.matchdomain.donation.adaptor.RequestFailedHistoryAdapter;
 import com.example.matchdomain.donation.entity.*;
 import com.example.matchdomain.donation.entity.enums.CardAbleStatus;
 import com.example.matchdomain.donation.entity.enums.DonationStatus;
@@ -56,6 +57,7 @@ public class OrderService {
     private final RegularPaymentAdaptor regularPaymentAdaptor;
     private final UserCardAdaptor userCardAdaptor;
     private final DonationHistoryService donationHistoryService;
+    private final RequestFailedHistoryAdapter failedHistoryAdapter;
 
     @Transactional
     public List<OrderRes.UserBillCard> getUserBillCard(Long userId) {
@@ -198,6 +200,7 @@ public class OrderService {
     private void cancelRegularPayment(List<RegularPayment> regularPayments) {
         for(RegularPayment regularPayment : regularPayments){
             regularPayment.setRegularPayStatus(RegularPayStatus.USER_CANCEL);
+            failedHistoryAdapter.deleteByRegularPaymentId(regularPayment.getId());
         }
         regularPaymentRepository.saveAll(regularPayments);
     }
