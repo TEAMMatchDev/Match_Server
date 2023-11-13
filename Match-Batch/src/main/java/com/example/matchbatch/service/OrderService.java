@@ -9,6 +9,8 @@ import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchdomain.donation.adaptor.RegularPaymentAdaptor;
 import com.example.matchdomain.donation.adaptor.RequestFailedHistoryAdapter;
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.user.adaptor.UserCardAdaptor;
+import com.example.matchdomain.user.entity.User;
 import com.example.matchinfrastructure.discord.service.DiscordService;
 import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import com.example.matchinfrastructure.pay.portone.converter.PortOneConverter;
@@ -40,6 +42,7 @@ public class OrderService {
     private final OrderConverter orderConverter;
     private final TimeUtils timeUtils;
     private final NotificationService notificationService;
+    private final UserCardAdaptor userCardAdaptor;
 
     public void regularDonationPayment() {
         List<RegularPayment> regularPayments = calculateDay();
@@ -165,5 +168,21 @@ public class OrderService {
     private List<RegularPayment> historyToRegularPayments(List<RequestFailedHistory> requestFailedHistories) {
         return requestFailedHistories.stream()
                 .map(RequestFailedHistory::getRegularPayment).collect(Collectors.toList());
+    }
+
+    public void deleteForOrder(User user) {
+        List<UserCard> userCards = userCardAdaptor.findCardLists(user.getId());
+
+        String accessToken = portOneAuthService.getAuthToken();
+
+        for(UserCard userCard : userCards){
+            deleteUserCard(userCard, accessToken);
+        }
+
+        userCardAdaptor.deleteByUser(user.getId());
+    }
+
+    private void deleteUserCard(UserCard userCard, String accessToken) {
+        portOneFeignClient.deleteBillKey(accessToken, userCard.getCustomerId());
     }
 }

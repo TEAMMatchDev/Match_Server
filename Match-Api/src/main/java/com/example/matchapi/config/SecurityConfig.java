@@ -88,7 +88,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/order").permitAll()
                 .antMatchers("/order/serverAuth").permitAll()
                 .antMatchers("/projects").permitAll()
-                .antMatchers("/projects/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/projects/{projectId}").permitAll()
                 .antMatchers("/projects/list").authenticated()
                 .antMatchers("/").permitAll()
                 .antMatchers("/serverAuth").permitAll()

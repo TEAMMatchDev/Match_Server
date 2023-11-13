@@ -29,13 +29,12 @@ public class PaymentScheduler {
     private final DiscordConverter discordConverter;
 
     //매일 12시 30분에 실행되는 스케줄러
-    //@Scheduled(cron = "0 30 12 * * *")
+    @Scheduled(cron = "0 30 12 * * *")
     //매 1분마다 실행
     //@Scheduled(cron = "0,20,40 * * * * *", zone = "asia/seoul")
-    @Scheduled(fixedDelay = 30000)
+    //@Scheduled(fixedDelay = 30000)
     public void RegularPayScheduler(){
         log.info("정기 결제 스케줄러 시작");
-        discordFeignClient.alertMessage(discordConverter.convertToAlertBatchMessage("정기 결제 스케줄러 시작",20));
 
         Map<String, JobParameter> confMap = new HashMap<>();
         confMap.put("time", new JobParameter(System.currentTimeMillis()));
@@ -52,8 +51,7 @@ public class PaymentScheduler {
         }
 
     }
-    //@Scheduled(cron = "0 0 13/1 * * *")
-    //@Scheduled(fixedDelay = 1)
+    @Scheduled(cron = "0 0 15 */2 * ?") // 매월 짝수 일의 15시(3 PM)에 실행
     public void RegularFailedPayScheduler(){
         log.info("정기 결제 실패 한 결제들 재시도 시작");
 

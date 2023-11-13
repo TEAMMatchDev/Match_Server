@@ -1,6 +1,7 @@
 package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
@@ -69,4 +70,5 @@ public class RegularPayment extends BaseEntity {
     @JoinColumn(name = "regularPaymentId")
     @BatchSize(size = 100)
     private List<DonationUser> donationUser = new ArrayList<>();
+
 }

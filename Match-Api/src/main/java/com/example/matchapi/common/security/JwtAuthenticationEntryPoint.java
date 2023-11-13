@@ -57,6 +57,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 errorCode = NOT_EXISTS_USER_HAVE_TOKEN;
                 setResponse(response, errorCode, request);
                 return;
+            case "NotUserActiveException":
+                errorCode = NOT_USER_ACTIVE;
+                setResponse(response, errorCode, request);
+                return;
         }
     }
 

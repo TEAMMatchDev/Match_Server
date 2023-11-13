@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
+import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.user.entity.enums.AuthorityEnum.ROLE_ADMIN;
 import static com.example.matchdomain.user.entity.enums.SocialType.*;
 import static com.example.matchdomain.user.exception.AdminLoginErrorCode.NOT_ADMIN;
@@ -87,7 +88,7 @@ public class AuthService {
         KakaoUserInfoDto kakaoUserInfoDto = kakaoFeignClient.getInfo(BEARER + socialLoginToken.getAccessToken());
 
         Long userId;
-        Optional<User> user = userRepository.findBySocialIdAndSocialType(kakaoUserInfoDto.getId(), KAKAO);
+        Optional<User> user = userRepository.findBySocialIdAndSocialTypeAndStatus(kakaoUserInfoDto.getId(), KAKAO, ACTIVE);
         authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
 
         //소셜 로그인 정보가 없을 시
@@ -156,9 +157,10 @@ public class AuthService {
     public UserRes.UserToken naverLogIn(UserReq.SocialLoginToken socialLoginToken) {
         NaverUserInfoDto naverUserInfoDto = naverFeignClient.getInfo(BEARER + socialLoginToken.getAccessToken());
         Long userId;
+
         authHelper.checkUserExists(naverUserInfoDto.getMobile(), NAVER);
 
-        Optional<User> user = userRepository.findBySocialIdAndSocialType(naverUserInfoDto.getResponse().getId(), NAVER);
+        Optional<User> user = userRepository.findBySocialIdAndSocialTypeAndStatus(naverUserInfoDto.getResponse().getId(), NAVER, ACTIVE);
 
         if (user.isEmpty()) userId = naverSignUp(naverUserInfoDto);
 
@@ -184,15 +186,15 @@ public class AuthService {
     }
 
     public void checkUserPhone(UserReq.UserPhone userPhone) {
-        if(userRepository.existsByPhoneNumber(userPhone.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
+        if(userRepository.existsByPhoneNumberAndStatus(userPhone.getPhone(),ACTIVE)) throw new BadRequestException(USERS_EXISTS_PHONE);
     }
 
     public void checkUserEmail(UserReq.UserEmail userEmail) {
-        if(userRepository.existsByEmail(userEmail.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        if(userRepository.existsByEmailAndStatus(userEmail.getEmail(), ACTIVE)) throw new BadRequestException(USERS_EXISTS_EMAIL);
     }
 
     public UserRes.UserToken logIn(UserReq.LogIn logIn) {
-        User user=userRepository.findByUsername(logIn.getEmail()).orElseThrow(() -> new UnauthorizedException(NOT_EXIST_USER));
+        User user=userRepository.findByUsernameAndStatus(logIn.getEmail(), ACTIVE).orElseThrow(() -> new UnauthorizedException(NOT_EXIST_USER));
 
         if(!passwordEncoder.matches(logIn.getPassword(),user.getPassword())) throw new BadRequestException(NOT_CORRECT_PASSWORD);
 
@@ -260,7 +262,7 @@ public class AuthService {
     public UserRes.UserToken appleLogin(UserReq.SocialLoginToken socialLoginToken) {
         AppleUserRes appleUserRes = authService.appleLogin(socialLoginToken.getAccessToken());
 
-        if(userRepository.existsByEmail(appleUserRes.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        if(userRepository.existsByEmailAndSocialTypeNot(appleUserRes.getEmail(), APPLE)) throw new BadRequestException(USERS_EXISTS_EMAIL);
         Optional<User> user = userAdaptor.existsSocialUser(appleUserRes.getSocialId(), APPLE);
 
         Long userId;

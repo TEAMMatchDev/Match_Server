@@ -18,4 +18,6 @@ public interface ProjectCommentRepository extends JpaRepository<ProjectComment, 
     Page<ProjectComment> findByProjectIdAndStatusOrderByCreatedAtAsc(Long projectId, Status status, Pageable pageable);
 
     Optional<ProjectComment> findByIdAndStatus(Long commentId, Status status);
+
+    void deleteByUserId(Long id);
 }

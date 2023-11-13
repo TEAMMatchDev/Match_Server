@@ -10,6 +10,8 @@ import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.redis.repository.RefreshTokenRepository;
+import com.example.matchdomain.user.entity.enums.SocialType;
+import com.example.matchdomain.user.exception.DeleteUserErrorCode;
 import com.example.matchdomain.user.exception.ModifyEmailCode;
 import com.example.matchdomain.user.exception.ModifyPhoneErrorCode;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
@@ -22,13 +24,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 
+import static com.example.matchdomain.user.exception.DeleteUserErrorCode.APPLE_USER_NOT_API;
 import static com.example.matchdomain.user.exception.UserAuthErrorCode.INVALID_REFRESH_TOKEN;
 
 @RestController
@@ -182,6 +187,33 @@ public class UserController {
                                                                     @RequestParam AlarmType alarmType){
         return CommonResponse.onSuccess(userService.patchAlarm(user, alarmType));
     }
+    @Operation(summary = "02-11 애플유저 결제화면 추가 정보 POST 👤" , description = "애플 유저 결제 화면 추가정보 POST")
+    @PostMapping("/apple")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    public CommonResponse<String> postAppleUserInfo(@AuthenticationPrincipal User user,
+                                                    @Valid @RequestBody UserReq.AppleUserInfo appleUserInfo){
+        userService.postAppleUserInfo(user, appleUserInfo);
+        return CommonResponse.onSuccess("성공");
+    }
 
+    @Operation(summary = "02-12 유저 탈퇴 API")
+    @DeleteMapping("")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, DeleteUserErrorCode.class})
+    public CommonResponse<String> deleteUserInfo(@AuthenticationPrincipal User user){
+        if(user.getSocialType().equals(SocialType.APPLE)){
+            throw new BadRequestException(APPLE_USER_NOT_API);
+        }
+        userService.deleteUserInfo(user);
+        return CommonResponse.onSuccess("탈퇴 성공");
+    }
+
+    @Operation(summary = "02-13 애플 유저 탈퇴 API")
+    @DeleteMapping("/apple")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    public CommonResponse<String> deleteAppleUserInfo(@AuthenticationPrincipal User user,
+                                                      @Valid @RequestBody UserReq.AppleCode appleCode){
+        userService.deleteAppleUserInfo(user, appleCode);
+        return CommonResponse.onSuccess("탈퇴 성공");
+    }
 
 }

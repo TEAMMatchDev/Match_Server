@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.validation.constraints.*;
+import java.time.LocalDate;
 
 public class UserReq {
 
@@ -184,5 +185,33 @@ public class UserReq {
         private String oldEmail;
 
         private String newEmail;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AppleUserInfo {
+        @NotBlank(message = "이름을 입력해주세요")
+        private String name;
+
+        @NotBlank(message = "생일을 입력해주세요")
+        private LocalDate birthDate;
+
+        @NotBlank(message = "전화번호를 입력해주세요")
+        private String phone;
+    }
+
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AppleCode {
+        @Schema(description = "애플 코드 입력", required = true)
+        @NotBlank(message = "코드를 입력해주세요")
+        private String code;
     }
 }

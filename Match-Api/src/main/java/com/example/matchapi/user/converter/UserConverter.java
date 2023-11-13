@@ -142,7 +142,7 @@ public class UserConverter {
     public OrderRes.UserDetail convertToUserInfo(User user) {
         return OrderRes.UserDetail.builder()
                 .name(user.getName())
-                .birthDay(user.getBirth().toString())
+                .birthDay(user.getBirth())
                 .phoneNumber(user.getPhoneNumber()).build();
     }
 
@@ -231,7 +231,6 @@ public class UserConverter {
                 .username(appleUserRes.getSocialId())
                 .password(authHelper.createRandomPassword())
                 .profileImgUrl(BASE_PROFILE)
-                .name(userHelper.createRandomNickName())
                 .email(appleUserRes.getEmail())
                 .socialId(appleUserRes.getSocialId())
                 .socialType(SocialType.APPLE)

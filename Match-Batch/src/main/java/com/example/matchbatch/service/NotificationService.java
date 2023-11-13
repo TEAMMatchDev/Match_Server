@@ -7,6 +7,7 @@ import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.notification.adaptor.NotificationAdaptor;
 import com.example.matchdomain.user.adaptor.UserFcmAdaptor;
+import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserFcmToken;
 import com.example.matchinfrastructure.fcm.converter.FcmConverter;
 import com.example.matchinfrastructure.fcm.dto.FCMNotificationRequestDto;
@@ -39,5 +40,9 @@ public class NotificationService {
         }
 
         notificationAdaptor.saveNotification(converter.convertToNotification(fcmNotificationRequestDto, donationUser));
+    }
+
+    public void deleteForNotification(User user) {
+        notificationAdaptor.deleteByUserId(user.getId());
     }
 }
