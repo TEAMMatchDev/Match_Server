@@ -4,26 +4,20 @@ import com.example.matchapi.donation.service.DonationHistoryService;
 import com.example.matchapi.order.converter.OrderConverter;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
+import com.example.matchapi.portone.dto.PaymentCommand;
 import com.example.matchapi.portone.dto.PaymentReq;
 import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.properties.PortOneProperties;
-import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.adaptor.DonationAdaptor;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.UserCard;
-import com.example.matchdomain.donation.repository.DonationUserRepository;
-import com.example.matchdomain.project.adaptor.ProjectAdaptor;
-import com.example.matchdomain.project.entity.Project;
-import com.example.matchdomain.redis.entity.OrderRequest;
-import com.example.matchdomain.redis.repository.OrderRequestRepository;
-import com.example.matchdomain.user.entity.User;
-import com.example.matchdomain.user.repository.UserRepository;
+import com.example.matchdomain.redis.adaptor.OrderAdaptor;
 import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import com.example.matchinfrastructure.pay.portone.converter.PortOneConverter;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
-import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
@@ -31,85 +25,62 @@ import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.UUID;
 
-import static com.example.matchcommon.constants.MatchStatic.ONE_TIME;
+import static com.example.matchcommon.constants.MatchStatic.CANCEL_STATUS;
 import static com.example.matchdomain.order.exception.PortOneAuthErrorCode.*;
-import static com.example.matchdomain.project.exception.ProjectOneTimeErrorCode.PROJECT_NOT_EXIST;
-import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_EXIST_USER;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class PaymentService {
-    private final OrderRequestRepository orderRequestRepository;
-    private final UserRepository userRepository;
+    private final OrderAdaptor orderAdaptor;
     private final OrderHelper orderHelper;
-    private final DonationUserRepository donationUserRepository;
     private final OrderConverter orderConverter;
-    private final IamportClient iamportClient;
-    private final ProjectAdaptor projectAdaptor;
     private final DonationHistoryService donationHistoryService;
     private final PortOneProperties portOneProperties;
     private final PortOneConverter portOneConverter;
     private final PortOneFeignClient portOneFeignClient;
     private final PortOneAuthService portOneAuthService;
+    private final DonationAdaptor donationAdaptor;
+    private IamportClient iamportClient;
 
-
-    @Autowired
-    public PaymentService(PortOneProperties portOneProperties,
-                          OrderRequestRepository orderRequestRepository,
-                          UserRepository userRepository,
-                          OrderHelper orderHelper,
-                          DonationUserRepository donationUserRepository,
-                          OrderConverter orderConverter, ProjectAdaptor projectAdaptor, DonationHistoryService donationHistoryService, PortOneConverter portOneConverter, PortOneFeignClient portOneFeignClient, PortOneAuthService portOneAuthService) {
-        this.portOneProperties = portOneProperties;
-        this.orderRequestRepository = orderRequestRepository;
-        this.userRepository = userRepository;
-        this.orderHelper = orderHelper;
-        this.donationUserRepository = donationUserRepository;
-        this.orderConverter = orderConverter;
+    @PostConstruct
+    private void init() {
         this.iamportClient = new IamportClient(portOneProperties.getKey(), portOneProperties.getSecret());
-        this.projectAdaptor = projectAdaptor;
-        this.donationHistoryService = donationHistoryService;
-        this.portOneConverter = portOneConverter;
-        this.portOneFeignClient = portOneFeignClient;
-        this.portOneAuthService = portOneAuthService;
     }
 
-    @RedissonLock(LockName = "결제-검증", key = "#validatePayment.orderId")
-    public OrderRes.CompleteDonation checkPayment(PaymentReq.ValidatePayment validatePayment){
+    @RedissonLock(LockName = "결제-검증", key = "#paymentValidation.validatePayment.orderId")
+    public OrderRes.CompleteDonation checkPayment(PaymentCommand.PaymentValidation paymentValidation){
         try {
-            OrderRequest orderRequest = orderRequestRepository.findById(validatePayment.getOrderId()).orElseThrow(()->new BadRequestException(NOT_EXIST_ORDER_ID));
+            IamportResponse<Payment> payment = iamportClient.paymentByImpUid(paymentValidation.getValidatePayment().getImpUid());
 
-            log.info(orderRequest.getOrderId());
+            validatePayments(payment, paymentValidation.getValidatePayment());
 
-            IamportResponse<Payment> payment = iamportClient.paymentByImpUid(validatePayment.getImpUid());
+            saveDonationUser(paymentValidation);
 
-            if(payment.getResponse().getAmount().intValue()!=validatePayment.getAmount()) throw new BadRequestException(FAILED_ERROR_AUTH_AMOUNT);
+            orderAdaptor.deleteById(paymentValidation.getValidatePayment().getOrderId());
 
-            User user = userRepository.findByIdAndStatus(Long.valueOf(orderRequest.getUserId()), Status.ACTIVE).orElseThrow(()->new BadRequestException(NOT_EXIST_USER));
-
-            Project project = projectAdaptor.findByProjectId(Long.valueOf(orderRequest.getProjectId())).orElseThrow(()->new BadRequestException(PROJECT_NOT_EXIST));
-
-            saveDonationUser(user, validatePayment, project);
-
-            orderRequestRepository.deleteById(validatePayment.getOrderId());
-
-            return orderConverter.convertToCompleteDonation(user.getName(), project, (long) validatePayment.getAmount());
-        } catch (BadRequestException | IamportResponseException | IOException e) {
-            try {
-                refundPayment(validatePayment.getImpUid());
-            } catch(Exception ex) {
-                System.out.println(ex.getMessage());
-            }
+            return orderConverter.convertToCompleteDonation(paymentValidation.getUser().getName(), paymentValidation.getProject(), (long) paymentValidation.getValidatePayment().getAmount());
+        } catch (IamportResponseException | IOException e) {
             throw new BadRequestException(FAILED_ERROR_AUTH);
         }
+    }
+
+    private void validatePayments(IamportResponse<Payment> payment, PaymentReq.ValidatePayment validatePayment) {
+        log.info(payment.getResponse().getStatus());
+
+        if(payment.getResponse().getStatus().equals(CANCEL_STATUS)) throw new BadRequestException(EXIST_CANCEL_STATUS);
+
+        if(donationAdaptor.existsByImpId(validatePayment.getImpUid())) throw new BadRequestException(EXIST_IMP_UID);
+
+        if(payment.getResponse().getAmount().intValue()!=validatePayment.getAmount()) throw new BadRequestException(FAILED_ERROR_AUTH_AMOUNT);
+
+        if(!payment.getResponse().getMerchantUid().equals(validatePayment.getOrderId())) throw new BadRequestException(NOT_CORRECT_ORDER_ID);
     }
 
     private CancelData createCancelData(IamportResponse<Payment> response, int refundAmount) {
@@ -127,9 +98,9 @@ public class PaymentService {
         }
     }
 
-    public void saveDonationUser(User user, PaymentReq.ValidatePayment validatePayment, Project project) {
-        OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
-        DonationUser donationUser = donationUserRepository.save(orderConverter.convertToDonationUserPortone(user.getId(), validatePayment, project.getId(), createInherenceDto));
+    public void saveDonationUser(PaymentCommand.PaymentValidation paymentValidation) {
+        OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(paymentValidation.getUser());
+        DonationUser donationUser = donationAdaptor.save(orderConverter.convertToDonationUserPortone(paymentValidation.getUser().getId(), paymentValidation.getValidatePayment(), paymentValidation.getProject().getId(), createInherenceDto));
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
     }
 

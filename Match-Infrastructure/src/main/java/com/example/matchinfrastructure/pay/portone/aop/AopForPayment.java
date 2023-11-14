@@ -1,6 +1,6 @@
 package com.example.matchinfrastructure.pay.portone.aop;
 
-import com.example.matchcommon.annotation.RegularPaymentIntercept;
+import com.example.matchcommon.annotation.PaymentIntercept;
 import com.example.matchcommon.aop.KeyGenerator;
 import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +21,11 @@ public class AopForPayment {
 
 
     // @PaymentValidator 어노테이션이 붙은 메소드에서 예외가 발생하면 이 메소드가 호출됩니다.
-    @AfterThrowing(pointcut = "execution(* *(..)) && @annotation(regularPaymentIntercept)", throwing = "exception")
-    public void refundOnPaymentFailure(JoinPoint joinPoint, RegularPaymentIntercept regularPaymentIntercept, Throwable exception) {
+    @AfterThrowing(pointcut = "execution(* *(..)) && @annotation(paymentIntercept)", throwing = "exception")
+    public void refundOnPaymentFailure(JoinPoint joinPoint, PaymentIntercept paymentIntercept, Throwable exception) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
 
-        String impUid = (String) keyGenerator.getDynamicValue(methodSignature.getParameterNames(),  joinPoint.getArgs(), regularPaymentIntercept.key());
+        String impUid = (String) keyGenerator.getDynamicValue(methodSignature.getParameterNames(),  joinPoint.getArgs(), paymentIntercept.key());
 
         log.info("ERROR OCCUR : " + impUid);
         try {

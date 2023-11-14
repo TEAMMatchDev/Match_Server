@@ -128,4 +128,8 @@ public class ProjectAdaptor {
         Page<ProjectRepository.ProjectList> projects = projectRepository.findLikeProjects(user.getId(), pageable);
         return projects;
     }
+
+    public Project findByProject(String projectId) {
+        return findByProjectId(Long.valueOf(projectId)).orElseThrow(()->new BadRequestException(ProjectOneTimeErrorCode.PROJECT_NOT_EXIST));
+    }
 }

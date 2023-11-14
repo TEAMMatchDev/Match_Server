@@ -37,6 +37,7 @@ public class RedissonCheckLockAop {
         RLock rLock = redissonClient.getLock("key" + key);  // (1)
 
         try {
+            log.info("Redisson Lock Start key : " + key);
             boolean available = rLock.tryLock(redissonLock.waitTime(), redissonLock.leaseTime(), redissonLock.timeUnit());  // (2)
             if (!available) {
                 return false;
