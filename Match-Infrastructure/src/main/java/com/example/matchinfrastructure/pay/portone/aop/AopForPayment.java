@@ -11,6 +11,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
+import static com.example.matchcommon.constants.MatchStatic.CANCEL_IMP_UID;
+import static com.example.matchcommon.constants.MatchStatic.CANCEL_ORDER_ID;
+
 @Component
 @Aspect
 @RequiredArgsConstructor
@@ -25,12 +28,21 @@ public class AopForPayment {
     public void refundOnPaymentFailure(JoinPoint joinPoint, PaymentIntercept paymentIntercept, Throwable exception) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
 
-        String impUid = (String) keyGenerator.getDynamicValue(methodSignature.getParameterNames(),  joinPoint.getArgs(), paymentIntercept.key());
+        String parameter = paymentIntercept.key();
+
+        String impUid = (String) keyGenerator.getDynamicValue(methodSignature.getParameterNames(),  joinPoint.getArgs(), parameter);
 
         log.info("ERROR OCCUR : " + impUid);
         try {
-            portOneService.refundPayment(impUid);
-            log.error("에러 발생 환불 IMP_UID : " + impUid);
+            if(parameter.contains(CANCEL_IMP_UID)) {
+                log.info(CANCEL_IMP_UID + " 값 환불");
+                log.error("에러 발생 환불 IMP_UID : " + impUid);
+                portOneService.refundPayment(impUid);
+            }else{
+                log.info(CANCEL_ORDER_ID + " 값 환불");
+                log.error("에러 발생 환불 ORDER_ID : " + impUid);
+                portOneService.refundPaymentOrderId(impUid);
+            }
         } catch (Exception e) {
             log.error("환불 처리 중 에러 발생 IMP_UID : " + impUid);
         }

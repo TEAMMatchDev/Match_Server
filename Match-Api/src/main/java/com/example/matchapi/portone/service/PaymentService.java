@@ -8,6 +8,7 @@ import com.example.matchapi.portone.dto.PaymentCommand;
 import com.example.matchapi.portone.dto.PaymentReq;
 import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.BaseException;
 import com.example.matchcommon.properties.PortOneProperties;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
 import com.example.matchdomain.donation.entity.DonationUser;
@@ -31,6 +32,7 @@ import java.io.IOException;
 
 import static com.example.matchcommon.constants.MatchStatic.CANCEL_STATUS;
 import static com.example.matchdomain.order.exception.PortOneAuthErrorCode.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Service
 @Slf4j
@@ -87,9 +89,16 @@ public class PaymentService {
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
     }
 
-    public PortOneResponse<PortOneBillPayResponse> payBillKey(UserCard card, Long amount, String projectName, String type) {
-        String orderId = orderHelper.createOrderId(type);
+    public PortOneResponse<PortOneBillPayResponse> payBillKey(UserCard card, Long amount, String projectName, String orderId) {
         String accessToken = portOneAuthService.getToken();
-        return portOneFeignClient.payWithBillKey(accessToken, portOneConverter.convertPayWithBillKey(card.getBid(), orderId, amount, projectName, card.getCustomerId()));
+
+        PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(accessToken, portOneConverter.convertPayWithBillKey(card.getBid(), orderId, amount, projectName, card.getCustomerId()));
+
+        if (portOneResponse.getCode()!=0){
+            if (portOneResponse.getCode() != 0) {
+                throw new BaseException(BAD_REQUEST, false, "PORT_ONE_BILL_AUTH_001", portOneResponse.getMessage());
+            }
+        }
+        return portOneResponse;
     }
 }
