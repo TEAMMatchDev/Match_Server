@@ -31,6 +31,7 @@ import com.example.matchinfrastructure.pay.portone.dto.req.PortOnePrepareReq;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
 import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
@@ -42,6 +43,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class OrderService {
     private final DonationUserRepository donationUserRepository;
     private final OrderConverter orderConverter;
@@ -142,6 +144,10 @@ public class OrderService {
         String orderId = orderHelper.createOrderId(ONE_TIME);
 
         orderRequestRepository.save(orderConverter.CreateRequest(user.getId(), projectId, orderId));
+
+        PortOnePrepareReq portOnePrepareReq = portOneConverter.convertToRequestPrepare(orderId, 1000);
+
+        portOneFeignClient.preparePayments(portOneAuthService.getToken(), portOnePrepareReq);
 
         return orderId;
     }

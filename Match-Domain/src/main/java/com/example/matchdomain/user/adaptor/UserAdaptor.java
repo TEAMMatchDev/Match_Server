@@ -1,19 +1,18 @@
 package com.example.matchdomain.user.adaptor;
 
 import com.example.matchcommon.annotation.Adaptor;
+import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchdomain.user.entity.enums.Alarm.ACTIVE;
-import static com.example.matchdomain.user.entity.enums.Alarm.INACTIVE;
+import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_EXIST_USER;
 
 @Adaptor
 @RequiredArgsConstructor
@@ -33,5 +32,9 @@ public class UserAdaptor {
 
     public List<User> findDeleteUsers() {
         return userRepository.findByStatus(Status.INACTIVE);
+    }
+
+    public User findByUser(String userId) {
+        return userRepository.findByIdAndStatus(Long.valueOf(userId), Status.ACTIVE).orElseThrow(()->new BadRequestException(NOT_EXIST_USER));
     }
 }

@@ -322,4 +322,8 @@ public class ProjectService {
         Page<ProjectRepository.ProjectList> projects = projectAdaptor.findLikeProjects(user, page, size);
         return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectConverter.convertToProjectLists(projects.getContent()));
     }
+
+    public Project findByProject(String projectId) {
+        return projectAdaptor.findByProject(projectId);
+    }
 }

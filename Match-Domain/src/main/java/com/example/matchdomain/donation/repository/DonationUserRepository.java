@@ -117,6 +117,8 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
 
     List<DonationUser> findByUser(User user);
 
+    boolean existsByTid(String impUid);
+
 
     interface flameList {
         Long getRegularPayId();
