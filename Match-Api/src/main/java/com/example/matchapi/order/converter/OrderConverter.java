@@ -62,6 +62,7 @@ public class OrderConverter {
                 .inherenceNumber(createInherenceDto.getInherenceNumber())
                 .regularStatus(RegularStatus.ONE_TIME)
                 .flameImage(FlameImage.NORMAL_IMG.getImg())
+                .flameType(FlameType.NORMAL_FLAME)
                 .build();
     }
 
