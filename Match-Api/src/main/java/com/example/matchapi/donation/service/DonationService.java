@@ -31,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
+import static com.example.matchdomain.common.model.Status.INACTIVE;
 import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
 import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.PROCEEDING;
 import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.USER_CANCEL;
@@ -154,7 +155,7 @@ public class DonationService {
     public void deleteRegularPayment(User user) {
         List<RegularPayment> regularPayments = regularPaymentRepository.findByUser(user);
         for (RegularPayment regularPayment : regularPayments) {
-            regularPayment.setStatus(ACTIVE);
+            regularPayment.setStatus(INACTIVE);
             regularPayment.setRegularPayStatus(USER_CANCEL);
         }
         regularPaymentAdaptor.saveAll(regularPayments);

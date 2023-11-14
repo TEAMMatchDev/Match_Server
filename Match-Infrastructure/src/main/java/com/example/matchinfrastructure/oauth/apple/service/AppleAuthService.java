@@ -98,8 +98,7 @@ public class AppleAuthService {
     }
 
 
-    public Key
-    getMatchedKeyBy(String kid, String alg, List<Key> keys) {
+    public Key getMatchedKeyBy(String kid, String alg, List<Key> keys) {
         return keys.stream()
                 .filter(key -> key.getKid().equals(kid) && key.getAlg().equals(alg))
                 .findFirst().orElseThrow(()->new BadRequestException(MISMATCH_APPLE_KEY));
@@ -152,11 +151,13 @@ public class AppleAuthService {
     private String generateAuthToken(String code) {
         RestTemplate restTemplate = new RestTemplateBuilder().build();
         String authUrl = "https://appleid.apple.com/auth/token";
+        String secret = createClientSecret();
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("code", code);
         params.add("client_id", appleProperties.getBundleId());
-        params.add("client_secret", createClientSecret());
+        log.info("secret: " + secret);
+        params.add("client_secret", secret);
         params.add("grant_type", "authorization_code");
 
         HttpHeaders headers = new HttpHeaders();
@@ -165,10 +166,12 @@ public class AppleAuthService {
 
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
 
+        log.info(params.toString());
+        log.info(String.valueOf(httpEntity));
         try {
             ResponseEntity<AppleAuthTokenResponse> response = restTemplate.postForEntity(authUrl, httpEntity, AppleAuthTokenResponse.class);
-            System.out.println("상태코드:"+response.getStatusCode());
-            System.out.println("토큰:"+response.getBody().getAccess_token());
+            log.info("상태코드:"+response.getStatusCode());
+            log.info("토큰:"+response.getBody().getAccess_token());
             return response.getBody().getAccess_token();
         } catch (HttpClientErrorException e) {
             log.error(String.valueOf(e));
@@ -181,18 +184,9 @@ public class AppleAuthService {
         Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
         Map<String, Object> jwtHeader = new HashMap<>();
 
-        jwtHeader.put("kid", "HR7JU89RQ6");
-        jwtHeader.put("alg", KID);
+        jwtHeader.put("kid", KID);
+        jwtHeader.put("alg", "ES256");
 
-        log.info("액세스토큰 : "+Jwts.builder()
-                .setHeaderParams(jwtHeader)
-                .setIssuer(appleProperties.getTeamId())
-                .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
-                .setExpiration(expirationDate) // 만료 시간
-                .setAudience("https://appleid.apple.com")
-                .setSubject(appleProperties.getBundleId())
-                .signWith(SignatureAlgorithm.ES256, getPrivateKey())
-                .compact());
         return Jwts.builder()
                 .setHeaderParams(jwtHeader)
                 .setIssuer(appleProperties.getTeamId())
@@ -205,12 +199,13 @@ public class AppleAuthService {
     }
 
     private PrivateKey getPrivateKey(){
-        ClassPathResource resource = new ClassPathResource(appleProperties.getKeyPath());
+        ClassPathResource resource = new ClassPathResource("AuthKey_74JQ8SGRU2.p8");
         String privateKey = null;
         try {
             privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-            System.out.println(privateKey);
+            log.info(privateKey);
         } catch (IOException e) {
+            log.error(String.valueOf(e));
             throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
         }
 
@@ -221,11 +216,13 @@ public class AppleAuthService {
         try {
             object = (PrivateKeyInfo) pemParser.readObject();
         } catch (IOException e) {
+            log.error(String.valueOf(e));
             throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
         }
         try {
             return converter.getPrivateKey(object);
         } catch (PEMException e) {
+            log.error(String.valueOf(e));
             throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
         }
     }
