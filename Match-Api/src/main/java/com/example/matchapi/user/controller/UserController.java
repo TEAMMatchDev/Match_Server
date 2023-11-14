@@ -11,10 +11,7 @@ import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.redis.repository.RefreshTokenRepository;
 import com.example.matchdomain.user.entity.enums.SocialType;
-import com.example.matchdomain.user.exception.DeleteUserErrorCode;
-import com.example.matchdomain.user.exception.ModifyEmailCode;
-import com.example.matchdomain.user.exception.ModifyPhoneErrorCode;
-import com.example.matchdomain.user.exception.UserAuthErrorCode;
+import com.example.matchdomain.user.exception.*;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchdomain.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -189,7 +186,7 @@ public class UserController {
     }
     @Operation(summary = "02-11 애플유저 결제화면 추가 정보 POST 👤" , description = "애플 유저 결제 화면 추가정보 POST")
     @PostMapping("/apple")
-    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    @ApiErrorCodeExample({UserAuthErrorCode.class, CheckUserPhoneErrorCode.class})
     public CommonResponse<String> postAppleUserInfo(@AuthenticationPrincipal User user,
                                                     @Valid @RequestBody UserReq.AppleUserInfo appleUserInfo){
         userService.postAppleUserInfo(user, appleUserInfo);

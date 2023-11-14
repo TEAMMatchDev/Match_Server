@@ -196,7 +196,7 @@ public class UserReq {
         @NotBlank(message = "이름을 입력해주세요")
         private String name;
 
-        @NotBlank(message = "생일을 입력해주세요")
+        @NotNull(message = "생일을 입력해주세요")
         private LocalDate birthDate;
 
         @NotBlank(message = "전화번호를 입력해주세요")

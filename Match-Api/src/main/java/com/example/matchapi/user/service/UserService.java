@@ -14,7 +14,9 @@ import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
+import com.example.matchdomain.user.adaptor.UserAdaptor;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
 import com.example.matchdomain.user.entity.enums.Alarm;
@@ -64,6 +66,8 @@ public class UserService {
     private final UserFcmTokenRepository userFcmTokenRepository;
     private final DonationService donationService;
     private final AppleAuthService appleAuthService;
+    private final AuthService authService;
+    private final UserAdaptor userAdaptor;
 
     public Optional<User> findUser(long id) {
         return userRepository.findById(id);
@@ -225,6 +229,7 @@ public class UserService {
 
     @Transactional
     public void postAppleUserInfo(User user, UserReq.AppleUserInfo appleUserInfo) {
+        authService.checkUserPhone(new UserReq.UserPhone(appleUserInfo.getPhone()));
         user.updateUserInfo(appleUserInfo.getBirthDate(), appleUserInfo.getName(), appleUserInfo.getPhone());
 
         userRepository.save(user);
@@ -242,4 +247,7 @@ public class UserService {
         deleteUserInfo(user);
     }
 
+    public User findByUser(String userId) {
+        return userAdaptor.findByUser(userId);
+    }
 }

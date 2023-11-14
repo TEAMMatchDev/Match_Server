@@ -53,6 +53,8 @@ public class MatchStatic {
 
     public static final String PAY_TITLE = getCurrentDateFormatted() + " MATCH 기부금 정기 결제";
 
+    public static final String CANCEL_STATUS = "cancelled";
+
     private static String getCurrentDateFormatted() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(PAYMENT_DATE_FORMAT));
     }

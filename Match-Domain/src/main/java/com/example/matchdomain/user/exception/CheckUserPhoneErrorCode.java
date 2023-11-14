@@ -1,4 +1,4 @@
-package com.example.matchdomain.order.exception;
+package com.example.matchdomain.user.exception;
 
 import com.example.matchcommon.annotation.ExplainError;
 import com.example.matchcommon.dto.ErrorReason;
@@ -10,18 +10,13 @@ import org.springframework.http.HttpStatus;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @Getter
 @AllArgsConstructor
-public enum PortOneAuthErrorCode implements BaseErrorCode {
-    FAILED_ERROR_AUTH_AMOUNT(BAD_REQUEST,"ORDER_001", "주문 가격이 일치하지 않습니다."),
-    NOT_EXIST_ORDER_ID(BAD_REQUEST,"ORDER_002", "주문 번호가 존재하지 않습니다."),
-    EXIST_IMP_UID(BAD_REQUEST,"ORDER_004", "이미 결제 완료된 imp_uid 값 입니다."),
-    NOT_CORRECT_ORDER_ID(BAD_REQUEST, "ORDER_005", "주문 ID가 일치하지 않습니다"),
-    EXIST_CANCEL_STATUS(BAD_REQUEST,"ORDER_006", "이미 취소된 결제 번호입니다."),
-    FAILED_ERROR_AUTH(INTERNAL_SERVER_ERROR,"ORDER_003", "결제요청에 실패했습니다. 다시 시도해주세요.");
+public enum CheckUserPhoneErrorCode implements BaseErrorCode {
+    @ExplainError("유저가 이미 가입된 전화번호로 가입을 요청하는 경우")
+    USERS_EXISTS_PHONE(FORBIDDEN,"U005","중복된 전화번호입니다.");
 
 
     private final HttpStatus httpStatus;

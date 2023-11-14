@@ -3,7 +3,7 @@ package com.example.matchbatch.service;
 import com.example.matchbatch.converter.DonationConverter;
 import com.example.matchbatch.converter.OrderConverter;
 import com.example.matchbatch.helper.OrderHelper;
-import com.example.matchcommon.annotation.RegularPaymentIntercept;
+import com.example.matchcommon.annotation.PaymentIntercept;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
 import com.example.matchdomain.donation.adaptor.DonationHistoryAdaptor;
 import com.example.matchdomain.donation.entity.DonationUser;
@@ -29,7 +29,7 @@ public class DonationService {
     private final OrderConverter orderConverter;
     private final DonationConverter donationConverter;
 
-    @RegularPaymentIntercept(key = "#portOneBillPayResponse.imp_uid")
+    @PaymentIntercept(key = "#portOneBillPayResponse.imp_uid")
     @Transactional
     public DonationUser processSaveDonationPayment(PortOneBillPayResponse portOneBillPayResponse, RegularPayment payment) {
         DonationUser donationUser = createDonationUser(payment, portOneBillPayResponse);
