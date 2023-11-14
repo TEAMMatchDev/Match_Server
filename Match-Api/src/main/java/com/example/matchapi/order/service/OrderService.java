@@ -216,9 +216,9 @@ public class OrderService {
 
         orderRequestRepository.save(orderConverter.convertToRequestPrepare(user.getId(), projectId, amount, orderId));
 
-        PortOnePrepareReq portOnePrepareReq = portOneConverter.convertToRequestPrepare(orderId, amount);
+        //PortOnePrepareReq portOnePrepareReq = portOneConverter.convertToRequestPrepare(orderId, amount);
 
-        portOneFeignClient.preparePayments(portOneAuthService.getToken(), portOnePrepareReq);
+        //portOneFeignClient.preparePayments(portOneAuthService.getToken(), portOnePrepareReq);
 
         return orderId;
     }
