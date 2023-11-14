@@ -55,6 +55,10 @@ public class MatchStatic {
 
     public static final String CANCEL_STATUS = "cancelled";
 
+    public static final String CANCEL_IMP_UID = "impUid";
+
+    public static final String CANCEL_ORDER_ID = "orderId";
+
     private static String getCurrentDateFormatted() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(PAYMENT_DATE_FORMAT));
     }

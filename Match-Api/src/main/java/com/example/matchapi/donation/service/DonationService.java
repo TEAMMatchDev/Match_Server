@@ -18,6 +18,7 @@ import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
+import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -42,12 +43,12 @@ import static com.example.matchdomain.donation.exception.DonationRefundErrorCode
 public class DonationService {
     private final DonationConverter donationConverter;
     private final RegularPaymentRepository regularPaymentRepository;
-    private final PaymentService paymentService;
     private final RegularPaymentAdaptor regularPaymentAdaptor;
     private final DonationAdaptor donationAdaptor;
     private final DonationHistoryAdaptor donationHistoryAdaptor;
     private final RegularPaymentConverter regularPaymentConverter;
     private final DonationHelper donationHelper;
+    private final PortOneService portOneService;
 
 
     public PageResponse<List<DonationRes.DonationList>> getDonationList(Long userId, int filter, int page, int size) {
@@ -64,7 +65,7 @@ public class DonationService {
 
         if(!donationUser.getDonationStatus().equals(EXECUTION_BEFORE)) throw new BadRequestException(CANNOT_DELETE_DONATION_STATUS);
 
-        paymentService.refundPayment(donationUser.getTid());
+        portOneService.refundPayment(donationUser.getTid());
 
         donationUser.setDonationStatus(EXECUTION_REFUND);
     }
