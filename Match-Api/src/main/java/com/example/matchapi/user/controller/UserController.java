@@ -189,6 +189,7 @@ public class UserController {
     @ApiErrorCodeExample({UserAuthErrorCode.class, CheckUserPhoneErrorCode.class})
     public CommonResponse<String> postAppleUserInfo(@AuthenticationPrincipal User user,
                                                     @Valid @RequestBody UserReq.AppleUserInfo appleUserInfo){
+        log.info("02-11 애플 유저 결제화면 추가 정보 POST API");
         userService.postAppleUserInfo(user, appleUserInfo);
         return CommonResponse.onSuccess("성공");
     }
@@ -197,6 +198,7 @@ public class UserController {
     @DeleteMapping("")
     @ApiErrorCodeExample({UserAuthErrorCode.class, DeleteUserErrorCode.class})
     public CommonResponse<String> deleteUserInfo(@AuthenticationPrincipal User user){
+        log.info("02-12 유저 탈퇴 API userId : " + user.getId());
         if(user.getSocialType().equals(SocialType.APPLE)){
             throw new BadRequestException(APPLE_USER_NOT_API);
         }
@@ -209,6 +211,7 @@ public class UserController {
     @ApiErrorCodeExample({UserAuthErrorCode.class})
     public CommonResponse<String> deleteAppleUserInfo(@AuthenticationPrincipal User user,
                                                       @Valid @RequestBody UserReq.AppleCode appleCode){
+        log.info("02-13 애플 유저 탈퇴 code : " + appleCode.getCode());
         userService.deleteAppleUserInfo(user, appleCode);
         return CommonResponse.onSuccess("탈퇴 성공");
     }
