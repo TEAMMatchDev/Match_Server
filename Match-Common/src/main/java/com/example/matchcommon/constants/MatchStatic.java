@@ -55,6 +55,10 @@ public class MatchStatic {
 
     public static final String CANCEL_STATUS = "cancelled";
 
+    public static final String CANCEL_IMP_UID = "impUid";
+
+    public static final String CANCEL_ORDER_ID = "orderId";
+
     public static final String KID = "HR7JU89RQ6";
 
     private static String getCurrentDateFormatted() {

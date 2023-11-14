@@ -2,11 +2,13 @@ package com.example.matchapi.order.service;
 
 import com.example.matchapi.donation.service.DonationHistoryService;
 import com.example.matchapi.order.converter.OrderConverter;
+import com.example.matchapi.order.dto.OrderCommand;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.portone.service.PaymentService;
 import com.example.matchapi.project.service.ProjectService;
+import com.example.matchcommon.annotation.PaymentIntercept;
 import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.BaseException;
@@ -34,6 +36,7 @@ import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -87,58 +90,58 @@ public class OrderService {
         userCardRepository.save(userCard);
     }
 
-    @RedissonLock(LockName = "정기-기부-신청", key = "#cardId")
-    public OrderRes.CompleteDonation regularDonation(User user, OrderReq.RegularDonation regularDonation, Long cardId, Long projectId) {
-        UserCard card = userCardAdaptor.findCardByCardId(cardId);
+    private void validateCard(UserCard card, User user) {
+        if (!card.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
 
-        validateCard(card, user);
+        if (!card.getCardAbleStatus().equals(CardAbleStatus.ABLE)) throw new BadRequestException(CARD_NOT_ABLE);
+    }
 
-        Project project = projectService.checkProjectExists(projectId, RegularStatus.REGULAR);
+    @PaymentIntercept(key = "#orderCommand.orderId")
+    @RedissonLock(LockName = "빌키-단기-기부", key = "#orderCommand.userCard.id")
+    public OrderRes.CompleteDonation paymentForOnetime(OrderCommand.OneTimeDonation orderCommand) {
+        UserCard card = orderCommand.getUserCard();
+        Project project = orderCommand.getProject();
+        User user = orderCommand.getUser();
+        OrderReq.OneTimeDonation oneTimeDonation = orderCommand.getOneTimeDonation();
 
-        PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, regularDonation.getAmount(), project.getProjectName(), REGULAR);
+        System.out.println(orderCommand.getOrderId());
+
+        PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, oneTimeDonation.getAmount(), project.getProjectName(), orderCommand.getOrderId());
 
         OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
 
-        RegularPayment regularPayment = regularPaymentRepository.save(orderConverter.convertToRegularPayment(user.getId(), regularDonation, cardId, projectId));
+        DonationUser donationUser = donationUserRepository.save(
+                orderConverter.donationBillPayUser(portOneResponse.getResponse(), user.getId(),
+                        oneTimeDonation.getAmount(), project.getId(),
+                        createInherenceDto, RegularStatus.ONE_TIME, null));
 
-        DonationUser donationUser = donationUserRepository.save(orderConverter.donationBillPayUser(portOneResponse.getResponse(), user.getId(), regularDonation.getAmount(), projectId, createInherenceDto, RegularStatus.REGULAR, regularPayment.getId()));
+        donationHistoryService.oneTimeDonationHistory(donationUser.getId());
+
+        return orderConverter.convertToCompleteDonation(user.getName(), project, oneTimeDonation.getAmount());
+    }
+
+    @PaymentIntercept(key = "#orderCommand.orderId")
+    @RedissonLock(LockName = "정기-기부-신청", key = "#orderCommand.userCard.id")
+    public OrderRes.CompleteDonation paymentForRegular(OrderCommand.RegularDonation orderCommand) {
+        UserCard card = orderCommand.getUserCard();
+        Project project = orderCommand.getProject();
+        User user = orderCommand.getUser();
+
+        OrderReq.RegularDonation regularDonation = orderCommand.getRegularDonation();
+
+        PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, regularDonation.getAmount(), project.getProjectName(), orderCommand.getOrderId());
+
+        OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
+
+        RegularPayment regularPayment = regularPaymentRepository.save(orderConverter.convertToRegularPayment(user.getId(), regularDonation, card.getId(), project.getId()));
+
+        DonationUser donationUser = donationUserRepository.save(orderConverter.donationBillPayUser(
+                portOneResponse.getResponse(), user.getId(), regularDonation.getAmount(), project.getId(),
+                createInherenceDto, RegularStatus.REGULAR, regularPayment.getId()));
 
         donationHistoryService.postRegularDonationHistory(regularPayment.getId(), donationUser.getId());
 
         return orderConverter.convertToCompleteDonation(user.getName(), project, regularDonation.getAmount());
-    }
-
-
-    private void validateCard(UserCard card, User user) {
-        if(!card.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
-
-        if(!card.getCardAbleStatus().equals(CardAbleStatus.ABLE)) throw new BadRequestException(CARD_NOT_ABLE);
-    }
-
-    @RedissonLock(LockName = "빌키-단기-기부", key = "#cardId")
-    public OrderRes.CompleteDonation oneTimeDonationCard(User user, OrderReq.OneTimeDonation oneTimeDonation, Long cardId, Long projectId) {
-        try {
-            UserCard card = userCardAdaptor.findCardByCardId(cardId);
-
-            validateCard(card, user);
-
-            Project project = projectService.checkProjectExists(projectId, RegularStatus.ONE_TIME);
-
-            PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, oneTimeDonation.getAmount(), project.getProjectName(), ONE_TIME);
-
-            OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
-
-            DonationUser donationUser = donationUserRepository.save(orderConverter.donationBillPayUser(portOneResponse.getResponse(), user.getId(), oneTimeDonation.getAmount(), projectId,
-                    createInherenceDto, RegularStatus.ONE_TIME, null));
-
-            donationHistoryService.oneTimeDonationHistory(donationUser.getId());
-
-            return orderConverter.convertToCompleteDonation(user.getName(), project, oneTimeDonation.getAmount());
-        }catch (Exception e){
-            //paymentService.refundPayment();
-        }
-
-        return null;
     }
 
     @Transactional
@@ -156,7 +159,7 @@ public class OrderService {
 
     @RedissonLock(LockName = "관리자-환불-처리", key = "#donationUserId")
     public void adminRefundDonation(Long donationUserId) {
-        DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
+        DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(() -> new BadRequestException(DONATION_NOT_EXIST));
         donationUser.setDonationStatus(DonationStatus.EXECUTION_REFUND);
         portOneService.refundPayment(donationUser.getTid());
         donationUserRepository.save(donationUser);
@@ -164,7 +167,7 @@ public class OrderService {
 
     @Transactional
     public void modifyDonationStatus(Long donationUserId, DonationStatus donationStatus) {
-        DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
+        DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(() -> new BadRequestException(DONATION_NOT_EXIST));
         donationUser.setDonationStatus(donationStatus);
         donationUserRepository.save(donationUser);
     }
@@ -172,10 +175,10 @@ public class OrderService {
     @Transactional
     public void revokePay(User user, Long cardId) {
         UserCard userCard = userCardAdaptor.findCardByCardId(cardId);
-        if(!userCard.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
+        if (!userCard.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
         List<RegularPayment> regularPayments = regularPaymentRepository.findByUserCardId(cardId);
 
-        for(RegularPayment regularPayment : regularPayments){
+        for (RegularPayment regularPayment : regularPayments) {
             regularPayment.setRegularPayStatus(RegularPayStatus.USER_CANCEL);
         }
 
@@ -193,7 +196,7 @@ public class OrderService {
                 portOneConverter.convertToPortOneBill(cardNo, expiry, registrationCard.getIdNo(), registrationCard.getCardPw())
         );
 
-        if(portOneResponse.getCode()!=0){
+        if (portOneResponse.getCode() != 0) {
             throw new BaseException(BAD_REQUEST, false, "PORT_ONE_BILL_AUTH_001", portOneResponse.getMessage());
         }
 
@@ -204,9 +207,8 @@ public class OrderService {
     }
 
 
-
     private void cancelRegularPayment(List<RegularPayment> regularPayments) {
-        for(RegularPayment regularPayment : regularPayments){
+        for (RegularPayment regularPayment : regularPayments) {
             regularPayment.setRegularPayStatus(RegularPayStatus.USER_CANCEL);
             failedHistoryAdapter.deleteByRegularPaymentId(regularPayment.getId());
         }

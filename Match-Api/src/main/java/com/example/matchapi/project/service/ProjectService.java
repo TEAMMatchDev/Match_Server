@@ -326,4 +326,8 @@ public class ProjectService {
     public Project findByProject(String projectId) {
         return projectAdaptor.findByProject(projectId);
     }
+
+    public Project findByProjectId(Long projectId) {
+        return projectAdaptor.findById(projectId);
+    }
 }

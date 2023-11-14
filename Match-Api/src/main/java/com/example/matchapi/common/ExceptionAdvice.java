@@ -91,7 +91,7 @@ public class ExceptionAdvice {
     }
 
 
-
+/*
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity onException(Exception exception, @AuthenticationPrincipal User user,
                                       HttpServletRequest request) {
@@ -105,7 +105,7 @@ public class ExceptionAdvice {
 
         return new ResponseEntity<>(CommonResponse.onFailure("500", exception.getMessage(), null), null,
                 HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    }*/
 
     private void getExceptionStackTrace(Exception e, User user, HttpServletRequest request, Map<String, String> errors) {
         StringWriter sw = new StringWriter();

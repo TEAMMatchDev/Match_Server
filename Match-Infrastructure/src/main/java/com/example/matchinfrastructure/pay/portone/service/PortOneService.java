@@ -7,12 +7,14 @@ import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PortOneService {
     private IamportClient iamportClient;
@@ -30,6 +32,7 @@ public class PortOneService {
             System.out.println(paymentIamportResponse.getCode());
             System.out.println(paymentIamportResponse.getResponse());
         } catch (IamportResponseException | IOException e) {
+            log.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -40,6 +43,7 @@ public class PortOneService {
             System.out.println(paymentIamportResponse.getCode());
             System.out.println(paymentIamportResponse.getResponse());
         } catch (IamportResponseException | IOException e) {
+            log.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
