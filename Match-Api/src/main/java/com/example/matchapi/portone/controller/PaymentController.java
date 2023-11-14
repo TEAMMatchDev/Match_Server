@@ -17,6 +17,7 @@ import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
+import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -48,12 +49,5 @@ public class PaymentController {
         Project project = projectService.findByProject(orderRequest.getProjectId());
 
         return CommonResponse.onSuccess(paymentService.checkPayment(mapper.toPaymentValidationCommand(orderRequest, user, project, validatePayment)));
-    }
-
-    @PostMapping("/refund")
-    @Deprecated
-    public CommonResponse<String> refundPayment(@RequestParam String impUid){
-        paymentService.refundPayment(impUid);
-        return CommonResponse.onSuccess("환불 성공");
     }
 }

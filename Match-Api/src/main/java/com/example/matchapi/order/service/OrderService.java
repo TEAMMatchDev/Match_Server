@@ -30,6 +30,7 @@ import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
 import com.example.matchinfrastructure.pay.portone.dto.req.PortOnePrepareReq;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
 import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
+import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,7 @@ public class OrderService {
     private final UserCardAdaptor userCardAdaptor;
     private final DonationHistoryService donationHistoryService;
     private final RequestFailedHistoryAdapter failedHistoryAdapter;
+    private final PortOneService portOneService;
 
     @Transactional
     public List<OrderRes.UserBillCard> getUserBillCard(Long userId) {
@@ -156,7 +158,7 @@ public class OrderService {
     public void adminRefundDonation(Long donationUserId) {
         DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
         donationUser.setDonationStatus(DonationStatus.EXECUTION_REFUND);
-        paymentService.refundPayment(donationUser.getTid());
+        portOneService.refundPayment(donationUser.getTid());
         donationUserRepository.save(donationUser);
     }
 
@@ -216,9 +218,9 @@ public class OrderService {
 
         orderRequestRepository.save(orderConverter.convertToRequestPrepare(user.getId(), projectId, amount, orderId));
 
-        //PortOnePrepareReq portOnePrepareReq = portOneConverter.convertToRequestPrepare(orderId, amount);
+        PortOnePrepareReq portOnePrepareReq = portOneConverter.convertToRequestPrepare(orderId, amount);
 
-        //portOneFeignClient.preparePayments(portOneAuthService.getToken(), portOnePrepareReq);
+        portOneFeignClient.preparePayments(portOneAuthService.getToken(), portOnePrepareReq);
 
         return orderId;
     }

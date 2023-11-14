@@ -20,7 +20,6 @@ import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
-import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.math.BigDecimal;
 
 import static com.example.matchcommon.constants.MatchStatic.CANCEL_STATUS;
 import static com.example.matchdomain.order.exception.PortOneAuthErrorCode.*;
@@ -81,21 +79,6 @@ public class PaymentService {
         if(payment.getResponse().getAmount().intValue()!=validatePayment.getAmount()) throw new BadRequestException(FAILED_ERROR_AUTH_AMOUNT);
 
         if(!payment.getResponse().getMerchantUid().equals(validatePayment.getOrderId())) throw new BadRequestException(NOT_CORRECT_ORDER_ID);
-    }
-
-    private CancelData createCancelData(IamportResponse<Payment> response, int refundAmount) {
-        if (refundAmount == 0) { //전액 환불일 경우
-            return new CancelData(response.getResponse().getImpUid(), true);
-        }
-        return new CancelData(response.getResponse().getImpUid(), true, new BigDecimal(refundAmount));
-    }
-
-    public void refundPayment(String impUid) {
-        try {
-            iamportClient.cancelPaymentByImpUid(new CancelData(impUid, true));
-        } catch (IamportResponseException | IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void saveDonationUser(PaymentCommand.PaymentValidation paymentValidation) {
