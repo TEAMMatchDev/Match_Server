@@ -177,7 +177,10 @@ public class UserService {
     }
 
     public void deleteFcmToken(Long userId, String deviceId) {
-        userFcmTokenRepository.deleteById(UserFcmPk.builder().userId(userId).deviceId(deviceId).build());
+        UserFcmPk userFcmPk = UserFcmPk.builder().userId(userId).deviceId(deviceId).build();
+        if(userFcmTokenRepository.existsById(userFcmPk)) {
+            userFcmTokenRepository.deleteById(userFcmPk);
+        }
     }
 
     @Transactional

@@ -184,7 +184,7 @@ public class AppleAuthService {
         jwtHeader.put("kid", "HR7JU89RQ6");
         jwtHeader.put("alg", KID);
 
-        System.out.println(Jwts.builder()
+        log.info("액세스토큰 : "+Jwts.builder()
                 .setHeaderParams(jwtHeader)
                 .setIssuer(appleProperties.getTeamId())
                 .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
@@ -209,6 +209,7 @@ public class AppleAuthService {
         String privateKey = null;
         try {
             privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+            System.out.println(privateKey);
         } catch (IOException e) {
             throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
         }
