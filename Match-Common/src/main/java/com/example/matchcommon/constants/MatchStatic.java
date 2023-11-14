@@ -55,6 +55,8 @@ public class MatchStatic {
 
     public static final String CANCEL_STATUS = "cancelled";
 
+    public static final String KID = "HR7JU89RQ6";
+
     private static String getCurrentDateFormatted() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(PAYMENT_DATE_FORMAT));
     }

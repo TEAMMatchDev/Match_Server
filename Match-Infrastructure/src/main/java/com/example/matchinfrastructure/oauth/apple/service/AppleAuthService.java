@@ -15,6 +15,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMException;
 import org.bouncycastle.openssl.PEMParser;
@@ -46,10 +47,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
+import static com.example.matchcommon.constants.MatchStatic.KID;
 import static com.example.matchcommon.exception.errorcode.OtherServerErrorCode.OTHER_SERVER_BAD_REQUEST;
 import static com.example.matchinfrastructure.oauth.apple.exception.AppleErrorCode.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AppleAuthService {
     private final AppleFeignClient appleFeignClient;
@@ -168,7 +171,8 @@ public class AppleAuthService {
             System.out.println("토큰:"+response.getBody().getAccess_token());
             return response.getBody().getAccess_token();
         } catch (HttpClientErrorException e) {
-            System.out.println(e.getCause());
+            log.error(String.valueOf(e));
+            log.error(e.getMessage());
             throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
         }
     }
@@ -176,10 +180,9 @@ public class AppleAuthService {
     private String createClientSecret(){
         Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
         Map<String, Object> jwtHeader = new HashMap<>();
-        ApplePublicResponse applePublicResponse = appleFeignClient.getPublicKey();
 
-        jwtHeader.put("kid", applePublicResponse.getKeys().get(0).getKid());
-        jwtHeader.put("alg", "ES256");
+        jwtHeader.put("kid", "HR7JU89RQ6");
+        jwtHeader.put("alg", KID);
 
         System.out.println(Jwts.builder()
                 .setHeaderParams(jwtHeader)
