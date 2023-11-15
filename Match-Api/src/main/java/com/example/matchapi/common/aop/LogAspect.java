@@ -40,9 +40,8 @@ public class LogAspect {
         for (Object arg : args) {
             if(arg != null) {
                 log.info("parameterNames = {} type = {}, value = {}", parameterNames[index], arg.getClass().getSimpleName(), arg.toString());
-                index += 1;
             }
-
+            index += 1;
         }
     }
 
