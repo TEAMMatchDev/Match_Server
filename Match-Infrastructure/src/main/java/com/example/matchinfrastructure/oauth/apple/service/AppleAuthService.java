@@ -32,9 +32,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -46,9 +44,12 @@ import java.security.spec.RSAPublicKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static com.example.matchcommon.constants.MatchStatic.CLASS_PATH;
 import static com.example.matchcommon.constants.MatchStatic.KID;
 import static com.example.matchcommon.exception.errorcode.OtherServerErrorCode.OTHER_SERVER_BAD_REQUEST;
+import static com.example.matchcommon.exception.errorcode.OtherServerErrorCode.OTHER_SERVER_INTERNAL_SERVER_ERROR;
 import static com.example.matchinfrastructure.oauth.apple.exception.AppleErrorCode.*;
 
 @Service
@@ -199,29 +200,22 @@ public class AppleAuthService {
     }
 
     private PrivateKey getPrivateKey(){
-        ClassPathResource resource = new ClassPathResource("AuthKey_74JQ8SGRU2.p8");
-        String privateKey = null;
-        try {
-            privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-            log.info(privateKey);
-        } catch (IOException e) {
-            log.error(String.valueOf(e));
-            throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
-        }
+        ClassPathResource resource = new ClassPathResource(CLASS_PATH);
+        try (InputStream inputStream = resource.getInputStream()) {
+            String privateKeyPEM = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                    .lines().collect(Collectors.joining("\n"));
 
-        Reader pemReader = new StringReader(privateKey);
-        PEMParser pemParser = new PEMParser(pemReader);
-        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-        PrivateKeyInfo object = null;
-        try {
-            object = (PrivateKeyInfo) pemParser.readObject();
+            log.info(privateKeyPEM);
+
+            try (PEMParser pemParser = new PEMParser(new StringReader(privateKeyPEM))) {
+                JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+                PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
+                return converter.getPrivateKey(object);
+            } catch (IOException e) {
+                log.error(String.valueOf(e));
+                throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
+            }
         } catch (IOException e) {
-            log.error(String.valueOf(e));
-            throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
-        }
-        try {
-            return converter.getPrivateKey(object);
-        } catch (PEMException e) {
             log.error(String.valueOf(e));
             throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
         }
