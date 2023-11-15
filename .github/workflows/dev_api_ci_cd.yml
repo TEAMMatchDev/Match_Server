@@ -61,6 +61,9 @@ jobs:
           portone.secret : ${{ secrets.PORTONE_SECRET }}
           portone.billmid: ${{ secrets.DEV_PORTONE_BILL_MID}}
           private.aes.key: ${{ secrets.AES_PRIVATE_KEY }}
+          apple.bundle.id: ${{ secrets.APPLE_BUNDLE_ID }}
+          apple.team.id: ${{ secrets.APPLE_TEAM_ID }}
+
 
 
       - name: Set Environment Domain - Domain DEV Yml
