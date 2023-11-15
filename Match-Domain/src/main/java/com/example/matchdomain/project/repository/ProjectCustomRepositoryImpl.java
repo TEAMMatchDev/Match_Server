@@ -207,4 +207,34 @@ public class ProjectCustomRepositoryImpl implements ProjectCustomRepository{
         return PageableExecutionUtils.getPage(projectDtos, pageable, countQuery::fetchCount);
     }
 
+    @Override
+    public long countQueryForProject(ProjectStatus projectStatus, LocalDateTime now, Status status, String content, ProjectKind projectKind) {
+        QProject project = QProject.project;
+
+        Predicate predicate = buildSearchCountPredicate(projectStatus, now, status, content, projectKind, project);
+
+        return queryFactory.selectFrom(project)
+                .where(predicate)
+                .fetchCount();
+    }
+
+    private Predicate buildSearchCountPredicate(ProjectStatus projectStatus, LocalDateTime now, Status status, String content, ProjectKind projectKind, QProject project) {
+        BooleanExpression predicate = project.projectStatus.eq(projectStatus)
+                .and(project.finishedAt.goe(now))
+                .and(project.status.eq(status));
+
+        if (projectKind != null) {
+            predicate = predicate.and(project.projectKind.eq(projectKind));
+        }
+        if (content != null) {
+            predicate = predicate.and(project.projectName.like("%" + content + "%")
+                    .or(project.projectExplanation.like("%" + content + "%"))
+                    .or(project.usages.like("%" + content + "%"))
+                    .or(project.searchKeyword.like("%" + content + "%")));
+        }
+
+
+        return predicate;
+    }
+
 }
