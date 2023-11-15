@@ -19,7 +19,7 @@ import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_EXIS
 public class UserAdaptor {
     private final UserRepository userRepository;
     public Optional<User> existsSocialUser(String socialId, SocialType socialType){
-        return userRepository.findBySocialIdAndSocialType(socialId, socialType);
+        return userRepository.findBySocialIdAndSocialTypeAndStatus(socialId, socialType, Status.ACTIVE);
     }
 
     public Optional<User> findByUserId(Long userId) {

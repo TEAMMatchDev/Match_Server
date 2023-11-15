@@ -15,6 +15,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMException;
 import org.bouncycastle.openssl.PEMParser;
@@ -31,9 +32,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -45,11 +44,16 @@ import java.security.spec.RSAPublicKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static com.example.matchcommon.constants.MatchStatic.CLASS_PATH;
+import static com.example.matchcommon.constants.MatchStatic.KID;
 import static com.example.matchcommon.exception.errorcode.OtherServerErrorCode.OTHER_SERVER_BAD_REQUEST;
+import static com.example.matchcommon.exception.errorcode.OtherServerErrorCode.OTHER_SERVER_INTERNAL_SERVER_ERROR;
 import static com.example.matchinfrastructure.oauth.apple.exception.AppleErrorCode.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AppleAuthService {
     private final AppleFeignClient appleFeignClient;
@@ -95,8 +99,7 @@ public class AppleAuthService {
     }
 
 
-    public Key
-    getMatchedKeyBy(String kid, String alg, List<Key> keys) {
+    public Key getMatchedKeyBy(String kid, String alg, List<Key> keys) {
         return keys.stream()
                 .filter(key -> key.getKid().equals(kid) && key.getAlg().equals(alg))
                 .findFirst().orElseThrow(()->new BadRequestException(MISMATCH_APPLE_KEY));
@@ -149,11 +152,13 @@ public class AppleAuthService {
     private String generateAuthToken(String code) {
         RestTemplate restTemplate = new RestTemplateBuilder().build();
         String authUrl = "https://appleid.apple.com/auth/token";
+        String secret = createClientSecret();
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("code", code);
         params.add("client_id", appleProperties.getBundleId());
-        params.add("client_secret", createClientSecret());
+        log.info("secret: " + secret);
+        params.add("client_secret", secret);
         params.add("grant_type", "authorization_code");
 
         HttpHeaders headers = new HttpHeaders();
@@ -162,13 +167,16 @@ public class AppleAuthService {
 
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
 
+        log.info(params.toString());
+        log.info(String.valueOf(httpEntity));
         try {
             ResponseEntity<AppleAuthTokenResponse> response = restTemplate.postForEntity(authUrl, httpEntity, AppleAuthTokenResponse.class);
-            System.out.println("상태코드:"+response.getStatusCode());
-            System.out.println("토큰:"+response.getBody().getAccess_token());
+            log.info("상태코드:"+response.getStatusCode());
+            log.info("토큰:"+response.getBody().getAccess_token());
             return response.getBody().getAccess_token();
         } catch (HttpClientErrorException e) {
-            System.out.println(e.getCause());
+            log.error(String.valueOf(e));
+            log.error(e.getMessage());
             throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
         }
     }
@@ -176,20 +184,10 @@ public class AppleAuthService {
     private String createClientSecret(){
         Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
         Map<String, Object> jwtHeader = new HashMap<>();
-        ApplePublicResponse applePublicResponse = appleFeignClient.getPublicKey();
 
-        jwtHeader.put("kid", applePublicResponse.getKeys().get(0).getKid());
+        jwtHeader.put("kid", KID);
         jwtHeader.put("alg", "ES256");
 
-        System.out.println(Jwts.builder()
-                .setHeaderParams(jwtHeader)
-                .setIssuer(appleProperties.getTeamId())
-                .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
-                .setExpiration(expirationDate) // 만료 시간
-                .setAudience("https://appleid.apple.com")
-                .setSubject(appleProperties.getBundleId())
-                .signWith(SignatureAlgorithm.ES256, getPrivateKey())
-                .compact());
         return Jwts.builder()
                 .setHeaderParams(jwtHeader)
                 .setIssuer(appleProperties.getTeamId())
@@ -202,26 +200,21 @@ public class AppleAuthService {
     }
 
     private PrivateKey getPrivateKey(){
-        ClassPathResource resource = new ClassPathResource(appleProperties.getKeyPath());
-        String privateKey = null;
-        try {
-            privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-        } catch (IOException e) {
-            throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
-        }
+        ClassPathResource resource = new ClassPathResource(CLASS_PATH);
+        try (InputStream inputStream = resource.getInputStream()) {
+            String privateKeyPEM = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                    .lines().collect(Collectors.joining("\n"));
 
-        Reader pemReader = new StringReader(privateKey);
-        PEMParser pemParser = new PEMParser(pemReader);
-        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-        PrivateKeyInfo object = null;
-        try {
-            object = (PrivateKeyInfo) pemParser.readObject();
+            try (PEMParser pemParser = new PEMParser(new StringReader(privateKeyPEM))) {
+                JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+                PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
+                return converter.getPrivateKey(object);
+            } catch (IOException e) {
+                log.error(String.valueOf(e));
+                throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
+            }
         } catch (IOException e) {
-            throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
-        }
-        try {
-            return converter.getPrivateKey(object);
-        } catch (PEMException e) {
+            log.error(String.valueOf(e));
             throw new OtherServerException(OTHER_SERVER_BAD_REQUEST);
         }
     }

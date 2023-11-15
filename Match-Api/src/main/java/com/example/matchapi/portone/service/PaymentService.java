@@ -8,6 +8,7 @@ import com.example.matchapi.portone.dto.PaymentCommand;
 import com.example.matchapi.portone.dto.PaymentReq;
 import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.BaseException;
 import com.example.matchcommon.properties.PortOneProperties;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
 import com.example.matchdomain.donation.entity.DonationUser;
@@ -20,7 +21,6 @@ import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
-import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +29,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.math.BigDecimal;
 
 import static com.example.matchcommon.constants.MatchStatic.CANCEL_STATUS;
 import static com.example.matchdomain.order.exception.PortOneAuthErrorCode.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Service
 @Slf4j
@@ -83,30 +83,22 @@ public class PaymentService {
         if(!payment.getResponse().getMerchantUid().equals(validatePayment.getOrderId())) throw new BadRequestException(NOT_CORRECT_ORDER_ID);
     }
 
-    private CancelData createCancelData(IamportResponse<Payment> response, int refundAmount) {
-        if (refundAmount == 0) { //전액 환불일 경우
-            return new CancelData(response.getResponse().getImpUid(), true);
-        }
-        return new CancelData(response.getResponse().getImpUid(), true, new BigDecimal(refundAmount));
-    }
-
-    public void refundPayment(String impUid) {
-        try {
-            iamportClient.cancelPaymentByImpUid(new CancelData(impUid, true));
-        } catch (IamportResponseException | IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void saveDonationUser(PaymentCommand.PaymentValidation paymentValidation) {
         OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(paymentValidation.getUser());
         DonationUser donationUser = donationAdaptor.save(orderConverter.convertToDonationUserPortone(paymentValidation.getUser().getId(), paymentValidation.getValidatePayment(), paymentValidation.getProject().getId(), createInherenceDto));
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
     }
 
-    public PortOneResponse<PortOneBillPayResponse> payBillKey(UserCard card, Long amount, String projectName, String type) {
-        String orderId = orderHelper.createOrderId(type);
+    public PortOneResponse<PortOneBillPayResponse> payBillKey(UserCard card, Long amount, String projectName, String orderId) {
         String accessToken = portOneAuthService.getToken();
-        return portOneFeignClient.payWithBillKey(accessToken, portOneConverter.convertPayWithBillKey(card.getBid(), orderId, amount, projectName, card.getCustomerId()));
+
+        PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(accessToken, portOneConverter.convertPayWithBillKey(card.getBid(), orderId, amount, projectName, card.getCustomerId()));
+
+        if (portOneResponse.getCode()!=0){
+            if (portOneResponse.getCode() != 0) {
+                throw new BaseException(BAD_REQUEST, false, "PORT_ONE_BILL_AUTH_001", portOneResponse.getMessage());
+            }
+        }
+        return portOneResponse;
     }
 }

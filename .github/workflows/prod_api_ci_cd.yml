@@ -64,6 +64,8 @@ jobs:
           portone.secret: ${{ secrets.PORTONE_SECRET }}
           portone.billmid: ${{ secrets.PROD_PORTONE_BILL_MID}}
           private.aes.key: ${{ secrets.AES_PRIVATE_KEY }}
+          apple.bundle.id: ${{ secrets.APPLE_BUNDLE_ID }}
+          apple.team.id: ${{ secrets.APPLE_TEAM_ID }}
 
 
       - name: Set Environment Domain - Domain Prod Yml
@@ -89,7 +91,7 @@ jobs:
 
       - name: Create Auth Key File
         run: |
-          echo "${{ secrets.AUTH_KEY }}" > ./Match-Common/src/main/resources/AuthKey_HR7JU89RQ6.p8
+          echo "${{ secrets.AUTH_KEY }}" > ./Match-Common/src/main/resources/AuthKey_74JQ8SGRU2.p8
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
