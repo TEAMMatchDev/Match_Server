@@ -229,4 +229,24 @@ public class UserReq {
         @NotBlank(message = "코드를 입력해주세요")
         private String code;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    public static class FindPassword {
+        @Schema(description = "인증 번호 받은 이메일")
+        @NotBlank(message = "이메일을 입력해주세요")
+        private String email;
+
+        @Schema(description = "애플 코드 입력", required = true)
+        @NotBlank(message = "코드를 입력해주세요")
+        private String code;
+
+        @Schema(description = "변경할 비밀번호")
+        @NotBlank(message = "변경할 비밀번호를 입력해주세요")
+        private String modifyPassword;
+    }
 }
