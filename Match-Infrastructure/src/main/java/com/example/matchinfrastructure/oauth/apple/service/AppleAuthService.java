@@ -205,8 +205,6 @@ public class AppleAuthService {
             String privateKeyPEM = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                     .lines().collect(Collectors.joining("\n"));
 
-            log.info(privateKeyPEM);
-
             try (PEMParser pemParser = new PEMParser(new StringReader(privateKeyPEM))) {
                 JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
                 PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
