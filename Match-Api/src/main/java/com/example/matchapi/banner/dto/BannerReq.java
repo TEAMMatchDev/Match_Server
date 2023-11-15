@@ -9,6 +9,7 @@ public class BannerReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class BannerUpload {
         private Long eventId;
 

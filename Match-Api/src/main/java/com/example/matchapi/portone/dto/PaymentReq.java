@@ -8,6 +8,7 @@ public class PaymentReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class ValidatePayment{
         private String impUid;
         private String orderId;
