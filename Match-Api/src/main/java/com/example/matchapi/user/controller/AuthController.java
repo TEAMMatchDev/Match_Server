@@ -8,10 +8,7 @@ import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.MailSendErrorCode;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
-import com.example.matchdomain.user.exception.CodeAuthErrorCode;
-import com.example.matchdomain.user.exception.UserLoginErrorCode;
-import com.example.matchdomain.user.exception.UserNormalSignUpErrorCode;
-import com.example.matchdomain.user.exception.UserSignUpErrorCode;
+import com.example.matchdomain.user.exception.*;
 import com.example.matchcommon.reponse.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -167,6 +164,23 @@ public class AuthController {
     @ApiErrorCodeExample({UserSignUpErrorCode.class, OtherServerErrorCode.class, RequestErrorCode.class})
     public CommonResponse<UserRes.UserToken> appleLogin(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         return CommonResponse.onSuccess(authService.appleLogin(socialLoginToken));
+    }
+
+    @Operation(summary = "01-14🔑 비밀번호 찾기용 이메일 전송 이메일 전송 시 01-08 API 로 인증번호 확인 입니다.", description = "만료시간 5분")
+    @PostMapping("/password/email")
+    @ApiErrorCodeExample({UserSignUpErrorCode.class, SendEmailFindPassword.class})
+    public CommonResponse<String> sendEmailPasswordFind(@RequestParam String email){
+        authService.sendEmailPasswordFind(email);
+        return CommonResponse.onSuccess("메일 인증 성공");
+    }
+
+
+    @Operation(summary = "01-13🔑 비밀번호 찾기", description = "여기서 또 한번 인증 코드를 받는 이유는 이중 인증을 위함 입니다. 변경은 5분안에 마무리 되야합니다.")
+    @PostMapping("/password")
+    @ApiErrorCodeExample({UserSignUpErrorCode.class, RequestErrorCode.class, CodeAuthErrorCode.class})
+    public CommonResponse<String> modifyPassword(@RequestBody @Valid UserReq.FindPassword findPassword){
+        authService.modifyPassword(findPassword);
+        return CommonResponse.onSuccess("비밀번호 변경 성공");
     }
 
 }
