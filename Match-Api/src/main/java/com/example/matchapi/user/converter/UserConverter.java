@@ -11,6 +11,7 @@ import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
 import com.example.matchdomain.user.entity.enums.AddressType;
 import com.example.matchdomain.user.entity.enums.AuthorityEnum;
+import com.example.matchdomain.user.entity.enums.Gender;
 import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.repository.UserRepository;
@@ -238,6 +239,7 @@ public class UserConverter {
                 .nickname(userHelper.createRandomNickName())
                 .serviceAlarm(ACTIVE)
                 .eventAlarm(ACTIVE)
+                .gender(Gender.UNKNOWN)
                 .build();
     }
 
