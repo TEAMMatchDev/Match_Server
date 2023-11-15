@@ -79,7 +79,7 @@ public class UserController {
     @ResponseBody
     @GetMapping("/logout")
     public CommonResponse<String> logOut(@Parameter(hidden = true) @AuthenticationPrincipal User user,
-                                         @Parameter(description = "디바이스 아이디", required = true, in = ParameterIn.HEADER, name = "DEVICE_ID", schema = @Schema(type = "string")) @RequestHeader("DEVICE_ID") String deviceId){
+                                         @Parameter(description = "디바이스 아이디", in = ParameterIn.HEADER, name = "DEVICE_ID", schema = @Schema(type = "string")) @RequestHeader(value = "DEVICE_ID", required = false) String deviceId){
         log.info("api = logout 02-03");
         Long userId = user.getId();
 
