@@ -10,6 +10,7 @@ public class DonationReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class EnforceDonation {
         private Long projectId;
         private List<Long> donationUserLists;
