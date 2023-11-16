@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchdomain.user.entity.enums.Alarm.ACTIVE;
+import static com.example.matchdomain.user.entity.enums.SocialType.NORMAL;
 import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_EXIST_USER;
 
 @Adaptor
@@ -47,7 +48,7 @@ public class UserAdaptor {
     }
 
     public User findByUserName(String email) {
-        return userRepository.findByUsernameAndStatus(email, Status.ACTIVE).orElseThrow(()->new BadRequestException(NOT_EXIST_USER));
+        return userRepository.findByUsernameAndStatusAndSocialType(email, Status.ACTIVE, NORMAL).orElseThrow(()->new BadRequestException(NOT_EXIST_USER));
     }
 
     public User save(User user) {
