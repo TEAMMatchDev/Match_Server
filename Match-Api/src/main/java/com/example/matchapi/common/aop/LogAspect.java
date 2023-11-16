@@ -1,21 +1,19 @@
 package com.example.matchapi.common.aop;
 
+import com.example.matchcommon.reponse.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 @Component
 @Aspect
 @Slf4j
 public class LogAspect {
-
     @Pointcut("execution(* com.example.matchapi..*Controller.*(..))")
     public void controller() {
     }
@@ -47,11 +45,28 @@ public class LogAspect {
 
     @After("controller()")
     public void afterLogic(JoinPoint joinPoint) throws Throwable {
-        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-        Method method = methodSignature.getMethod();
+        Method method = getMethod(joinPoint);
+
         log.info("logging finish method = {}", method.getName());
 
         log.info("==========================LOG_FINISH==========================");
     }
 
+    @AfterReturning(value = "controller()", returning = "returnObj")
+    public void afterReturnLog(JoinPoint joinPoint, Object returnObj) {
+        Method method = getMethod(joinPoint);
+
+        if(returnObj != null) {
+            log.info("========================RETURN_LOG============================");
+            log.info("method name = {}", method.getName());
+            log.info("return type = {}", returnObj.getClass().getSimpleName());
+            log.info("return value = {}", returnObj.toString());
+            log.info("==============================================================");
+        }
+    }
+
+    private Method getMethod(JoinPoint joinPoint) {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        return signature.getMethod();
+    }
 }
