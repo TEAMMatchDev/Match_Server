@@ -276,7 +276,7 @@ public class AuthService {
 
 
     public void sendEmailPasswordFind(String email) {
-        if(!userAdaptor.existsEmail(email)) throw new BadRequestException(NOT_EXISTS_EMAIL);
+        if(!userAdaptor.checkEmailPassword(email, NORMAL)) throw new BadRequestException(NOT_EXISTS_EMAIL);
 
         String code = smsHelper.createRandomNumber();
 

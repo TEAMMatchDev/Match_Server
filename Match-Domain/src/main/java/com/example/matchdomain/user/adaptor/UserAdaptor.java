@@ -53,4 +53,8 @@ public class UserAdaptor {
     public User save(User user) {
         return userRepository.save(user);
     }
+
+    public boolean checkEmailPassword(String email, SocialType socialType) {
+        return userRepository.existsByUsernameAndSocialTypeAndStatus(email, socialType, Status.ACTIVE);
+    }
 }
