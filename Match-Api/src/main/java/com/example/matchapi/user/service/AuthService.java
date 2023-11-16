@@ -17,14 +17,11 @@ import com.example.matchdomain.redis.entity.CodeAuth;
 import com.example.matchdomain.redis.repository.CodeAuthRepository;
 import com.example.matchdomain.redis.repository.RefreshTokenRepository;
 import com.example.matchdomain.user.adaptor.UserAdaptor;
-import com.example.matchdomain.user.entity.Authority;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
 import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.match_aligo.client.MatchAligoFeignClient;
-import com.example.matchinfrastructure.oauth.apple.client.AppleFeignClient;
-import com.example.matchinfrastructure.oauth.apple.dto.ApplePublicResponse;
 import com.example.matchinfrastructure.oauth.apple.dto.AppleUserRes;
 import com.example.matchinfrastructure.oauth.apple.service.AppleAuthService;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoFeignClient;
@@ -53,6 +50,7 @@ import static com.example.matchdomain.user.entity.enums.SocialType.*;
 import static com.example.matchdomain.user.exception.AdminLoginErrorCode.NOT_ADMIN;
 import static com.example.matchdomain.user.exception.CodeAuthErrorCode.NOT_CORRECT_AUTH;
 import static com.example.matchdomain.user.exception.CodeAuthErrorCode.NOT_CORRECT_CODE;
+import static com.example.matchdomain.user.exception.SendEmailFindPassword.NOT_EXISTS_EMAIL;
 import static com.example.matchdomain.user.exception.UserAuthErrorCode.NOT_EXIST_USER;
 import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_CORRECT_PASSWORD;
 import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_EMAIL;
@@ -174,8 +172,8 @@ public class AuthService {
 
 
     public UserRes.UserToken signUpUser(UserReq.SignUpUser signUpUser) {
-        if(userRepository.existsByPhoneNumber(signUpUser.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
-        if(userRepository.existsByEmail(signUpUser.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        if(userAdaptor.existsPhoneNumber(signUpUser.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
+        if(userAdaptor.existsEmail(signUpUser.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
 
         Long userId = userRepository.save(userConverter.convertToSignUpUser(signUpUser)).getId();
 
@@ -186,11 +184,11 @@ public class AuthService {
     }
 
     public void checkUserPhone(UserReq.UserPhone userPhone) {
-        if(userRepository.existsByPhoneNumberAndStatus(userPhone.getPhone(),ACTIVE)) throw new BadRequestException(USERS_EXISTS_PHONE);
+        if(userAdaptor.existsPhoneNumber(userPhone.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
     }
 
     public void checkUserEmail(UserReq.UserEmail userEmail) {
-        if(userRepository.existsByEmailAndStatus(userEmail.getEmail(), ACTIVE)) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        if(userAdaptor.existsEmail(userEmail.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
     }
 
     public UserRes.UserToken logIn(UserReq.LogIn logIn) {
@@ -237,7 +235,6 @@ public class AuthService {
         codeAuthRepository.save(CodeAuth.builder().auth(email).code(code).ttl(300).build());
 
         mailService.sendEmailMessage(email, code);
-
     }
 
     public void checkUserEmailAuth(UserReq.UserEmailAuth email) {
@@ -250,8 +247,6 @@ public class AuthService {
         String code = smsHelper.createRandomNumber();
         codeAuthRepository.save(CodeAuth.builder().auth(phone).code(code).ttl(300).build());
         CommonResponse<String> sendRes = matchAligoFeignClient.sendSmsAuth(jwtService.createToken(1L), phone, code);
-        System.out.println(sendRes.getCode());
-        System.out.println(sendRes.getMessage());
     }
 
     public void checkPhoneAuth(UserReq.UserPhoneAuth phone) {
@@ -277,5 +272,28 @@ public class AuthService {
 
     private Long appleSignUp(AppleUserRes appleUserRes) {
         return userRepository.save(userConverter.convertToAppleUserSignUp(appleUserRes)).getId();
+    }
+
+
+    public void sendEmailPasswordFind(String email) {
+        if(!userAdaptor.checkEmailPassword(email, NORMAL)) throw new BadRequestException(NOT_EXISTS_EMAIL);
+
+        String code = smsHelper.createRandomNumber();
+
+        codeAuthRepository.save(CodeAuth.builder().auth(email).code(code).ttl(300).build());
+
+        mailService.sendEmailMessage(email, code);
+    }
+
+    public void modifyPassword(UserReq.FindPassword findPassword) {
+        CodeAuth codeAuth = codeAuthRepository.findById(findPassword.getEmail()).orElseThrow(()->new BadRequestException(NOT_CORRECT_AUTH));
+
+        if(!codeAuth.getCode().equals(findPassword.getCode()))throw new BadRequestException(NOT_CORRECT_CODE);
+
+        User user = userAdaptor.findByUserName(findPassword.getEmail());
+
+        user.setPassword(passwordEncoder.encode(findPassword.getModifyPassword()));
+
+        user = userAdaptor.save(user);
     }
 }

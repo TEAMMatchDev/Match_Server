@@ -325,7 +325,7 @@ public class ProjectConverter {
 
         projects.forEach(
                 result -> {
-                    String imageUrl = result.getProjectImage().isEmpty() ? null : result.getProjectImage().get(0).getUrl();
+                    String imageUrl = result.getProjectImage().isEmpty() ? null : result.getProjectImage().get(result.getProjectImage().size()-1).getUrl();
                     projectLists.add(new ProjectRes.ProjectList(
                             result.getId(),
                             imageUrl,

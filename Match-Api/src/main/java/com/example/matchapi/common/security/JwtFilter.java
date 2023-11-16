@@ -15,6 +15,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+import static com.example.matchcommon.constants.MatchStatic.ignoredUri;
+
 @RequiredArgsConstructor
 public class JwtFilter extends GenericFilterBean{
 
@@ -40,12 +42,15 @@ public class JwtFilter extends GenericFilterBean{
             Authentication authentication = jwtService.getAuthentication(jwt, servletRequest);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             if(authentication !=null) {
-                logger.info("Security Context '{}' 인증 정보를 저장했습니다, uri: {} method: {}", authentication.getName(), requestURI, httpServletRequest.getMethod());
+                logger.info("method : {} ", ((HttpServletRequest) servletRequest).getMethod());
+                logger.info("Security Context 에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
             }else{
                 logger.info("해당 토큰을 가진 유저가 존재하지 않습니다, uri: {}", requestURI);
             }
         } else {
-            logger.info("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
+            if(!ignoredUri.contains(requestURI)) {
+                logger.info("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
+            }
         }
 
 

@@ -37,4 +37,24 @@ public class UserAdaptor {
     public User findByUser(String userId) {
         return userRepository.findByIdAndStatus(Long.valueOf(userId), Status.ACTIVE).orElseThrow(()->new BadRequestException(NOT_EXIST_USER));
     }
+
+    public boolean existsEmail(String email) {
+        return userRepository.existsByEmailAndStatus(email, Status.ACTIVE);
+    }
+
+    public boolean existsPhoneNumber(String phone) {
+        return userRepository.existsByPhoneNumberAndStatus(phone, Status.ACTIVE);
+    }
+
+    public User findByUserName(String email) {
+        return userRepository.findByUsernameAndStatus(email, Status.ACTIVE).orElseThrow(()->new BadRequestException(NOT_EXIST_USER));
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    public boolean checkEmailPassword(String email, SocialType socialType) {
+        return userRepository.existsByUsernameAndSocialTypeAndStatus(email, socialType, Status.ACTIVE);
+    }
 }
