@@ -115,9 +115,7 @@ public class AuthService {
     }
 
     private UserRes.Token createToken(Long userId) {
-        UserRes.Token token =  jwtService.createTokens(userId);
-        refreshTokenRepository.save(userConverter.convertToRefreshToken(userId,token.getRefreshToken(),jwtProperties.getRefreshTokenSeconds()));
-        return token;
+        return jwtService.createTokens(userId);
     }
 
 

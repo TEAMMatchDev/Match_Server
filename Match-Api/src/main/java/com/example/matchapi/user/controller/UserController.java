@@ -101,9 +101,7 @@ public class UserController {
 
         if(!redisRefreshToken.getToken().equals(refreshToken)) throw new BadRequestException(INVALID_REFRESH_TOKEN);
 
-        UserRes.ReIssueToken tokenRes=new UserRes.ReIssueToken(jwtService.createToken(userId));
-
-        return CommonResponse.onSuccess(tokenRes);
+        return CommonResponse.onSuccess(new UserRes.ReIssueToken(jwtService.createToken(userId)));
 
     }
 
