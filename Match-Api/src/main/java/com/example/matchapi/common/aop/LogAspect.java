@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import static com.example.matchcommon.constants.MatchStatic.ignoredMethods;
+
 @Component
 @Aspect
 @Slf4j
@@ -26,42 +28,60 @@ public class LogAspect {
 
     @Before("controller()")
     public void beforeLogic(JoinPoint joinPoint) throws Throwable {
-        log.info("==========================LOG_START==========================");
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
-        log.info("logging start method = {}", method.getName());
+        String methodName = getMethodName(method);
 
-        String[] parameterNames = methodSignature.getParameterNames();
+        if(!ignoredMethods.contains(methodName)) {
+            log.info("==========================LOG_START==========================");
 
-        Object[] args = joinPoint.getArgs();
-        int index = 0;
-        for (Object arg : args) {
-            if(arg != null) {
-                log.info("parameterNames = {} type = {}, value = {}", parameterNames[index], arg.getClass().getSimpleName(), arg.toString());
+            log.info("logging start method = {}", methodName);
+
+            String[] parameterNames = methodSignature.getParameterNames();
+
+            Object[] args = joinPoint.getArgs();
+            int index = 0;
+            for (Object arg : args) {
+                if (arg != null) {
+                    log.info("parameterNames = {} type = {}, value = {}", parameterNames[index], arg.getClass().getSimpleName(), arg.toString());
+                }
+                index += 1;
             }
-            index += 1;
         }
+    }
+
+    private String getMethodName(Method method) {
+        return method.getName();
     }
 
     @After("controller()")
     public void afterLogic(JoinPoint joinPoint) throws Throwable {
         Method method = getMethod(joinPoint);
 
-        log.info("logging finish method = {}", method.getName());
+        String methodName = getMethodName(method);
 
-        log.info("==========================LOG_FINISH==========================");
+        if(!ignoredMethods.contains(methodName)) {
+
+            log.info("logging finish method = {}", methodName);
+
+            log.info("==========================LOG_FINISH==========================");
+        }
     }
 
     @AfterReturning(value = "controller()", returning = "returnObj")
     public void afterReturnLog(JoinPoint joinPoint, Object returnObj) {
         Method method = getMethod(joinPoint);
 
-        if(returnObj != null) {
-            log.info("========================RETURN_LOG============================");
-            log.info("method name = {}", method.getName());
-            log.info("return type = {}", returnObj.getClass().getSimpleName());
-            log.info("return value = {}", returnObj.toString());
-            log.info("==============================================================");
+        String methodName = getMethodName(method);
+
+        if(!ignoredMethods.contains(methodName)) {
+            if (returnObj != null) {
+                log.info("========================RETURN_LOG============================");
+                log.info("method name = {}", methodName);
+                log.info("return type = {}", returnObj.getClass().getSimpleName());
+                log.info("return value = {}", returnObj.toString());
+                log.info("==============================================================");
+            }
         }
     }
 
