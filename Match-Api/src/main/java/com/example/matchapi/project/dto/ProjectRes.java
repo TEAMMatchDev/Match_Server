@@ -14,6 +14,7 @@ public class ProjectRes {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class ProjectList {
         @Schema(description = "projectId 값", required = true, example = "1")
         private Long projectId;

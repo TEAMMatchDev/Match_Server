@@ -27,6 +27,8 @@ public class QDonationUser extends EntityPathBase<DonationUser> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
+    public final ListPath<DonationExecution, QDonationExecution> donationExecutions = this.<DonationExecution, QDonationExecution>createList("donationExecutions", DonationExecution.class, QDonationExecution.class, PathInits.DIRECT2);
+
     public final ListPath<DonationHistory, QDonationHistory> donationHistories = this.<DonationHistory, QDonationHistory>createList("donationHistories", DonationHistory.class, QDonationHistory.class, PathInits.DIRECT2);
 
     public final EnumPath<com.example.matchdomain.donation.entity.enums.DonationStatus> donationStatus = createEnum("donationStatus", com.example.matchdomain.donation.entity.enums.DonationStatus.class);

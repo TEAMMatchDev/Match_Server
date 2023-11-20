@@ -46,13 +46,12 @@ public class OrderConverter {
                 .userId(String.valueOf(userId))
                 .projectId(String.valueOf(projectId))
                 .orderId(orderId)
-                .ttl(10L)
+                .ttl(1800L)
                 .build();
     }
     public DonationUser convertToDonationUserPortone(Long userId, PaymentReq.ValidatePayment validatePayment, Long projectId, OrderRes.CreateInherenceDto createInherenceDto) {
         return DonationUser.builder()
                 .userId(userId)
-                .payMethod(orderHelper.getPayMethod(validatePayment.getPayMethod()))
                 .projectId(projectId)
                 .price((long) validatePayment.getAmount())
                 .tid(validatePayment.getImpUid())
@@ -63,6 +62,7 @@ public class OrderConverter {
                 .inherenceNumber(createInherenceDto.getInherenceNumber())
                 .regularStatus(RegularStatus.ONE_TIME)
                 .flameImage(FlameImage.NORMAL_IMG.getImg())
+                .flameType(FlameType.NORMAL_FLAME)
                 .build();
     }
 

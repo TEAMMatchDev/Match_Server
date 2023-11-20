@@ -2,6 +2,7 @@ package com.example.matchcommon.constants;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class MatchStatic {
     public static final String BEARER = "Bearer ";
@@ -52,6 +53,21 @@ public class MatchStatic {
     public static final String RETRY_PAYMENT = "RETRY";
 
     public static final String PAY_TITLE = getCurrentDateFormatted() + " MATCH 기부금 정기 결제";
+
+    public static final String CANCEL_STATUS = "cancelled";
+
+    public static final String CANCEL_IMP_UID = "impUid";
+
+    public static final String CANCEL_ORDER_ID = "orderId";
+
+    public static final String KID = "74JQ8SGRU2";
+
+    public static final String CLASS_PATH = "AuthKey_74JQ8SGRU2.p8";
+
+    public static final List<String> ignoredMethods = List.of(new String[]{"healthCheck", ""});
+
+    public static final List<String> ignoredUri = List.of(new String[]{"/health", "/error"});
+
 
     private static String getCurrentDateFormatted() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(PAYMENT_DATE_FORMAT));

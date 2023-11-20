@@ -21,4 +21,6 @@ public interface ProjectCustomRepository {
     Page<Project> getProjectList(User user, ProjectStatus projectStatus, LocalDateTime now, ImageRepresentStatus imageRepresentStatus, Status status, ProjectKind projectKind, String content, Pageable pageable);
 
     Page<ProjectDto> findProject(User user, ProjectStatus projectStatus, LocalDateTime now, ImageRepresentStatus imageRepresentStatus, Status status, ProjectKind projectKind, String content, Pageable pageable);
+
+    long countQueryForProject(ProjectStatus projectStatus, LocalDateTime now, Status status, String content, ProjectKind projectKind);
 }

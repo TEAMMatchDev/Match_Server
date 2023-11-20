@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,14 +58,19 @@ public class MailService {
     public void sendEmailMessage(String email, String code){
         try {
             MimeMessage message = emailSender.createMimeMessage();
-            message.addRecipients(MimeMessage.RecipientType.TO, email);
-            message.setSubject("[MATCH] 인증번호 발송");
-            message.setText(setContext(code), "utf-8", "html");
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(email);
+            helper.setSubject("[MATCH] 인증번호 발송");
+            String html = setContext(code);
+            helper.setText(html, true);
+
             emailSender.send(message);
-        }catch(Exception exception){
+        } catch(Exception exception){
             throw new InternalServerException(UNABLE_TO_SEND_EMAIL);
         }
     }
+
     private String setContext(String code) {
         Context context = new Context();
         context.setVariable("code", code);
@@ -72,14 +78,13 @@ public class MailService {
 
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setPrefix("templates/");
-        templateResolver.setSuffix("TemplateMail.html");
+        templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode(TemplateMode.HTML);
         templateResolver.setCharacterEncoding("UTF-8");
-        templateResolver.setOrder(0);
+        templateResolver.setOrder(1);
         templateEngine.setTemplateResolver(templateResolver);
 
-        return templateEngine.process("", context);
+        return templateEngine.process("TemplateMail", context);
     }
-
 
 }

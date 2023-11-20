@@ -102,4 +102,8 @@ public class DonationAdaptor {
     public void saveAll(List<DonationUser> donationUsers) {
         donationUserRepository.saveAll(donationUsers);
     }
+
+    public boolean existsByImpId(String impUid) {
+        return donationUserRepository.existsByTid(impUid);
+    }
 }

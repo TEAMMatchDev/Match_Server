@@ -90,7 +90,6 @@ public class DonationConverter {
         String histories = "";
         String flameImage = null;
         List<DonationRes.DonationHistoryImage> donationHistoryImages = new ArrayList<>();
-        System.out.println("분기");
         if(result.getHistoryStatus() == HistoryStatus.CREATE){
             System.out.println("CREATE");
             histories = inherenceName + "가 생성되었습니다.";

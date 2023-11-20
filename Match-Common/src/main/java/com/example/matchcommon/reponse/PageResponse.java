@@ -4,11 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
 @Getter
 @AllArgsConstructor
+@ToString
 @Schema(description = "페이징 처리 응답")
 public class PageResponse<T> implements Serializable {
     @Schema(description = "마지막 페이지 유무", required = true, example = "true")
