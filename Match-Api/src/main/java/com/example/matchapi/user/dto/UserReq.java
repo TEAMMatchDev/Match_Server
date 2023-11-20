@@ -249,4 +249,41 @@ public class UserReq {
         @NotBlank(message = "변경할 비밀번호를 입력해주세요")
         private String modifyPassword;
     }
+
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    public static class AppleSignUp {
+        @NotEmpty (message = "소셜 ID를 입력해주세요")
+        @Schema(description ="소셜 ID",required = true,example = "match123")
+        private String socialId;
+
+
+        @Email
+        @NotEmpty (message = "이메일을 입력해주세요")
+        @Schema(description ="이메일",required = true,example = "match123@gmail.com")
+        private String email;
+
+        @NotEmpty (message = "이름을 입력해주세요")
+        @Schema(description ="이름",required = true,example = "match123")
+        private String name;
+
+        @NotEmpty(message = "전화번호를 입력해주세요")
+        @Size(min = 11, max = 11, message = "전화번호는 11자리 이어야 합니다.")
+        @Pattern(regexp = "^01(?:0|1|[6-9])[0-9]{7,8}$", message = "전화번호 형식에 맞지 않습니다. 01012345678 '-' 를 제외하고 입력해주세요. ")
+        @Schema(description ="전화번호",required = true,example = "0101234567")
+        private String phone;
+
+        @Schema(description ="성별",required = true,example = "남성은 남성 여성은 여성 선택 안함 ")
+        @Enum(message="남성, 여성, 선택 안함에 맞춰서 입력해주세요")
+        private Gender gender;
+
+        @NotEmpty (message = "생년월일을 입력해주세요")
+        @Schema(description ="생일",required = true,example = "20200101")
+        private String birthDate;
+    }
 }
