@@ -7,6 +7,7 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.BaseDynamicException;
 import com.example.matchcommon.exception.UnauthorizedException;
 import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchcommon.properties.KakaoProperties;
@@ -39,7 +40,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,6 +51,7 @@ import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.user.entity.enums.AuthorityEnum.ROLE_ADMIN;
 import static com.example.matchdomain.user.entity.enums.SocialType.*;
 import static com.example.matchdomain.user.exception.AdminLoginErrorCode.NOT_ADMIN;
+import static com.example.matchdomain.user.exception.AppleLoginErrorCode.NOT_EXISTS_APPLE_USER;
 import static com.example.matchdomain.user.exception.CodeAuthErrorCode.NOT_CORRECT_AUTH;
 import static com.example.matchdomain.user.exception.CodeAuthErrorCode.NOT_CORRECT_CODE;
 import static com.example.matchdomain.user.exception.SendEmailFindPassword.NOT_EXISTS_EMAIL;
@@ -256,20 +260,34 @@ public class AuthService {
         AppleUserRes appleUserRes = authService.appleLogin(socialLoginToken.getAccessToken());
 
         if(userRepository.existsByEmailAndSocialTypeNot(appleUserRes.getEmail(), APPLE)) throw new BadRequestException(USERS_EXISTS_EMAIL);
+
         Optional<User> user = userAdaptor.existsSocialUser(appleUserRes.getSocialId(), APPLE);
 
-        Long userId;
-        if (user.isEmpty()) userId = appleSignUp(appleUserRes);
+        if (user.isEmpty()) {
+            HashMap<String, String> userInfo = new HashMap<>();
 
-        else userId = user.get().getId();
+            userInfo.put("socialId", appleUserRes.getSocialId());
+
+            throw new BaseDynamicException(NOT_EXISTS_APPLE_USER, userInfo);
+        }
+
+        Long userId = user.get().getId();
 
         UserRes.Token token = createToken(userId);
 
         return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
     }
 
-    private Long appleSignUp(AppleUserRes appleUserRes) {
-        return userRepository.save(userConverter.convertToAppleUserSignUp(appleUserRes)).getId();
+    public UserRes.UserToken appleSignUp(UserReq.@Valid AppleSignUp appleSignUp) {
+        if(userAdaptor.existsPhoneNumber(appleSignUp.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
+
+        if(userAdaptor.existsEmail(appleSignUp.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+
+        User user = userRepository.save(userConverter.convertToAppleUserSignUp(appleSignUp));
+
+        UserRes.Token token = createToken(user.getId());
+
+        return new UserRes.UserToken(user.getId(), token.getAccessToken(), token.getRefreshToken());
     }
 
 
