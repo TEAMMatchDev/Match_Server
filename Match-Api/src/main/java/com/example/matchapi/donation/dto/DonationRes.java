@@ -310,4 +310,27 @@ public class DonationRes {
         @Schema(description = "랜덤 불꽃이 메세지")
         private String randomMessage;
     }
+
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProjectDonationStatus {
+        @Schema(description = "프로젝트 id", example = "1")
+        private Long projectId;
+
+        @Schema(description = "후원처 명")
+        private String usages;
+
+        @Schema(description = "분류 대기 금액")
+        private int waitingSortingAmount;
+
+        @Schema(description = "수입 금액")
+        private int importedAmount;
+
+        @Schema(description = "지출 완료 금액")
+        private int completeAmount;
+    }
 }

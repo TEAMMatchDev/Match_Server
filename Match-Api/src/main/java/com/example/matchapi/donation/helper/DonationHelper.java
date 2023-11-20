@@ -38,6 +38,7 @@ public class DonationHelper {
             case EXECUTION_UNDER:
                 return getRandomMessageType(UNDER);
             case EXECUTION_SUCCESS:
+            case SOME_EXECUTION:
                 return getRandomMessageType(COMPLETE);
         }
         return "하이";

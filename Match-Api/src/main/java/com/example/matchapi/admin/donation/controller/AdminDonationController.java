@@ -7,6 +7,7 @@ import com.example.matchapi.donation.service.DonationService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
+import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,15 +43,16 @@ public class AdminDonationController {
         return CommonResponse.onSuccess(adminDonationService.getDonationDetail(donationId));
     }
 
-    @PostMapping("/complete")
+    /*@PostMapping("/complete")
     @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class})
-    @Operation(summary = "ADMIN-05-03 기부금 집행 완료 POST API", description = "기부금 집행 완료")
+    @Operation(summary = "ADMIN-05-03 기부금 집행 중 API POST API", description = "기부금 집행 중 API")
     public CommonResponse<String> postExecution(
             @RequestBody DonationReq.EnforceDonation enforceDonation
     ){
         adminDonationService.postExecution(enforceDonation);
         return CommonResponse.onSuccess("집행 중 으로 변환 성공");
     }
+     */
 
 
     @PostMapping(value = "/enforce", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -65,5 +67,14 @@ public class AdminDonationController {
             @RequestPart("enforceDonation") DonationReq.EnforceDonation enforceDonation){
         adminDonationService.enforceDonation(imageLists, enforceDonation);
         return CommonResponse.onSuccess("성공");
+    }
+
+    @GetMapping("/execution")
+    @Operation(summary = "기부금 전반 내용 확인")
+    public CommonResponse<PageResponse<List<DonationRes.ProjectDonationStatus>>> getProjectDonationStatus(
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size
+    ){
+        return CommonResponse.onSuccess(adminDonationService.getProjectDonationStatus(page, size));
     }
 }
