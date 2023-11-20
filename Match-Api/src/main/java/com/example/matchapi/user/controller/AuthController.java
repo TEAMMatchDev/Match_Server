@@ -160,14 +160,14 @@ public class AuthController {
     }
 
 
-    @Operation(summary="01-11🔑 애플로그인 API", description= "애플로그인 API 입니다. APPLE_SIGN_UP 에러 코드 발생 시 01-10-01 API 로 회원가입 요청")
+    @Operation(summary="01-11🔑 애플로그인 API", description= "애플로그인 API 입니다. APPLE_SIGN_UP 에러 코드 발생 시 01-11-01 API 로 회원가입 요청")
     @PostMapping("/apple")
     @ApiErrorCodeExample({UserSignUpErrorCode.class, OtherServerErrorCode.class, RequestErrorCode.class, AppleLoginErrorCode.class})
     public CommonResponse<UserRes.UserToken> appleLogin(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         return CommonResponse.onSuccess(authService.appleLogin(socialLoginToken));
     }
 
-    @Operation(summary = "01-11-01🔑",description = "애플유저용 회원가입")
+    @Operation(summary = "01-11-01 애플 회원가입🔑",description = "애플유저용 회원가입")
     @PostMapping("/apple/sing-up")
     @ApiErrorCodeExample({UserSignUpErrorCode.class, RequestErrorCode.class})
     public CommonResponse<UserRes.UserToken> appleSignUp(@RequestBody @Valid UserReq.AppleSignUp appleSignUp){
