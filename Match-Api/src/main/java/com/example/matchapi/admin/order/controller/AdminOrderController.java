@@ -27,13 +27,5 @@ public class AdminOrderController {
         return CommonResponse.onSuccess("환불 성공");
     }
 
-    @Operation(summary = "ADMIN-ORDER-04-02💸 기부금 상태 변경 API", description = "관리자 기부금 상태변경 API 입니다,")
-    @ApiErrorCodeExample({UserAuthErrorCode.class,DonationGerErrorCode.class})
-    @PatchMapping("/{donationId}")
-    public CommonResponse<String> modifyDonationStatus(@RequestParam("donationStatus")DonationStatus donationStatus, @PathVariable Long donationId){
-        orderService.modifyDonationStatus(donationId, donationStatus);
-        return CommonResponse.onSuccess("기부 상태 수정 완료 : " + donationStatus.getName());
-    }
-
 
 }
