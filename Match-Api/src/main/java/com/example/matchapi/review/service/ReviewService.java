@@ -1,6 +1,7 @@
 package com.example.matchapi.review.service;
 
 import com.example.matchapi.review.converter.ReviewConverter;
+import com.example.matchapi.review.dto.ReviewReq;
 import com.example.matchapi.review.dto.ReviewRes;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
@@ -39,5 +40,9 @@ public class ReviewService {
         if(donationExecution.getReview() != null) throw new NotFoundException(NOT_EXISTS_DONATION);
 
         return donationExecution;
+    }
+
+    public void postReview(User user, ReviewReq.ReviewUpload reviewUpload) {
+        reviewAdaptor.save(reviewConverter.convertToReview(reviewUpload));
     }
 }

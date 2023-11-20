@@ -11,4 +11,7 @@ public class ReviewAdaptor {
     private final ReviewRepository reviewRepository;
 
 
+    public Review save(Review review) {
+        return reviewRepository.save(review);
+    }
 }
