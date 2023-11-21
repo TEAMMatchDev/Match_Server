@@ -254,4 +254,14 @@ public class UserConverter {
                 .eventAlarm(user.getEventAlarm())
                 .build();
     }
+
+    public UserRes.UserToken convertToToken(Long userId, String accessToken, String refreshToken, boolean isNew) {
+        return UserRes.UserToken
+                .builder()
+                .userId(userId)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .isNew(isNew)
+                .build();
+    }
 }
