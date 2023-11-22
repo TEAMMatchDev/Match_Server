@@ -1,6 +1,7 @@
 package com.example.matchapi.project.service;
 
 import com.example.matchapi.common.util.MessageHelper;
+import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.project.converter.ProjectConverter;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
@@ -329,5 +330,10 @@ public class ProjectService {
 
     public Project findByProjectId(Long projectId) {
         return projectAdaptor.findById(projectId);
+    }
+
+    public List<DonationRes.Tutorial> getTutorialDonation() {
+        List<Project> projects = projectAdaptor.getRandom3Project();
+        return projectConverter.convertToTutorialDonation(projects);
     }
 }

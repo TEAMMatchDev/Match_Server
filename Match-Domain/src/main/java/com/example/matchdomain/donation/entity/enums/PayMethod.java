@@ -12,7 +12,8 @@ public enum PayMethod {
     KAKAO_PAY("kakaopay","카카오 페이"),
     PAYCO("payco","페이코"),
     SSGPAY("ssgpay","쓱페이"),
-    SAMSUNG_PAY("samsungpay","삼성페이");
+    SAMSUNG_PAY("samsungpay","삼성페이"),
+    TUTORIAL("TUTORIAL","튜토리얼");
 
     private final String value;
     private final String name;

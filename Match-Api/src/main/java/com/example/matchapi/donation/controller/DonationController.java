@@ -1,17 +1,23 @@
 package com.example.matchapi.donation.controller;
 
+import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.service.DonationService;
+import com.example.matchapi.project.service.ProjectService;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchcommon.annotation.RedissonLock;
+import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.exception.*;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +31,7 @@ import java.util.List;
 @Tag(name = "05-Donation💸",description = "기부금 관련 API 입니다.")
 public class DonationController {
     private final DonationService donationService;
+    private final ProjectService projectService;
 
     @PatchMapping("/{donationId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, DonationRefundErrorCode.class})
@@ -183,4 +190,24 @@ public class DonationController {
         return CommonResponse.onSuccess(donationService.getBurningFlameList(user, page, size));
     }
 
+
+    @Operation(summary = "05-13 튜토리얼 기부 리스트", description = "튜토리얼 기부 리스트")
+    @GetMapping("/tutorial")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    public CommonResponse<List<DonationRes.Tutorial>> getTutorialDonation(
+        @AuthenticationPrincipal User user
+    ){
+        return CommonResponse.onSuccess(projectService.getTutorialDonation());
+    }
+
+    @Operation(summary = "05-14 튜토리얼 기부 ", description = "튜토리얼 1원 기부 POST API 입니다.")
+    @PostMapping("/tutorial")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class})
+    @RedissonLock(LockName = "유저 튜토리얼 기부", key = "#user.id")
+    public CommonResponse<DonationRes.CompleteDonation> postTutorialDonation(
+            @AuthenticationPrincipal User user,
+            @RequestBody DonationReq.Tutorial tutorial){
+        Project project = projectService.findByProjectId(tutorial.getProjectId());
+        return CommonResponse.onSuccess(donationService.postTutorialDonation(user, tutorial, project));
+    }
 }

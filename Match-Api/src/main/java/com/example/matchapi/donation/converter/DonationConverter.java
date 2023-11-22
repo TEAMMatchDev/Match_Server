@@ -1,14 +1,22 @@
 package com.example.matchapi.donation.converter;
 
 import com.example.matchapi.common.util.TimeHelper;
+import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
+import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchcommon.annotation.Converter;
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
+import com.example.matchdomain.donation.entity.enums.PayMethod;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.donation.entity.flameEnum.FlameImage;
+import com.example.matchdomain.donation.entity.flameEnum.FlameType;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
-import com.example.matchdomain.donation.repository.HistoryImageRepository;
+import com.example.matchdomain.project.entity.Project;
+import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 
@@ -306,4 +314,28 @@ public class DonationConverter {
     }
 
 
+    public DonationUser convertToTutorialDonation(User user, DonationReq.Tutorial tutorial, OrderRes.CreateInherenceDto createInherenceDto) {
+        return DonationUser.builder()
+                .userId(user.getId())
+                .projectId(tutorial.getProjectId())
+                .price(1L)
+                .donationStatus(DonationStatus.EXECUTION_BEFORE)
+                .payMethod(PayMethod.TUTORIAL)
+                .inherenceName(createInherenceDto.getInherenceName())
+                .inherenceNumber(createInherenceDto.getInherenceNumber())
+                .regularStatus(RegularStatus.ONE_TIME)
+                .flameImage(FlameImage.NORMAL_IMG.getImg())
+                .flameType(FlameType.NORMAL_FLAME)
+                .build();
+    }
+
+    public DonationRes.CompleteDonation convertToCompleteDonation(DonationUser donationUser, Project project) {
+        return DonationRes.CompleteDonation
+                .builder()
+                .projectId(donationUser.getProjectId())
+                .image(donationUser.getFlameImage())
+                .inherenceName(donationUser.getInherenceName())
+                .randomMessage(donationHelper.createRandomMessageTutorial(project.getProjectKind()))
+                .build();
+    }
 }

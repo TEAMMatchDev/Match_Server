@@ -30,4 +30,14 @@ public class DonationReq {
 
         private Long amount;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    public static class Tutorial {
+        private Long projectId;
+    }
 }

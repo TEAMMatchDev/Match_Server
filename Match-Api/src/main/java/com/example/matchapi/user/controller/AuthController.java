@@ -60,7 +60,7 @@ public class AuthController {
     @PostMapping(value="/naver")
     public CommonResponse<UserRes.UserToken> naverLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         log.info("01-03 네이버 로그인,회원가입 API");
-        return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
+        return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken.getAccessToken()));
     }
 
     /*

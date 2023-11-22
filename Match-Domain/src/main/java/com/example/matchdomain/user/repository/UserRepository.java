@@ -100,6 +100,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     Optional<User> findByUsernameAndStatusAndSocialType(String email, Status status, SocialType socialType);
 
+    boolean existsByEmailAndSocialTypeNotAndStatus(String email, SocialType socialType, Status status);
+
     public interface UserList {
         Long getUserId();
         String getName();
