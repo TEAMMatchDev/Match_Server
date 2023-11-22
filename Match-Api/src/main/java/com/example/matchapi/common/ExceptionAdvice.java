@@ -126,7 +126,7 @@ public class ExceptionAdvice {
             pw.append("ERROR_MESSAGE : ").append(errors.toString()).append("\n");
         }
         else {
-            pw.append("ERROR_MESSAGE : ").append(e.getMessage()).append("\n");
+            pw.append("ERROR_MESSAGE : ").append(e.toString()).append("\n");
             pw.append("ERROR_MESSAGE : ").append(e.getLocalizedMessage()).append("\n");
         }
         pw.append("=====================================================================");

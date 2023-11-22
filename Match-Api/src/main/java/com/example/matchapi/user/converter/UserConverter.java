@@ -16,13 +16,14 @@ import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.aligo.dto.SendReq;
-import com.example.matchinfrastructure.oauth.apple.dto.AppleUserRes;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.example.matchcommon.constants.MatchStatic.BASE_PROFILE;
@@ -227,19 +228,22 @@ public class UserConverter {
                 .build();
     }
 
-    public User convertToAppleUserSignUp(AppleUserRes appleUserRes) {
+    public User convertToAppleUserSignUp(UserReq.@Valid AppleSignUp appleSignUp) {
         return User.builder()
-                .username(appleUserRes.getSocialId())
+                .username(appleSignUp.getSocialId())
+                .name(appleSignUp.getName())
                 .password(authHelper.createRandomPassword())
                 .profileImgUrl(BASE_PROFILE)
-                .email(appleUserRes.getEmail())
-                .socialId(appleUserRes.getSocialId())
+                .email(appleSignUp.getEmail())
+                .phoneNumber(appleSignUp.getPhone())
+                .socialId(appleSignUp.getSocialId())
                 .socialType(SocialType.APPLE)
                 .role(AuthorityEnum.ROLE_USER.getValue())
                 .nickname(userHelper.createRandomNickName())
                 .serviceAlarm(ACTIVE)
                 .eventAlarm(ACTIVE)
-                .gender(Gender.UNKNOWN)
+                .gender(appleSignUp.getGender())
+                .birth(LocalDate.parse(appleSignUp.getBirthDate()))
                 .build();
     }
 
@@ -248,6 +252,16 @@ public class UserConverter {
                 .builder()
                 .serviceAlarm(user.getServiceAlarm())
                 .eventAlarm(user.getEventAlarm())
+                .build();
+    }
+
+    public UserRes.UserToken convertToToken(Long userId, String accessToken, String refreshToken, boolean isNew) {
+        return UserRes.UserToken
+                .builder()
+                .userId(userId)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .isNew(isNew)
                 .build();
     }
 }

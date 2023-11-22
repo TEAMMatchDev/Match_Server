@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum FlameImage {
-    NORMAL_IMG("https://match-image.s3.ap-northeast-2.amazonaws.com/image+56.jpg");
+    NORMAL_IMG("https://match-image.s3.ap-northeast-2.amazonaws.com/flame.png");
     private final String img;
 }

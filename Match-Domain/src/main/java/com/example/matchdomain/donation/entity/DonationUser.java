@@ -25,7 +25,7 @@ import java.util.List;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-@BatchSize(size = 1000)
+@BatchSize(size = 100)
 public class DonationUser extends BaseEntity {
     @Id
     @Column(name = "id")
@@ -81,6 +81,11 @@ public class DonationUser extends BaseEntity {
     @JoinColumn(name = "donationUserId")
     @BatchSize(size = 100)
     private List<DonationHistory> donationHistories = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "donationUserId")
+    @BatchSize(size = 100)
+    private List<DonationExecution> donationExecutions = new ArrayList<>();
 
     public void updateInherenceNumber(String inherenceNumber, String flameName) {
         this.inherenceNumber = inherenceNumber;

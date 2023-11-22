@@ -48,7 +48,7 @@ public class OrderHelper {
 
         String randomName;
         do {
-            randomName = user.getName() + "님의 " + getRandomEnumValue(AdjectiveFlame.class).getValue() + " " + getRandomEnumValue(Adjective.class).getValue() +  " 불꽃이";
+            randomName = getRandomEnumValue(AdjectiveFlame.class).getValue() + " " + getRandomEnumValue(Adjective.class).getValue() +  " 불꽃이";
         } while (inherenceNames.contains(randomName));
 
         return randomName;

@@ -135,4 +135,13 @@ public class ProjectAdaptor {
     public Project findByProject(String projectId) {
         return findByProjectId(Long.valueOf(projectId)).orElseThrow(()->new BadRequestException(ProjectOneTimeErrorCode.PROJECT_NOT_EXIST));
     }
+
+    public Page<Project> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return projectRepository.findByOrderByCreatedAtAsc(pageable);
+    }
+
+    public List<Project> getRandom3Project() {
+        return projectRepository.findRandomThreeProject(LocalDateTime.now());
+    }
 }
