@@ -1,6 +1,7 @@
 package com.example.matchapi.project.converter;
 
 import com.example.matchapi.common.util.TimeHelper;
+import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
@@ -348,6 +349,25 @@ public class ProjectConverter {
                 .profileImgUrl(result.getUser().getProfileImgUrl())
                 .userId(result.getUserId())
                 .isMy(result.getUserId().equals(userId))
+                .build();
+    }
+
+    public List<DonationRes.Tutorial> convertToTutorialDonation(List<Project> projects) {
+        List<DonationRes.Tutorial> tutorials = new ArrayList<>();
+
+        projects.forEach(
+                result -> tutorials.add(
+                        convertToTutorialDetail(result)
+                )
+        );
+        return tutorials;
+    }
+
+    private DonationRes.Tutorial convertToTutorialDetail(Project result) {
+        return DonationRes.Tutorial
+                .builder()
+                .projectId(result.getId())
+                .projectKind(result.getProjectKind())
                 .build();
     }
 }

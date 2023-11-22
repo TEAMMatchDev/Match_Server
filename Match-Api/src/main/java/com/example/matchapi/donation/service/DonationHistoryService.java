@@ -26,6 +26,6 @@ public class DonationHistoryService {
     }
 
     public void oneTimeDonationHistory(Long donationId){
-        saveDonationHistory(donationConverter.convertToDonationHistory(donationId, CREATE));
+        donationHistoryAdaptor.saveDonationHistory(donationConverter.convertToDonationHistory(donationId, CREATE));
     }
 }
