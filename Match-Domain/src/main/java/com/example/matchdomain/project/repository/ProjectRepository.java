@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -333,6 +334,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
     Page<ProjectList> findLikeProjects(@Param("userId") Long userId, Pageable pageable);
 
     Page<Project> findByOrderByCreatedAtAsc(Pageable pageable);
+
+    @Query(value = "SELECT * FROM Project WHERE projectStatus = 'PROCEEDING' and finishedAt > :now and status = 'ACTIVE'  ORDER BY RAND() LIMIT 3", nativeQuery = true)
+    List<Project> findRandomThreeProject(@Param("now") LocalDateTime now);
 
 
     interface ProjectList {

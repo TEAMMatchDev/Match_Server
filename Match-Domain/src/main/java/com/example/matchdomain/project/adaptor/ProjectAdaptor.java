@@ -140,4 +140,8 @@ public class ProjectAdaptor {
         Pageable pageable = PageRequest.of(page, size);
         return projectRepository.findByOrderByCreatedAtAsc(pageable);
     }
+
+    public List<Project> getRandom3Project() {
+        return projectRepository.findRandomThreeProject(LocalDateTime.now());
+    }
 }

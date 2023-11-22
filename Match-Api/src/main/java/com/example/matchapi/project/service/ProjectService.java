@@ -1,6 +1,7 @@
 package com.example.matchapi.project.service;
 
 import com.example.matchapi.common.util.MessageHelper;
+import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.project.converter.ProjectConverter;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
@@ -273,8 +274,10 @@ public class ProjectService {
     }
 
 
-    public void postComment(User user, Long projectId, ProjectReq.Comment comment) {
-        projectCommentRepository.save(projectConverter.convertToComment(user.getId(), projectId, comment.getComment()));
+    public ProjectRes.CommentList postComment(User user, Long projectId, ProjectReq.Comment comment) {
+        ProjectComment projectComment = projectCommentRepository.save(projectConverter.convertToComment(user.getId(), projectId, comment.getComment()));
+
+        return projectConverter.projectComment(user, projectComment);
     }
 
     public void reportComment(Long commentId, ReportReason reportReason) {
@@ -297,11 +300,6 @@ public class ProjectService {
     public PageResponse<List<ProjectRes.CommentList>> getProjectComment(User user, Long projectId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Long userId;
-        if(authHelper.checkGuest(user)) userId = user.getId();
-        else {
-            userId = 0L;
-        }
 
         Page<ProjectComment> projectComments = projectCommentRepository.findByProjectIdAndStatusOrderByCreatedAtAsc(projectId, ACTIVE,pageable);
 
@@ -309,7 +307,7 @@ public class ProjectService {
         projectComments.getContent().forEach(
                 result-> {
                     commentLists.add(
-                            projectConverter.projectComment(userId, result)
+                            projectConverter.projectComment(user, result)
                     );
                 }
         );
@@ -329,5 +327,10 @@ public class ProjectService {
 
     public Project findByProjectId(Long projectId) {
         return projectAdaptor.findById(projectId);
+    }
+
+    public List<DonationRes.Tutorial> getTutorialDonation() {
+        List<Project> projects = projectAdaptor.getRandom3Project();
+        return projectConverter.convertToTutorialDonation(projects);
     }
 }

@@ -5,6 +5,7 @@ import com.example.matchdomain.common.model.MessageType;
 import com.example.matchdomain.common.model.RandomMessage;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.enums.DonationStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
 import lombok.RequiredArgsConstructor;
 
 import java.text.DecimalFormat;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import static com.example.matchcommon.constants.RandomMessageStatic.*;
 import static com.example.matchdomain.common.model.MessageType.*;
 import static com.example.matchdomain.donation.entity.enums.RegularStatus.ONE_TIME;
 
@@ -70,5 +72,32 @@ public class DonationHelper {
 
     public boolean isOneDayPassed(LocalDateTime dateTime) {
         return Duration.between(dateTime, LocalDateTime.now()).toDays() >= 1;
+    }
+
+    public String createRandomMessageTutorial(ProjectKind projectKind) {
+        switch (projectKind){
+            case CHILDREN:
+                return CHILDREN_MESSAGE;
+            case YOUTH:
+                return YOUTH_MESSAGE;
+            case WOMEN:
+                return WOMEN_MESSAGE;
+            case ELDER:
+                return ELDER_MESSAGE;
+            case DISABLED:
+                return DISABLED_MESSAGE;
+            case SOCIAL:
+                return SOCIAL_MESSAGE;
+            case NEIGHBOR:
+                return NEIGHBOR_MESSAGE;
+            case EARTH:
+                return EARTH_MESSAGE;
+            case ANIMAL:
+                return ANIMAL_MESSAGE;
+            case ENVIRONMENT:
+                return ENVIRONMENT_MESSAGE;
+            default:
+                return RANDOM_MESSAGE;
+        }
     }
 }

@@ -97,7 +97,6 @@ public class ProjectRes {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CommentList {
-
         private Long commentId;
 
         private String comment;
