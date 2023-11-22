@@ -168,7 +168,7 @@ public class AuthController {
     }
 
     @Operation(summary = "01-11-01 애플 회원가입🔑",description = "애플유저용 회원가입")
-    @PostMapping("/apple/sing-up")
+    @PostMapping("/apple/sign-up")
     @ApiErrorCodeExample({UserSignUpErrorCode.class, RequestErrorCode.class})
     public CommonResponse<UserRes.UserToken> appleSignUp(@RequestBody @Valid UserReq.AppleSignUp appleSignUp){
         return CommonResponse.onSuccess(authService.appleSignUp(appleSignUp));
