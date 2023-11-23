@@ -345,6 +345,9 @@ public class DonationRes {
         private Long projectId;
 
         private ProjectKind projectKind;
+
+        @Schema(description = "랜덤 불꽃이 메세지")
+        private String randomMessage;
     }
 
     @Getter
