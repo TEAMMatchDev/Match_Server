@@ -27,6 +27,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.IOException;
 
@@ -76,8 +77,8 @@ public class UserController {
 
 
     @Operation(summary = "02-04 로그아웃 👤", description = "로그아웃 요청 API")
-    @ResponseBody
     @GetMapping("/logout")
+    @Transactional
     public CommonResponse<String> logOut(@Parameter(hidden = true) @AuthenticationPrincipal User user,
                                          @Parameter(description = "디바이스 아이디") @RequestParam(value = "DEVICE_ID", required = true) String deviceId){
         log.info("api = logout 02-03");

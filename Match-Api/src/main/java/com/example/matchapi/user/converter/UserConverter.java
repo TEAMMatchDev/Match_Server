@@ -243,7 +243,7 @@ public class UserConverter {
                 .serviceAlarm(ACTIVE)
                 .eventAlarm(ACTIVE)
                 .gender(appleSignUp.getGender())
-                .birth(LocalDate.parse(appleSignUp.getBirthDate()))
+                .birth(authHelper.birthConversionToLocalDate(appleSignUp.getBirthDate()))
                 .build();
     }
 

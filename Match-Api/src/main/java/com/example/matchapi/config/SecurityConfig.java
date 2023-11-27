@@ -102,6 +102,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/donation-temporaries/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/order/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/auth/logIn").permitAll()
+                .antMatchers("/payments/web-hook").permitAll()
                 .and()
                 .apply(new JwtSecurityConfig(jwtService));
     }

@@ -1,6 +1,8 @@
 package com.example.matchapi.project.converter;
 
 import com.example.matchapi.donation.dto.DonationRes;
+import com.example.matchapi.donation.helper.DonationHelper;
+import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.helper.ProjectHelper;
@@ -30,6 +32,7 @@ import static com.example.matchdomain.project.entity.enums.ProjectStatus.BEFORE_
 @RequiredArgsConstructor
 public class ProjectConverter {
     private final ProjectHelper projectHelper;
+    private final DonationHelper donationHelper;
     private final RegularPaymentRepository regularPaymentRepository;
     private static final String FIRST_TIME = "T00:00:00";
     private static final String LAST_TIME = "T23:59:59";
@@ -366,6 +369,7 @@ public class ProjectConverter {
                 .builder()
                 .projectId(result.getId())
                 .projectKind(result.getProjectKind())
+                .randomMessage(donationHelper.createRandomMessageTutorial(result.getProjectKind()))
                 .build();
     }
 }

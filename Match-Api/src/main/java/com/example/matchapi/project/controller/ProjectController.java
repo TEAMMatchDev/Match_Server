@@ -171,7 +171,7 @@ public class ProjectController {
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @PathVariable Long commentId){
         projectService.deleteComment(user, commentId);
-        return CommonResponse.onSuccess("신고 성공");
+        return CommonResponse.onSuccess("삭제 성공");
     }
 
     @Operation(summary = "03-13 내가 찜한 기부처 모아보기 ", description = "내가 찜한 기부처 모아보기")
