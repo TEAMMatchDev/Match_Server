@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PayMethod {
     CARD("CARD","신용카드"),
+    POINT("point", "카카오페이 포인트"),
     VBANK("VBANK","카드"),
     NAVER_PAY("naverpay","네이버 페이"),
     KAKAO_PAY("kakaopay","카카오 페이"),

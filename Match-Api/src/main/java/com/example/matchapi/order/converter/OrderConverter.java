@@ -16,6 +16,7 @@ import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchinfrastructure.pay.nice.dto.*;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
+import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
@@ -49,15 +50,15 @@ public class OrderConverter {
                 .ttl(1800L)
                 .build();
     }
-    public DonationUser convertToDonationUserPortone(Long userId, PaymentReq.ValidatePayment validatePayment, Long projectId, OrderRes.CreateInherenceDto createInherenceDto) {
+    public DonationUser convertToDonationUserPortone(Long userId, Payment payment, Long projectId, OrderRes.CreateInherenceDto createInherenceDto) {
         return DonationUser.builder()
                 .userId(userId)
                 .projectId(projectId)
-                .price((long) validatePayment.getAmount())
-                .tid(validatePayment.getImpUid())
-                .orderId(validatePayment.getOrderId())
+                .price((long) payment.getAmount().intValue())
+                .tid(payment.getImpUid())
+                .orderId(payment.getMerchantUid())
                 .donationStatus(DonationStatus.EXECUTION_BEFORE)
-                .payMethod(orderHelper.getPayMethod(validatePayment.getPayMethod()))
+                .payMethod(orderHelper.getPayMethod(payment.getPayMethod()))
                 .inherenceName(createInherenceDto.getInherenceName())
                 .inherenceNumber(createInherenceDto.getInherenceNumber())
                 .regularStatus(RegularStatus.ONE_TIME)
