@@ -8,8 +8,6 @@ import com.example.matchinfrastructure.aligo.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import static com.example.matchinfrastructure.aligo.AligoStatic.PAYMENT_TEMPLATE;
-
 @Service
 @RequiredArgsConstructor
 public class AligoInfraService {
@@ -26,12 +24,13 @@ public class AligoInfraService {
         System.out.println(sendRes.getMessage());
     }
 
-    public void sendAlimTalkForPayment(String phone, String name){
+    public void sendAlimTalkForPayment(String phone, String name, AlimType alimType){
         CreateTokenRes token = getAligoToken();
 
-        AlimTalkReq alimTalkReq = aligoConverter.convertToPayment(phone, name, aligoProperties, token.getToken());
+        AlimTalkReq alimTalkReq = aligoConverter.convertToPayment(phone, name, aligoProperties, token.getToken(), alimType);
 
         System.out.println(alimTalkReq.toString());
+
         AligoResponse<AlimTalkRes> aligoResponse =
                 kakaoAligoFeignClient.sendAlimTalk(
                         alimTalkReq
