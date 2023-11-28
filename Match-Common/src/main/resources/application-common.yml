@@ -67,7 +67,7 @@ aligo:
   username: ${ALIGO_USERNAME}
   key: ${ALIGO_KEY}
   sender: ${SMS_SENDER}
-  sender-key: ${KAKAO_SENDER_KEY}}
+  sender-key: ${KAKAO_SENDER_KEY}
 
 web:
   return:
