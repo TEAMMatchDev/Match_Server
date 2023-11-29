@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class AlimTalkDto {
-    private Long regularId;
+    private Long donationId;
     private String name;
     private String phone;
     private String usages;

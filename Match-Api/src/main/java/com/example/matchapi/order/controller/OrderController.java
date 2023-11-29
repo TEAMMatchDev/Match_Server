@@ -12,6 +12,7 @@ import com.example.matchapi.order.mapper.OrderMapper;
 import com.example.matchapi.order.service.CardService;
 import com.example.matchapi.order.service.OrderService;
 import com.example.matchapi.project.service.ProjectService;
+import com.example.matchapi.user.service.AligoService;
 import com.example.matchapi.user.service.UserService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.constants.MatchStatic;
@@ -28,6 +29,7 @@ import com.example.matchdomain.project.exception.ProjectOneTimeErrorCode;
 import com.example.matchdomain.project.exception.ProjectRegualrErrorCode;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
+import com.example.matchinfrastructure.aligo.converter.AligoConverter;
 import com.example.matchinfrastructure.pay.nice.dto.NicePaymentAuth;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,6 +65,7 @@ public class OrderController {
     private final ProjectService projectService;
     private final OrderHelper orderHelper;
     private final OrderMapper orderMapper = OrderMapper.INSTANCE;
+
 
     @PostMapping("/{projectId}")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
@@ -127,7 +130,6 @@ public class OrderController {
         UserCard card = cardService.findByCardId(cardId);
         Project project = projectService.checkProjectExists(projectId, REGULAR);
         String orderId = orderHelper.createOrderId(MatchStatic.REGULAR);
-        System.out.println(orderId);
         return CommonResponse.onSuccess(orderService.paymentForRegular(orderMapper.toRegularDonation(card, regularDonation, user, project, orderId)));
     }
 

@@ -66,12 +66,22 @@ public class AligoConverter {
     }
 
     public AlimTalkReq convertToAlimTalk(AligoProperties aligoProperties, String token, AlimType alimType, AlimTalkDto alimTalkDto) {
-        String json = createButtonJson(alimType, alimTalkDto.getRegularId());
+        String json = createButtonJson(alimType, alimTalkDto.getDonationId());
         String tplCode = alimType.equals(AlimType.PAYMENT) ? PAYMENT_TEMPLATE : EXECUTION_TEMPLATE;
         String emTitle = alimType.equals(AlimType.PAYMENT) ? PAYMENT_EM_TITLE : EXECUTION_EM_TITLE;
         String subject = alimType.equals(AlimType.PAYMENT) ? PAYMENT_SUBJECT : EXECUTION_SUBJECT;
         String message = alimType.equals(AlimType.PAYMENT) ? String.format(PAYMENT_MESSAGE, alimTalkDto.getName()) : String.format(EXECUTION_MESSAGE, alimTalkDto.getName(), alimTalkDto.getArticle(), alimTalkDto.getUsages());
 
         return createAlimTalkReq(aligoProperties, token, alimType, alimTalkDto.getPhone(), alimTalkDto.getName(), tplCode, emTitle, subject, message, json);
+    }
+
+    public AlimTalkDto convertToAlimTalkPayment(Long donationId, String name, String phoneNumber) {
+        return AlimTalkDto
+                .builder()
+                .donationId(donationId)
+                .name(name)
+                .phone(phoneNumber)
+                .build();
+
     }
 }

@@ -1,11 +1,13 @@
 package com.example.matchapi.portone.service;
 
+import com.example.matchapi.common.security.JwtService;
 import com.example.matchapi.donation.service.DonationHistoryService;
 import com.example.matchapi.order.converter.OrderConverter;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.portone.dto.PaymentCommand;
 import com.example.matchapi.portone.dto.PaymentReq;
+import com.example.matchapi.user.service.AligoService;
 import com.example.matchcommon.annotation.PaymentIntercept;
 import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
@@ -20,6 +22,8 @@ import com.example.matchdomain.redis.adaptor.OrderAdaptor;
 import com.example.matchdomain.redis.entity.OrderRequest;
 import com.example.matchdomain.user.adaptor.UserAdaptor;
 import com.example.matchdomain.user.entity.User;
+import com.example.matchinfrastructure.aligo.converter.AligoConverter;
+import com.example.matchinfrastructure.aligo.dto.AlimType;
 import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import com.example.matchinfrastructure.pay.portone.converter.PortOneConverter;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
@@ -56,6 +60,9 @@ public class PaymentService {
     private final DonationAdaptor donationAdaptor;
     private final ProjectAdaptor projectAdaptor;
     private final UserAdaptor userAdaptor;
+    private final AligoService aligoService;
+    private final AligoConverter aligoConverter;
+    private final JwtService jwtService;
 
     private IamportClient iamportClient;
 
@@ -71,9 +78,11 @@ public class PaymentService {
 
             validatePayments(payment, paymentValidation.getValidatePayment(), paymentValidation.getOrderRequest());
 
-            saveDonationUser(paymentValidation.getUser(), paymentValidation.getProject(), payment.getResponse());
+            DonationUser donationUser = saveDonationUser(paymentValidation.getUser(), paymentValidation.getProject(), payment.getResponse());
 
             orderAdaptor.deleteById(paymentValidation.getValidatePayment().getOrderId());
+
+            aligoService.sendAlimTalk(jwtService.createToken(1L), AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), paymentValidation.getUser().getName(), paymentValidation.getUser().getPhoneNumber()));
 
             return orderConverter.convertToCompleteDonation(paymentValidation.getUser().getName(), paymentValidation.getProject(), (long) paymentValidation.getValidatePayment().getAmount());
         } catch (IamportResponseException | IOException e) {
@@ -109,10 +118,11 @@ public class PaymentService {
     }
 
     @PaymentIntercept(key = "#payment.imp_uid")
-    public void saveDonationUser(User user, Project project, Payment payment) {
+    public DonationUser saveDonationUser(User user, Project project, Payment payment) {
         OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
         DonationUser donationUser = donationAdaptor.save(orderConverter.convertToDonationUserPortone(user.getId(), payment, project.getId(), createInherenceDto));
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
+        return donationUser;
     }
 
     public PortOneResponse<PortOneBillPayResponse> payBillKey(UserCard card, Long amount, String projectName, String orderId) {
