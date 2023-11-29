@@ -20,7 +20,7 @@ public class TestController {
     public CommonResponse<String> testAlimTalk(
             @RequestParam("name") String name,
             @RequestParam("phone") String phone) {
-        aligoInfraService.sendAlimTalkForPayment(phone, name, PAYMENT);
+        aligoInfraService.sendAlimTalkTest(phone, name, PAYMENT);
         return CommonResponse.onSuccess("성공");
     }
 }

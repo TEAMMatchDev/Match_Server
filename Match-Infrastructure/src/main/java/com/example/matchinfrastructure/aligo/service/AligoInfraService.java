@@ -5,6 +5,7 @@ import com.example.matchinfrastructure.aligo.client.AligoFeignClient;
 import com.example.matchinfrastructure.aligo.client.KakaoAligoFeignClient;
 import com.example.matchinfrastructure.aligo.converter.AligoConverter;
 import com.example.matchinfrastructure.aligo.dto.*;
+import com.example.matchinfrastructure.match_aligo.dto.AlimTalkDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +25,10 @@ public class AligoInfraService {
         System.out.println(sendRes.getMessage());
     }
 
-    public void sendAlimTalkForPayment(String phone, String name, AlimType alimType){
+    public void sendAlimTalkTest(String phone, String name, AlimType alimType){
         CreateTokenRes token = getAligoToken();
 
-        AlimTalkReq alimTalkReq = aligoConverter.convertToPayment(phone, name, aligoProperties, token.getToken(), alimType);
+        AlimTalkReq alimTalkReq = aligoConverter.convertToAlimTalkTest(phone, name, aligoProperties, token.getToken(), alimType);
 
         System.out.println(alimTalkReq.toString());
 
@@ -37,14 +38,22 @@ public class AligoInfraService {
                         );
         System.out.println(aligoResponse.toString());
     }
-
-    public void sendAlimTalkForExecution(){
-        CreateTokenRes token = getAligoToken();
-
-    }
-
     private CreateTokenRes getAligoToken() {
         return kakaoAligoFeignClient.createToken(aligoProperties.getKey(), aligoProperties.getUsername());
     }
 
+    public void sendAlimTalk(AlimTalkDto alimTalkDto, AlimType alimType) {
+
+        CreateTokenRes token = getAligoToken();
+
+        AlimTalkReq alimTalkReq = aligoConverter.convertToAlimTalk(aligoProperties, token.getToken(), alimType, alimTalkDto);
+
+        System.out.println(alimTalkReq.toString());
+
+        AligoResponse<AlimTalkRes> aligoResponse =
+                kakaoAligoFeignClient.sendAlimTalk(
+                        alimTalkReq
+                );
+        System.out.println(aligoResponse.toString());
+    }
 }
