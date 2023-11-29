@@ -66,6 +66,7 @@ jobs:
           private.aes.key: ${{ secrets.AES_PRIVATE_KEY }}
           apple.bundle.id: ${{ secrets.APPLE_BUNDLE_ID }}
           apple.team.id: ${{ secrets.APPLE_TEAM_ID }}
+          aligo.sender-key: ${{ secrets.KAKAO_SENDER_KEY }}
 
 
       - name: Set Environment Domain - Domain Prod Yml

@@ -232,6 +232,7 @@ public class AuthService {
             HashMap<String, String> userInfo = new HashMap<>();
 
             userInfo.put("socialId", appleUserRes.getSocialId());
+            userInfo.put("email", appleUserRes.getEmail());
 
             throw new BaseDynamicException(NOT_EXISTS_APPLE_USER, userInfo);
         }
