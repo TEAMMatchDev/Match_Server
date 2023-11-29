@@ -60,7 +60,7 @@ public class AuthController {
     @PostMapping(value="/naver")
     public CommonResponse<UserRes.UserToken> naverLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         log.info("01-03 네이버 로그인,회원가입 API");
-        return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
+        return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken.getAccessToken()));
     }
 
     /*
@@ -159,11 +159,19 @@ public class AuthController {
         return CommonResponse.onSuccess("핸드폰 인증 성공");
     }
 
-    @Operation(summary="01-11🔑 애플로그인 API", description= "애플로그인 API 입니다.")
+
+    @Operation(summary="01-11🔑 애플로그인 API", description= "애플로그인 API 입니다. APPLE_SIGN_UP 에러 코드 발생 시 01-11-01 API 로 회원가입 요청")
     @PostMapping("/apple")
-    @ApiErrorCodeExample({UserSignUpErrorCode.class, OtherServerErrorCode.class, RequestErrorCode.class})
+    @ApiErrorCodeExample({UserSignUpErrorCode.class, OtherServerErrorCode.class, RequestErrorCode.class, AppleLoginErrorCode.class})
     public CommonResponse<UserRes.UserToken> appleLogin(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         return CommonResponse.onSuccess(authService.appleLogin(socialLoginToken));
+    }
+
+    @Operation(summary = "01-11-01 애플 회원가입🔑",description = "애플유저용 회원가입")
+    @PostMapping("/apple/sign-up")
+    @ApiErrorCodeExample({UserSignUpErrorCode.class, RequestErrorCode.class})
+    public CommonResponse<UserRes.UserToken> appleSignUp(@RequestBody @Valid UserReq.AppleSignUp appleSignUp){
+        return CommonResponse.onSuccess(authService.appleSignUp(appleSignUp));
     }
 
     @Operation(summary = "01-14🔑 비밀번호 찾기용 이메일 전송 이메일 전송 시 01-08 API 로 인증번호 확인 입니다.", description = "만료시간 5분")
@@ -182,5 +190,6 @@ public class AuthController {
         authService.modifyPassword(findPassword);
         return CommonResponse.onSuccess("비밀번호 변경 성공");
     }
+
 
 }

@@ -83,7 +83,10 @@ public class JwtService {
     }
 
     public String createRefreshToken(Long userId) {
-        return createJwtToken(userId, Duration.ofDays(jwtProperties.getRefreshTokenSeconds()), getRefreshKey(), "refresh");
+        Long ttl =  Duration.ofDays(jwtProperties.getRefreshTokenSeconds()).getSeconds();
+        String refreshToken = createJwtToken(userId, Duration.ofDays(jwtProperties.getRefreshTokenSeconds()), getRefreshKey(), "refresh");
+        refreshTokenRepository.save(RefreshToken.builder().userId(String.valueOf(userId)).token(refreshToken).ttl(ttl).build());
+        return refreshToken;
     }
     public Authentication getAuthentication(String token, ServletRequest servletRequest)  {
         try {
@@ -157,21 +160,15 @@ public class JwtService {
         return request.getHeader(JwtFilter.AUTHORIZATION_HEADER);
     }
 
-    public String getRefreshToken(){
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        return request.getHeader(JwtFilter.REFRESH_TOKEN_HEADER);
-    }
-
     public Date getExpiredTime(String token){
         //받은 토큰의 유효 시간을 받아오기
         return Jwts.parser().setSigningKey(getSecretKey()).parseClaimsJws(token).getBody().getExpiration();
     }
 
     public Long getUserIdByRefreshToken(String refreshToken) {
-        Jws<Claims> claims =
-                Jwts.parser()
-                        .setSigningKey(getRefreshKey())
-                        .parseClaimsJws(refreshToken);
+        Jws<Claims> claims = Jwts.parser()
+                .setSigningKey(getRefreshKey())
+                .parseClaimsJws(refreshToken);
 
         System.out.println(claims.getBody().get("userId",Long.class));
 

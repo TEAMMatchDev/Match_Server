@@ -3,6 +3,7 @@ package com.example.matchapi.config;
 import com.example.matchapi.common.security.*;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -14,11 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -29,6 +26,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final UserDetailsService userDetailsService;
+    @Value("${spring.config.activate.on-profile}")
+    private String profile;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -51,67 +50,65 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 ;
 
     }
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
 
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
+        configureCsrfAndHeaders(httpSecurity);
+        configureSessionManagement(httpSecurity);
+        configureExceptionHandling(httpSecurity);
+        configureAuthorizationRequests(httpSecurity);
+        disableFormLogin(httpSecurity);
+        configureEnvironmentSpecificAccess(httpSecurity);
+    }
+
+    private void configureCsrfAndHeaders(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                // token을 사용하는 방식이기 때문에 csrf를 disable합니다.
                 .csrf().disable()
-                // enable h2-console
                 .headers()
                 .frameOptions()
-                .sameOrigin()
+                .sameOrigin();
+    }
 
-                // 세션을 사용하지 않기 때문에 STATELESS로 설정
-                .and()
+    private void configureSessionManagement(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    }
 
-                .and()
+    private void configureExceptionHandling(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .accessDeniedHandler(jwtAccessDeniedHandler)
+                .accessDeniedHandler(jwtAccessDeniedHandler);
+    }
 
-
-                .and()
+    private void configureAuthorizationRequests(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                .antMatchers("/swagger-resources/**").permitAll()
-                .antMatchers("/swagger-ui/**").permitAll()
-                .antMatchers("/api-docs/**").permitAll()
                 .antMatchers("/webjars/**").permitAll()
-                .antMatchers("/v3/api-docs").permitAll()
-                .antMatchers("/image/**").permitAll()
                 .antMatchers("/users/refresh").permitAll()
-                .antMatchers("/profile").permitAll()
-                .antMatchers("/login/**").permitAll()
-                .antMatchers("/test/**").permitAll()
-                .antMatchers("/login/**").permitAll()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/health").permitAll()
                 .antMatchers("/order").permitAll()
-                .antMatchers("/order/serverAuth").permitAll()
                 .antMatchers("/projects").permitAll()
                 .antMatchers(HttpMethod.GET, "/projects/{projectId}").permitAll()
+                .antMatchers(HttpMethod.GET,"/donation-temporaries").permitAll()
                 .antMatchers("/projects/list").authenticated()
-                .antMatchers("/").permitAll()
-                .antMatchers("/serverAuth").permitAll()
-                .antMatchers(HttpMethod.GET,"/donation-temporaries").permitAll()
                 .antMatchers("/users/refresh").permitAll()
-                .antMatchers(HttpMethod.GET,"/donation-temporaries").permitAll()
+                .antMatchers("/terms/**").permitAll()
                 .antMatchers("/admin/projects/**").hasAnyRole("ADMIN")
-                .antMatchers("/admin/users/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/users/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/donation-users/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/donation-temporaries/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/order/**").hasAnyRole("ADMIN")
                 .antMatchers("/admin/auth/logIn").permitAll()
-                .antMatchers("/test/fcm/user").authenticated()
-                .antMatchers("/terms/**").permitAll()
-                .anyRequest().authenticated()
-
+                .antMatchers("/payments/web-hook").permitAll()
+                .antMatchers("/test").permitAll()
                 .and()
                 .apply(new JwtSecurityConfig(jwtService));
+    }
 
+    private void disableFormLogin(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .httpBasic()
                 .and()
@@ -119,17 +116,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*"); // 모든 도메인으로부터의 요청을 허용
-        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드를 허용
-        configuration.addAllowedHeader("DEVICE_ID"); // 특정 헤더를 허용
+    private void configureEnvironmentSpecificAccess(HttpSecurity httpSecurity) throws Exception {
+        if (!profile.equals("prod")) {
+            allowSwaggerForNonProd(httpSecurity);
+        } else {
+            restrictSwaggerForProd(httpSecurity);
+        }
+    }
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+    private void allowSwaggerForNonProd(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .authorizeRequests()
+                .antMatchers("/swagger-ui/**").permitAll()
+                .antMatchers("/api-docs/**").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .anyRequest().authenticated();
+    }
 
-        return source;
+    private void restrictSwaggerForProd(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .authorizeRequests()
+                .antMatchers("/swagger-ui/**").authenticated()
+                .antMatchers("/api-docs/**").authenticated()
+                .antMatchers("/swagger-resources/**").authenticated()
+                .anyRequest().authenticated();
     }
 
 

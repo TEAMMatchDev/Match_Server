@@ -84,8 +84,9 @@ public class AppleAuthService {
 
         checkValidationInfo(iss, aud);
 
-        String appleId  = userInfoObject.get("sub").getAsString();
-        String email = userInfoObject.get("email").getAsString();
+        String appleId  = String.valueOf(userInfoObject.get("sub")).replace("\"","");
+        System.out.println(appleId);
+        String email = String.valueOf(userInfoObject.get("email")).replace("\"","");
 
         return new AppleUserRes(email, appleId);
     }

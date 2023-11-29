@@ -2,11 +2,12 @@ package com.example.matchapi.donation.service;
 
 import com.example.matchapi.donation.converter.DonationConverter;
 import com.example.matchapi.donation.converter.RegularPaymentConverter;
+import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
-import com.example.matchapi.portone.dto.PaymentReq;
-import com.example.matchapi.portone.service.PaymentService;
+import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.project.dto.ProjectRes;
+import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
@@ -19,15 +20,12 @@ import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchinfrastructure.pay.portone.service.PortOneService;
-import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
@@ -50,6 +48,8 @@ public class DonationService {
     private final RegularPaymentConverter regularPaymentConverter;
     private final DonationHelper donationHelper;
     private final PortOneService portOneService;
+    private final OrderHelper orderHelper;
+    private final DonationHistoryService donationHistoryService;
 
 
     public PageResponse<List<DonationRes.DonationList>> getDonationList(Long userId, int filter, int page, int size) {
@@ -159,5 +159,13 @@ public class DonationService {
             regularPayment.setRegularPayStatus(USER_CANCEL);
         }
         regularPaymentAdaptor.saveAll(regularPayments);
+    }
+
+    public DonationRes.CompleteDonation postTutorialDonation(User user, DonationReq.Tutorial tutorial, Project project) {
+        DonationUser donationUser = donationAdaptor.save(donationConverter.convertToTutorialDonation(user, tutorial, orderHelper.createInherence(user)));
+
+        donationHistoryService.oneTimeDonationHistory(donationUser.getId());
+
+        return donationConverter.convertToCompleteDonation(donationUser, project);
     }
 }

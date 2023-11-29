@@ -5,6 +5,7 @@ package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.enums.Execution;
+import com.example.matchdomain.review.entity.Review;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Comment;
@@ -29,6 +30,9 @@ public class DonationExecution extends BaseEntity {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne(mappedBy = "donationExecution", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Review review;
 
     @Enumerated(EnumType.STRING)
     @Comment("집행 전체인지 일부 인지 구분")

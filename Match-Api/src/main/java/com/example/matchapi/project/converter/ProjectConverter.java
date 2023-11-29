@@ -1,7 +1,8 @@
 package com.example.matchapi.project.converter;
 
-import com.example.matchapi.common.util.TimeHelper;
+import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
+import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
 import com.example.matchapi.project.helper.ProjectHelper;
@@ -12,11 +13,11 @@ import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
 import com.example.matchdomain.project.dto.ProjectDto;
-import com.example.matchdomain.project.dto.ProjectList;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.enums.ReportReason;
 import com.example.matchdomain.project.repository.ProjectRepository;
+import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ import static com.example.matchdomain.project.entity.enums.ProjectStatus.BEFORE_
 @RequiredArgsConstructor
 public class ProjectConverter {
     private final ProjectHelper projectHelper;
+    private final DonationHelper donationHelper;
     private final RegularPaymentRepository regularPaymentRepository;
     private static final String FIRST_TIME = "T00:00:00";
     private static final String LAST_TIME = "T23:59:59";
@@ -339,15 +341,35 @@ public class ProjectConverter {
         return projectLists;
     }
 
-    public ProjectRes.CommentList projectComment(Long userId, ProjectComment result) {
+    public ProjectRes.CommentList projectComment(User user, ProjectComment result) {
         return ProjectRes.CommentList.builder()
                 .commentId(result.getId())
                 .comment(result.getComment())
                 .commentDate(result.getCreatedAt())
-                .nickname(result.getUser().getNickname())
-                .profileImgUrl(result.getUser().getProfileImgUrl())
+                .nickname(user.getNickname())
+                .profileImgUrl(user.getProfileImgUrl())
                 .userId(result.getUserId())
-                .isMy(result.getUserId().equals(userId))
+                .isMy(result.getUserId().equals(user.getId()))
+                .build();
+    }
+
+    public List<DonationRes.Tutorial> convertToTutorialDonation(List<Project> projects) {
+        List<DonationRes.Tutorial> tutorials = new ArrayList<>();
+
+        projects.forEach(
+                result -> tutorials.add(
+                        convertToTutorialDetail(result)
+                )
+        );
+        return tutorials;
+    }
+
+    private DonationRes.Tutorial convertToTutorialDetail(Project result) {
+        return DonationRes.Tutorial
+                .builder()
+                .projectId(result.getId())
+                .projectKind(result.getProjectKind())
+                .randomMessage(donationHelper.createRandomMessageTutorial(result.getProjectKind()))
                 .build();
     }
 }

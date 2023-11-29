@@ -3,6 +3,7 @@ package com.example.matchapi.donation.dto;
 import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -332,5 +333,38 @@ public class DonationRes {
 
         @Schema(description = "지출 완료 금액")
         private int completeAmount;
+    }
+
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Tutorial {
+        private Long projectId;
+
+        private ProjectKind projectKind;
+
+        @Schema(description = "랜덤 불꽃이 메세지")
+        private String randomMessage;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CompleteDonation {
+        private Long projectId;
+
+        @Schema(description = "고유 불꽃이 이름")
+        private String inherenceName;
+
+        @Schema(description = "불꽃이 이미지")
+        private String image;
+
+        @Schema(description = "랜덤 불꽃이 메세지")
+        private String randomMessage;
     }
 }

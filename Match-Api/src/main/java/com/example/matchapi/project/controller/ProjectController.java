@@ -149,11 +149,10 @@ public class ProjectController {
     @CheckIdExist
     @PostMapping("/comment/{projectId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class, RequestErrorCode.class})
-    public CommonResponse<String> postComment(@Parameter(hidden = true) @AuthenticationPrincipal User user,
+    public CommonResponse<ProjectRes.CommentList> postComment(@Parameter(hidden = true) @AuthenticationPrincipal User user,
                                               @Parameter(description = "프로젝트 id")  @PathVariable("projectId") Long projectId,
                                               @Valid  @RequestBody ProjectReq.Comment comment){
-        projectService.postComment(user, projectId, comment);
-        return CommonResponse.onSuccess("응원 달기 성공");
+        return CommonResponse.onSuccess(projectService.postComment(user, projectId, comment));
     }
 
     @Operation(summary = "03-11💻 후원 응원 신고하기 #FRAME_후원 상세조회", description = "후원 응원 신고하기 기능입니다")
@@ -172,7 +171,7 @@ public class ProjectController {
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @PathVariable Long commentId){
         projectService.deleteComment(user, commentId);
-        return CommonResponse.onSuccess("신고 성공");
+        return CommonResponse.onSuccess("삭제 성공");
     }
 
     @Operation(summary = "03-13 내가 찜한 기부처 모아보기 ", description = "내가 찜한 기부처 모아보기")

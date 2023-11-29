@@ -2,9 +2,11 @@ package com.example.matchdomain.user.adaptor;
 
 import com.example.matchcommon.annotation.Adaptor;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.UnauthorizedException;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.enums.SocialType;
+import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchdomain.user.entity.enums.Alarm.ACTIVE;
+import static com.example.matchdomain.user.entity.enums.SocialType.APPLE;
 import static com.example.matchdomain.user.entity.enums.SocialType.NORMAL;
 import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_EXIST_USER;
 
@@ -57,5 +60,13 @@ public class UserAdaptor {
 
     public boolean checkEmailPassword(String email, SocialType socialType) {
         return userRepository.existsByUsernameAndSocialTypeAndStatus(email, socialType, Status.ACTIVE);
+    }
+
+    public boolean existsEmailAndSocial(String email, SocialType socialType){
+        return userRepository.existsByEmailAndSocialTypeNotAndStatus(email, socialType, Status.ACTIVE);
+    }
+
+    public User findByUsernameAndStatus(String username){
+        return userRepository.findByUsernameAndStatus(username, Status.ACTIVE).orElseThrow(() -> new UnauthorizedException(UserAuthErrorCode.NOT_EXIST_USER));
     }
 }

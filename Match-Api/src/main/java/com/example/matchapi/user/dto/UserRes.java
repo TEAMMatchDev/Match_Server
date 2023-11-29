@@ -20,6 +20,8 @@ public class UserRes {
         private String accessToken;
         @Schema(description = "리프레쉬 토큰", required = true, example = "asdkjanwjkldnjk----")
         private String refreshToken;
+        @Schema(description = "회원가입 유무 true - 회원가입, false - 로그인")
+        private boolean isNew;
     }
     @Getter
     @Setter
