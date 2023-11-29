@@ -8,9 +8,7 @@ import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.MailSendErrorCode;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
-import com.example.matchdomain.user.exception.UserLoginErrorCode;
-import com.example.matchdomain.user.exception.UserNormalSignUpErrorCode;
-import com.example.matchdomain.user.exception.UserSignUpErrorCode;
+import com.example.matchdomain.user.exception.*;
 import com.example.matchcommon.reponse.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -62,7 +60,7 @@ public class AuthController {
     @PostMapping(value="/naver")
     public CommonResponse<UserRes.UserToken> naverLogIn(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
         log.info("01-03 네이버 로그인,회원가입 API");
-        return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken));
+        return CommonResponse.onSuccess(authService.naverLogIn(socialLoginToken.getAccessToken()));
     }
 
     /*
@@ -77,6 +75,7 @@ public class AuthController {
     }
 
      */
+
 
 
     @ApiErrorCodeExample(RequestErrorCode.class)
@@ -137,6 +136,7 @@ public class AuthController {
 
     @Operation(summary="01-08🔑 유저 이메일 인증번호 확인 API", description= "이메일 인증번호 확인 API 입니다.")
     @PostMapping("/check/email")
+    @ApiErrorCodeExample(CodeAuthErrorCode.class)
     public CommonResponse<String> checkEmailAuth(@RequestBody UserReq.UserEmailAuth email){
         authService.checkUserEmailAuth(email);
         return CommonResponse.onSuccess("메일 인증 성공");
@@ -149,6 +149,46 @@ public class AuthController {
     public CommonResponse<String> checkPhone(@RequestParam String phone){
         authService.sendPhone(phone);
         return CommonResponse.onSuccess("문자 전송 성공");
+    }
+
+    @Operation(summary="01-10🔑 유저 전화번호 인증번호 확인 API", description= "전화번호 인증번호 확인 API 입니다.")
+    @PostMapping("/check/phone")
+    @ApiErrorCodeExample(CodeAuthErrorCode.class)
+    public CommonResponse<String> checkEmailAuth(@RequestBody UserReq.UserPhoneAuth phone){
+        authService.checkPhoneAuth(phone);
+        return CommonResponse.onSuccess("핸드폰 인증 성공");
+    }
+
+
+    @Operation(summary="01-11🔑 애플로그인 API", description= "애플로그인 API 입니다. APPLE_SIGN_UP 에러 코드 발생 시 01-11-01 API 로 회원가입 요청")
+    @PostMapping("/apple")
+    @ApiErrorCodeExample({UserSignUpErrorCode.class, OtherServerErrorCode.class, RequestErrorCode.class, AppleLoginErrorCode.class})
+    public CommonResponse<UserRes.UserToken> appleLogin(@RequestBody @Valid UserReq.SocialLoginToken socialLoginToken){
+        return CommonResponse.onSuccess(authService.appleLogin(socialLoginToken));
+    }
+
+    @Operation(summary = "01-11-01 애플 회원가입🔑",description = "애플유저용 회원가입")
+    @PostMapping("/apple/sign-up")
+    @ApiErrorCodeExample({UserSignUpErrorCode.class, RequestErrorCode.class})
+    public CommonResponse<UserRes.UserToken> appleSignUp(@RequestBody @Valid UserReq.AppleSignUp appleSignUp){
+        return CommonResponse.onSuccess(authService.appleSignUp(appleSignUp));
+    }
+
+    @Operation(summary = "01-14🔑 비밀번호 찾기용 이메일 전송 이메일 전송 시 01-08 API 로 인증번호 확인 입니다.", description = "만료시간 5분")
+    @PostMapping("/password/email")
+    @ApiErrorCodeExample({UserSignUpErrorCode.class, SendEmailFindPassword.class})
+    public CommonResponse<String> sendEmailPasswordFind(@RequestParam String email){
+        authService.sendEmailPasswordFind(email);
+        return CommonResponse.onSuccess("메일 인증 성공");
+    }
+
+
+    @Operation(summary = "01-13🔑 비밀번호 찾기", description = "여기서 또 한번 인증 코드를 받는 이유는 이중 인증을 위함 입니다. 변경은 5분안에 마무리 되야합니다.")
+    @PostMapping("/password")
+    @ApiErrorCodeExample({UserSignUpErrorCode.class, RequestErrorCode.class, CodeAuthErrorCode.class})
+    public CommonResponse<String> modifyPassword(@RequestBody @Valid UserReq.FindPassword findPassword){
+        authService.modifyPassword(findPassword);
+        return CommonResponse.onSuccess("비밀번호 변경 성공");
     }
 
 

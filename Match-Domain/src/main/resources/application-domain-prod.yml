@@ -9,9 +9,18 @@ spring:
     init:
       platform: mysql
   datasource:
-    url: ${PROD_DB_URL_HOST}
-    username: ${AWS_DB_USER_NAME}
-    password: ${AWS_DB_PASSWORD}
+    master:
+      hikari:
+        username: ${AWS_DB_USER_NAME}
+        password: ${AWS_DB_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: ${PROD_DB_URL_HOST}
+    slave:
+      hikari:
+        username: ${AWS_DB_USER_NAME}
+        password: ${AWS_DB_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: ${PROD_SLAVE_URL_HOST}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
@@ -21,14 +30,14 @@ spring:
     # create-drop: create와 같으나 종료 시점에 테이블 DROP
     # none: 사용하지 않음
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     # DDl 생성 시 데이터베이스 고유의 기능 사용여부
     generate-ddl: false
     # 실행되는 쿼리문 보여주기 여부
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true

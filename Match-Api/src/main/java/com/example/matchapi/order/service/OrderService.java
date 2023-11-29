@@ -1,287 +1,239 @@
 package com.example.matchapi.order.service;
 
-import com.example.matchapi.donation.convertor.DonationConvertor;
-import com.example.matchapi.order.convertor.OrderConvertor;
+import com.example.matchapi.common.security.JwtService;
+import com.example.matchapi.donation.service.DonationHistoryService;
+import com.example.matchapi.order.converter.OrderConverter;
+import com.example.matchapi.order.dto.OrderCommand;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
+import com.example.matchapi.portone.service.PaymentService;
+import com.example.matchapi.project.service.ProjectService;
+import com.example.matchapi.user.service.AligoService;
+import com.example.matchcommon.annotation.PaymentIntercept;
+import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
-import com.example.matchcommon.exception.InternalServerException;
-import com.example.matchcommon.properties.NicePayProperties;
+import com.example.matchcommon.exception.BaseException;
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.adaptor.RegularPaymentAdaptor;
+import com.example.matchdomain.donation.adaptor.RequestFailedHistoryAdapter;
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.CardAbleStatus;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
+import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
 import com.example.matchdomain.donation.repository.*;
-import com.example.matchdomain.redis.entity.OrderRequest;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.redis.repository.OrderRequestRepository;
+import com.example.matchdomain.user.adaptor.UserCardAdaptor;
 import com.example.matchdomain.user.entity.User;
-import com.example.matchdomain.user.repository.UserRepository;
-import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
-import com.example.matchinfrastructure.pay.nice.dto.*;
+import com.example.matchinfrastructure.aligo.converter.AligoConverter;
+import com.example.matchinfrastructure.aligo.dto.AlimType;
+import com.example.matchinfrastructure.pay.portone.converter.PortOneConverter;
+import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
+import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
+import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
+import com.example.matchinfrastructure.pay.portone.dto.req.PortOnePrepareReq;
+import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
+import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
+import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.binary.Hex;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import javax.transaction.Transactional;
-import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.example.matchcommon.constants.MatchStatic.*;
-import static com.example.matchdomain.donation.entity.HistoryStatus.CREATE;
+import static com.example.matchdomain.donation.exception.DeleteCardErrorCode.*;
 import static com.example.matchdomain.donation.exception.DonationGerErrorCode.DONATION_NOT_EXIST;
-import static com.example.matchdomain.order.exception.RegistrationCardErrorCode.FAILED_ERROR_ENCRYPT;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class OrderService {
-    private final NiceAuthFeignClient niceAuthFeignClient;
-    private final NicePayProperties nicePayProperties;
     private final DonationUserRepository donationUserRepository;
-    private final OrderConvertor orderConvertor;
+    private final OrderConverter orderConverter;
     private final OrderHelper orderHelper;
     private final RegularPaymentRepository regularPaymentRepository;
     private final UserCardRepository userCardRepository;
-    private final RequestPaymentHistoryRepository requestPaymentHistoryRepository;
     private final OrderRequestRepository orderRequestRepository;
-    private final UserRepository userRepository;
-    private final DonationHistoryRepository donationHistoryRepository;
-    private final DonationConvertor donationConvertor;
-
-    @Transactional
-    public NicePaymentAuth authPayment(String tid, Long amount) {
-        String authorizationHeader = orderHelper.getNicePaymentAuthorizationHeader();
-        NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.paymentAuth(authorizationHeader, tid, new NicePayRequest(String.valueOf(amount)));
-
-        orderHelper.checkNicePaymentsResult(nicePaymentAuth.getResultCode(), nicePaymentAuth.getResultMsg());
-        return nicePaymentAuth;
-    }
-
-    @Transactional
-    public String payForProject(OrderReq.OrderDetail orderDetail) {
-        String authorizationHeader = orderHelper.getNicePaymentAuthorizationHeader();
-        NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.paymentAuth(authorizationHeader, orderDetail.getTid(), new NicePayRequest(String.valueOf(orderDetail.getAmount())));
-
-        orderHelper.checkNicePaymentsResult(nicePaymentAuth.getResultCode(), nicePaymentAuth.getResultMsg());
-
-        return null;
-    }
-
-
-    @Transactional
-    public NicePaymentAuth cancelPayment(String tid, String orderId) {
-        NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.cancelPayment(orderHelper.getNicePaymentAuthorizationHeader(), tid, new NicePayCancelRequest("단순취소", orderId));
-
-        orderHelper.checkNicePaymentsResult(nicePaymentAuth.getResultCode(), nicePaymentAuth.getResultMsg());
-
-        return nicePaymentAuth;
-    }
-
-    @Transactional
-    public String requestPayment(User user, OrderReq.OrderDetail orderDetail, Long projectId) {
-        NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.
-                paymentAuth(orderHelper.getNicePaymentAuthorizationHeader(),
-                        orderDetail.getTid(),
-                        new NicePayRequest(String.valueOf(orderDetail.getAmount())));
-
-        orderHelper.checkNicePaymentsResult(nicePaymentAuth.getResultCode(), nicePaymentAuth.getResultMsg());
-
-        String flameName = orderHelper.createFlameName(user.getName());
-
-        String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
-
-        donationUserRepository.save(orderConvertor.donationUser(nicePaymentAuth, user.getId(), orderDetail, projectId, flameName, inherenceNumber));
-
-        return flameName;
-    }
-
-    @Transactional
-    public void registrationCard(User user, OrderReq.RegistrationCard registrationCard) {
-        String encrypt = encrypt(orderConvertor.createPlainText(registrationCard), nicePayProperties.getSecret().substring(0, 32), nicePayProperties.getSecret().substring(0, 16));
-        String orderId = BILL + createRandomOrderId();
-        Long userId = user.getId();
-        //빌키 발급
-        NicePayBillkeyResponse nicePayBillkeyResponse = niceAuthFeignClient.registrationCard(
-                orderHelper.getNicePaymentAuthorizationHeader(),
-                new NicePayRegistrationCardRequest(encrypt, orderId, "A2"));
-
-        //나이스 카드 확인용 OrderId, Bid 필요
-        NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(), nicePayBillkeyResponse.getBid(), orderConvertor.niceBillOk(nicePayBillkeyResponse, orderId));
-
-        //에러코드 핸들링
-        orderHelper.checkBillResult(niceBillOkResponse.getResultCode(), niceBillOkResponse.getResultMsg(), niceBillOkResponse.getTid(), niceBillOkResponse.getOrderId());
-
-        //결제 완료 후
-        //Billing Key 카드 저장
-        UserCard userCard = userCardRepository.save(orderConvertor.UserCard(userId, registrationCard, nicePayBillkeyResponse));
-
-    }
-
-    @Transactional
-    public String encrypt(String plainText, String secretKey, String iv) {
-        SecretKey secureKey = new SecretKeySpec(secretKey.getBytes(), "AES");
-        try {
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secureKey, new IvParameterSpec(iv.getBytes()));
-            byte[] encrypted = cipher.doFinal(plainText.getBytes("UTF-8"));
-            return Hex.encodeHexString(encrypted);
-        } catch (Exception e) {
-            throw new InternalServerException(FAILED_ERROR_ENCRYPT);
-        }
-    }
-
-    @Transactional
-    public String createRandomUUID() {
-        return UUID.randomUUID().toString();
-    }
-
-    @Transactional
-    public String createRandomOrderId() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "-" + UUID.randomUUID().toString();
-
-    }
+    private final PortOneFeignClient portOneFeignClient;
+    private final PortOneAuthService portOneAuthService;
+    private final PortOneConverter portOneConverter;
+    private final PaymentService paymentService;
+    private final RegularPaymentAdaptor regularPaymentAdaptor;
+    private final UserCardAdaptor userCardAdaptor;
+    private final DonationHistoryService donationHistoryService;
+    private final RequestFailedHistoryAdapter failedHistoryAdapter;
+    private final PortOneService portOneService;
+    private final AligoService aligoService;
+    private final AligoConverter aligoConverter;
+    private final JwtService jwtService;
 
     @Transactional
     public List<OrderRes.UserBillCard> getUserBillCard(Long userId) {
-        List<UserCard> userCards = userCardRepository.findByUserIdAndStatus(userId,Status.ACTIVE);
-        List<OrderRes.UserBillCard> userBillCards = new ArrayList<>();
+        List<UserCard> userCards = userCardAdaptor.findCardLists(userId);
 
-        userCards.forEach(
-                result -> {
-                    userBillCards.add(
-                            new OrderRes.UserBillCard(
-                                    result.getId(),
-                                    result.getCardCode(),
-                                    result.getCardName(),
-                                    orderHelper.maskMiddleNum(result.getCardNo()),
-                                    result.getCardAbleStatus().getName()
-                            )
-                    );
-                }
-        );
-        return userBillCards;
+        return orderConverter.convertToUserCardLists(userCards);
     }
 
-    @Transactional
+    @RedissonLock(LockName = "카드-삭제", key = "#cardId")
     public void deleteBillCard(Long cardId) {
-        Optional<UserCard> userCard = userCardRepository.findByIdAndStatus(cardId,Status.ACTIVE);
-        NiceBillExpireResponse niceBillExpireResponse = niceAuthFeignClient.billKeyExpire(orderHelper.getNicePaymentAuthorizationHeader(), userCard.get().getBid(), new NiceBillExpireRequest(DELETE + createRandomOrderId()));
-        System.out.println(niceBillExpireResponse.getResultCode() + niceBillExpireResponse.getResultMsg());
-        userCard.get().setStatus(Status.INACTIVE);
+        UserCard userCard = userCardAdaptor.findCardByCardId(cardId);
+
+        List<RegularPayment> regularPayments = regularPaymentAdaptor.findByCardId(cardId);
+
+        cancelRegularPayment(regularPayments);
+
+        String accessToken = portOneAuthService.getToken();
+
+        portOneFeignClient.deleteBillKey(accessToken, userCard.getBid());
+
+        userCard.setStatus(Status.INACTIVE);
+
+        userCardRepository.save(userCard);
     }
 
+    private void validateCard(UserCard card, User user) {
+        if (!card.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
 
-    @Transactional
-    public void regularDonation(User user, OrderReq.RegularDonation regularDonation, Long cardId, Long projectId) {
-
-        Optional<UserCard> card = userCardRepository.findByIdAndStatus(cardId,Status.ACTIVE);
-
-        String orderId = REGULAR + createRandomOrderId();
-
-        System.out.println(orderId);
-
-        NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(), card.get().getBid(), orderConvertor.billCardOneTime(regularDonation.getAmount(),orderId));
-
-        orderHelper.checkNicePaymentsResult(niceBillOkResponse.getResultCode(), niceBillOkResponse.getResultMsg());
-
-        String flameName = orderHelper.createFlameName(user.getName());
-
-        String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
-
-        RegularPayment regularPayment = regularPaymentRepository.save(orderConvertor.RegularPayment(user.getId(), regularDonation, cardId, projectId));
-
-        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), regularDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.REGULAR, regularPayment.getId()));
-
-        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE, regularPayment.getId()));
+        if (!card.getCardAbleStatus().equals(CardAbleStatus.ABLE)) throw new BadRequestException(CARD_NOT_ABLE);
     }
 
-    @Transactional
-    public void oneTimeDonationCard(User user, OrderReq.@Valid OneTimeDonation oneTimeDonation, Long cardId, Long projectId) {
-        Optional<UserCard> card = userCardRepository.findByIdAndStatus(cardId, Status.ACTIVE);
+    @PaymentIntercept(key = "#orderCommand.orderId")
+    @RedissonLock(LockName = "빌키-단기-기부", key = "#orderCommand.userCard.id")
+    public OrderRes.CompleteDonation paymentForOnetime(OrderCommand.OneTimeDonation orderCommand) {
+        UserCard card = orderCommand.getUserCard();
+        Project project = orderCommand.getProject();
+        User user = orderCommand.getUser();
+        OrderReq.OneTimeDonation oneTimeDonation = orderCommand.getOneTimeDonation();
 
-        String orderId = ONE_TIME + createRandomOrderId();
+        System.out.println(orderCommand.getOrderId());
 
-        NiceBillOkResponse niceBillOkResponse = niceAuthFeignClient.billOkRequest(orderHelper.getNicePaymentAuthorizationHeader(), card.get().getBid(), orderConvertor.billCardOneTime(oneTimeDonation.getAmount(),orderId));
+        PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, oneTimeDonation.getAmount(), project.getProjectName(), orderCommand.getOrderId());
 
-        orderHelper.checkNicePaymentsResult(niceBillOkResponse.getResultCode(), niceBillOkResponse.getResultMsg());
+        OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
 
-        String flameName = orderHelper.createFlameName(user.getName());
+        DonationUser donationUser = donationUserRepository.save(
+                orderConverter.donationBillPayUser(portOneResponse.getResponse(), user.getId(),
+                        oneTimeDonation.getAmount(), project.getId(),
+                        createInherenceDto, RegularStatus.ONE_TIME, null));
 
-        String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
+        donationHistoryService.oneTimeDonationHistory(donationUser.getId());
 
-        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationBillUser(niceBillOkResponse, user.getId(), oneTimeDonation.getAmount(), projectId, flameName, inherenceNumber, RegularStatus.ONE_TIME, null));
+        aligoService.sendAlimTalk(jwtService.createToken(1L), AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), user.getName(), user.getPhoneNumber()));
 
-        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE, null));
+        return orderConverter.convertToCompleteDonation(user.getName(), project, oneTimeDonation.getAmount());
+    }
 
+    @PaymentIntercept(key = "#orderCommand.orderId")
+    @RedissonLock(LockName = "정기-기부-신청", key = "#orderCommand.userCard.id")
+    public OrderRes.CompleteDonation paymentForRegular(OrderCommand.RegularDonation orderCommand) {
+        UserCard card = orderCommand.getUserCard();
+        Project project = orderCommand.getProject();
+        User user = orderCommand.getUser();
+
+        OrderReq.RegularDonation regularDonation = orderCommand.getRegularDonation();
+
+        PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, regularDonation.getAmount(), project.getProjectName(), orderCommand.getOrderId());
+
+        OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
+
+        RegularPayment regularPayment = regularPaymentRepository.save(orderConverter.convertToRegularPayment(user.getId(), regularDonation, card.getId(), project.getId()));
+
+        DonationUser donationUser = donationUserRepository.save(orderConverter.donationBillPayUser(
+                portOneResponse.getResponse(), user.getId(), regularDonation.getAmount(), project.getId(),
+                createInherenceDto, RegularStatus.REGULAR, regularPayment.getId()));
+
+        donationHistoryService.postRegularDonationHistory(regularPayment.getId(), donationUser.getId());
+
+        aligoService.sendAlimTalk(jwtService.createToken(1L), AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), user.getName(), user.getPhoneNumber()));
+
+        return orderConverter.convertToCompleteDonation(user.getName(), project, regularDonation.getAmount());
     }
 
     @Transactional
     public String saveRequest(User user, Long projectId) {
-        String orderId = ONE_TIME + createRandomOrderId();
+        String orderId = orderHelper.createOrderId(ONE_TIME);
 
-        orderRequestRepository.save(orderConvertor.CreateRequest(user.getId(), projectId, orderId));
+        orderRequestRepository.save(orderConverter.CreateRequest(user.getId(), projectId, orderId));
 
-        return orderId;
-    }
+        PortOnePrepareReq portOnePrepareReq = portOneConverter.convertToRequestPrepare(orderId, 1000);
 
-    @Transactional
-    public String saveRequest(Long projectId) {
-        String orderId = ONE_TIME + createRandomOrderId();
-
-        orderRequestRepository.save(orderConvertor.CreateRequest(1L, projectId, orderId));
+        portOneFeignClient.preparePayments(portOneAuthService.getToken(), portOnePrepareReq);
 
         return orderId;
     }
 
-    @Transactional
-    public OrderRequest getOrderRequest(String orderId) {
-        Optional<OrderRequest> orderRequest = orderRequestRepository.findById(orderId);
-        return orderRequest.get();
-
-    }
-
-    @Transactional
-    public void requestPaymentAuth(String tid, Long amount) {
-        NicePaymentAuth nicePaymentAuth = niceAuthFeignClient.
-                paymentAuth(orderHelper.getNicePaymentAuthorizationHeader(),
-                        tid,
-                        new NicePayRequest(String.valueOf(amount)));
-
-        orderHelper.checkNicePaymentsResult(nicePaymentAuth.getResultCode(), nicePaymentAuth.getResultMsg());
-
-        Optional<OrderRequest> orderRequest = orderRequestRepository.findById(nicePaymentAuth.getOrderId());
-
-        Optional<User> user = userRepository.findByIdAndStatus(Long.valueOf(orderRequest.get().getUserId()),Status.ACTIVE);
-
-        String flameName = orderHelper.createFlameName(user.get().getName());
-
-        String inherenceNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy.MM.dd.HH:mm")) + "." + createRandomUUID();
-
-        DonationUser donationUser = donationUserRepository.save(orderConvertor.donationUserV2(nicePaymentAuth, user.get().getId(), amount, orderRequest.get().getProjectId(), flameName, inherenceNumber));
-
-        donationHistoryRepository.save(donationConvertor.DonationHistory(donationUser.getId(), CREATE, null));
-
-    }
-
-    @Transactional
+    @RedissonLock(LockName = "관리자-환불-처리", key = "#donationUserId")
     public void adminRefundDonation(Long donationUserId) {
-        DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
+        DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(() -> new BadRequestException(DONATION_NOT_EXIST));
         donationUser.setDonationStatus(DonationStatus.EXECUTION_REFUND);
-        cancelPayment(donationUser.getTid(), donationUser.getOrderId());
+        portOneService.refundPayment(donationUser.getTid());
         donationUserRepository.save(donationUser);
     }
 
     @Transactional
     public void modifyDonationStatus(Long donationUserId, DonationStatus donationStatus) {
-        DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
+        DonationUser donationUser = donationUserRepository.findById(donationUserId).orElseThrow(() -> new BadRequestException(DONATION_NOT_EXIST));
         donationUser.setDonationStatus(donationStatus);
         donationUserRepository.save(donationUser);
+    }
+
+    @Transactional
+    public void revokePay(User user, Long cardId) {
+        UserCard userCard = userCardAdaptor.findCardByCardId(cardId);
+        if (!userCard.getUserId().equals(user.getId())) throw new BadRequestException(CARD_NOT_CORRECT_USER);
+        List<RegularPayment> regularPayments = regularPaymentRepository.findByUserCardId(cardId);
+
+        for (RegularPayment regularPayment : regularPayments) {
+            regularPayment.setRegularPayStatus(RegularPayStatus.USER_CANCEL);
+        }
+
+        regularPaymentRepository.saveAll(regularPayments);
+    }
+
+    @RedissonLock(LockName = "유저-카드-등록", key = "#user.id")
+    public PortOneBillResponse postCard(User user, OrderReq.RegistrationCard registrationCard) {
+        String accessToken = portOneAuthService.getToken();
+        String cardNo = orderHelper.formatString(registrationCard.getCardNo(), 4);
+        String expiry = "20" + registrationCard.getExpYear() + "-" + registrationCard.getExpMonth();
+        PortOneResponse<PortOneBillResponse> portOneResponse = portOneFeignClient.getBillKey(
+                accessToken,
+                orderHelper.createOrderId(BILL),
+                portOneConverter.convertToPortOneBill(cardNo, expiry, registrationCard.getIdNo(), registrationCard.getCardPw())
+        );
+
+        if (portOneResponse.getCode() != 0) {
+            throw new BaseException(BAD_REQUEST, false, "PORT_ONE_BILL_AUTH_001", portOneResponse.getMessage());
+        }
+
+        System.out.println(portOneResponse.getResponse().getCard_code());
+        userCardRepository.save(orderConverter.convertToUserBillCard(user.getId(), registrationCard, portOneResponse.getResponse()));
+
+        return portOneResponse.getResponse();
+    }
+
+
+    private void cancelRegularPayment(List<RegularPayment> regularPayments) {
+        for (RegularPayment regularPayment : regularPayments) {
+            regularPayment.setRegularPayStatus(RegularPayStatus.USER_CANCEL);
+            failedHistoryAdapter.deleteByRegularPaymentId(regularPayment.getId());
+        }
+        regularPaymentRepository.saveAll(regularPayments);
+    }
+
+    public String saveRequestPrepare(User user, Long projectId, int amount) {
+        String orderId = orderHelper.createOrderId(ONE_TIME);
+
+        orderRequestRepository.save(orderConverter.convertToRequestPrepare(user.getId(), projectId, amount, orderId));
+
+        PortOnePrepareReq portOnePrepareReq = portOneConverter.convertToRequestPrepare(orderId, amount);
+
+        portOneFeignClient.preparePayments(portOneAuthService.getToken(), portOnePrepareReq);
+
+        return orderId;
     }
 }

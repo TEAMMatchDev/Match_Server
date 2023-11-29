@@ -2,7 +2,11 @@ package com.example.matchdomain.project.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.donation.entity.DonationUser;
-import com.example.matchdomain.donation.entity.RegularStatus;
+import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
+import com.example.matchdomain.project.entity.enums.ProjectStatus;
+import com.example.matchdomain.project.entity.enums.TodayStatus;
 import lombok.*;
 import org.hibernate.annotations.*;
 
@@ -58,6 +62,9 @@ public class Project extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private RegularStatus regularStatus;
 
+    @Enumerated(EnumType.STRING)
+    private TodayStatus todayStatus = TodayStatus.NOT_TODAY;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "projectId")
     @BatchSize(size = 100)
@@ -68,6 +75,9 @@ public class Project extends BaseEntity {
     @Fetch(FetchMode.JOIN)
     private List<ProjectImage> projectImage = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "projectId")
+    private List<RegularPayment> regularPayments = new ArrayList<>();
 
     public Project(Long id, String projectName, String usages, List<ProjectImage> projectImage) {
         this.id = id;

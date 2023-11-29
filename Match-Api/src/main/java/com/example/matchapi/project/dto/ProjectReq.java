@@ -1,8 +1,8 @@
 package com.example.matchapi.project.dto;
 
 import com.example.matchcommon.annotation.Enum;
-import com.example.matchdomain.donation.entity.RegularStatus;
-import com.example.matchdomain.project.entity.ProjectKind;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,6 +18,7 @@ public class ProjectReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class Project{
         @NotEmpty(message = "프로젝트 이름을 입력해주세요")
         @Schema(description = "프로젝트 이름", required = true, example = "tbt")
@@ -49,6 +50,7 @@ public class ProjectReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class ModifyProject {
         @NotEmpty(message = "프로젝트 이름을 입력해주세요")
         @Schema(description = "프로젝트 이름", required = true, example = "tbt")
@@ -74,5 +76,16 @@ public class ProjectReq {
         @Enum(message = "DOG, CHILDREN,YOUTH,WOMEN, ELDER, DISABLED, SOCIAL, EARTH, NEIGHBOR, ANIMAL, ENVIRONMENT 중 입력해주세요")
         private ProjectKind projectKind;
         private String searchKeyword;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    public static class Comment {
+        @NotEmpty(message = "프로젝트 이름을 입력해주세요")
+        @Schema(description = "프로젝트 이름", required = true, example = "tbt")
+        private String comment;
     }
 }

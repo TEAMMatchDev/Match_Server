@@ -7,10 +7,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 
 @Getter
 @AllArgsConstructor
+@ToString
 @JsonPropertyOrder({"isSuccess", "code", "message", "result"})
 @Schema(description  = "기본 응답")
 public class CommonResponse<T> {
@@ -22,7 +24,7 @@ public class CommonResponse<T> {
     private final String message;
     @Schema(description = "응답 코드", required = true, example = "1000")
     private final String code;
-    @Schema(description = "응답 결과", required = false, example = "응답 결과")
+    @Schema(description = "응답 결과", required = false)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T result;
 

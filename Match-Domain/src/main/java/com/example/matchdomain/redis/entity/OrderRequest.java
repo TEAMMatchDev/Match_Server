@@ -18,15 +18,20 @@ public class OrderRequest {
 
     private String projectId;
 
+    private int amount;
+
+
+
 
     @TimeToLive
     private long ttl;
 
-    public OrderRequest update(String orderId,String projectId, String userId, long ttl) {
+    public OrderRequest update(String orderId,String projectId, String userId, int amount, long ttl) {
         this.orderId = orderId;
         this.projectId = projectId;
         this.userId = userId;
         this.ttl = ttl;
+        this.amount = amount;
         return this;
     }
 }

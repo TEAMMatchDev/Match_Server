@@ -9,6 +9,7 @@ import com.example.matchinfrastructure.match_aligo.client.MatchAligoFeignClient;
 import com.example.matchinfrastructure.oauth.BaseFeignClientPackage;
 import com.example.matchinfrastructure.pay.BasePayFeignClientPackage;
 import com.example.matchinfrastructure.pay.nice.client.NiceAuthFeignClient;
+import com.example.matchinfrastructure.user.UserFeignClientPackage;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -24,7 +25,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableFeignClients(basePackageClasses = {BaseFeignClientPackage.class, BasePayFeignClientPackage.class,
-        BaseFeignDiscordPackage.class, BaseFeignAligoPackage.class, BaseFeignMatchAligoPackage.class})
+        BaseFeignDiscordPackage.class, BaseFeignAligoPackage.class, BaseFeignMatchAligoPackage.class,
+        UserFeignClientPackage.class})
 public class FeignCommonConfig {
 
     @Bean

@@ -13,6 +13,7 @@ public class OrderReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     @Schema(description = "04-01💸 기부 결제 요청 API Request")
     public static class OrderDetail {
         @NotEmpty(message = "나이스 페이먼츠 고유 거래 키 값을 입력해주세요")
@@ -28,6 +29,7 @@ public class OrderReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     @Schema(description = "04-02💸 정기 결제용 카드 등록 API Request")
     public static class RegistrationCard {
 
@@ -61,6 +63,7 @@ public class OrderReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     @Schema(description = "04-02💸 정기 결제용 카드 등록 API Request")
     public static class RegularDonation {
 
@@ -78,6 +81,7 @@ public class OrderReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     @Schema(description = "04-06💸 단기 결제용 카드 결제 API Request")
     public static class OneTimeDonation {
 

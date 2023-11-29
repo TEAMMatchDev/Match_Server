@@ -21,50 +21,74 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Set Environment - Common Yml
+      - name: Set Environment - Common Prod Yml
         uses: microsoft/variable-substitution@v1
         with:
           files: ./Match-Common/src/main/resources/application-common.yml
         env:
-          oauth.kakao.base-url: ${{ secrets.KAKAO_BASE_URL }}
+          oauth.kakao.base-url: ${{ secrets.KAKAO_PROD_BASE_URL }}
           oauth.kakao.client-id: ${{ secrets.KAKAO_CLIENT }}
           oauth.kakao.client-secret: ${{ secrets.KAKAO_SECRET }}
-          oauth.kakao.redirect-url: ${{ secrets.KAKAO_REDIRECT }}
+          oauth.kakao.redirect-url: ${{ secrets.KAKAO_PROD_REDIRECT }}
           oauth.kakao.app-id: ${{ secrets.KAKAO_APP_ID }}
           oauth.kakao.admin-key: ${{ secrets.KAKAO_ADMIN_KEY }}
           jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
           jwt.refresh: ${{ secrets.JWT_REFRESH_KEY }}
           oauth.naver.secret: ${{ secrets.NAVER_SECRET }}
           oauth.naver.client: ${{ secrets.NAVER_CLIENT }}
-          oauth.naver.redirect-url: ${{ secrets.NAVER_REDIRECT}}
+          oauth.naver.redirect-url: ${{ secrets.NAVER_PROD_REDIRECT}}
           sms.secret: ${{ secrets.SMS_SECRET_KEY }}
           sms.api: ${{ secrets.SMS_API_KEY }}
           sms.sender: ${{ secrets.SMS_SENDER }}
-          nice.secret: ${{ secrets.NICE_SECRET_KEY}}
-          nice.client: ${{ secrets.NICE_CLIENT_KEY }}
-          nice.url: ${{ secrets.NICE_DEV_URL}}
+          nice.secret: ${{ secrets.NICE_PROD_SECRET_KEY}}
+          nice.client: ${{ secrets.NICE_PROD_CLIENT_KEY }}
+          nice.url: ${{ secrets.NICE_PROD_URL}}
           aws.access-key: ${{ secrets.AWS_S3_ACCESS_KEY }}
           aws.secret-key: ${{ secrets.AWS_S3_SECRET_KEY }}
           aws.s3.bucket: ${{ secrets.AWS_S3_BUCKET }}
           aws.s3.bucket-url: ${{ secrets.AWS_S3_BASE_URL }}
           discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
           discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
-          server.host: ${{ secrets.DEV_SERVER_HOST}}
+          web.return.url: ${{ secrets.PROD_RETURN_URL }}
+          match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
+          server.host: ${{ secrets.PROD_SERVER_HOST}}
           spring.password: ${{ secrets.APP_PASSWORD}}
           aligo.username: ${{ secrets.ALIGO_USERNAME }}
           aligo.key: ${{ secrets.ALIGO_KEY }}
-          web.return.url: ${{ secrets.DEV_RETURN_URL }}
-          match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
+          portone.code: ${{ secrets.PORTONE_CODE }}
+          portone.key: ${{ secrets.PORTONE_KEY }}
+          portone.secret: ${{ secrets.PORTONE_SECRET }}
+          portone.billmid: ${{ secrets.PROD_PORTONE_BILL_MID}}
+          private.aes.key: ${{ secrets.AES_PRIVATE_KEY }}
+          apple.bundle.id: ${{ secrets.APPLE_BUNDLE_ID }}
+          apple.team.id: ${{ secrets.APPLE_TEAM_ID }}
+          aligo.sender-key: ${{ secrets.KAKAO_SENDER_KEY }}
+
 
       - name: Set Environment Domain - Domain Prod Yml
         uses: microsoft/variable-substitution@v1
         with:
           files: ./Match-Domain/src/main/resources/application-domain-prod.yml
         env:
-          spring.datasource.url: ${{ secrets.PROD_DB_URL_HOST }}
-          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
-          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.datasource.master.hikari.jdbc-url: ${{ secrets.PROD_DB_URL_HOST }}
+          spring.datasource.master.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.master.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.datasource.slave.hikari.jdbc-url: ${{ secrets.PROD_SLAVE_URL_HOST }}
+          spring.datasource.slave.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.slave.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
           spring.redis.host : ${{ secrets.REDIS_PROD_HOST }}
+
+      - name: create-fcm-json
+        id: create-fcm-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "serviceAccountKey.json"
+          json: ${{ secrets.FCM_JSON }}
+          dir: "Match-Common/src/main/resources/"
+
+      - name: Create Auth Key File
+        run: |
+          echo "${{ secrets.AUTH_KEY }}" > ./Match-Common/src/main/resources/AuthKey_74JQ8SGRU2.p8
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew

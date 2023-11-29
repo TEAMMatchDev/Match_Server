@@ -1,7 +1,7 @@
 package com.example.matchdomain.project.repository;
 
 import com.example.matchdomain.common.model.Status;
-import com.example.matchdomain.project.entity.ImageRepresentStatus;
+import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.ProjectImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

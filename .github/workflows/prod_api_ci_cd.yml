@@ -4,13 +4,14 @@ on:
   push:
     tags:
       - Api-Release-v*.*.*
-    #tags:
-    # - Dev-Api-v*.*.*
   workflow_dispatch: # 수동 실행 옵션 (생략)
 
 jobs:
   build:
     runs-on: ubuntu-latest # action 스크립트가 작동될 OS
+
+    outputs:
+      version: ${{ steps.get_version.outputs.BRANCH_NAME }}
 
     steps: # 작업 단계
       - name: Checkout source code #  단계별 이름, 구분자로 소스를 가져옴
@@ -52,11 +53,20 @@ jobs:
           aws.s3.bucket-url: ${{ secrets.AWS_S3_BASE_URL }}
           discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
           discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
-          server.host: ${{ secrets.DEV_SERVER_HOST}}
-          spring.password: ${{ secrets.APP_PASSWORD}}
           web.return.url: ${{ secrets.PROD_RETURN_URL }}
           match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
-
+          server.host: ${{ secrets.PROD_SERVER_HOST}}
+          spring.password: ${{ secrets.APP_PASSWORD}}
+          aligo.username: ${{ secrets.ALIGO_USERNAME }}
+          aligo.key: ${{ secrets.ALIGO_KEY }}
+          portone.code: ${{ secrets.PORTONE_CODE }}
+          portone.key: ${{ secrets.PORTONE_KEY }}
+          portone.secret: ${{ secrets.PORTONE_SECRET }}
+          portone.billmid: ${{ secrets.PROD_PORTONE_BILL_MID}}
+          private.aes.key: ${{ secrets.AES_PRIVATE_KEY }}
+          apple.bundle.id: ${{ secrets.APPLE_BUNDLE_ID }}
+          apple.team.id: ${{ secrets.APPLE_TEAM_ID }}
+          aligo.sender-key: ${{ secrets.KAKAO_SENDER_KEY }}
 
 
       - name: Set Environment Domain - Domain Prod Yml
@@ -64,10 +74,25 @@ jobs:
         with:
           files: ./Match-Domain/src/main/resources/application-domain-prod.yml
         env:
-          spring.datasource.url: ${{ secrets.PROD_DB_URL_HOST }}
-          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
-          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.datasource.master.hikari.jdbc-url: ${{ secrets.PROD_DB_URL_HOST }}
+          spring.datasource.master.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.master.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.datasource.slave.hikari.jdbc-url: ${{ secrets.PROD_SLAVE_URL_HOST }}
+          spring.datasource.slave.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.slave.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
           spring.redis.host : ${{ secrets.REDIS_PROD_HOST }}
+
+      - name: create-fcm-json
+        id: create-fcm-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "serviceAccountKey.json"
+          json: ${{ secrets.FCM_JSON }}
+          dir: "Match-Common/src/main/resources/"
+
+      - name: Create Auth Key File
+        run: |
+          echo "${{ secrets.AUTH_KEY }}" > ./Match-Common/src/main/resources/AuthKey_74JQ8SGRU2.p8
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew

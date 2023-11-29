@@ -8,11 +8,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProjectCommentRepository extends JpaRepository<ProjectComment, ProjectUserAttentionPk> {
 
 
     Page<ProjectComment> findByProjectIdOrderByCreatedAtDesc(Long projectId, Pageable pageable);
 
-    Page<ProjectComment> findByProjectIdAndStatusOrderByCreatedAtDesc(Long projectId, Status status, Pageable pageable);
+    Page<ProjectComment> findByProjectIdAndStatusOrderByCreatedAtAsc(Long projectId, Status status, Pageable pageable);
+
+    Optional<ProjectComment> findByIdAndStatus(Long commentId, Status status);
+
+    void deleteByUserId(Long id);
 }

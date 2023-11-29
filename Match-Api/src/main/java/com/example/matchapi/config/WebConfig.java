@@ -20,6 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                         "http://localhost:63343",
                         "http://localhost:3000",
+                        "http://localhost:8080",
                         "https://www.match-api-server.com",
                         "https://localhost:3000",
                         "https://match-official.vercel.app",

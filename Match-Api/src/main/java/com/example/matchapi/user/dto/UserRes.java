@@ -1,12 +1,10 @@
 package com.example.matchapi.user.dto;
 
-import com.example.matchapi.order.dto.OrderRes;
-import com.example.matchapi.project.dto.ProjectRes;
+import com.example.matchdomain.user.entity.enums.Alarm;
+import com.example.matchdomain.user.entity.enums.SocialType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.List;
 
 public class UserRes {
     @Getter
@@ -22,6 +20,8 @@ public class UserRes {
         private String accessToken;
         @Schema(description = "리프레쉬 토큰", required = true, example = "asdkjanwjkldnjk----")
         private String refreshToken;
+        @Schema(description = "회원가입 유무 true - 회원가입, false - 로그인")
+        private boolean isNew;
     }
     @Getter
     @Setter
@@ -81,23 +81,24 @@ public class UserRes {
     @NoArgsConstructor
     @Schema(description ="02-01👤 유저 정보 조회 API Response")
     public static class MyPage {
-        @Schema(description = "후원 집행 전 갯수", required = true, example = "후원 집행 전 갯수")
-        private int beforeCnt;
+        @Schema(description = "닉네임")
+        private String name;
 
-        @Schema(description = "후원 집행 진행 중 갯수", required = true, example = "후원 집행 진행 중 갯수")
+        @Schema(description = "진행중 매치 갯수", required = true, example = "후원 집행 진행 중 갯수")
         private int underCnt;
 
-        @Schema(description = "후원 집행 진행 중 갯수", required = true, example = "후원 집행 진행 중 갯수")
+        @Schema(description = "종료된 매치 갯수", required = true, example = "후원 집행 진행 중 갯수")
         private int successCnt;
 
-        @Schema(description = "관심있는 프로젝트 리스트", required = true, example = "프로젝트 리스트")
-        private List<ProjectRes.ProjectList> projectList;
+        @Schema(description = "좋아하는 매치", required = true, example = "후원 집행 전 갯수")
+        private int likeCnt;
     }
     @Getter
     @Setter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema(description = "토큰 재발급", name = "ReIssueToken")
     public static class ReIssueToken {
         private String accessToken;
     }
@@ -183,5 +184,34 @@ public class UserRes {
 
     public static class EmailAuth {
         private String number;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Profile {
+        private String profileImgUrl;
+
+        private String name;
+
+        private String nickName;
+
+        private SocialType socialType;
+
+        private String email;;
+
+        private String phone;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AlarmAgreeList {
+        private Alarm serviceAlarm;
+
+        private Alarm eventAlarm;
     }
 }

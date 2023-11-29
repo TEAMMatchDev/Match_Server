@@ -1,6 +1,8 @@
 package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.donation.entity.enums.HistoryStatus;
+import com.example.matchdomain.project.entity.Project;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
@@ -32,6 +34,13 @@ public class DonationHistory extends BaseEntity {
     private HistoryStatus historyStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "regularPaymentId",nullable = false, insertable=false, updatable=false)
+    private RegularPayment regularPayment;
+
+    @Column(name="regularPaymentId")
+    private Long regularPaymentId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "donationUserId",nullable = false, insertable=false, updatable=false)
     private DonationUser donationUser;
 
@@ -39,17 +48,23 @@ public class DonationHistory extends BaseEntity {
     private Long donationUserId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "regularPaymentId",nullable = false, insertable=false, updatable=false)
-    private RegularPayment regularPayment;
+    @JoinColumn(name = "projectId",nullable = false, insertable=false, updatable=false)
+    private Project project;
 
-    @Column(name="regularPaymentId")
-    private Long regularPaymentId;
-
-    private String flameImage;
-
+    @Column(name="projectId")
+    private Long projectId;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "donationHistoryId")
     private List<HistoryImage> historyImages = new ArrayList<>();
+
+    @Column
+    @ElementCollection
+    private List<Long> completeIdLists;
+
+    @Column
+    @ElementCollection
+    private List<Long> changeIdLists;
+
 
 }

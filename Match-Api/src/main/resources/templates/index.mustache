@@ -2,26 +2,25 @@
 <html>
 
 <head>
-  <title>Nicepay spring-boot</title>
-  <meta httpEquiv="x-ua-compatible" content="ie=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Match 결제 페이지</title>
+    <meta httpEquiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
-
 <body>
-  <h1>NICEPAY TEST</h1>
-  <button onclick="serverAuth()">serverAuth 결제하기</button>
-
   <script src="https://pay.nicepay.co.kr/v1/js/"></script>
-
   <script>
+      window.addEventListener('load', function() {
+          serverAuth();
+      });
+
     function serverAuth() {
       AUTHNICE.requestPay({
         clientId: '{{clientId}}',
         method: '{{method}}',
         orderId: '{{orderId}}',
-        amount: 1004,
-        goodsName: '나이스페이-상품',
-        returnUrl: 'http://localhost:9000/order/serverAuth',
+        amount: '{{amount}}',
+        goodsName: '{{productName}}',
+        returnUrl: '{{returnUrl}}',
         fnError: function (result) {
           alert('개발자확인용 : ' + result.errorMsg + '')
         }

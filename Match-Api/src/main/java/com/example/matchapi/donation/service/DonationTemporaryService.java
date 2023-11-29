@@ -1,6 +1,6 @@
 package com.example.matchapi.donation.service;
 
-import com.example.matchapi.donation.convertor.DonationTemporaryConvertor;
+import com.example.matchapi.donation.converter.DonationTemporaryConverter;
 import com.example.matchapi.donation.dto.DonationTemporaryReq;
 import com.example.matchapi.donation.dto.DonationTemporaryRes;
 import com.example.matchapi.donation.helper.DonationHelper;
@@ -26,19 +26,19 @@ import static com.example.matchdomain.donationTemporary.exception.AdminDonationR
 @Service
 @RequiredArgsConstructor
 public class DonationTemporaryService {
-   private final DonationTemporaryConvertor donationTemporaryConvertor;
+   private final DonationTemporaryConverter donationTemporaryConverter;
    private final DonationTemporaryRepository donationTemporaryRepository;
    private final DonationListRepository donationListRepository;
    private final DonationHelper donationHelper;
     public DonationTemporaryRes.UserInfo getUserInfo(User user) {
-        return donationTemporaryConvertor.UserInfo(user);
+        return donationTemporaryConverter.convertToUserInfo(user);
     }
 
     public void postDonationTemporary(User user, DonationTemporaryReq.DonationInfo donationInfo) {
         if(donationInfo.getAlarmMethod() == AlarmMethod.SMS) {
-            donationTemporaryRepository.save(donationTemporaryConvertor.DonationInfo(user, donationInfo));
+            donationTemporaryRepository.save(donationTemporaryConverter.convertToDonationInfo(user, donationInfo));
         }else{
-            donationTemporaryRepository.save(donationTemporaryConvertor.DonationInfoEmail(user, donationInfo));
+            donationTemporaryRepository.save(donationTemporaryConverter.convertToDonationInfoEmail(user, donationInfo));
         }
     }
 
@@ -49,7 +49,7 @@ public class DonationTemporaryService {
 
         donationLists.getContent().forEach(
                 result -> donationList.add(
-                        donationTemporaryConvertor.DonationList(result, donationHelper.parsePriceComma(result.getAmount()))
+                        donationTemporaryConverter.convertToDonationList(result, donationHelper.parsePriceComma(result.getAmount()))
                 )
         );
 
@@ -73,7 +73,7 @@ public class DonationTemporaryService {
                 donationTemporaries = donationTemporaryRepository.findByNameContainingAndDepositOrderByCreatedAtDesc(content,deposit, pageable);
             }
         }
-        return new PageResponse<>(donationTemporaries.isLast(), donationTemporaries.getTotalElements(), donationTemporaryConvertor.DonationRequestAdminList(donationTemporaries.getContent()));
+        return new PageResponse<>(donationTemporaries.isLast(), donationTemporaries.getTotalElements(), donationTemporaryConverter.convertToDonationRequestAdminList(donationTemporaries.getContent()));
     }
 
     @Transactional
@@ -81,7 +81,7 @@ public class DonationTemporaryService {
         DonationTemporary donationTemporary = donationTemporaryRepository.findById(donationDeposit.getDonationRequestId())
                 .orElseThrow(()-> new BadRequestException(NOT_EXIST_DONATION_REQUEST));
 
-        donationListRepository.save(donationTemporaryConvertor.DonationDeposit(donationDeposit));
+        donationListRepository.save(donationTemporaryConverter.convertToDonationDeposit(donationDeposit));
 
         donationTemporary.setDeposit(Deposit.EXISTENCE);
         donationTemporaryRepository.save(donationTemporary);
@@ -90,6 +90,6 @@ public class DonationTemporaryService {
     public DonationTemporaryRes.DonationDetail getDonationInfo(Long donationRequestId) {
         DonationTemporary donationTemporary = donationTemporaryRepository.findById(donationRequestId)
                 .orElseThrow(()-> new BadRequestException(NOT_EXIST_DONATION_REQUEST));
-        return donationTemporaryConvertor.DonationInfoDetail(donationTemporary);
+        return donationTemporaryConverter.convertToDonationInfoDetail(donationTemporary);
     }
 }

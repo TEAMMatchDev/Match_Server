@@ -3,7 +3,7 @@ name: dev MATCH API Server CI/CD
 on:
   push:
     branches: [dev]
-      #tags:
+    #tags:
     # - Dev-Api-v*.*.*
   workflow_dispatch: # 수동 실행 옵션 (생략)
 
@@ -55,6 +55,15 @@ jobs:
           aligo.key: ${{ secrets.ALIGO_KEY }}
           web.return.url: ${{ secrets.DEV_RETURN_URL }}
           match.aligo.url: ${ secrets.MATCH_ALIGO_URL }}
+          portone.code: ${{ secrets.PORTONE_CODE }}
+          portone.key: ${{ secrets.PORTONE_KEY }}
+          portone.secret : ${{ secrets.PORTONE_SECRET }}
+          portone.billmid: ${{ secrets.DEV_PORTONE_BILL_MID}}
+          private.aes.key: ${{ secrets.AES_PRIVATE_KEY }}
+          apple.bundle.id: ${{ secrets.APPLE_BUNDLE_ID }}
+          apple.team.id: ${{ secrets.APPLE_TEAM_ID }}
+          aligo.sender-key: ${{ secrets.KAKAO_SENDER_KEY }}
+
 
 
       - name: Set Environment Domain - Domain DEV Yml
@@ -62,10 +71,25 @@ jobs:
         with:
           files: ./Match-Domain/src/main/resources/application-domain-dev.yml
         env:
-          spring.datasource.url: ${{ secrets.DB_URL_HOST }}
-          spring.datasource.username: ${{ secrets.AWS_DB_USER_NAME }}
-          spring.datasource.password: ${{ secrets.AWS_DB_PASSWORD }}
-          spring.redis.host : ${{ secrets.REDIS_DEV_HOST }}
+          spring.datasource.master.hikari.jdbc-url: ${{ secrets.DB_URL_HOST }}
+          spring.datasource.master.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.master.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.datasource.slave.hikari.jdbc-url: ${{ secrets.DEV_SLAVE_URL_HOST }}
+          spring.datasource.slave.hikari.username: ${{ secrets.AWS_DB_USER_NAME }}
+          spring.datasource.slave.hikari.password: ${{ secrets.AWS_DB_PASSWORD }}
+          spring.redis.host : ${{ secrets.REDIS_PROD_HOST }}
+
+      - name: create-fcm-json
+        id: create-fcm-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "serviceAccountKey.json"
+          json: ${{ secrets.FCM_JSON }}
+          dir: "Match-Common/src/main/resources/"
+
+      - name: Create Auth Key File
+        run: |
+          echo "${{ secrets.AUTH_KEY }}" > ./Match-Common/src/main/resources/AuthKey_74JQ8SGRU2.p8
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew

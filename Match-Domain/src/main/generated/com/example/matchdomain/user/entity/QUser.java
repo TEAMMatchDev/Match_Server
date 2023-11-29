@@ -31,7 +31,9 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath email = createString("email");
 
-    public final EnumPath<Gender> gender = createEnum("gender", Gender.class);
+    public final EnumPath<com.example.matchdomain.user.entity.enums.Alarm> eventAlarm = createEnum("eventAlarm", com.example.matchdomain.user.entity.enums.Alarm.class);
+
+    public final EnumPath<com.example.matchdomain.user.entity.enums.Gender> gender = createEnum("gender", com.example.matchdomain.user.entity.enums.Gender.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -49,9 +51,11 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath role = createString("role");
 
+    public final EnumPath<com.example.matchdomain.user.entity.enums.Alarm> serviceAlarm = createEnum("serviceAlarm", com.example.matchdomain.user.entity.enums.Alarm.class);
+
     public final StringPath socialId = createString("socialId");
 
-    public final EnumPath<SocialType> socialType = createEnum("socialType", SocialType.class);
+    public final EnumPath<com.example.matchdomain.user.entity.enums.SocialType> socialType = createEnum("socialType", com.example.matchdomain.user.entity.enums.SocialType.class);
 
     //inherited
     public final EnumPath<com.example.matchdomain.common.model.Status> status = _super.status;
@@ -62,6 +66,8 @@ public class QUser extends EntityPathBase<User> {
     public final ListPath<UserAddress, QUserAddress> userAddresses = this.<UserAddress, QUserAddress>createList("userAddresses", UserAddress.class, QUserAddress.class, PathInits.DIRECT2);
 
     public final ListPath<com.example.matchdomain.donation.entity.UserCard, com.example.matchdomain.donation.entity.QUserCard> userCard = this.<com.example.matchdomain.donation.entity.UserCard, com.example.matchdomain.donation.entity.QUserCard>createList("userCard", com.example.matchdomain.donation.entity.UserCard.class, com.example.matchdomain.donation.entity.QUserCard.class, PathInits.DIRECT2);
+
+    public final ListPath<UserFcmToken, QUserFcmToken> userFcmTokens = this.<UserFcmToken, QUserFcmToken>createList("userFcmTokens", UserFcmToken.class, QUserFcmToken.class, PathInits.DIRECT2);
 
     public final StringPath username = createString("username");
 
