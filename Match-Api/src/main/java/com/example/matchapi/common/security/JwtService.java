@@ -82,6 +82,19 @@ public class JwtService {
         return createJwtToken(userId, Duration.ofDays(jwtProperties.getAccessTokenSeconds()), getSecretKey(), "jwt");
     }
 
+    public String createTokenToWeb(Long userId, Long seconds) {
+        Instant issuedAt = Instant.now();
+        Instant expiration = issuedAt.plusSeconds(seconds);
+
+        return Jwts.builder()
+                .setHeaderParam("type", "jwt")
+                .claim("userId", userId)
+                .setIssuedAt(Date.from(issuedAt))
+                .setExpiration(Date.from(expiration))
+                .signWith(getSecretKey())
+                .compact();
+    }
+
     public String createRefreshToken(Long userId) {
         Long ttl =  Duration.ofDays(jwtProperties.getRefreshTokenSeconds()).getSeconds();
         String refreshToken = createJwtToken(userId, Duration.ofDays(jwtProperties.getRefreshTokenSeconds()), getRefreshKey(), "refresh");

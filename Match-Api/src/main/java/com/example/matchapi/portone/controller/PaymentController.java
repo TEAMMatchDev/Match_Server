@@ -1,5 +1,6 @@
 package com.example.matchapi.portone.controller;
 
+import com.example.matchapi.common.security.JwtService;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderRequestService;
 import com.example.matchapi.portone.dto.PaymentReq;
@@ -34,6 +35,7 @@ public class PaymentController {
     private final UserService userService;
     private final ProjectService projectService;
     private final OrderRequestService orderRequestService;
+    private final JwtService jwtService;
     @Value("${spring.config.activate.on-profile}")
     private String profile;
 
@@ -50,6 +52,20 @@ public class PaymentController {
         Project project = projectService.findByProject(orderRequest.getProjectId());
 
         return CommonResponse.onSuccess(paymentService.checkPayment(mapper.toPaymentValidationCommand(orderRequest, user, project, validatePayment)));
+    }
+
+    @GetMapping("/info")
+    @Operation(summary = "08-02 Payment Web 사용자 정보 불러오기", description = "웹에서 결제를 위한 사용자 정보 불러오기 입니다.")
+    public CommonResponse<OrderRes.PaymentInfoDto> getPaymentInfo(@RequestParam String orderId){
+        OrderRequest orderRequest = orderRequestService.findByOrderId(orderId);
+
+        User user = userService.findByUser(orderRequest.getUserId());
+
+        Project project = projectService.findByProject(orderRequest.getProjectId());
+
+        String accessToken = jwtService.createTokenToWeb(user.getId(), 600L);
+
+        return CommonResponse.onSuccess(mapper.toPaymentInfoDto(user.getName(), user.getBirth(), user.getPhoneNumber(), project.getUsages(), project.getRegularStatus(), accessToken));
     }
 
     /*
