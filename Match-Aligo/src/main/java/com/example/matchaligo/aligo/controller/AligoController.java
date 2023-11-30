@@ -1,9 +1,13 @@
 package com.example.matchaligo.aligo.controller;
 
+import com.example.matchaligo.aligo.dto.AligoReq;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
+import com.example.matchinfrastructure.aligo.dto.AlimTalkReq;
+import com.example.matchinfrastructure.aligo.dto.AlimType;
 import com.example.matchinfrastructure.aligo.service.AligoInfraService;
+import com.example.matchinfrastructure.match_aligo.dto.AlimTalkDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +32,8 @@ public class AligoController {
     }
 
     @PostMapping("/alim-talk")
-    public CommonResponse<String> sendAlimTalk(){
+    public CommonResponse<String> sendAlimTalk(@RequestParam AlimType alimType, @RequestBody AlimTalkDto alimTalk){
+        aligoInfraService.sendAlimTalk(alimTalk, alimType);
         return CommonResponse.onSuccess("알림톡 전송 성공");
     }
 

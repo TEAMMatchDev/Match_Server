@@ -117,7 +117,7 @@ public class ProjectService {
 
         saveImgList(project.getId(), url, imgUrlList);
 
-        donationHistoryAdaptor.saveDonationHistory(projectConverter.convertToDonationHistory(project.getId(), HistoryStatus.TURN_ON));
+        donationHistoryAdaptor.saveDonationHistory(projectConverter.convertToDonationHistory(project.getId(), HistoryStatus.START));
 
         messageHelper.helpFcmMessage(PROJECT_UPLOAD_BODY, Topic.PROJECT_UPLOAD, project.getId());
 

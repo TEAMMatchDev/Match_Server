@@ -27,19 +27,17 @@ public class ReviewService {
     public ReviewRes.PopUpInfo checkPopUp(User user) {
         List<DonationExecution> donationExecutions = donationExecutionAdaptor.checkPopUp(user);
 
-        DonationExecution donationExecution = checkExecution(donationExecutions);
+        if(donationExecutions.isEmpty()){
+            return null;
+        }
+
+        DonationExecution donationExecution = donationExecutions.get(0);
+
+        if(donationExecution.getReview() != null){
+            return null;
+        }
 
         return reviewConverter.convertToPopUp(donationExecution.getDonationUser(), donationExecution.getId());
-    }
-
-    private DonationExecution checkExecution(List<DonationExecution> donationExecutions) {
-        if(donationExecutions.isEmpty()) throw new NotFoundException(NOT_EXISTS_DONATION);
-
-        DonationExecution donationExecution =donationExecutions.get(0);
-
-        if(donationExecution.getReview() != null) throw new NotFoundException(NOT_EXISTS_DONATION);
-
-        return donationExecution;
     }
 
     public void postReview(User user, ReviewReq.ReviewUpload reviewUpload) {
