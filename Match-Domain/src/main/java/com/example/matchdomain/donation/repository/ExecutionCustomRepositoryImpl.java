@@ -26,7 +26,7 @@ public class ExecutionCustomRepositoryImpl implements ExecutionCustomRepository 
                 .from(qDonationExecution)
                 .leftJoin(qDonationUser).on(qDonationExecution.id.eq(qDonationUser.id)).fetchJoin()
                 .leftJoin(qReview).on(qDonationExecution.id.eq(qReview.donationExecution.id))
-                .where(qReview.isNull()) // 필터링: Review가 존재하지 않는 경우
+                .where(qReview.isNull().and(qDonationExecution.donationUser.userId.eq(user.getId())))
                 .orderBy(qDonationExecution.createdAt.desc())
                 .limit(1)
                 .fetch();

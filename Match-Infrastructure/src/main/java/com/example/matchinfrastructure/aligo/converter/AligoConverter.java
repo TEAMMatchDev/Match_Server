@@ -60,7 +60,7 @@ public class AligoConverter {
         String tplCode = alimType.equals(AlimType.PAYMENT) ? PAYMENT_TEMPLATE : EXECUTION_TEMPLATE;
         String emTitle = alimType.equals(AlimType.PAYMENT) ? PAYMENT_EM_TITLE : EXECUTION_EM_TITLE;
         String subject = alimType.equals(AlimType.PAYMENT) ? PAYMENT_SUBJECT : EXECUTION_SUBJECT;
-        String message = alimType.equals(AlimType.PAYMENT) ? String.format(PAYMENT_MESSAGE, name) : String.format(EXECUTION_MESSAGE, name, "", "");
+        String message = alimType.equals(AlimType.PAYMENT) ? String.format(PAYMENT_MESSAGE, name, name) : String.format(EXECUTION_MESSAGE, name, "", "");
 
         return createAlimTalkReq(aligoProperties, token, alimType, phone, name, tplCode, emTitle, subject, message, json);
     }
@@ -70,7 +70,7 @@ public class AligoConverter {
         String tplCode = alimType.equals(AlimType.PAYMENT) ? PAYMENT_TEMPLATE : EXECUTION_TEMPLATE;
         String emTitle = alimType.equals(AlimType.PAYMENT) ? PAYMENT_EM_TITLE : EXECUTION_EM_TITLE;
         String subject = alimType.equals(AlimType.PAYMENT) ? PAYMENT_SUBJECT : EXECUTION_SUBJECT;
-        String message = alimType.equals(AlimType.PAYMENT) ? String.format(PAYMENT_MESSAGE, alimTalkDto.getName()) : String.format(EXECUTION_MESSAGE, alimTalkDto.getName(), alimTalkDto.getArticle(), alimTalkDto.getUsages());
+        String message = alimType.equals(AlimType.PAYMENT) ? String.format(PAYMENT_MESSAGE, alimTalkDto.getName(), alimTalkDto.getName()) : String.format(EXECUTION_MESSAGE, alimTalkDto.getName(), alimTalkDto.getArticle(), alimTalkDto.getUsages());
 
         return createAlimTalkReq(aligoProperties, token, alimType, alimTalkDto.getPhone(), alimTalkDto.getName(), tplCode, emTitle, subject, message, json);
     }

@@ -10,7 +10,9 @@ public class AligoStatic {
     public static final String PAYMENT_BUTTON_NAME = "내 불꽃이 보러 가기";
     public static final String PAYMENT_EM_TITLE = "기부가 시작되었습니다";
     public static final String PAYMENT_SUBJECT = "결제 알림";
-    public static final String PAYMENT_MESSAGE = "%s님의 마음 속 따뜻함이\n" +
+    public static final String PAYMENT_MESSAGE =
+            "%s님! 기부 신청이 완료되었습니다.\n\n" +
+            "%s님의 마음 속 따뜻함이\n" +
             "세상을 따뜻하게 할 불꽃이가 되었습니다.\n" +
             "\n" +
             "어떤 불꽃이가 탄생했는지 \n" +

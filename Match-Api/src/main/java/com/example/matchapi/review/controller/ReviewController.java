@@ -25,8 +25,12 @@ public class ReviewController {
     @GetMapping("")
     @Operation(summary = "13-01 Review 작성 유무 팝업 창 띄우기 유무",description = "매 번 스플레시 단 or 홈화면에서 호출 하여 팝업창 띄우기")
     public CommonResponse<ReviewRes.PopUpInfo> checkPopUp(@AuthenticationPrincipal User user){
+        ReviewRes.PopUpInfo popUpInfo = reviewService.checkPopUp(user);
 
-        return CommonResponse.onSuccess(reviewService.checkPopUp(user));
+        if(popUpInfo == null){
+            return CommonResponse.onSuccessesFail(null);
+        }
+        return CommonResponse.onSuccess(popUpInfo);
     }
 
     @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class})
