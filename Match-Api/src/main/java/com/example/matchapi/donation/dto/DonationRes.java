@@ -325,6 +325,8 @@ public class DonationRes {
         @Schema(description = "후원처 명")
         private String usages;
 
+        private int totalAmount;
+
         @Schema(description = "분류 대기 금액")
         private int waitingSortingAmount;
 

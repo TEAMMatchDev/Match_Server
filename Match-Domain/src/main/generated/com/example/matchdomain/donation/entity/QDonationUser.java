@@ -27,11 +27,11 @@ public class QDonationUser extends EntityPathBase<DonationUser> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final ListPath<DonationExecution, QDonationExecution> donationExecutions = this.<DonationExecution, QDonationExecution>createList("donationExecutions", DonationExecution.class, QDonationExecution.class, PathInits.DIRECT2);
-
     public final ListPath<DonationHistory, QDonationHistory> donationHistories = this.<DonationHistory, QDonationHistory>createList("donationHistories", DonationHistory.class, QDonationHistory.class, PathInits.DIRECT2);
 
     public final EnumPath<com.example.matchdomain.donation.entity.enums.DonationStatus> donationStatus = createEnum("donationStatus", com.example.matchdomain.donation.entity.enums.DonationStatus.class);
+
+    public final NumberPath<Long> executionPrice = createNumber("executionPrice", Long.class);
 
     public final StringPath flameImage = createString("flameImage");
 
@@ -58,6 +58,8 @@ public class QDonationUser extends EntityPathBase<DonationUser> {
     public final NumberPath<Long> regularPaymentId = createNumber("regularPaymentId", Long.class);
 
     public final EnumPath<com.example.matchdomain.donation.entity.enums.RegularStatus> regularStatus = createEnum("regularStatus", com.example.matchdomain.donation.entity.enums.RegularStatus.class);
+
+    public final com.example.matchdomain.review.entity.QReview review;
 
     //inherited
     public final EnumPath<com.example.matchdomain.common.model.Status> status = _super.status;
@@ -91,6 +93,7 @@ public class QDonationUser extends EntityPathBase<DonationUser> {
         super(type, metadata, inits);
         this.project = inits.isInitialized("project") ? new com.example.matchdomain.project.entity.QProject(forProperty("project")) : null;
         this.regularPayment = inits.isInitialized("regularPayment") ? new QRegularPayment(forProperty("regularPayment"), inits.get("regularPayment")) : null;
+        this.review = inits.isInitialized("review") ? new com.example.matchdomain.review.entity.QReview(forProperty("review"), inits.get("review")) : null;
         this.user = inits.isInitialized("user") ? new com.example.matchdomain.user.entity.QUser(forProperty("user")) : null;
     }
 

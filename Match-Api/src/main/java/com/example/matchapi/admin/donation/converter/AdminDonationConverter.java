@@ -3,16 +3,14 @@ package com.example.matchapi.admin.donation.converter;
 import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchcommon.annotation.Converter;
-import com.example.matchdomain.donation.entity.DonationExecution;
+import com.example.matchdomain.donation.dto.DonationExecutionDto;
 import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.HistoryImage;
 import com.example.matchdomain.donation.entity.enums.DonationStatus;
-import com.example.matchdomain.donation.entity.enums.Execution;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.project.entity.Project;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Converter
@@ -62,16 +60,7 @@ public class AdminDonationConverter {
                 .build();
     }
 
-    public DonationExecution convertToDonationExecution(Long donationUserId, Long amount, Execution execution) {
-        return DonationExecution
-                .builder()
-                .price(amount)
-                .donationUserId(donationUserId)
-                .execution(execution)
-                .build();
-    }
-
-    public List<DonationRes.ProjectDonationStatus> convertToProjectDonationStatus(List<Project> projects) {
+   /* public List<DonationRes.ProjectDonationStatus> convertToProjectDonationStatus(List<Project> projects) {
         List<DonationRes.ProjectDonationStatus> projectDonations = new ArrayList<>();
         projects.forEach(
                 result -> {
@@ -79,24 +68,21 @@ public class AdminDonationConverter {
                 }
         );
         return projectDonations;
-    }
+    }*/
 
-    private DonationRes.ProjectDonationStatus convertToStatusDetail(Project project) {
-        List<DonationUser> donationUsers = project.getDonationUser();
-
+    public DonationRes.ProjectDonationStatus convertToStatusDetail(List<DonationExecutionDto> donationUsers, Project project) {
         int totalAmount = 0;
         int waitingSortingAmount = 0;
         int completeAmount = 0;
 
-        for(DonationUser donationUser : donationUsers){
+        for(DonationExecutionDto donationUser : donationUsers){
+            System.out.println(completeAmount);
             if(donationUser.getDonationStatus().equals(DonationStatus.EXECUTION_SUCCESS)){
-                completeAmount+=donationUser.getPrice();
+                completeAmount+=donationUser.getExecutionPrice();
             }
-            if(donationUser.getDonationStatus().equals(DonationStatus.SOME_EXECUTION)){
-                List<DonationExecution> donationExecutions = donationUser.getDonationExecutions();
-                for (DonationExecution donationExecution : donationExecutions){
-                    completeAmount += donationExecution.getPrice();
-                }
+            if(donationUser.getDonationStatus().equals(DonationStatus.PARTIAL_EXECUTION)){
+                completeAmount += donationUser.getExecutionPrice();
+                waitingSortingAmount += donationUser.getPrice() - donationUser.getExecutionPrice();
             }
             if(donationUser.getDonationStatus().equals(DonationStatus.EXECUTION_BEFORE)){
                 waitingSortingAmount += donationUser.getPrice();
@@ -107,6 +93,7 @@ public class AdminDonationConverter {
                 .builder()
                 .projectId(project.getId())
                 .usages(project.getUsages())
+                .totalAmount(totalAmount)
                 .waitingSortingAmount(waitingSortingAmount)
                 .importedAmount((int) (totalAmount*0.1))
                 .completeAmount(completeAmount)
