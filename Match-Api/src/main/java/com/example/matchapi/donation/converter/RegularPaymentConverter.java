@@ -29,6 +29,7 @@ public class RegularPaymentConverter {
     private DonationRes.MatchList convertToMatchListDetail(RegularPayment result) {
         return DonationRes.MatchList
                 .builder()
+                .regularId(result.getId())
                 .regularDate(timeHelper.matchTimeFormat(result.getCreatedAt()))
                 .projectTitle(result.getProject().getProjectName())
                 .regularPayStatus(result.getRegularPayStatus())

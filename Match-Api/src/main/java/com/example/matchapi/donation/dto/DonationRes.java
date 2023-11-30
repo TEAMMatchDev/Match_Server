@@ -276,6 +276,8 @@ public class DonationRes {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class MatchList {
+        private Long regularId;
+
         private String projectTitle;
 
         private String regularDate;
