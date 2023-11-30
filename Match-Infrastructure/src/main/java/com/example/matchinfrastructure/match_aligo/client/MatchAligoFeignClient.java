@@ -18,7 +18,7 @@ public interface MatchAligoFeignClient {
                                        @RequestParam("code") String code);
 
 
-    @PostMapping("/alim-talk")
+    @PostMapping("/send/alim-talk")
     CommonResponse<String> sendAlimTalk(@RequestHeader(name = "X-AUTH-TOKEN") String token,
                                         @RequestParam("alimType")AlimType alimType,
                                         @RequestBody AlimTalkDto alimTalkDto);
