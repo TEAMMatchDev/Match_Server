@@ -50,7 +50,6 @@ jobs:
           discord.webhook.error: ${{ secrets.DISCORD_WEBHOOK_ERROR}}
           discord.webhook.alert: ${{ secrets.DISCORD_WEBHOOK_ALERT }}
           server.host: ${{ secrets.DEV_SERVER_HOST}}
-
           spring.password: ${{ secrets.APP_PASSWORD}}
           aligo.username: ${{ secrets.ALIGO_USERNAME }}
           aligo.key: ${{ secrets.ALIGO_KEY }}
@@ -63,6 +62,7 @@ jobs:
           private.aes.key: ${{ secrets.AES_PRIVATE_KEY }}
           apple.bundle.id: ${{ secrets.APPLE_BUNDLE_ID }}
           apple.team.id: ${{ secrets.APPLE_TEAM_ID }}
+          aligo.sender-key: ${{ secrets.KAKAO_SENDER_KEY }}
 
 
 

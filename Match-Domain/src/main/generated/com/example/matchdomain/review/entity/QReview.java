@@ -31,9 +31,9 @@ public class QReview extends EntityPathBase<Review> {
 
     public final NumberPath<Integer> donation = createNumber("donation", Integer.class);
 
-    public final com.example.matchdomain.donation.entity.QDonationExecution donationExecution;
+    public final NumberPath<Long> donationId = createNumber("donationId", Long.class);
 
-    public final NumberPath<Long> executionId = createNumber("executionId", Long.class);
+    public final com.example.matchdomain.donation.entity.QDonationUser donationUser;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -65,7 +65,7 @@ public class QReview extends EntityPathBase<Review> {
 
     public QReview(Class<? extends Review> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.donationExecution = inits.isInitialized("donationExecution") ? new com.example.matchdomain.donation.entity.QDonationExecution(forProperty("donationExecution"), inits.get("donationExecution")) : null;
+        this.donationUser = inits.isInitialized("donationUser") ? new com.example.matchdomain.donation.entity.QDonationUser(forProperty("donationUser"), inits.get("donationUser")) : null;
     }
 
 }

@@ -44,6 +44,10 @@ public class CommonResponse<T> {
         return new CommonResponse<>(true, "요청에 성공하였습니다.","1000", data);
     }
 
+    public static <T> CommonResponse<T> onSuccessesFail(T data) {
+        return new CommonResponse<>(false,"요청에 성공하였습니다.", "1000", data);
+    }
+
     public static <T> CommonResponse<T> onFailure(String code, String message, T data) {
         return new CommonResponse<>(false, message, code, data);
     }

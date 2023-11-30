@@ -2,6 +2,7 @@ package com.example.matchdomain.donation.repository;
 
 
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.dto.DonationExecutionDto;
 import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
@@ -14,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface DonationUserRepository extends JpaRepository<DonationUser,Long> {
+public interface DonationUserRepository extends JpaRepository<DonationUser,Long>, DonationCustomRepository {
     List<DonationUser> findByUserAndDonationStatusNotAndStatus(User user, DonationStatus donationStatus, Status status);
 
     Page<DonationUser> findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(Long userId,  DonationStatus donationStatus,Status status, Pageable pageable);
@@ -75,6 +76,10 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
     List<DonationUser> findByUser(User user);
 
     boolean existsByTid(String impUid);
+
+    @Query("SELECT new com.example.matchdomain.donation.dto.DonationExecutionDto(DU.donationStatus, DU.price, DU.executionPrice) " +
+            "FROM DonationUser DU WHERE DU.projectId = :projectId AND DU.donationStatus != 'EXECUTION_REFUND'")
+    List<DonationExecutionDto> findAllDtoByProjectId(@Param("projectId") Long projectId);
 
 
     interface flameList {

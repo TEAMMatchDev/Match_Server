@@ -1,5 +1,6 @@
 package com.example.matchapi.order.service;
 
+import com.example.matchapi.common.security.JwtService;
 import com.example.matchapi.donation.service.DonationHistoryService;
 import com.example.matchapi.order.converter.OrderConverter;
 import com.example.matchapi.order.dto.OrderCommand;
@@ -8,6 +9,7 @@ import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.portone.service.PaymentService;
 import com.example.matchapi.project.service.ProjectService;
+import com.example.matchapi.user.service.AligoService;
 import com.example.matchcommon.annotation.PaymentIntercept;
 import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
@@ -25,6 +27,8 @@ import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.redis.repository.OrderRequestRepository;
 import com.example.matchdomain.user.adaptor.UserCardAdaptor;
 import com.example.matchdomain.user.entity.User;
+import com.example.matchinfrastructure.aligo.converter.AligoConverter;
+import com.example.matchinfrastructure.aligo.dto.AlimType;
 import com.example.matchinfrastructure.pay.portone.converter.PortOneConverter;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
@@ -59,12 +63,14 @@ public class OrderService {
     private final PortOneAuthService portOneAuthService;
     private final PortOneConverter portOneConverter;
     private final PaymentService paymentService;
-    private final ProjectService projectService;
     private final RegularPaymentAdaptor regularPaymentAdaptor;
     private final UserCardAdaptor userCardAdaptor;
     private final DonationHistoryService donationHistoryService;
     private final RequestFailedHistoryAdapter failedHistoryAdapter;
     private final PortOneService portOneService;
+    private final AligoService aligoService;
+    private final AligoConverter aligoConverter;
+    private final JwtService jwtService;
 
     @Transactional
     public List<OrderRes.UserBillCard> getUserBillCard(Long userId) {
@@ -117,6 +123,8 @@ public class OrderService {
 
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
 
+        aligoService.sendAlimTalk(jwtService.createToken(1L), AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), user.getName(), user.getPhoneNumber()));
+
         return orderConverter.convertToCompleteDonation(user.getName(), project, oneTimeDonation.getAmount());
     }
 
@@ -140,6 +148,8 @@ public class OrderService {
                 createInherenceDto, RegularStatus.REGULAR, regularPayment.getId()));
 
         donationHistoryService.postRegularDonationHistory(regularPayment.getId(), donationUser.getId());
+
+        aligoService.sendAlimTalk(jwtService.createToken(1L), AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), user.getName(), user.getPhoneNumber()));
 
         return orderConverter.convertToCompleteDonation(user.getName(), project, regularDonation.getAmount());
     }
