@@ -1,12 +1,16 @@
 package com.example.matchdomain.donation.repository;
 
 import com.example.matchdomain.donation.entity.*;
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
+import com.example.matchdomain.review.entity.QReview;
+import com.example.matchdomain.user.entity.User;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
@@ -14,6 +18,7 @@ import java.util.List;
 import static com.example.matchdomain.donation.entity.enums.HistoryStatus.COMPLETE;
 
 @RequiredArgsConstructor
+@EnableJpaRepositories
 public class DonationCustomRepositoryImpl implements DonationCustomRepository{
     private final JPAQueryFactory queryFactory;
     @Override
@@ -67,5 +72,21 @@ public class DonationCustomRepositoryImpl implements DonationCustomRepository{
                 )
                 .orderBy(donationHistory.createdAt.asc());
         return PageableExecutionUtils.getPage(donationHistories, pageable, countQuery::fetchCount);
+    }
+
+    @Override
+    public List<DonationUser> checkPopUp(User user) {
+
+        QDonationUser qDonationUser = QDonationUser.donationUser;
+        QReview qReview = QReview.review;
+
+        return queryFactory
+                .select(qDonationUser)
+                .from(qDonationUser)
+                .leftJoin(qReview).on(qDonationUser.id.eq(qReview.donationUser.id))
+                .where(qReview.isNull().and(qDonationUser.userId.eq(user.getId())).and(qDonationUser.donationStatus.eq(DonationStatus.EXECUTION_SUCCESS).or(qDonationUser.donationStatus.eq(DonationStatus.PARTIAL_EXECUTION))))
+                .orderBy(qDonationUser.createdAt.desc())
+                .limit(1)
+                .fetch();
     }
 }
