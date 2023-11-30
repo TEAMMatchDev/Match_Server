@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 public class OrderRequestService {
     private final OrderAdaptor orderAdaptor;
     public OrderRequest findByOrderIdForPayment(String orderId) {
-        OrderRequest orderRequest = orderAdaptor.findById(orderId);
+        OrderRequest orderRequest = findByOrderId(orderId);
 
         orderAdaptor.deleteById(orderId);
 
         return orderRequest;
+    }
+
+    public OrderRequest findByOrderId(String orderId) {
+        return orderAdaptor.findById(orderId);
     }
 
 }

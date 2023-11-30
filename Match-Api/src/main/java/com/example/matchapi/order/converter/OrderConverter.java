@@ -47,7 +47,7 @@ public class OrderConverter {
                 .userId(String.valueOf(userId))
                 .projectId(String.valueOf(projectId))
                 .orderId(orderId)
-                .ttl(1800L)
+                .ttl(2400L)
                 .build();
     }
     public DonationUser convertToDonationUserPortone(Long userId, Payment payment, Long projectId, OrderRes.CreateInherenceDto createInherenceDto) {
