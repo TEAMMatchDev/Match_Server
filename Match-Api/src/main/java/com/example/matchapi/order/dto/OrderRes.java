@@ -69,4 +69,25 @@ public class OrderRes {
 
         private String inherenceNumber;
     }
+
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PaymentInfoDto {
+        private String name;
+
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private LocalDate birth;
+
+        private String phone;
+
+        private String usages;
+
+        private RegularStatus regularStatus;
+
+        private String accessToken;
+    }
 }
