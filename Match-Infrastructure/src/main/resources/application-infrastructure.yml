@@ -3,6 +3,9 @@ feign:
     config:
       default:
         loggerLevel: FULL
+logging:
+  level:
+    com.example.matchinfrastructure.aligo.client.KakaoAligoFeignClient: DEBUG
 ---
 spring:
   config:
