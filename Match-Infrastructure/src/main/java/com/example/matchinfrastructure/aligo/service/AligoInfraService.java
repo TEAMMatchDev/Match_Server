@@ -43,7 +43,6 @@ public class AligoInfraService {
     }
 
     public void sendAlimTalk(AlimTalkDto alimTalkDto, AlimType alimType) {
-
         CreateTokenRes token = getAligoToken();
 
         AlimTalkReq alimTalkReq = aligoConverter.convertToAlimTalk(aligoProperties, token.getToken(), alimType, alimTalkDto);

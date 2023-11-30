@@ -32,7 +32,7 @@ public class AligoController {
     }
 
     @PostMapping("/alim-talk")
-    public CommonResponse<String> sendAlimTalㄴk(@RequestParam AlimType alimType, @RequestBody AlimTalkDto alimTalk){
+    public CommonResponse<String> sendAlimTalk(@RequestParam AlimType alimType, @RequestBody AlimTalkDto alimTalk){
         aligoInfraService.sendAlimTalk(alimTalk, alimType);
         return CommonResponse.onSuccess("알림톡 전송 성공");
     }
