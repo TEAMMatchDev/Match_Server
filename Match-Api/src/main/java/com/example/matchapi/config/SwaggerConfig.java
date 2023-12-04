@@ -20,6 +20,7 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.SpringDocUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -48,16 +49,34 @@ public class SwaggerConfig {
     private String profile;
 
     @Bean
-    public ModelResolver modelResolver(ObjectMapper objectMapper) {
-        return new ModelResolver(objectMapper);
+    public GroupedOpenApi v1ApiDocs() {
+        String[] paths = { "/**" };
+
+        return GroupedOpenApi.builder()
+                .group("API Version 1")
+                .pathsToMatch(paths)
+                .build();
     }
+
+
+    @Bean
+    public GroupedOpenApi v2ApiDocs() {
+        String[] paths = { "/v2/**" };
+
+        return GroupedOpenApi.builder()
+                .group("API Version 2")
+                .pathsToMatch(paths)
+                .build();
+    }
+
 
     @Bean
     public OpenAPI openAPI() {
         Info info = new Info()
                 .title(profile + "환경 Match Rest API 문서") // 타이틀
                 .version("0.0.1") // 문서 버전
-                .description("잘못된 부분이나 오류 발생 시 바로 말씀해주세요.") // 문서 설명
+                .description("잘못된 부분이나 오류 발생 시 바로 말씀해주세요.\n" +
+                        "우측 상단 Select a definition 클릭시 v1 v2 API 버전 분리") // 문서 설명
                 .contact(new Contact() // 연락처
                         .name("임현우")
                         .email("gusdn8926@naver.com"));
@@ -79,12 +98,6 @@ public class SwaggerConfig {
                 .addSecurityItem(addSecurityItem)
                 .info(info);
     }
-
-
-
-
-
-
 
     @Bean
     public OperationCustomizer customize() {
