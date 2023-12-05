@@ -3,9 +3,12 @@ package com.example.matchdomain.donation.adaptor;
 import com.example.matchcommon.annotation.Adaptor;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
+import com.example.matchdomain.donation.dto.DonationExecutionDto;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.enums.DonationStatus;
+import com.example.matchdomain.donation.repository.DonationCustomRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -105,5 +108,19 @@ public class DonationAdaptor {
 
     public boolean existsByImpId(String impUid) {
         return donationUserRepository.existsByTid(impUid);
+    }
+
+    public List<DonationUser> checkPopUp(User user) {
+        return donationUserRepository.checkPopUp(user);
+    }
+
+    public List<DonationExecutionDto> findByProject(Project project) {
+        return donationUserRepository.findAllDtoByProjectId(project.getId());
+    }
+
+    public Page<DonationUser> findByUserForAdminPage(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return donationUserRepository.findByUserOrderByIdAsc(user, pageable);
     }
 }

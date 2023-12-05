@@ -1,8 +1,9 @@
 package com.example.matchdomain.review.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
-import com.example.matchdomain.donation.entity.DonationExecution;
+import com.example.matchdomain.donation.entity.DonationUser;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -17,6 +18,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
+@BatchSize(size = 10)
 public class Review extends BaseEntity {
     @Id
     @Column(name = "id")
@@ -24,10 +26,10 @@ public class Review extends BaseEntity {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "executionId",nullable = false, insertable=false, updatable=false)
-    private DonationExecution donationExecution;
+    @JoinColumn(name = "donationId",nullable = false, insertable=false, updatable=false)
+    private DonationUser donationUser;
 
-    private Long executionId;
+    private Long donationId;
 
     private int donation;
 

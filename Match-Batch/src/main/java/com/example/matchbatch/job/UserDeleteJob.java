@@ -25,11 +25,11 @@ public class UserDeleteJob {
         log.info(JOB_NAME + " JOB START");
 
         return jobBuilderFactory.get(JOB_NAME)
-                .start(regularPaymentStep())
+                .start(deleteUserStep())
                 .build();
     }
 
-    private Step regularPaymentStep() {
+    private Step deleteUserStep() {
         return stepBuilderFactory.get(JOB_NAME+" STEP")
                 .tasklet((contribution, chunkContext) -> {
                     log.info("Step!");

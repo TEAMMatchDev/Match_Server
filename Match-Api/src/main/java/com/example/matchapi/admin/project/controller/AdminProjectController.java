@@ -36,11 +36,9 @@ import static com.example.matchcommon.exception.errorcode.FileUploadException.FI
 public class AdminProjectController {
     private final ProjectService projectService;
     @Operation(summary = "ADMIN-03-01💻 프로젝트 리스트 업로드 API.",description = "프로젝트 업로드 API 입니다.")
-    @PostMapping(value = "", consumes = {"multipart/form-data"}, produces = "application/json")
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class, FileUploadException.class})
     public CommonResponse<String> postProject(
-            @Parameter(description = "project 상세 내용입니다. type 은 application/json"
-                    , content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             @Valid @RequestPart("project") ProjectReq.Project project,
             @RequestPart("presentFile") MultipartFile presentFile,
             @RequestPart("multipartFiles") List<MultipartFile> multipartFiles){

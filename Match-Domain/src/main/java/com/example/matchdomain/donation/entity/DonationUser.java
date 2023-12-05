@@ -6,9 +6,11 @@ import com.example.matchdomain.donation.entity.enums.PayMethod;
 import com.example.matchdomain.donation.entity.enums.RegularStatus;
 import com.example.matchdomain.donation.entity.flameEnum.FlameType;
 import com.example.matchdomain.project.entity.Project;
+import com.example.matchdomain.review.entity.Review;
 import com.example.matchdomain.user.entity.User;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -64,6 +66,7 @@ public class DonationUser extends BaseEntity {
     private String inherenceName;
 
     @Enumerated(EnumType.STRING)
+    @Comment("donation Status ")
     private DonationStatus donationStatus;
 
     @Enumerated(EnumType.STRING)
@@ -82,10 +85,8 @@ public class DonationUser extends BaseEntity {
     @BatchSize(size = 100)
     private List<DonationHistory> donationHistories = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "donationUserId")
-    @BatchSize(size = 100)
-    private List<DonationExecution> donationExecutions = new ArrayList<>();
+    @Comment("집행 금액, DonationStatus SomeExecution 인 경우와 Execution Success 인 경우")
+    private Long executionPrice;
 
     public void updateInherenceNumber(String inherenceNumber, String flameName) {
         this.inherenceNumber = inherenceNumber;
@@ -94,5 +95,10 @@ public class DonationUser extends BaseEntity {
 
     public void updateDonationStatus(DonationStatus donationStatus) {
         this.donationStatus = donationStatus;
+    }
+
+    public void updateDonationExecution(DonationStatus donationStatus, Long executionPrice) {
+        this.donationStatus = donationStatus;
+        this.executionPrice = executionPrice;
     }
 }

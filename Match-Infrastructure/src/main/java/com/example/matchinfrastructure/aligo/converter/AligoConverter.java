@@ -84,4 +84,15 @@ public class AligoConverter {
                 .build();
 
     }
+
+    public AlimTalkDto convertToAlimTalkExecution(Long donationId, String name, String phoneNumber, String article, String usages){
+        return AlimTalkDto
+                .builder()
+                .donationId(donationId)
+                .name(name)
+                .phone(phoneNumber)
+                .article(article)
+                .usages(usages)
+                .build();
+    }
 }

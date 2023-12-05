@@ -7,7 +7,6 @@ import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.project.dto.ProjectRes;
-import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
@@ -26,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
@@ -167,5 +167,9 @@ public class DonationService {
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
 
         return donationConverter.convertToCompleteDonation(donationUser, project);
+    }
+
+    public Page<DonationUser> findByUserId(User user, int page, int size) {
+        return donationAdaptor.findByUserForAdminPage(user, page, size);
     }
 }
