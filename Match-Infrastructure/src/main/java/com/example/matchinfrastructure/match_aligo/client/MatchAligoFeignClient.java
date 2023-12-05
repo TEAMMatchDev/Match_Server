@@ -7,6 +7,8 @@ import com.example.matchinfrastructure.match_aligo.dto.AlimTalkDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @FeignClient(
         name = "MatchAligoFeignClient",
         url = "${match.aligo.url}",
@@ -22,5 +24,11 @@ public interface MatchAligoFeignClient {
     CommonResponse<String> sendAlimTalk(@RequestHeader(name = "X-AUTH-TOKEN") String token,
                                         @RequestParam("alimType")AlimType alimType,
                                         @RequestBody AlimTalkDto alimTalkDto);
+
+    @PostMapping("/send/alim-talk-execution")
+    CommonResponse<String> sendAlimTalks(
+            @RequestHeader(name = "X-AUTH-TOKEN") String token,
+            @RequestParam("alimType")AlimType alimType,
+            @RequestBody List<AlimTalkDto> alimTalkDtos);
 
 }

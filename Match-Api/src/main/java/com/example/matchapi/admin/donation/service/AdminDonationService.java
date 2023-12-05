@@ -1,10 +1,10 @@
 package com.example.matchapi.admin.donation.service;
 
 import com.example.matchapi.admin.donation.converter.AdminDonationConverter;
+import com.example.matchapi.common.lisetner.ExecutionEvent;
 import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
-import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
 import com.example.matchdomain.donation.adaptor.DonationHistoryAdaptor;
@@ -16,6 +16,8 @@ import com.example.matchdomain.project.adaptor.ProjectAdaptor;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +27,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,9 @@ public class AdminDonationService {
     private final S3UploadService s3UploadService;
     private final ProjectAdaptor projectAdaptor;
     private final HistoryImageRepository historyImageRepository;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
 
     @Transactional
     public DonationRes.DonationInfo getDonationInfo() {
@@ -91,6 +95,12 @@ public class AdminDonationService {
         donationUsers.addAll(executeSuccessfulDonations(excludeSomeExecutionIds(allDonationUserIds, someExecutionIds)));
 
         donationAdaptor.saveAll(donationUsers);
+
+        Project project = projectAdaptor.findById(enforceDonation.getProjectId());
+
+        ExecutionEvent event = new ExecutionEvent(this, donationUsers, project, enforceDonation.getItem());
+
+        eventPublisher.publishEvent(event);
     }
 
     private List<Long> getSomeExecutionIds(List<DonationReq.SomeExecution> someExecutions) {

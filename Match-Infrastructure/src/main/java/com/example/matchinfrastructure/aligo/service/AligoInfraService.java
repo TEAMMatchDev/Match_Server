@@ -9,6 +9,8 @@ import com.example.matchinfrastructure.match_aligo.dto.AlimTalkDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AligoInfraService {
@@ -54,5 +56,20 @@ public class AligoInfraService {
                         alimTalkReq
                 );
         System.out.println(aligoResponse.toString());
+    }
+
+    public void sendAlimTalks(List<AlimTalkDto> alimTalks, AlimType alimType) {
+        CreateTokenRes token = getAligoToken();
+
+        for(AlimTalkDto alimTalkDto : alimTalks) {
+            AlimTalkReq alimTalkReq = aligoConverter.convertToAlimTalk(aligoProperties, token.getToken(), alimType, alimTalkDto);
+
+            System.out.println(alimTalkReq.toString());
+
+            AligoResponse<AlimTalkRes> aligoResponse =
+                    kakaoAligoFeignClient.sendAlimTalk(
+                            alimTalkReq
+                    );
+        }
     }
 }
