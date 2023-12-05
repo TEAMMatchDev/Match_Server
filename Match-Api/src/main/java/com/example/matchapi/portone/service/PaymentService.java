@@ -82,7 +82,7 @@ public class PaymentService {
 
             orderAdaptor.deleteById(paymentValidation.getValidatePayment().getOrderId());
 
-            aligoService.sendAlimTalk(jwtService.createToken(1L), AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), paymentValidation.getUser().getName(), paymentValidation.getUser().getPhoneNumber()));
+            aligoService.sendAlimTalk(AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), paymentValidation.getUser().getName(), paymentValidation.getUser().getPhoneNumber()));
 
             return orderConverter.convertToCompleteDonation(paymentValidation.getUser().getName(), paymentValidation.getProject(), (long) paymentValidation.getValidatePayment().getAmount());
         } catch (IamportResponseException | IOException e) {
