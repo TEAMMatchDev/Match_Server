@@ -13,7 +13,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-11-30T17:29:40+0900",
+    date = "2023-12-05T09:50:48+0900",
     comments = "version: 1.5.3.Final, compiler: javac, environment: Java 11.0.19 (Oracle Corporation)"
 )
 public class PaymentMapperImpl implements PaymentMapper {

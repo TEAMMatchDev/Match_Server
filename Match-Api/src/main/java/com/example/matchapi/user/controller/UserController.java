@@ -6,6 +6,7 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.service.UserService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchcommon.annotation.DisableSecurity;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchdomain.redis.entity.RefreshToken;
@@ -91,8 +92,8 @@ public class UserController {
     }
 
     @Operation(summary = "02-05 토큰 재발급 👤", description = "액세스 토큰 만료시 재발급 요청 하는 API X-REFRESH-TOKEN 을 헤더에 담아서 보내주세요, accessToken 은 보내지 않습니다.")
-    @ResponseBody
     @PostMapping("/refresh")
+    @DisableSecurity
     public CommonResponse<UserRes.ReIssueToken> reIssueToken(
             @Parameter(description = "리프레쉬 토큰", required = true, in = ParameterIn.HEADER, name = "X-REFRESH-TOKEN", schema = @Schema(type = "string")) @RequestHeader("X-REFRESH-TOKEN") String refreshToken
     ){
