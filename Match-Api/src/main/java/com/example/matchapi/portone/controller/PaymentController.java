@@ -9,6 +9,7 @@ import com.example.matchapi.portone.service.PaymentService;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchapi.user.service.UserService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchcommon.annotation.DisableSecurity;
 import com.example.matchcommon.annotation.PaymentIntercept;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchdomain.order.exception.PortOneAuthErrorCode;
@@ -43,6 +44,7 @@ public class PaymentController {
     @Operation(summary = "08-01 Payment 가격 검증💸", description = "결제 검증용 API 해당 API")
     @PaymentIntercept(key = "#validatePayment.impUid")
     @ApiErrorCodeExample({UserAuthErrorCode.class, PortOneAuthErrorCode.class})
+    @DisableSecurity
     public CommonResponse<OrderRes.CompleteDonation> validatePayment(@RequestBody PaymentReq.ValidatePayment validatePayment){
         log.info("가격 검증");
         OrderRequest orderRequest = orderRequestService.findByOrderIdForPayment(validatePayment.getOrderId());
@@ -56,6 +58,7 @@ public class PaymentController {
 
     @GetMapping("/info")
     @Operation(summary = "08-02 Payment Web 사용자 정보 불러오기", description = "웹에서 결제를 위한 사용자 정보 불러오기 입니다.")
+    @DisableSecurity
     public CommonResponse<OrderRes.PaymentInfoDto> getPaymentInfo(@RequestParam String orderId){
         OrderRequest orderRequest = orderRequestService.findByOrderId(orderId);
 
