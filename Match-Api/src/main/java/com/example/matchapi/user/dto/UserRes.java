@@ -1,5 +1,6 @@
 package com.example.matchapi.user.dto;
 
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.user.entity.enums.Alarm;
 import com.example.matchdomain.user.entity.enums.SocialType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -213,5 +214,24 @@ public class UserRes {
         private Alarm serviceAlarm;
 
         private Alarm eventAlarm;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserFlameListDto {
+        private Long donationId;
+
+        private int donationCnt;
+
+        private String inherenceName;
+
+        private String inherenceNumber;
+
+        private DonationStatus donationStatus;
+
+        private String donationStatusName;
     }
 }

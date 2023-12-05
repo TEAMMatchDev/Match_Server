@@ -81,6 +81,8 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
             "FROM DonationUser DU WHERE DU.projectId = :projectId AND DU.donationStatus != 'EXECUTION_REFUND'")
     List<DonationExecutionDto> findAllDtoByProjectId(@Param("projectId") Long projectId);
 
+    Page<DonationUser> findByUserOrderByIdAsc(User user, Pageable pageable);
+
 
     interface flameList {
         Long getRegularPayId();

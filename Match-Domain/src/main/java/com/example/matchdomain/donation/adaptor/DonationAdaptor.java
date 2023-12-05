@@ -117,4 +117,10 @@ public class DonationAdaptor {
     public List<DonationExecutionDto> findByProject(Project project) {
         return donationUserRepository.findAllDtoByProjectId(project.getId());
     }
+
+    public Page<DonationUser> findByUserForAdminPage(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return donationUserRepository.findByUserOrderByIdAsc(user, pageable);
+    }
 }
