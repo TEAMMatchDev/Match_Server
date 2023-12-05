@@ -179,7 +179,6 @@ public class OrderService {
             deleteUserCard(userCard, accessToken);
         }
 
-        userCardAdaptor.deleteByUser(user.getId());
     }
 
     private void deleteUserCard(UserCard userCard, String accessToken) {

@@ -10,6 +10,8 @@ import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.NotFoundException;
+import com.example.matchcommon.exception.UnauthorizedException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.RegularPayment;
@@ -22,6 +24,7 @@ import com.example.matchdomain.user.entity.UserAddress;
 import com.example.matchdomain.user.entity.enums.Alarm;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.exception.ModifyEmailCode;
+import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserFcmTokenRepository;
 import com.example.matchdomain.user.repository.UserRepository;
@@ -49,6 +52,7 @@ import static com.example.matchdomain.user.entity.enums.Alarm.ACTIVE;
 import static com.example.matchdomain.user.entity.enums.Alarm.INACTIVE;
 import static com.example.matchdomain.user.exception.ModifyEmailCode.NOT_CORRECT_EMAIL;
 import static com.example.matchdomain.user.exception.ModifyPhoneErrorCode.NOT_CORRECT_PHONE;
+import static com.example.matchdomain.user.exception.UserAuthErrorCode.NOT_EXIST_USER;
 import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_PHONE;
 
 @Service
@@ -252,5 +256,9 @@ public class UserService {
 
     public User findByUser(String userId) {
         return userAdaptor.findByUser(userId);
+    }
+
+    public User findByUserId(Long userId) {
+        return userAdaptor.findByUserId(userId).orElseThrow(() -> new NotFoundException(NOT_EXIST_USER));
     }
 }

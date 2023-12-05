@@ -29,9 +29,8 @@ public class UserService {
 
     private void deleteUserInfo(User user) {
         projectService.deleteForProject(user);
-        donationService.deleteForDonation(user);
-        orderService.deleteForOrder(user);
         notificationService.deleteForNotification(user);
+        orderService.deleteForOrder(user);
     }
 
 }

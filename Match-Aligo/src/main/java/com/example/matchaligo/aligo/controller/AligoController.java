@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -36,5 +38,12 @@ public class AligoController {
         aligoInfraService.sendAlimTalk(alimTalk, alimType);
         return CommonResponse.onSuccess("알림톡 전송 성공");
     }
+
+    @PostMapping("/alim-talk-execution")
+    public CommonResponse<String> sendAlimTalks(@RequestParam AlimType alimType, @RequestBody List<AlimTalkDto> alimTalks){
+        aligoInfraService.sendAlimTalks(alimTalks, alimType);
+        return CommonResponse.onSuccess("알림톡 전송 성공");
+    }
+
 
 }

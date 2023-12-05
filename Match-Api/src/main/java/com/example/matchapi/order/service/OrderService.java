@@ -123,7 +123,7 @@ public class OrderService {
 
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
 
-        aligoService.sendAlimTalk(jwtService.createToken(1L), AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), user.getName(), user.getPhoneNumber()));
+        aligoService.sendAlimTalk(AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), user.getName(), user.getPhoneNumber()));
 
         return orderConverter.convertToCompleteDonation(user.getName(), project, oneTimeDonation.getAmount());
     }
@@ -149,7 +149,7 @@ public class OrderService {
 
         donationHistoryService.postRegularDonationHistory(regularPayment.getId(), donationUser.getId());
 
-        aligoService.sendAlimTalk(jwtService.createToken(1L), AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), user.getName(), user.getPhoneNumber()));
+        aligoService.sendAlimTalk(AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), user.getName(), user.getPhoneNumber()));
 
         return orderConverter.convertToCompleteDonation(user.getName(), project, regularDonation.getAmount());
     }

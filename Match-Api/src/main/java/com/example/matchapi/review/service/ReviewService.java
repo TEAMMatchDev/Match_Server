@@ -6,11 +6,13 @@ import com.example.matchapi.review.dto.ReviewRes;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.review.adaptor.ReviewAdaptor;
+import com.example.matchdomain.review.entity.Review;
 import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -27,7 +29,9 @@ public class ReviewService {
 
         DonationUser donationUser = donationUsers.get(0);
 
-        if(donationUser.getReview()!=null) return  null;
+        Optional<Review> review = reviewAdaptor.findByDonationUser(donationUser);
+
+        if(review.isEmpty()) return  null;
 
         return reviewConverter.convertToPopUp(donationUser, donationUser.getId());
     }
