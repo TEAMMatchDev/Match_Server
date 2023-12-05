@@ -4,6 +4,7 @@ import com.example.matchapi.admin.donation.converter.AdminDonationConverter;
 import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
+import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
 import com.example.matchdomain.donation.adaptor.DonationHistoryAdaptor;
@@ -24,14 +25,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
 import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
 import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
-import static com.example.matchdomain.donation.entity.enums.Execution.ALL;
-import static com.example.matchdomain.donation.entity.enums.Execution.SOME;
 
 @Service
 @RequiredArgsConstructor
@@ -74,18 +74,23 @@ public class AdminDonationService {
     }
 
 
+
     @Transactional
     public void enforceDonation(List<MultipartFile> imageLists, DonationReq.EnforceDonation enforceDonation) {
         List<Long> someExecutionIds = getSomeExecutionIds(enforceDonation.getSomeExecutions());
         List<Long> allDonationUserIds = new ArrayList<>(enforceDonation.getDonationUserLists());
 
         DonationHistory donationHistory = donationHistoryAdaptor.saveDonationHistory(
-                adminDonationConverter.convertToDonationHistoryComplete(enforceDonation.getProjectId(), allDonationUserIds));
+                adminDonationConverter.convertToDonationHistoryComplete(enforceDonation.getProjectId(), allDonationUserIds, enforceDonation.getItem()));
 
         saveDonationHistoryImages(imageLists, donationHistory.getId());
 
-        executePartialDonations(enforceDonation.getSomeExecutions());
-        executeSuccessfulDonations(excludeSomeExecutionIds(allDonationUserIds, someExecutionIds));
+        List<DonationUser> donationUsers = new ArrayList<>();
+
+        donationUsers.addAll(executePartialDonations(enforceDonation.getSomeExecutions()));
+        donationUsers.addAll(executeSuccessfulDonations(excludeSomeExecutionIds(allDonationUserIds, someExecutionIds)));
+
+        donationAdaptor.saveAll(donationUsers);
     }
 
     private List<Long> getSomeExecutionIds(List<DonationReq.SomeExecution> someExecutions) {
@@ -94,16 +99,29 @@ public class AdminDonationService {
                 .collect(Collectors.toList());
     }
 
-    private void executePartialDonations(List<DonationReq.SomeExecution> someExecutions) {
+    private List<DonationUser> executePartialDonations(List<DonationReq.SomeExecution> someExecutions) {
         List<Long> someExecutionIds = getSomeExecutionIds(someExecutions);
         List<DonationUser> partialDonationUsers = donationAdaptor.findByListIn(someExecutionIds);
 
         for (DonationUser donationUser : partialDonationUsers) {
-            DonationReq.SomeExecution execution = findSomeExecutionByUserId(someExecutions, donationUser.getId());
-            donationUser.updateDonationExecution(PARTIAL_EXECUTION, execution.getAmount());
+            if(!donationUser.getDonationStatus().equals(EXECUTION_SUCCESS)) {
+                DonationReq.SomeExecution execution = findSomeExecutionByUserId(someExecutions, donationUser.getId());
+                donationUser.updateDonationExecution(PARTIAL_EXECUTION, execution.getAmount());
+            }
         }
 
-        donationAdaptor.saveAll(partialDonationUsers);
+        return partialDonationUsers;
+    }
+
+    private List<DonationUser> executeSuccessfulDonations(List<Long> donationUserIds) {
+        List<DonationUser> successfulDonationUsers = donationAdaptor.findByListIn(donationUserIds);
+
+        for (DonationUser donationUser : successfulDonationUsers) {
+            if(!donationUser.getDonationStatus().equals(EXECUTION_SUCCESS)) {
+                donationUser.updateDonationExecution(EXECUTION_SUCCESS, (long) (donationUser.getPrice() * 0.9));
+            }
+        }
+        return successfulDonationUsers;
     }
 
     private DonationReq.SomeExecution findSomeExecutionByUserId(List<DonationReq.SomeExecution> someExecutions, Long userId) {
@@ -113,15 +131,6 @@ public class AdminDonationService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
     }
 
-    private void executeSuccessfulDonations(List<Long> donationUserIds) {
-        List<DonationUser> successfulDonationUsers = donationAdaptor.findByListIn(donationUserIds);
-
-        for (DonationUser donationUser : successfulDonationUsers) {
-            donationUser.updateDonationExecution(EXECUTION_SUCCESS, (long) (donationUser.getPrice() * 0.9));
-        }
-
-        donationAdaptor.saveAll(successfulDonationUsers);
-    }
 
     private List<Long> excludeSomeExecutionIds(List<Long> allIds, List<Long> excludeIds) {
         return allIds.stream()
