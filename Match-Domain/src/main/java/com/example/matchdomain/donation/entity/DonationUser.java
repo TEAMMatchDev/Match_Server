@@ -88,9 +88,6 @@ public class DonationUser extends BaseEntity {
     @Comment("집행 금액, DonationStatus SomeExecution 인 경우와 Execution Success 인 경우")
     private Long executionPrice;
 
-    @OneToOne(mappedBy = "donationUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Review review;
-
     public void updateInherenceNumber(String inherenceNumber, String flameName) {
         this.inherenceNumber = inherenceNumber;
         this.inherenceName = flameName;
