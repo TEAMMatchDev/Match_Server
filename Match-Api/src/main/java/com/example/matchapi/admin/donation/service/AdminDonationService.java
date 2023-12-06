@@ -175,4 +175,10 @@ public class AdminDonationService {
 
         return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectDonations);
     }
+
+    public PageResponse<List<DonationRes.ProjectDonationDto>> getProjectDonationLists(Project project, int page, int size) {
+        Page<DonationUser> donationUsers = donationAdaptor.findDonationLists(project.getId(), page, size);
+
+        return new PageResponse<>(donationUsers.isLast(),donationUsers.getTotalElements(), adminDonationConverter.convertToDonationLists(donationUsers.getContent()));
+    }
 }

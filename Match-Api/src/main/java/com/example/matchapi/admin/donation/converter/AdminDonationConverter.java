@@ -11,6 +11,7 @@ import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.project.entity.Project;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Converter
@@ -98,6 +99,32 @@ public class AdminDonationConverter {
                 .waitingSortingAmount(waitingSortingAmount)
                 .importedAmount((int) (totalAmount*0.1))
                 .completeAmount(completeAmount)
+                .build();
+    }
+
+    public List<DonationRes.ProjectDonationDto> convertToDonationLists(List<DonationUser> content) {
+        List<DonationRes.ProjectDonationDto> dtos = new ArrayList<>();
+
+        content.forEach(
+                result -> {
+                    dtos.add(convertToDonationInfo(result));
+                }
+        );
+        return dtos;
+    }
+
+    private DonationRes.ProjectDonationDto convertToDonationInfo(DonationUser result) {
+        return DonationRes.ProjectDonationDto
+                .builder()
+                .donationId(result.getId())
+                .donationDate(result.getCreatedAt())
+                .donationStatusName(result.getDonationStatus().getName())
+                .donationStatus(result.getDonationStatus())
+                .userId(result.getUserId())
+                .userName(result.getUser().getName())
+                .amount(result.getPrice())
+                .importedAmount((int) (result.getPrice()*0.1))
+                .waitingSortingAmount(result.getDonationStatus().equals(DonationStatus.PARTIAL_EXECUTION) ? result.getExecutionPrice() : (long) (result.getPrice() * 0.9))
                 .build();
     }
 }

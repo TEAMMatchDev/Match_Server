@@ -66,7 +66,7 @@ public class PaymentController {
 
         Project project = projectService.findByProject(orderRequest.getProjectId());
 
-        String accessToken = jwtService.createTokenToWeb(user.getId(), 600L);
+        String accessToken = jwtService.createTokenToWeb(user.getId(), 6000L);
 
         return CommonResponse.onSuccess(mapper.toPaymentInfoDto(user.getName(), user.getBirth(), user.getPhoneNumber(), project.getUsages(), project.getRegularStatus(), accessToken));
     }
