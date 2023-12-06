@@ -14,6 +14,8 @@ public class DonationReq {
     public static class EnforceDonation {
         private Long projectId;
 
+        private List<String> item;
+
         private List<Long> donationUserLists;
 
         private List<SomeExecution> someExecutions;

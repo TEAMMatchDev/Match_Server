@@ -33,12 +33,13 @@ public class AdminDonationConverter {
                 .build();
     }
 
-    public DonationHistory convertToDonationHistoryComplete(Long projectId, List<Long> donationUserLists) {
+    public DonationHistory convertToDonationHistoryComplete(Long projectId, List<Long> donationUserLists, List<String> item) {
         return DonationHistory
                 .builder()
                 .projectId(projectId)
                 .historyStatus(HistoryStatus.COMPLETE)
                 .completeIdLists(donationUserLists)
+                .item(item.toString())
                 .build();
     }
 

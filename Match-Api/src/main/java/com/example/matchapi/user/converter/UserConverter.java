@@ -7,6 +7,8 @@ import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.UserHelper;
 import com.example.matchcommon.annotation.Converter;
 import com.example.matchcommon.properties.AligoProperties;
+import com.example.matchcommon.reponse.PageResponse;
+import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
 import com.example.matchdomain.user.entity.enums.AddressType;
@@ -20,10 +22,12 @@ import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.matchcommon.constants.MatchStatic.BASE_PROFILE;
@@ -262,6 +266,30 @@ public class UserConverter {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .isNew(isNew)
+                .build();
+    }
+
+    public List<UserRes.UserFlameListDto> convertToFlameList(List<DonationUser> donationUsers) {
+        List<UserRes.UserFlameListDto> userFlameLists = new ArrayList<>();
+
+        int donationCnt = 1;
+
+        for(DonationUser donationUser : donationUsers) {
+            userFlameLists.add(convertToFlameDto(donationUser, donationCnt));
+            donationCnt ++;
+        }
+        return userFlameLists;
+    }
+
+    private UserRes.UserFlameListDto convertToFlameDto(DonationUser donationUser, int donationCnt) {
+        return UserRes.UserFlameListDto
+                .builder()
+                .donationId(donationUser.getId())
+                .inherenceName(donationUser.getInherenceName())
+                .inherenceNumber(donationUser.getInherenceNumber())
+                .donationCnt(donationCnt)
+                .donationStatus(donationUser.getDonationStatus())
+                .donationStatusName(donationUser.getDonationStatus().getName())
                 .build();
     }
 }

@@ -9,9 +9,9 @@ import org.springframework.http.HttpStatus;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import com.example.matchcommon.annotation.ExplainError;
+
+import static org.springframework.http.HttpStatus.*;
 
 
 @Getter
@@ -41,7 +41,7 @@ public enum UserAuthErrorCode implements BaseErrorCode {
     NOT_EXISTS_USER_HAVE_TOKEN(UNAUTHORIZED,"AUTH011", "해당 토큰을 가진 유저가 존재하지 않습니다."),
     NOT_USER_ACTIVE(UNAUTHORIZED,"AUTH012","유저가 비활성 상태입니다 로그인 할 수 없습니다."),
     @ExplainError("유저가 존재하지 않는 경우")
-    NOT_EXIST_USER(UNAUTHORIZED,"U009" , "해당 유저가 존재하지 않습니다."),
+    NOT_EXIST_USER(NOT_FOUND,"U009" , "해당 유저가 존재하지 않습니다."),
 
     NOT_ALLOWED_ACCESS(UNAUTHORIZED,"U010","접근 권한이 없습니다.");
 

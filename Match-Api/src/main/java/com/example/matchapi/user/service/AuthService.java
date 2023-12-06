@@ -213,7 +213,7 @@ public class AuthService {
         checkUserPhone(new UserReq.UserPhone(phone));
         String code = smsHelper.createRandomNumber();
         codeAuthRepository.save(CodeAuth.builder().auth(phone).code(code).ttl(300).build());
-        CommonResponse<String> sendRes = aligoService.sendSmsAuth(jwtService.createToken(1L), phone, code);
+        CommonResponse<String> sendRes = aligoService.sendSmsAuth(phone, code);
     }
 
     public void checkPhoneAuth(UserReq.UserPhoneAuth phone) {
