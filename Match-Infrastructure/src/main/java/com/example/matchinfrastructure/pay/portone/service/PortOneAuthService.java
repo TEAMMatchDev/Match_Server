@@ -42,7 +42,7 @@ public class PortOneAuthService {
         return portOneResponse.getResponse().getAccess_token();
     }
 
-    @Scheduled(fixedRate = 1750000) // 30분마다 실행
+    @Scheduled(fixedRate = 1200000)
     public void refreshAuthToken() {
        String refreshToken  = getTokens();
        log.info("refresh token {} ", refreshToken);
