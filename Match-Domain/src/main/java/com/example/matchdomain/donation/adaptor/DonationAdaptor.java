@@ -18,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
-import static com.example.matchdomain.donation.entity.enums.DonationStatus.EXECUTION_REFUND;
+import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
 import static com.example.matchdomain.donation.exception.DonationListErrorCode.FILTER_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationRefundErrorCode.DONATION_NOT_EXIST;
 import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.REPRESENT;
@@ -122,5 +122,13 @@ public class DonationAdaptor {
         Pageable pageable = PageRequest.of(page, size);
 
         return donationUserRepository.findByUserOrderByIdAsc(user, pageable);
+    }
+
+    public Page<DonationUser> findDonationLists(Long projectId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<DonationStatus> in = List.of(new DonationStatus[]{EXECUTION_BEFORE, PARTIAL_EXECUTION});
+
+        return donationUserRepository.findByProjectIdAndDonationStatusInOrderByCreatedAtAsc(projectId, in, pageable);
+
     }
 }
