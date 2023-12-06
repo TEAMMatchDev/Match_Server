@@ -262,8 +262,6 @@ public class UserReq {
         @Schema(description ="소셜 ID",required = true,example = "match123")
         private String socialId;
 
-
-        @Email
         @NotEmpty (message = "이메일을 입력해주세요")
         @Schema(description ="이메일",required = true,example = "match123@gmail.com")
         private String email;
