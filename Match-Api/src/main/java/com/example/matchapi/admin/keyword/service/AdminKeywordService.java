@@ -1,8 +1,8 @@
 package com.example.matchapi.admin.keyword.service;
 
-import com.example.matchapi.admin.keyword.convertor.AdminKeywordConvertor;
+import com.example.matchapi.admin.keyword.converter.AdminKeywordConverter;
 import com.example.matchapi.admin.keyword.dto.AdminKeywordReq;
-import com.example.matchapi.keword.convertor.KeywordConvertor;
+import com.example.matchapi.keword.converter.KeywordConverter;
 import com.example.matchapi.keword.dto.KeywordRes;
 import com.example.matchdomain.keyword.entity.SearchKeyword;
 import com.example.matchdomain.keyword.repository.SearchKeywordRepository;
@@ -20,13 +20,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminKeywordService {
     private final SearchKeywordRepository searchKeywordRepository;
-    private final KeywordConvertor keywordConvertor;
-    private final AdminKeywordConvertor adminKeywordConvertor;
+    private final KeywordConverter keywordConverter;
+    private final AdminKeywordConverter adminKeywordConverter;
 
     @Transactional
     @CachePut(cacheNames = "keywordList", key = "'all'", cacheManager = "ehcacheManager")
     public List<KeywordRes.KeywordList> postKeyword(AdminKeywordReq.KeywordUpload keyword) {
-        searchKeywordRepository.save(adminKeywordConvertor.convertToKeyword(keyword));
+        searchKeywordRepository.save(adminKeywordConverter.convertToKeyword(keyword));
         return cachingKeywordList();
     }
 
@@ -36,7 +36,7 @@ public class AdminKeywordService {
         List<KeywordRes.KeywordList> keywordLists = new ArrayList<>();
 
         searchKeywords.forEach(
-                result -> keywordLists.add(keywordConvertor.convertToKeywordList(result))
+                result -> keywordLists.add(keywordConverter.convertToKeywordList(result))
         );
         return keywordLists;
     }

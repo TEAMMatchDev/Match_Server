@@ -46,6 +46,8 @@ public interface RegularPaymentRepository extends JpaRepository<RegularPayment,L
 
     List<RegularPayment> findByUserCardIdAndRegularPayStatus(Long cardId, RegularPayStatus regularPayStatus);
 
+    List<RegularPayment> findByPayDateAndStatusAndRegularPayStatus(int currentDay, Status status, RegularPayStatus regularPayStatus);
+
     interface RegularPaymentFlame {
         Long getRegularPayId();
 

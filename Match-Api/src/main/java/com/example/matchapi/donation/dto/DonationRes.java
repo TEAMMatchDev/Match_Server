@@ -3,11 +3,14 @@ package com.example.matchapi.donation.dto;
 import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
+import com.example.matchdomain.project.entity.enums.ProjectKind;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class DonationRes {
@@ -275,6 +278,8 @@ public class DonationRes {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class MatchList {
+        private Long regularId;
+
         private String projectTitle;
 
         private String regularDate;
@@ -292,6 +297,9 @@ public class DonationRes {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BurningFlameDto implements Serializable {
+        @Schema(description = "프로젝트 id", example = "1")
+        private Long projectId;
+
         @Schema(description = "불꽃이 id 상세조회시 필요", required = true, example = "2")
         private Long donationId;
 
@@ -306,5 +314,90 @@ public class DonationRes {
 
         @Schema(description = "랜덤 불꽃이 메세지")
         private String randomMessage;
+    }
+
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProjectDonationStatus {
+        @Schema(description = "프로젝트 id", example = "1")
+        private Long projectId;
+
+        @Schema(description = "후원처 명")
+        private String usages;
+
+        private int totalAmount;
+
+        @Schema(description = "분류 대기 금액")
+        private int waitingSortingAmount;
+
+        @Schema(description = "수입 금액")
+        private int importedAmount;
+
+        @Schema(description = "지출 완료 금액")
+        private int completeAmount;
+    }
+
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Tutorial {
+        private Long projectId;
+
+        private ProjectKind projectKind;
+
+        @Schema(description = "랜덤 불꽃이 메세지")
+        private String randomMessage;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CompleteDonation {
+        private Long projectId;
+
+        @Schema(description = "고유 불꽃이 이름")
+        private String inherenceName;
+
+        @Schema(description = "불꽃이 이미지")
+        private String image;
+
+        @Schema(description = "랜덤 불꽃이 메세지")
+        private String randomMessage;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProjectDonationDto {
+        private Long donationId;
+
+        @JsonFormat(pattern = "yyyy.MM.dd.HH:mm")
+        private LocalDateTime donationDate;
+
+        private DonationStatus donationStatus;
+
+        private String donationStatusName;
+
+        private Long userId;
+
+        private String userName;
+
+        private Long amount;
+
+        private Long waitingSortingAmount;
+
+        @Schema(description = "수입 금액")
+        private int importedAmount;
     }
 }

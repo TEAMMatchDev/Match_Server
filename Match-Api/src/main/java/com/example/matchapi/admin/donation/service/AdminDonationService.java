@@ -1,18 +1,24 @@
 package com.example.matchapi.admin.donation.service;
 
-import com.example.matchapi.admin.donation.convertor.AdminDonationConvertor;
+import com.example.matchapi.admin.donation.converter.AdminDonationConverter;
+import com.example.matchapi.common.lisetner.ExecutionEvent;
 import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.helper.DonationHelper;
-import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.reponse.PageResponse;
+import com.example.matchdomain.donation.adaptor.DonationAdaptor;
+import com.example.matchdomain.donation.adaptor.DonationHistoryAdaptor;
 import com.example.matchdomain.donation.entity.DonationHistory;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.HistoryImage;
-import com.example.matchdomain.donation.repository.DonationHistoryRepository;
-import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.HistoryImageRepository;
+import com.example.matchdomain.project.adaptor.ProjectAdaptor;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,29 +28,31 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
 import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
-import static com.example.matchdomain.donation.entity.enums.DonationStatus.EXECUTION_REFUND;
-import static com.example.matchdomain.donation.entity.enums.DonationStatus.EXECUTION_SUCCESS;
-import static com.example.matchdomain.donation.exception.DonationRefundErrorCode.DONATION_NOT_EXIST;
+import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
 
 @Service
 @RequiredArgsConstructor
 public class AdminDonationService {
-    private final DonationUserRepository donationUserRepository;
+    private final DonationAdaptor donationAdaptor;
+    private final DonationHistoryAdaptor donationHistoryAdaptor;
     private final DonationHelper donationHelper;
-    private final AdminDonationConvertor adminDonationConvertor;
-    private final DonationHistoryRepository donationHistoryRepository;
+    private final AdminDonationConverter adminDonationConverter;
     private final S3UploadService s3UploadService;
+    private final ProjectAdaptor projectAdaptor;
     private final HistoryImageRepository historyImageRepository;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
 
     @Transactional
     public DonationRes.DonationInfo getDonationInfo() {
         LocalDate localDate = LocalDate.now();
 
-        List<DonationUser> donationUsers = donationUserRepository.findByDonationStatusNot(EXECUTION_REFUND);
+        List<DonationUser> donationUsers = donationAdaptor.findByDonationNotRefund();
 
         int oneDayDonationAmount = 0;
         int weekendDonationAmount = 0;
@@ -65,29 +73,79 @@ public class AdminDonationService {
     }
 
     public DonationRes.DonationDetail getDonationDetail(Long donationId) {
-        DonationUser donationUser = donationUserRepository.findById(donationId).orElseThrow(()-> new BadRequestException(DONATION_NOT_EXIST));
-        return adminDonationConvertor.getDonationDetail(donationUser);
+        DonationUser donationUser = donationAdaptor.findById(donationId);
+        return adminDonationConverter.getDonationDetail(donationUser);
     }
+
 
 
     @Transactional
     public void enforceDonation(List<MultipartFile> imageLists, DonationReq.EnforceDonation enforceDonation) {
-        donationHistoryRepository.save(adminDonationConvertor.convertToDonationHistoryChange(enforceDonation));
+        List<Long> someExecutionIds = getSomeExecutionIds(enforceDonation.getSomeExecutions());
+        List<Long> allDonationUserIds = new ArrayList<>(enforceDonation.getDonationUserLists());
 
-        DonationHistory donationHistory = donationHistoryRepository.save(adminDonationConvertor.convertToDonationHistoryComplete(enforceDonation.getProjectId(), enforceDonation.getDonationUserLists()));
+        DonationHistory donationHistory = donationHistoryAdaptor.saveDonationHistory(
+                adminDonationConverter.convertToDonationHistoryComplete(enforceDonation.getProjectId(), allDonationUserIds, enforceDonation.getItem()));
 
         saveDonationHistoryImages(imageLists, donationHistory.getId());
 
-        executionSuccessDonation(enforceDonation.getDonationUserLists());
+        List<DonationUser> donationUsers = new ArrayList<>();
+
+        donationUsers.addAll(executePartialDonations(enforceDonation.getSomeExecutions()));
+        donationUsers.addAll(executeSuccessfulDonations(excludeSomeExecutionIds(allDonationUserIds, someExecutionIds)));
+
+        donationAdaptor.saveAll(donationUsers);
+
+        Project project = projectAdaptor.findById(enforceDonation.getProjectId());
+
+        ExecutionEvent event = new ExecutionEvent(this, donationUsers, project, enforceDonation.getItem());
+
+        eventPublisher.publishEvent(event);
     }
 
-    private void executionSuccessDonation(List<Long> donationUserLists) {
-        List<DonationUser> donationUsers = donationUserRepository.findByIdIn(donationUserLists);
-        for(DonationUser donationUser : donationUsers){
-            donationUser.setDonationStatus(EXECUTION_SUCCESS);
+    private List<Long> getSomeExecutionIds(List<DonationReq.SomeExecution> someExecutions) {
+        return someExecutions.stream()
+                .map(DonationReq.SomeExecution::getDonationUserId)
+                .collect(Collectors.toList());
+    }
+
+    private List<DonationUser> executePartialDonations(List<DonationReq.SomeExecution> someExecutions) {
+        List<Long> someExecutionIds = getSomeExecutionIds(someExecutions);
+        List<DonationUser> partialDonationUsers = donationAdaptor.findByListIn(someExecutionIds);
+
+        for (DonationUser donationUser : partialDonationUsers) {
+            if(!donationUser.getDonationStatus().equals(EXECUTION_SUCCESS)) {
+                DonationReq.SomeExecution execution = findSomeExecutionByUserId(someExecutions, donationUser.getId());
+                donationUser.updateDonationExecution(PARTIAL_EXECUTION, execution.getAmount());
+            }
         }
 
-        donationUserRepository.saveAll(donationUsers);
+        return partialDonationUsers;
+    }
+
+    private List<DonationUser> executeSuccessfulDonations(List<Long> donationUserIds) {
+        List<DonationUser> successfulDonationUsers = donationAdaptor.findByListIn(donationUserIds);
+
+        for (DonationUser donationUser : successfulDonationUsers) {
+            if(!donationUser.getDonationStatus().equals(EXECUTION_SUCCESS)) {
+                donationUser.updateDonationExecution(EXECUTION_SUCCESS, (long) (donationUser.getPrice() * 0.9));
+            }
+        }
+        return successfulDonationUsers;
+    }
+
+    private DonationReq.SomeExecution findSomeExecutionByUserId(List<DonationReq.SomeExecution> someExecutions, Long userId) {
+        return someExecutions.stream()
+                .filter(execution -> execution.getDonationUserId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+    }
+
+
+    private List<Long> excludeSomeExecutionIds(List<Long> allIds, List<Long> excludeIds) {
+        return allIds.stream()
+                .filter(id -> !excludeIds.contains(id))
+                .collect(Collectors.toList());
     }
 
     private void saveDonationHistoryImages(List<MultipartFile> imageLists, Long historyId) {
@@ -96,8 +154,31 @@ public class AdminDonationService {
         List<HistoryImage> historyImages = new ArrayList<>();
 
         for(String image : images){
-            historyImages.add(adminDonationConvertor.convertToHistoryImage(image, historyId));
+            historyImages.add(adminDonationConverter.convertToHistoryImage(image, historyId));
         }
+
         historyImageRepository.saveAll(historyImages);
+    }
+
+    public void postExecution(DonationReq.EnforceDonation enforceDonation) {
+        donationHistoryAdaptor.saveDonationHistory(adminDonationConverter.convertToDonationHistoryChange(enforceDonation));
+    }
+
+    public PageResponse<List<DonationRes.ProjectDonationStatus>> getProjectDonationStatus(int page, int size) {
+        Page<Project> projects = projectAdaptor.findAll(page, size);
+
+        List<DonationRes.ProjectDonationStatus> projectDonations = new ArrayList<>();
+
+        for(Project project : projects){
+            projectDonations.add(adminDonationConverter.convertToStatusDetail(donationAdaptor.findByProject(project), project));
+        }
+
+        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), projectDonations);
+    }
+
+    public PageResponse<List<DonationRes.ProjectDonationDto>> getProjectDonationLists(Project project, int page, int size) {
+        Page<DonationUser> donationUsers = donationAdaptor.findDonationLists(project.getId(), page, size);
+
+        return new PageResponse<>(donationUsers.isLast(),donationUsers.getTotalElements(), adminDonationConverter.convertToDonationLists(donationUsers.getContent()));
     }
 }

@@ -42,4 +42,11 @@ public interface PortOneFeignClient {
             @RequestHeader("Authorization") String accessToken,
             @RequestBody PortOnePrepareReq portOnePrepareReq
             );
+
+
+    @GetMapping("/payments/prepare/{merchant_uid}")
+    PortOneResponse<Prepare> getPrepare(
+            @RequestHeader("Authorization") String accessToken,
+            @PathVariable("merchant_uid") String merchant_uid
+    );
 }

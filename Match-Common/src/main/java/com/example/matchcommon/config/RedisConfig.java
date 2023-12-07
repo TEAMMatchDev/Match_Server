@@ -41,7 +41,7 @@ public class RedisConfig {
                         .build())
                 .commandTimeout(Duration.ofSeconds(1000L)).build();
 
-        if(profile.equals("prod")){
+        if(profile.equals("prod")||profile.equals("dev")){
             log.info(profile + " profile");
             return new LettuceConnectionFactory(clusterConfiguration, clientConfiguration);
         }else {

@@ -1,6 +1,7 @@
 package com.example.matchdomain.donation.entity;
 
 import com.example.matchdomain.common.model.BaseEntity;
+import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
@@ -24,6 +25,7 @@ import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.PRO
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
+@BatchSize(size = 100)
 public class RegularPayment extends BaseEntity {
     @Id
     @Column(name = "id")
@@ -61,11 +63,12 @@ public class RegularPayment extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "regularPaymentId")
     @BatchSize(size = 100)
-    private List<RequestPaymentHistory> requestPaymentHistory = new ArrayList<>();
+    private List<RequestFailedHistory> requestFailedHistories = new ArrayList<>();
 
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "regularPaymentId")
     @BatchSize(size = 100)
     private List<DonationUser> donationUser = new ArrayList<>();
+
 }

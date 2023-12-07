@@ -1,12 +1,13 @@
 package com.example.matchapi.user.service;
 
 import com.example.matchapi.common.security.JwtService;
-import com.example.matchapi.user.convertor.UserConvertor;
+import com.example.matchapi.user.converter.UserConverter;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.SmsHelper;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.BaseDynamicException;
 import com.example.matchcommon.exception.UnauthorizedException;
 import com.example.matchcommon.properties.JwtProperties;
 import com.example.matchcommon.properties.KakaoProperties;
@@ -15,16 +16,12 @@ import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.service.MailService;
 import com.example.matchdomain.redis.entity.CodeAuth;
 import com.example.matchdomain.redis.repository.CodeAuthRepository;
-import com.example.matchdomain.redis.repository.RefreshTokenRepository;
 import com.example.matchdomain.user.adaptor.UserAdaptor;
-import com.example.matchdomain.user.entity.Authority;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
 import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.match_aligo.client.MatchAligoFeignClient;
-import com.example.matchinfrastructure.oauth.apple.client.AppleFeignClient;
-import com.example.matchinfrastructure.oauth.apple.dto.ApplePublicResponse;
 import com.example.matchinfrastructure.oauth.apple.dto.AppleUserRes;
 import com.example.matchinfrastructure.oauth.apple.service.AppleAuthService;
 import com.example.matchinfrastructure.oauth.kakao.client.KakaoFeignClient;
@@ -42,16 +39,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchcommon.constants.MatchStatic.BEARER;
+import static com.example.matchdomain.common.model.Status.ACTIVE;
 import static com.example.matchdomain.user.entity.enums.AuthorityEnum.ROLE_ADMIN;
 import static com.example.matchdomain.user.entity.enums.SocialType.*;
 import static com.example.matchdomain.user.exception.AdminLoginErrorCode.NOT_ADMIN;
+import static com.example.matchdomain.user.exception.AppleLoginErrorCode.NOT_EXISTS_APPLE_USER;
 import static com.example.matchdomain.user.exception.CodeAuthErrorCode.NOT_CORRECT_AUTH;
 import static com.example.matchdomain.user.exception.CodeAuthErrorCode.NOT_CORRECT_CODE;
+import static com.example.matchdomain.user.exception.SendEmailFindPassword.NOT_EXISTS_EMAIL;
 import static com.example.matchdomain.user.exception.UserAuthErrorCode.NOT_EXIST_USER;
 import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_CORRECT_PASSWORD;
 import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_EMAIL;
@@ -60,171 +62,136 @@ import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.U
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final KakaoFeignClient kakaoFeignClient;
-    private final KakaoLoginFeignClient kakaoLoginFeignClient;
-    private final NaverLoginFeignClient naverLoginFeignClient;
-    private final NaverFeignClient naverFeignClient;
-    private final KakaoProperties kakaoProperties;
-    private final NaverProperties naverProperties;
-    private final UserRepository userRepository;
     private final UserAddressRepository userAddressRepository;
     private final JwtService jwtService;
     private final AuthHelper authHelper;
-    private final UserConvertor userConvertor;
+    private final UserConverter userConverter;
     private final PasswordEncoder passwordEncoder;
     private final SmsHelper smsHelper;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final JwtProperties jwtProperties;
-    private final MailService mailService;
     private final CodeAuthRepository codeAuthRepository;
-    private final MatchAligoFeignClient matchAligoFeignClient;
     private final AppleAuthService authService;
     private final UserAdaptor userAdaptor;
+    private final KakaoService kakaoService;
+    private final NaverService naverService;
+    private final MailService mailService;
+    private final AligoService aligoService;
 
 
     @Transactional
     public UserRes.UserToken kakaoLogIn(UserReq.SocialLoginToken socialLoginToken) {
-        KakaoUserInfoDto kakaoUserInfoDto = kakaoFeignClient.getInfo(BEARER + socialLoginToken.getAccessToken());
+        boolean isNew ;
+
+        KakaoUserInfoDto kakaoUserInfoDto = kakaoService.getKakaoInfo(socialLoginToken.getAccessToken());
 
         Long userId;
-        Optional<User> user = userRepository.findBySocialIdAndSocialType(kakaoUserInfoDto.getId(), KAKAO);
+
+        Optional<User> user = userAdaptor.existsSocialUser(kakaoUserInfoDto.getId(), KAKAO);
+
         authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
 
-        //소셜 로그인 정보가 없을 시
         if (user.isEmpty()){
             userId = kakaoSignUp(kakaoUserInfoDto);
-            KakaoUserAddressDto kakaoUserAddressDto = kakaoFeignClient.getUserAddress(BEARER+socialLoginToken.getAccessToken());
-            if(!kakaoUserAddressDto.isShippingAddressesNeedsAgreement()){
-                List<UserAddress> userAddressList = new ArrayList<>();
-                for(KakaoUserAddressDto.ShippingAddresses shippingAddresses : kakaoUserAddressDto.getShippingAddresses()){
-                    UserAddress userAddress = userConvertor.convertToAddUserAddress(userId,shippingAddresses);
-                    userAddressList.add(userAddress);
-                }
-                userAddressRepository.saveAll(userAddressList);
-            }
+            saveUserAddress(userId, socialLoginToken.getAccessToken());
+            isNew = true;
         }
-        //소셜 로그인 정보가 있을 시
         else {
-            authHelper.checkUserExists(kakaoUserInfoDto.getPhoneNumber(), KAKAO);
             userId = user.get().getId();
+            isNew = false;
         }
         
-        UserRes.Token token = createToken(userId);
-        
-
-        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
+        return createToken(userId, isNew);
     }
 
-    private UserRes.Token createToken(Long userId) {
-        UserRes.Token token =  jwtService.createTokens(userId);
-        refreshTokenRepository.save(userConvertor.convertToRefreshToken(userId,token.getRefreshToken(),jwtProperties.getRefreshTokenSeconds()));
-        return token;
+    private void saveUserAddress(Long userId, String accessToken) {
+        KakaoUserAddressDto kakaoUserAddressDto = kakaoService.getKakaoUserAddress(accessToken);
+        if(!kakaoUserAddressDto.isShippingAddressesNeedsAgreement()){
+            List<UserAddress> userAddressList = new ArrayList<>();
+            for(KakaoUserAddressDto.ShippingAddresses shippingAddresses : kakaoUserAddressDto.getShippingAddresses()){
+                UserAddress userAddress = userConverter.convertToAddUserAddress(userId,shippingAddresses);
+                userAddressList.add(userAddress);
+            }
+            userAddressRepository.saveAll(userAddressList);
+        }
+    }
+
+    private UserRes.UserToken createToken(Long userId, boolean isNew) {
+        UserRes.Token token = jwtService.createTokens(userId);
+
+        return userConverter.convertToToken(userId, token.getAccessToken(), token.getRefreshToken(), isNew);
     }
 
 
     private Long kakaoSignUp(KakaoUserInfoDto kakaoUserInfoDto) {
-        User user = userConvertor.convertToKakaoSignUpUser(kakaoUserInfoDto, KAKAO);
+        User user = userConverter.convertToKakaoSignUpUser(kakaoUserInfoDto, KAKAO);
 
-        System.out.println(kakaoUserInfoDto.getPhoneNumber());
-
-        return userRepository.save(user).getId();
+        return userAdaptor.save(user).getId();
     }
 
     @Transactional
     public Long naverSignUp(NaverUserInfoDto naverUserInfoDto) {
-        return userRepository.save(userConvertor.convertToNaverSignUpUser(naverUserInfoDto, NAVER)).getId();
+        return userAdaptor.save(userConverter.convertToNaverSignUpUser(naverUserInfoDto, NAVER)).getId();
     }
     public KakaoLoginTokenRes getOauthToken(String code, String referer) {
-        return kakaoLoginFeignClient.kakaoAuth(
-                kakaoProperties.getKakaoClientId(),
-                kakaoProperties.getKakaoRedirectUrl(),
-                kakaoProperties.getKakaoClientSecret(),
-                code);
+        return kakaoService.getKakaoOauthToken(code);
 
     }
 
     public UserRes.UserToken getNaverOauthToken(String code) {
-        NaverTokenRes naverTokenRes = naverLoginFeignClient.naverAuth(
-                naverProperties.getNaverClientId(),
-                naverProperties.getNaverClientSecret(),
-                code
-        );
-
-        return naverLogIn(new UserReq.SocialLoginToken(naverTokenRes.getAccess_token()));
+        return naverLogIn(naverService.getNaverOauthToken(code).getAccess_token());
     }
 
-    public UserRes.UserToken naverLogIn(UserReq.SocialLoginToken socialLoginToken) {
-        NaverUserInfoDto naverUserInfoDto = naverFeignClient.getInfo(BEARER + socialLoginToken.getAccessToken());
-        Long userId;
+    public UserRes.UserToken naverLogIn(String socialToken) {
+        Long userId; boolean isNew;
+
+        NaverUserInfoDto naverUserInfoDto = naverService.getNaverUserInfo(socialToken);
+
         authHelper.checkUserExists(naverUserInfoDto.getMobile(), NAVER);
 
-        Optional<User> user = userRepository.findBySocialIdAndSocialType(naverUserInfoDto.getResponse().getId(), NAVER);
+        Optional<User> user = userAdaptor.existsSocialUser(naverUserInfoDto.getResponse().getId(), NAVER);
 
-        if (user.isEmpty()) userId = naverSignUp(naverUserInfoDto);
+        if (user.isEmpty()) {
+            userId = naverSignUp(naverUserInfoDto);
+            isNew = true;
+        }
+        else {
+            userId = user.get().getId();
+            isNew = false;
+        }
 
-        else userId = user.get().getId();
-
-        UserRes.Token token = createToken(userId);
-        
-        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
+        return createToken(userId, isNew);
     }
 
 
 
     public UserRes.UserToken signUpUser(UserReq.SignUpUser signUpUser) {
-        if(userRepository.existsByPhoneNumber(signUpUser.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
-        if(userRepository.existsByEmail(signUpUser.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        if(userAdaptor.existsPhoneNumber(signUpUser.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
+        if(userAdaptor.existsEmail(signUpUser.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
 
-        Long userId = userRepository.save(userConvertor.convertToSignUpUser(signUpUser)).getId();
-
-        UserRes.Token token = createToken(userId);
-
-
-        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
+        return createToken(userAdaptor.save(userConverter.convertToSignUpUser(signUpUser)).getId(), true);
     }
 
     public void checkUserPhone(UserReq.UserPhone userPhone) {
-        if(userRepository.existsByPhoneNumber(userPhone.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
+        if(userAdaptor.existsPhoneNumber(userPhone.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
     }
 
     public void checkUserEmail(UserReq.UserEmail userEmail) {
-        if(userRepository.existsByEmail(userEmail.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        if(userAdaptor.existsEmail(userEmail.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
     }
 
     public UserRes.UserToken logIn(UserReq.LogIn logIn) {
-        User user=userRepository.findByUsername(logIn.getEmail()).orElseThrow(() -> new UnauthorizedException(NOT_EXIST_USER));
+        User user = userAdaptor.findByUsernameAndStatus(logIn.getEmail());
 
         if(!passwordEncoder.matches(logIn.getPassword(),user.getPassword())) throw new BadRequestException(NOT_CORRECT_PASSWORD);
 
-        Long userId = user.getId();
-
-        UserRes.Token token = createToken(userId);
-
-        //반환 값 아이디 추가
-        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
+        return createToken(user.getId(), false);
     }
-
-    public KakaoUserAddressDto getKakaoAddress(String accessToken) {
-        return kakaoFeignClient.getUserAddress(BEARER + accessToken);
-    }
-
-
-    public NaverAddressDto getNaverAddress(String accessToken) {
-        return naverFeignClient.getUserAddress(BEARER + accessToken);
-    }
-
 
     public UserRes.UserToken adminLogIn(UserReq.LogIn logIn) {
-        User user=userRepository.findByUsername(logIn.getEmail()).orElseThrow(() -> new UnauthorizedException(NOT_EXIST_USER));
-
+        User user= userAdaptor.findByUserName(logIn.getEmail());
         if(!passwordEncoder.matches(logIn.getPassword(),user.getPassword())) throw new BadRequestException(NOT_CORRECT_PASSWORD);
         if(!user.getRole().contains(ROLE_ADMIN.getValue())) throw new BadRequestException(NOT_ADMIN);
 
-        Long userId = user.getId();
-
-        UserRes.Token token = createToken(userId);
-
-        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
+        return createToken(user.getId(), false);
     }
 
     public void sendEmailMessage(String email) {
@@ -235,7 +202,6 @@ public class AuthService {
         codeAuthRepository.save(CodeAuth.builder().auth(email).code(code).ttl(300).build());
 
         mailService.sendEmailMessage(email, code);
-
     }
 
     public void checkUserEmailAuth(UserReq.UserEmailAuth email) {
@@ -247,9 +213,7 @@ public class AuthService {
         checkUserPhone(new UserReq.UserPhone(phone));
         String code = smsHelper.createRandomNumber();
         codeAuthRepository.save(CodeAuth.builder().auth(phone).code(code).ttl(300).build());
-        CommonResponse<String> sendRes = matchAligoFeignClient.sendSmsAuth(jwtService.createToken(1L), phone, code);
-        System.out.println(sendRes.getCode());
-        System.out.println(sendRes.getMessage());
+        CommonResponse<String> sendRes = aligoService.sendSmsAuth(phone, code);
     }
 
     public void checkPhoneAuth(UserReq.UserPhoneAuth phone) {
@@ -260,20 +224,52 @@ public class AuthService {
     public UserRes.UserToken appleLogin(UserReq.SocialLoginToken socialLoginToken) {
         AppleUserRes appleUserRes = authService.appleLogin(socialLoginToken.getAccessToken());
 
-        if(userRepository.existsByEmail(appleUserRes.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+        if(userAdaptor.existsEmailAndSocial(appleUserRes.getEmail(), APPLE)) throw new BadRequestException(USERS_EXISTS_EMAIL);
+
         Optional<User> user = userAdaptor.existsSocialUser(appleUserRes.getSocialId(), APPLE);
 
-        Long userId;
-        if (user.isEmpty()) userId = appleSignUp(appleUserRes);
+        if (user.isEmpty()) {
+            HashMap<String, String> userInfo = new HashMap<>();
 
-        else userId = user.get().getId();
+            userInfo.put("socialId", appleUserRes.getSocialId());
+            userInfo.put("email", appleUserRes.getEmail());
 
-        UserRes.Token token = createToken(userId);
+            throw new BaseDynamicException(NOT_EXISTS_APPLE_USER, userInfo);
+        }
 
-        return new UserRes.UserToken(userId, token.getAccessToken(), token.getRefreshToken());
+        Long userId = user.get().getId();
+
+        return createToken(userId, false);
     }
 
-    private Long appleSignUp(AppleUserRes appleUserRes) {
-        return userRepository.save(userConvertor.convertToAppleUserSignUp(appleUserRes)).getId();
+    public UserRes.UserToken appleSignUp(UserReq.@Valid AppleSignUp appleSignUp) {
+        if(userAdaptor.existsPhoneNumber(appleSignUp.getPhone())) throw new BadRequestException(USERS_EXISTS_PHONE);
+
+        if(userAdaptor.existsEmail(appleSignUp.getEmail())) throw new BadRequestException(USERS_EXISTS_EMAIL);
+
+        return createToken(userAdaptor.save(userConverter.convertToAppleUserSignUp(appleSignUp)).getId(), true);
+    }
+
+
+    public void sendEmailPasswordFind(String email) {
+        if(!userAdaptor.checkEmailPassword(email, NORMAL)) throw new BadRequestException(NOT_EXISTS_EMAIL);
+
+        String code = smsHelper.createRandomNumber();
+
+        codeAuthRepository.save(CodeAuth.builder().auth(email).code(code).ttl(300).build());
+
+        mailService.sendEmailMessage(email, code);
+    }
+
+    public void modifyPassword(UserReq.FindPassword findPassword) {
+        CodeAuth codeAuth = codeAuthRepository.findById(findPassword.getEmail()).orElseThrow(()->new BadRequestException(NOT_CORRECT_AUTH));
+
+        if(!codeAuth.getCode().equals(findPassword.getCode()))throw new BadRequestException(NOT_CORRECT_CODE);
+
+        User user = userAdaptor.findByUserName(findPassword.getEmail());
+
+        user.setPassword(passwordEncoder.encode(findPassword.getModifyPassword()));
+
+        user = userAdaptor.save(user);
     }
 }

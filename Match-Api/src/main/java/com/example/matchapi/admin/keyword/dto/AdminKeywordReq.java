@@ -10,6 +10,7 @@ public class AdminKeywordReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class KeywordUpload implements Serializable {
         private String searchKeyword;
 

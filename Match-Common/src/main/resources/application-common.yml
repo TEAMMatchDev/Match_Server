@@ -18,8 +18,8 @@ jwt:
   header: X-AUTH-TOKEN
   secret: ${JWT_SECRET_KEY}
   refresh: ${JWT_REFRESH_KEY}
-  access-token-seconds: 31536000
-  refresh-token-seconds: 31536000
+  access-token-seconds: 1
+  refresh-token-seconds: 30
 sms:
   secret: ${SMS_SECRET_KEY}
   api: ${SMS_API_KEY}
@@ -67,6 +67,7 @@ aligo:
   username: ${ALIGO_USERNAME}
   key: ${ALIGO_KEY}
   sender: ${SMS_SENDER}
+  sender-key: ${KAKAO_SENDER_KEY}
 
 web:
   return:
@@ -82,3 +83,14 @@ portone:
   secret: ${PORTONE_SECRET}
   billmid: ${PORTONE_BILL_MID}
 
+private:
+  aes:
+    key: ${AES_PRIVATE_KEY}
+
+apple:
+  key:
+    path: ${APPLE_KEY_PATH}
+  bundle:
+    id: ${APPLE_BUNDLE_ID}
+  team:
+    id: ${APPLE_TEAM_ID}

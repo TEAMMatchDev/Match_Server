@@ -72,6 +72,18 @@ public class ProjectController {
         return CommonResponse.onSuccess(projectService.searchProjectList(user, content, page, size));
     }
 
+    @Operation(summary = "03-04💻 프로젝트 댓글 조회",description = "프로젝트 댓글 조회 API 입니다.")
+    @GetMapping("/comment/{projectId}")
+    public CommonResponse<PageResponse<List<ProjectRes.CommentList>>> getProjectComment(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size,
+            @Parameter(description = "프로젝트 id")  @PathVariable("projectId") Long projectId
+    ){
+        log.info("03-04 프로젝트 댓글 조회 projectId : "+ projectId);
+        return CommonResponse.onSuccess(projectService.getProjectComment(user, projectId, page, size));
+    }
+
     @Operation(summary = "03-05💻 프로젝트 리스트 조회 API #FRAME_프로젝트 리스트 조회.",description = "프로젝트 리스트 조회 API 입니다.")
     @GetMapping("/list")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
@@ -137,11 +149,10 @@ public class ProjectController {
     @CheckIdExist
     @PostMapping("/comment/{projectId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class, RequestErrorCode.class})
-    public CommonResponse<String> postComment(@Parameter(hidden = true) @AuthenticationPrincipal User user,
+    public CommonResponse<ProjectRes.CommentList> postComment(@Parameter(hidden = true) @AuthenticationPrincipal User user,
                                               @Parameter(description = "프로젝트 id")  @PathVariable("projectId") Long projectId,
                                               @Valid  @RequestBody ProjectReq.Comment comment){
-        projectService.postComment(user, projectId, comment);
-        return CommonResponse.onSuccess("응원 달기 성공");
+        return CommonResponse.onSuccess(projectService.postComment(user, projectId, comment));
     }
 
     @Operation(summary = "03-11💻 후원 응원 신고하기 #FRAME_후원 상세조회", description = "후원 응원 신고하기 기능입니다")
@@ -160,7 +171,17 @@ public class ProjectController {
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @PathVariable Long commentId){
         projectService.deleteComment(user, commentId);
-        return CommonResponse.onSuccess("신고 성공");
+        return CommonResponse.onSuccess("삭제 성공");
     }
 
+    @Operation(summary = "03-13 내가 찜한 기부처 모아보기 ", description = "내가 찜한 기부처 모아보기")
+    @GetMapping("/like")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    public CommonResponse<PageResponse<List<ProjectRes.ProjectLists>>> getLikeProjects(
+            @AuthenticationPrincipal User user,
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = true, defaultValue = "0") @Min(value = 0) int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = true, defaultValue = "10") int size
+    ){
+        return CommonResponse.onSuccess(projectService.getLikeProjects(user, page, size));
+    }
 }
