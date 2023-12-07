@@ -3,9 +3,12 @@ package com.example.matchdomain.donation.adaptor;
 import com.example.matchcommon.annotation.Adaptor;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.NotFoundException;
+import com.example.matchdomain.donation.dto.DonationExecutionDto;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.enums.DonationStatus;
+import com.example.matchdomain.donation.repository.DonationCustomRepository;
 import com.example.matchdomain.donation.repository.DonationUserRepository;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
-import static com.example.matchdomain.donation.entity.enums.DonationStatus.EXECUTION_REFUND;
+import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
 import static com.example.matchdomain.donation.exception.DonationListErrorCode.FILTER_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.DonationRefundErrorCode.DONATION_NOT_EXIST;
 import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.REPRESENT;
@@ -85,5 +88,47 @@ public class DonationAdaptor {
 
     public List<DonationUser> findDonationListsByUser(User user) {
         return donationUserRepository.findByUser(user);
+    }
+
+    public DonationUser save(DonationUser donationUser) {
+        return donationUserRepository.save(donationUser);
+    }
+
+    public List<DonationUser> findByDonationNotRefund() {
+        return donationUserRepository.findByDonationStatusNot(EXECUTION_REFUND);
+    }
+
+    public List<DonationUser> findByListIn(List<Long> donationUserLists) {
+        return donationUserRepository.findByIdIn(donationUserLists);
+    }
+
+    public void saveAll(List<DonationUser> donationUsers) {
+        donationUserRepository.saveAll(donationUsers);
+    }
+
+    public boolean existsByImpId(String impUid) {
+        return donationUserRepository.existsByTid(impUid);
+    }
+
+    public List<DonationUser> checkPopUp(User user) {
+        return donationUserRepository.checkPopUp(user);
+    }
+
+    public List<DonationExecutionDto> findByProject(Project project) {
+        return donationUserRepository.findAllDtoByProjectId(project.getId());
+    }
+
+    public Page<DonationUser> findByUserForAdminPage(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return donationUserRepository.findByUserOrderByIdAsc(user, pageable);
+    }
+
+    public Page<DonationUser> findDonationLists(Long projectId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<DonationStatus> in = List.of(new DonationStatus[]{EXECUTION_BEFORE, PARTIAL_EXECUTION});
+
+        return donationUserRepository.findByProjectIdAndDonationStatusInOrderByCreatedAtAsc(projectId, in, pageable);
+
     }
 }

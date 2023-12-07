@@ -1,7 +1,7 @@
 package com.example.matchapi.keword.service;
 
 import com.example.matchapi.admin.keyword.dto.AdminKeywordReq;
-import com.example.matchapi.keword.convertor.KeywordConvertor;
+import com.example.matchapi.keword.converter.KeywordConverter;
 import com.example.matchapi.keword.dto.KeywordRes;
 import com.example.matchdomain.keyword.entity.SearchKeyword;
 import com.example.matchdomain.keyword.repository.SearchKeywordRepository;
@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class KeywordService {
-    private final KeywordConvertor keywordConvertor;
+    private final KeywordConverter keywordConverter;
     private final SearchKeywordRepository searchKeywordRepository;
 
 
@@ -31,7 +31,7 @@ public class KeywordService {
         List<KeywordRes.KeywordList> keywordLists = new ArrayList<>();
 
         searchKeywords.forEach(
-                result -> keywordLists.add(keywordConvertor.convertToKeywordList(result))
+                result -> keywordLists.add(keywordConverter.convertToKeywordList(result))
         );
         return keywordLists;
     }

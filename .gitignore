@@ -37,3 +37,4 @@ out/
 .vscode/
 
 Match-Common/src/main/resources/serviceAccountKey.json
+Match-Common/src/main/resources/AuthKey_74JQ8SGRU2.p8

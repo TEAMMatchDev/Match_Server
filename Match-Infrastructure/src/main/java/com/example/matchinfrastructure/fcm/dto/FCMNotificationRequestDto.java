@@ -1,12 +1,12 @@
 package com.example.matchinfrastructure.fcm.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
+@Builder
 public class FCMNotificationRequestDto {
     private String title;
 

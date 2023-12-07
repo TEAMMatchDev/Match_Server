@@ -4,22 +4,32 @@ import com.example.matchapi.common.aop.CheckIdExist;
 import com.example.matchapi.common.aop.CheckOneTimeProject;
 import com.example.matchapi.common.aop.CheckRegularProject;
 import com.example.matchapi.donation.dto.DonationRes;
+import com.example.matchapi.order.dto.OrderCommand;
 import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
+import com.example.matchapi.order.helper.OrderHelper;
+import com.example.matchapi.order.mapper.OrderMapper;
+import com.example.matchapi.order.service.CardService;
 import com.example.matchapi.order.service.OrderService;
+import com.example.matchapi.project.service.ProjectService;
+import com.example.matchapi.user.service.AligoService;
 import com.example.matchapi.user.service.UserService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchcommon.constants.MatchStatic;
 import com.example.matchcommon.exception.errorcode.NicePayErrorCode;
 import com.example.matchcommon.exception.errorcode.OtherServerErrorCode;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.properties.NicePayProperties;
 import com.example.matchcommon.reponse.CommonResponse;
+import com.example.matchdomain.donation.entity.UserCard;
 import com.example.matchdomain.donation.exception.DeleteCardErrorCode;
 import com.example.matchdomain.order.exception.RegistrationCardErrorCode;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.exception.ProjectOneTimeErrorCode;
 import com.example.matchdomain.project.exception.ProjectRegualrErrorCode;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
+import com.example.matchinfrastructure.aligo.converter.AligoConverter;
 import com.example.matchinfrastructure.pay.nice.dto.NicePaymentAuth;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +37,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
@@ -38,6 +49,9 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
+import static com.example.matchdomain.donation.entity.enums.RegularStatus.ONE_TIME;
+import static com.example.matchdomain.donation.entity.enums.RegularStatus.REGULAR;
+
 
 @RequestMapping("/order")
 @RequiredArgsConstructor
@@ -47,6 +61,11 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     private final UserService userService;
+    private final CardService cardService;
+    private final ProjectService projectService;
+    private final OrderHelper orderHelper;
+    private final OrderMapper orderMapper = OrderMapper.INSTANCE;
+
 
     @PostMapping("/{projectId}")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
@@ -108,7 +127,10 @@ public class OrderController {
             @Parameter(description = "카드 id",example = "1") @PathVariable Long cardId,
             @Parameter(description = "프로젝트 id", example = "2") @PathVariable Long projectId,
             @Valid @RequestBody OrderReq.RegularDonation regularDonation){
-        return CommonResponse.onSuccess(orderService.regularDonation(user, regularDonation, cardId, projectId));
+        UserCard card = cardService.findByCardId(cardId);
+        Project project = projectService.checkProjectExists(projectId, REGULAR);
+        String orderId = orderHelper.createOrderId(MatchStatic.REGULAR);
+        return CommonResponse.onSuccess(orderService.paymentForRegular(orderMapper.toRegularDonation(card, regularDonation, user, project, orderId)));
     }
 
     @PostMapping("/pay/one/card/{cardId}/{projectId}")
@@ -119,7 +141,11 @@ public class OrderController {
             @Parameter(description = "카드 id",example = "1") @PathVariable Long cardId,
             @Parameter(description = "프로젝트 id", example = "2") @PathVariable Long projectId,
             @Valid @RequestBody OrderReq.OneTimeDonation oneTimeDonation){
-        return CommonResponse.onSuccess(orderService.oneTimeDonationCard(user, oneTimeDonation, cardId, projectId));
+        UserCard card = cardService.findByCardId(cardId);
+        Project project = projectService.checkProjectExists(projectId, ONE_TIME);
+        String orderId = orderHelper.createOrderId(MatchStatic.ONE_TIME);
+        log.info(orderId);
+        return CommonResponse.onSuccess(orderService.paymentForOnetime(orderMapper.toOneTimeDonation(card, oneTimeDonation, user, project, orderId)));
     }
 
     @PostMapping("/user")

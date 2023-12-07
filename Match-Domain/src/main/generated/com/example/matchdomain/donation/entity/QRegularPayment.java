@@ -41,7 +41,7 @@ public class QRegularPayment extends EntityPathBase<RegularPayment> {
 
     public final EnumPath<com.example.matchdomain.donation.entity.enums.RegularPayStatus> regularPayStatus = createEnum("regularPayStatus", com.example.matchdomain.donation.entity.enums.RegularPayStatus.class);
 
-    public final ListPath<RequestPaymentHistory, QRequestPaymentHistory> requestPaymentHistory = this.<RequestPaymentHistory, QRequestPaymentHistory>createList("requestPaymentHistory", RequestPaymentHistory.class, QRequestPaymentHistory.class, PathInits.DIRECT2);
+    public final ListPath<RequestFailedHistory, QRequestFailedHistory> requestFailedHistories = this.<RequestFailedHistory, QRequestFailedHistory>createList("requestFailedHistories", RequestFailedHistory.class, QRequestFailedHistory.class, PathInits.DIRECT2);
 
     //inherited
     public final EnumPath<com.example.matchdomain.common.model.Status> status = _super.status;

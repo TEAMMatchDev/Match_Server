@@ -1,141 +1,163 @@
 package com.example.matchapi.portone.service;
 
+import com.example.matchapi.common.security.JwtService;
 import com.example.matchapi.donation.service.DonationHistoryService;
-import com.example.matchapi.order.convertor.OrderConvertor;
+import com.example.matchapi.order.converter.OrderConverter;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
+import com.example.matchapi.portone.dto.PaymentCommand;
 import com.example.matchapi.portone.dto.PaymentReq;
+import com.example.matchapi.user.service.AligoService;
+import com.example.matchcommon.annotation.PaymentIntercept;
 import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.BaseException;
 import com.example.matchcommon.properties.PortOneProperties;
-import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.adaptor.DonationAdaptor;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.UserCard;
-import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.adaptor.ProjectAdaptor;
 import com.example.matchdomain.project.entity.Project;
+import com.example.matchdomain.redis.adaptor.OrderAdaptor;
 import com.example.matchdomain.redis.entity.OrderRequest;
-import com.example.matchdomain.redis.repository.OrderRequestRepository;
+import com.example.matchdomain.user.adaptor.UserAdaptor;
 import com.example.matchdomain.user.entity.User;
-import com.example.matchdomain.user.repository.UserRepository;
+import com.example.matchinfrastructure.aligo.converter.AligoConverter;
+import com.example.matchinfrastructure.aligo.dto.AlimType;
 import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
-import com.example.matchinfrastructure.pay.portone.convertor.PortOneConvertor;
+import com.example.matchinfrastructure.pay.portone.converter.PortOneConverter;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneBillPayResponse;
 import com.example.matchinfrastructure.pay.portone.dto.PortOneResponse;
+import com.example.matchinfrastructure.pay.portone.dto.PortOneWebhook;
 import com.example.matchinfrastructure.pay.portone.service.PortOneAuthService;
-import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
-import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.UUID;
 
-import static com.example.matchcommon.constants.MatchStatic.ONE_TIME;
+import static com.example.matchcommon.constants.MatchStatic.CANCEL_STATUS;
 import static com.example.matchdomain.order.exception.PortOneAuthErrorCode.*;
-import static com.example.matchdomain.project.exception.ProjectOneTimeErrorCode.PROJECT_NOT_EXIST;
-import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_EXIST_USER;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class PaymentService {
-    private final OrderRequestRepository orderRequestRepository;
-    private final UserRepository userRepository;
+    private final OrderAdaptor orderAdaptor;
     private final OrderHelper orderHelper;
-    private final DonationUserRepository donationUserRepository;
-    private final OrderConvertor orderConvertor;
-    private final IamportClient iamportClient;
-    private final ProjectAdaptor projectAdaptor;
+    private final OrderConverter orderConverter;
     private final DonationHistoryService donationHistoryService;
     private final PortOneProperties portOneProperties;
-    private final PortOneConvertor portOneConvertor;
+    private final PortOneConverter portOneConverter;
     private final PortOneFeignClient portOneFeignClient;
     private final PortOneAuthService portOneAuthService;
+    private final DonationAdaptor donationAdaptor;
+    private final ProjectAdaptor projectAdaptor;
+    private final UserAdaptor userAdaptor;
+    private final AligoService aligoService;
+    private final AligoConverter aligoConverter;
+    private final JwtService jwtService;
 
+    private IamportClient iamportClient;
 
-    @Autowired
-    public PaymentService(PortOneProperties portOneProperties,
-                          OrderRequestRepository orderRequestRepository,
-                          UserRepository userRepository,
-                          OrderHelper orderHelper,
-                          DonationUserRepository donationUserRepository,
-                          OrderConvertor orderConvertor, ProjectAdaptor projectAdaptor, DonationHistoryService donationHistoryService, PortOneConvertor portOneConvertor, PortOneFeignClient portOneFeignClient, PortOneAuthService portOneAuthService) {
-        this.portOneProperties = portOneProperties;
-        this.orderRequestRepository = orderRequestRepository;
-        this.userRepository = userRepository;
-        this.orderHelper = orderHelper;
-        this.donationUserRepository = donationUserRepository;
-        this.orderConvertor = orderConvertor;
+    @PostConstruct
+    private void init() {
         this.iamportClient = new IamportClient(portOneProperties.getKey(), portOneProperties.getSecret());
-        this.projectAdaptor = projectAdaptor;
-        this.donationHistoryService = donationHistoryService;
-        this.portOneConvertor = portOneConvertor;
-        this.portOneFeignClient = portOneFeignClient;
-        this.portOneAuthService = portOneAuthService;
     }
 
-    @RedissonLock(LockName = "결제-검증", key = "#validatePayment.orderId")
-    public OrderRes.CompleteDonation checkPayment(PaymentReq.ValidatePayment validatePayment){
+    @RedissonLock(LockName = "결제-검증", key = "#paymentValidation.validatePayment.orderId")
+    public OrderRes.CompleteDonation checkPayment(PaymentCommand.PaymentValidation paymentValidation){
         try {
-            OrderRequest orderRequest = orderRequestRepository.findById(validatePayment.getOrderId()).orElseThrow(()->new BadRequestException(NOT_EXIST_ORDER_ID));
+            IamportResponse<Payment> payment = iamportClient.paymentByImpUid(paymentValidation.getValidatePayment().getImpUid());
 
-            log.info(orderRequest.getOrderId());
+            validatePayments(payment, paymentValidation.getValidatePayment(), paymentValidation.getOrderRequest());
 
-            IamportResponse<Payment> payment = iamportClient.paymentByImpUid(validatePayment.getImpUid());
+            DonationUser donationUser = saveDonationUser(paymentValidation.getUser(), paymentValidation.getProject(), payment.getResponse());
 
-            if(payment.getResponse().getAmount().intValue()!=validatePayment.getAmount()) throw new BadRequestException(FAILED_ERROR_AUTH_AMOUNT);
+            orderAdaptor.deleteById(paymentValidation.getValidatePayment().getOrderId());
 
-            User user = userRepository.findByIdAndStatus(Long.valueOf(orderRequest.getUserId()), Status.ACTIVE).orElseThrow(()->new BadRequestException(NOT_EXIST_USER));
+            aligoService.sendAlimTalk(AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), paymentValidation.getUser().getName(), paymentValidation.getUser().getPhoneNumber()));
 
-            Project project = projectAdaptor.findByProjectId(Long.valueOf(orderRequest.getProjectId())).orElseThrow(()->new BadRequestException(PROJECT_NOT_EXIST));
-
-            saveDonationUser(user, validatePayment, project);
-
-            orderRequestRepository.deleteById(validatePayment.getOrderId());
-
-            return orderConvertor.convertToCompleteDonation(user.getName(), project, (long) validatePayment.getAmount());
-        } catch (BadRequestException | IamportResponseException | IOException e) {
-            try {
-                refundPayment(validatePayment.getImpUid());
-            } catch(Exception ex) {
-                System.out.println(ex.getMessage());
-            }
+            return orderConverter.convertToCompleteDonation(paymentValidation.getUser().getName(), paymentValidation.getProject(), (long) paymentValidation.getValidatePayment().getAmount());
+        } catch (IamportResponseException | IOException e) {
             throw new BadRequestException(FAILED_ERROR_AUTH);
         }
     }
 
-    private CancelData createCancelData(IamportResponse<Payment> response, int refundAmount) {
-        if (refundAmount == 0) { //전액 환불일 경우
-            return new CancelData(response.getResponse().getImpUid(), true);
-        }
-        return new CancelData(response.getResponse().getImpUid(), true, new BigDecimal(refundAmount));
+
+    private void validatePayments(IamportResponse<Payment> payment, PaymentReq.ValidatePayment validatePayment, OrderRequest orderRequest) {
+        checkCancelPayment(payment.getResponse().getStatus());
+
+        checkExistsImpUid(validatePayment.getImpUid());
+
+        checkPaymentAmount(payment.getResponse().getAmount().intValue(), orderRequest.getAmount());
+
+        checkOrderId(payment.getResponse().getMerchantUid(), validatePayment.getOrderId());
     }
 
-    public void refundPayment(String impUid) {
-        try {
-            iamportClient.cancelPaymentByImpUid(new CancelData(impUid, true));
-        } catch (IamportResponseException | IOException e) {
-            throw new RuntimeException(e);
-        }
+    private void checkOrderId(String merchantUid, String orderId) {
+        if(!merchantUid.equals(orderId)) throw new BadRequestException(NOT_CORRECT_ORDER_ID);
     }
 
-    public void saveDonationUser(User user, PaymentReq.ValidatePayment validatePayment, Project project) {
+    private void checkPaymentAmount(int paymentAmount, int amount) {
+        if(paymentAmount!=amount) throw new BadRequestException(FAILED_ERROR_AUTH_AMOUNT);
+    }
+
+    private void checkExistsImpUid(String impUid) {
+        if(donationAdaptor.existsByImpId(impUid)) throw new BadRequestException(EXIST_IMP_UID);
+    }
+
+    private void checkCancelPayment(String status) {
+        if(status.equals(CANCEL_STATUS)) throw new BadRequestException(EXIST_CANCEL_STATUS);
+    }
+
+    @PaymentIntercept(key = "#payment.imp_uid")
+    public DonationUser saveDonationUser(User user, Project project, Payment payment) {
         OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
-        DonationUser donationUser = donationUserRepository.save(orderConvertor.convertToDonationUserPortone(user.getId(), validatePayment, project.getId(), createInherenceDto));
+        DonationUser donationUser = donationAdaptor.save(orderConverter.convertToDonationUserPortone(user.getId(), payment, project.getId(), createInherenceDto));
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
+        return donationUser;
     }
 
-    public PortOneResponse<PortOneBillPayResponse> payBillKey(UserCard card, Long amount, String projectName, String type) {
-        String orderId = orderHelper.createOrderId(type);
+    public PortOneResponse<PortOneBillPayResponse> payBillKey(UserCard card, Long amount, String projectName, String orderId) {
         String accessToken = portOneAuthService.getToken();
-        return portOneFeignClient.payWithBillKey(accessToken, portOneConvertor.convertPayWithBillKey(card.getBid(), orderId, amount, projectName, card.getCustomerId()));
+
+        PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(accessToken, portOneConverter.convertPayWithBillKey(card.getBid(), orderId, amount, projectName, card.getCustomerId()));
+
+        if (portOneResponse.getCode()!=0){
+            if (portOneResponse.getCode() != 0) {
+                throw new BaseException(BAD_REQUEST, false, "PORT_ONE_BILL_AUTH_001", portOneResponse.getMessage());
+            }
+        }
+        return portOneResponse;
+    }
+
+    @RedissonLock(LockName = "결제-검증", key = "#orderRequest.orderId")
+    public void webHookCheck(PortOneWebhook portOneWebhook, OrderRequest orderRequest) {
+        try {
+            IamportResponse<Payment> payment = iamportClient.paymentByImpUid(portOneWebhook.getImp_uid());
+
+            checkCancelPayment(payment.getResponse().getStatus());
+            checkPaymentAmount(payment.getResponse().getAmount().intValue(), orderRequest.getAmount());
+
+            System.out.println(payment.getResponse().getPayMethod());
+
+            if(!donationAdaptor.existsByImpId(portOneWebhook.getImp_uid())){
+                User user = userAdaptor.findByUser(orderRequest.getUserId());
+
+                Project project = projectAdaptor.findByProject(orderRequest.getProjectId());
+
+                saveDonationUser(user, project, payment.getResponse());
+            }
+
+        } catch (IamportResponseException | IOException e) {
+            throw new BadRequestException(FAILED_ERROR_AUTH);
+        }
     }
 }

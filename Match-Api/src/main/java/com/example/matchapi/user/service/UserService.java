@@ -1,29 +1,35 @@
 package com.example.matchapi.user.service;
 
 import com.example.matchapi.common.model.AlarmType;
+import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.service.OrderService;
-import com.example.matchapi.project.convertor.ProjectConvertor;
-import com.example.matchapi.project.helper.ProjectHelper;
-import com.example.matchapi.user.convertor.UserConvertor;
+import com.example.matchapi.project.converter.ProjectConverter;
+import com.example.matchapi.user.converter.UserConverter;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
+import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.NotFoundException;
+import com.example.matchcommon.exception.UnauthorizedException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.RegularPayment;
-import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.donation.repository.RegularPaymentRepository;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.repository.ProjectUserAttentionRepository;
+import com.example.matchdomain.user.adaptor.UserAdaptor;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.UserAddress;
 import com.example.matchdomain.user.entity.enums.Alarm;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.exception.ModifyEmailCode;
+import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import com.example.matchdomain.user.repository.UserAddressRepository;
 import com.example.matchdomain.user.repository.UserFcmTokenRepository;
 import com.example.matchdomain.user.repository.UserRepository;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
+import com.example.matchinfrastructure.oauth.apple.service.AppleAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -32,6 +38,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
@@ -45,6 +52,7 @@ import static com.example.matchdomain.user.entity.enums.Alarm.ACTIVE;
 import static com.example.matchdomain.user.entity.enums.Alarm.INACTIVE;
 import static com.example.matchdomain.user.exception.ModifyEmailCode.NOT_CORRECT_EMAIL;
 import static com.example.matchdomain.user.exception.ModifyPhoneErrorCode.NOT_CORRECT_PHONE;
+import static com.example.matchdomain.user.exception.UserAuthErrorCode.NOT_EXIST_USER;
 import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.USERS_EXISTS_PHONE;
 
 @Service
@@ -53,13 +61,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserAddressRepository userAddressRepository;
-    private final UserConvertor userConvertor;
-    private final ProjectConvertor projectConvertor;
+    private final UserConverter userConverter;
+    private final ProjectConverter projectConverter;
     private final ProjectUserAttentionRepository projectUserAttentionRepository;
     private final OrderService orderService;
     private final RegularPaymentRepository regularPaymentRepository;
     private final S3UploadService s3UploadService;
     private final UserFcmTokenRepository userFcmTokenRepository;
+    private final DonationService donationService;
+    private final AppleAuthService appleAuthService;
+    private final AuthService authService;
+    private final UserAdaptor userAdaptor;
 
     public Optional<User> findUser(long id) {
         return userRepository.findById(id);
@@ -72,18 +84,18 @@ public class UserService {
     }
 
     public UserRes.EditMyPage getEditMyPage(User user) {
-        return userConvertor.convertToMyPage(user);
+        return userConverter.convertToMyPage(user);
     }
 
     public UserRes.MyPage getMyPage(User user) {
         List<RegularPayment> regularPayments = regularPaymentRepository.findByUser(user);
         Long projectAttentionCnt = projectUserAttentionRepository.countById_userId(user.getId());
 
-        return projectConvertor.getMyPage(regularPayments,projectAttentionCnt, user.getNickname());
+        return projectConverter.getMyPage(regularPayments,projectAttentionCnt, user.getNickname());
     }
 
     public OrderRes.UserDetail getUserInfo(User user) {
-        return userConvertor.convertToUserInfo(user);
+        return userConverter.convertToUserInfo(user);
     }
 
     public UserRes.SignUpInfo getUserSignUpInfo() {
@@ -93,7 +105,7 @@ public class UserService {
         Long weekUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.minusWeeks(1)+FIRST_TIME) , LocalDateTime.parse(localDate+LAST_TIME));
         Long monthUser = userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME), LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME));
 
-        return userConvertor.convertToUserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
+        return userConverter.convertToUserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
     }
 
     @Transactional
@@ -117,7 +129,7 @@ public class UserService {
 
         userList.getContent().forEach(
                 result -> userLists.add(
-                        userConvertor.convertToUserList(result)
+                        userConverter.convertToUserList(result)
                 )
         );
 
@@ -130,11 +142,11 @@ public class UserService {
         List<OrderRes.UserBillCard> userCards = orderService.getUserBillCard(userId);
 
 
-        return userConvertor.convertToUserAdminDetail(userDetail,userCards);
+        return userConverter.convertToUserAdminDetail(userDetail,userCards);
     }
 
     public UserRes.Profile getProfile(User user) {
-        return userConvertor.convertToUserProfile(user);
+        return userConverter.convertToUserProfile(user);
     }
 
     @Transactional
@@ -165,11 +177,14 @@ public class UserService {
     }
 
     public void saveFcmToken(User user, UserReq.FcmToken token) {
-        userFcmTokenRepository.save(userConvertor.convertToUserFcm(user, token));
+        userFcmTokenRepository.save(userConverter.convertToUserFcm(user, token));
     }
 
     public void deleteFcmToken(Long userId, String deviceId) {
-        userFcmTokenRepository.deleteById(UserFcmPk.builder().userId(userId).deviceId(deviceId).build());
+        UserFcmPk userFcmPk = UserFcmPk.builder().userId(userId).deviceId(deviceId).build();
+        if(userFcmTokenRepository.existsById(userFcmPk)) {
+            userFcmTokenRepository.deleteById(userFcmPk);
+        }
     }
 
     @Transactional
@@ -184,14 +199,14 @@ public class UserService {
     @Transactional
     public void modifyEmail(User user, UserReq.ModifyEmail email) {
         if(!user.getEmail().equals(email.getOldEmail())) throw new BadRequestException(NOT_CORRECT_EMAIL);
-        if(userRepository.existsByEmail(email.getNewEmail())) throw new BadRequestException(ModifyEmailCode.USERS_EXISTS_EMAIL);
+        if(userRepository.existsByEmailAndStatus(email.getNewEmail(), Status.ACTIVE)) throw new BadRequestException(ModifyEmailCode.USERS_EXISTS_EMAIL);
         user.setEmail(email.getNewEmail());
         userRepository.save(user);
     }
 
     public UserRes.AlarmAgreeList getAlarmAgreeList(User user) {
         System.out.println(user.getName());
-        return userConvertor.convertToAlarmAgree(user);
+        return userConverter.convertToAlarmAgree(user);
     }
 
     @CacheEvict(value = "userCache", key = "#user.id", cacheManager = "redisCacheManager")
@@ -216,6 +231,34 @@ public class UserService {
 
         user = userRepository.save(user);
 
-        return userConvertor.convertToAlarmAgree(user);
+        return userConverter.convertToAlarmAgree(user);
+    }
+
+    @Transactional
+    public void postAppleUserInfo(User user, UserReq.AppleUserInfo appleUserInfo) {
+        authService.checkUserPhone(new UserReq.UserPhone(appleUserInfo.getPhone()));
+        user.updateUserInfo(appleUserInfo.getBirthDate(), appleUserInfo.getName(), appleUserInfo.getPhone());
+
+        userRepository.save(user);
+    }
+
+    @RedissonLock(LockName = "유저 탈퇴", key = "#user.id")
+    public void deleteUserInfo(User user) {
+        user.setStatus(Status.INACTIVE);
+        donationService.deleteRegularPayment(user);
+        userRepository.save(user);
+    }
+
+    public void deleteAppleUserInfo(User user, UserReq.AppleCode appleCode) {
+        appleAuthService.revokeUser(appleCode.getCode());
+        deleteUserInfo(user);
+    }
+
+    public User findByUser(String userId) {
+        return userAdaptor.findByUser(userId);
+    }
+
+    public User findByUserId(Long userId) {
+        return userAdaptor.findByUserId(userId).orElseThrow(() -> new NotFoundException(NOT_EXIST_USER));
     }
 }

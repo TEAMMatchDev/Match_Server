@@ -18,6 +18,9 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 public enum PortOneAuthErrorCode implements BaseErrorCode {
     FAILED_ERROR_AUTH_AMOUNT(BAD_REQUEST,"ORDER_001", "주문 가격이 일치하지 않습니다."),
     NOT_EXIST_ORDER_ID(BAD_REQUEST,"ORDER_002", "주문 번호가 존재하지 않습니다."),
+    EXIST_IMP_UID(BAD_REQUEST,"ORDER_004", "이미 결제 완료된 imp_uid 값 입니다."),
+    NOT_CORRECT_ORDER_ID(BAD_REQUEST, "ORDER_005", "주문 ID가 일치하지 않습니다"),
+    EXIST_CANCEL_STATUS(BAD_REQUEST,"ORDER_006", "이미 취소된 결제 번호입니다."),
     FAILED_ERROR_AUTH(INTERNAL_SERVER_ERROR,"ORDER_003", "결제요청에 실패했습니다. 다시 시도해주세요.");
 
 

@@ -18,6 +18,7 @@ public class ProjectReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class Project{
         @NotEmpty(message = "프로젝트 이름을 입력해주세요")
         @Schema(description = "프로젝트 이름", required = true, example = "tbt")
@@ -49,6 +50,7 @@ public class ProjectReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class ModifyProject {
         @NotEmpty(message = "프로젝트 이름을 입력해주세요")
         @Schema(description = "프로젝트 이름", required = true, example = "tbt")
@@ -80,6 +82,7 @@ public class ProjectReq {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class Comment {
         @NotEmpty(message = "프로젝트 이름을 입력해주세요")
         @Schema(description = "프로젝트 이름", required = true, example = "tbt")

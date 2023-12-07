@@ -17,4 +17,5 @@ public class AligoProperties {
     private String username;
     private String key;
     private String sender;
+    private String senderKey;
 }

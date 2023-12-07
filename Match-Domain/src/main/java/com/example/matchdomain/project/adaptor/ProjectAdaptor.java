@@ -14,10 +14,12 @@ import com.example.matchdomain.project.repository.ProjectRepository;
 import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
@@ -64,48 +66,49 @@ public class ProjectAdaptor {
 
 
     public Page<ProjectRepository.ProjectList> findProject(User user, int page, int size, ProjectKind projectKind, String content, FILTER filter) {
-        Page<ProjectRepository.ProjectList> projects = null;
+        Page<ProjectRepository.ProjectList> projects;
+        List<ProjectRepository.ProjectList> projectLists;
         Pageable pageable = PageRequest.of(page, size);
+
+        long totalCnt = projectRepository.countQueryForProject(PROCEEDING, LocalDateTime.now(), ACTIVE, content, projectKind);
+
 
         if(filter == FILTER.RECOMMEND) {
             if (projectKind == null) {
                 if (content == null) {
-                    projects = projectRepository.findLoginUserProjectList(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue());
+                    projectLists = projectRepository.getProjectLists(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue());
                 } else {
-                    projects = projectRepository.findByContent(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), content);
-
+                    projectLists = projectRepository.findByContent(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), ACTIVE.getValue(), content, pageable);
                 }
             } else {
                 if (content == null) {
-                    projects = projectRepository.findByProjectKind(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
+                    projectLists = projectRepository.findByProjectKind(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
                             ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), projectKind.getValue());
 
                 } else {
-                    projects = projectRepository.findByContentAndProjectKind(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
-                            ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), projectKind.getValue(), content);
+                    projectLists = projectRepository.findByProjectKind(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
+                            ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), projectKind.getValue());
                 }
             }
         }else{
             if (projectKind == null) {
                 if (content == null) {
-                    projects = projectRepository.findLoginUserProjectListLatest(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue());
+                    projectLists = projectRepository.findLoginUserProjectListLatest(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue());
                 } else {
-                    projects = projectRepository.findByContentLatest(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), content);
+                    projectLists = projectRepository.findByContentLatest(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(), ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), content);
 
                 }
             } else {
                 if (content == null) {
-                    projects = projectRepository.findByProjectKindLatest(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
+                    projectLists = projectRepository.findByProjectKindLatest(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
                             ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), projectKind.getValue());
-
                 } else {
-                    projects = projectRepository.findByContentAndProjectKindLatest(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
+                    projectLists = projectRepository.findByContentAndProjectKindLatest(user.getId(), PROCEEDING.getValue(), LocalDateTime.now(),
                             ImageRepresentStatus.REPRESENT.getValue(), pageable, ACTIVE.getValue(), projectKind.getValue(), content);
                 }
             }
         }
-
-        return projects;
+        return new PageImpl<>(projectLists, pageable, totalCnt);
     }
 
     public Page<ProjectRepository.ProjectList> getTodayProjectLists(Long userId, int page, int size) {
@@ -120,5 +123,25 @@ public class ProjectAdaptor {
 
     public Optional<Project> findByProjectId(Long projectId) {
         return projectRepository.findById(projectId);
+    }
+
+    public Page<ProjectRepository.ProjectList> findLikeProjects(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ProjectRepository.ProjectList> projects = projectRepository.findLikeProjects(user.getId(), pageable);
+        return projects;
+    }
+
+    public Project findByProject(String projectId) {
+        return findByProjectId(Long.valueOf(projectId)).orElseThrow(()->new BadRequestException(ProjectOneTimeErrorCode.PROJECT_NOT_EXIST));
+    }
+
+    public Page<Project> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return projectRepository.findByOrderByCreatedAtAsc(pageable);
+    }
+
+    public List<Project> getRandom3Project() {
+        return projectRepository.findRandomThreeProject(LocalDateTime.now());
     }
 }

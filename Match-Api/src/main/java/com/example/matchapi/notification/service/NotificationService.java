@@ -1,6 +1,6 @@
 package com.example.matchapi.notification.service;
 
-import com.example.matchapi.notification.convertor.NotificationConvertor;
+import com.example.matchapi.notification.converter.NotificationConverter;
 import com.example.matchapi.notification.dto.NotificationRes;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.notification.adaptor.NotificationAdaptor;
@@ -17,16 +17,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationService {
     private final NotificationAdaptor notificationAdaptor;
-    private final NotificationConvertor notificationConvertor;
+    private final NotificationConverter notificationConverter;
 
     public PageResponse<NotificationRes.NotificationListInfo> getNotificationList(User user, int page, int size) {
         Page<Notification> notifications = notificationAdaptor.findByUser(user, page, size);
         int notificationCount = notificationAdaptor.countByUnRead(user);
-        return new PageResponse<>(notifications.isLast(), notifications.getTotalElements(), new NotificationRes.NotificationListInfo(notificationCount, notificationConvertor.convertToNotificationList(notifications.getContent())));
+        return new PageResponse<>(notifications.isLast(), notifications.getTotalElements(), new NotificationRes.NotificationListInfo(notificationCount, notificationConverter.convertToNotificationList(notifications.getContent())));
     }
 
     public void saveTestNotification(User user, FCMNotificationRequestDto fcmNotificationRequestDto) {
-        Notification notification = notificationConvertor.convertToNotificationTest(user, fcmNotificationRequestDto);
+        Notification notification = notificationConverter.convertToNotificationTest(user, fcmNotificationRequestDto);
 
         notificationAdaptor.saveNotification(notification);
     }
@@ -34,6 +34,6 @@ public class NotificationService {
     public NotificationRes.NotificationDetail getNotificationDetail(Long notificationId) {
         Notification notification = notificationAdaptor.findNotification(notificationId);
         notificationAdaptor.readNotification(notification);
-        return notificationConvertor.convertNotificationDetail(notification);
+        return notificationConverter.convertNotificationDetail(notification);
     }
 }

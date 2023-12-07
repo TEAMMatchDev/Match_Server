@@ -1,5 +1,6 @@
 package com.example.matchapi.user.dto;
 
+import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.user.entity.enums.Alarm;
 import com.example.matchdomain.user.entity.enums.SocialType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +21,8 @@ public class UserRes {
         private String accessToken;
         @Schema(description = "리프레쉬 토큰", required = true, example = "asdkjanwjkldnjk----")
         private String refreshToken;
+        @Schema(description = "회원가입 유무 true - 회원가입, false - 로그인")
+        private boolean isNew;
     }
     @Getter
     @Setter
@@ -211,5 +214,24 @@ public class UserRes {
         private Alarm serviceAlarm;
 
         private Alarm eventAlarm;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserFlameListDto {
+        private Long donationId;
+
+        private int donationCnt;
+
+        private String inherenceName;
+
+        private String inherenceNumber;
+
+        private DonationStatus donationStatus;
+
+        private String donationStatusName;
     }
 }

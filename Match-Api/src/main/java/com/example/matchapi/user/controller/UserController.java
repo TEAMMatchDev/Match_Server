@@ -6,13 +6,13 @@ import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.service.UserService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
+import com.example.matchcommon.annotation.DisableSecurity;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.redis.repository.RefreshTokenRepository;
-import com.example.matchdomain.user.exception.ModifyEmailCode;
-import com.example.matchdomain.user.exception.ModifyPhoneErrorCode;
-import com.example.matchdomain.user.exception.UserAuthErrorCode;
+import com.example.matchdomain.user.entity.enums.SocialType;
+import com.example.matchdomain.user.exception.*;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchdomain.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,13 +22,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.io.IOException;
 
+import static com.example.matchdomain.user.exception.DeleteUserErrorCode.APPLE_USER_NOT_API;
 import static com.example.matchdomain.user.exception.UserAuthErrorCode.INVALID_REFRESH_TOKEN;
 
 @RestController
@@ -74,11 +78,12 @@ public class UserController {
 
 
     @Operation(summary = "02-04 로그아웃 👤", description = "로그아웃 요청 API")
-    @ResponseBody
     @GetMapping("/logout")
+    @Transactional
     public CommonResponse<String> logOut(@Parameter(hidden = true) @AuthenticationPrincipal User user,
-                                         @Parameter(description = "디바이스 아이디", required = true, in = ParameterIn.HEADER, name = "DEVICE_ID", schema = @Schema(type = "string")) @RequestHeader("DEVICE_ID") String deviceId){
+                                         @Parameter(description = "디바이스 아이디") @RequestParam(value = "DEVICE_ID", required = true) String deviceId){
         log.info("api = logout 02-03");
+
         Long userId = user.getId();
 
         jwtService.logOut(userId);
@@ -87,8 +92,8 @@ public class UserController {
     }
 
     @Operation(summary = "02-05 토큰 재발급 👤", description = "액세스 토큰 만료시 재발급 요청 하는 API X-REFRESH-TOKEN 을 헤더에 담아서 보내주세요, accessToken 은 보내지 않습니다.")
-    @ResponseBody
     @PostMapping("/refresh")
+    @DisableSecurity
     public CommonResponse<UserRes.ReIssueToken> reIssueToken(
             @Parameter(description = "리프레쉬 토큰", required = true, in = ParameterIn.HEADER, name = "X-REFRESH-TOKEN", schema = @Schema(type = "string")) @RequestHeader("X-REFRESH-TOKEN") String refreshToken
     ){
@@ -99,9 +104,7 @@ public class UserController {
 
         if(!redisRefreshToken.getToken().equals(refreshToken)) throw new BadRequestException(INVALID_REFRESH_TOKEN);
 
-        UserRes.ReIssueToken tokenRes=new UserRes.ReIssueToken(jwtService.createToken(userId));
-
-        return CommonResponse.onSuccess(tokenRes);
+        return CommonResponse.onSuccess(new UserRes.ReIssueToken(jwtService.createToken(userId)));
 
     }
 
@@ -182,6 +185,36 @@ public class UserController {
                                                                     @RequestParam AlarmType alarmType){
         return CommonResponse.onSuccess(userService.patchAlarm(user, alarmType));
     }
+    @Operation(summary = "02-11 애플유저 결제화면 추가 정보 POST 👤" , description = "애플 유저 결제 화면 추가정보 POST")
+    @PostMapping("/apple")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, CheckUserPhoneErrorCode.class})
+    public CommonResponse<String> postAppleUserInfo(@AuthenticationPrincipal User user,
+                                                    @Valid @RequestBody UserReq.AppleUserInfo appleUserInfo){
+        log.info("02-11 애플 유저 결제화면 추가 정보 POST API");
+        userService.postAppleUserInfo(user, appleUserInfo);
+        return CommonResponse.onSuccess("성공");
+    }
 
+    @Operation(summary = "02-12 유저 탈퇴 API")
+    @DeleteMapping("")
+    @ApiErrorCodeExample({UserAuthErrorCode.class, DeleteUserErrorCode.class})
+    public CommonResponse<String> deleteUserInfo(@AuthenticationPrincipal User user){
+        log.info("02-12 유저 탈퇴 API userId : " + user.getId());
+        if(user.getSocialType().equals(SocialType.APPLE)){
+            throw new BadRequestException(APPLE_USER_NOT_API);
+        }
+        userService.deleteUserInfo(user);
+        return CommonResponse.onSuccess("탈퇴 성공");
+    }
+
+    @Operation(summary = "02-13 애플 유저 탈퇴 API")
+    @DeleteMapping("/apple")
+    @ApiErrorCodeExample({UserAuthErrorCode.class})
+    public CommonResponse<String> deleteAppleUserInfo(@AuthenticationPrincipal User user,
+                                                      @Valid @RequestBody UserReq.AppleCode appleCode){
+        log.info("02-13 애플 유저 탈퇴 code : " + appleCode.getCode());
+        userService.deleteAppleUserInfo(user, appleCode);
+        return CommonResponse.onSuccess("탈퇴 성공");
+    }
 
 }

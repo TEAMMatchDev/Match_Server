@@ -2,6 +2,7 @@ package com.example.matchdomain.donation.repository;
 
 
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.donation.dto.DonationExecutionDto;
 import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
@@ -14,53 +15,10 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface DonationUserRepository extends JpaRepository<DonationUser,Long> {
-
-    boolean existsByInherenceName(String randomName);
-
-    Page<DonationUser> findByUserId(Long userId, Pageable pageable);
-
-
-
-
-    List<DonationUser> findByUserAndDonationStatusNot(User user, DonationStatus donationStatus);
-
-
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceAsc(Long id, DonationStatus donationStatus, String content, String s, String content1, Status active, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceDesc(Long id, DonationStatus donationStatus, String content, String s, String content1, Status active, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(Long id, DonationStatus donationStatus, String content, String s, String content1, Status active, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusNotOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(Long id, DonationStatus donationStatus, String content, String s, String content1, Status active, Pageable pageable);
-
-
+public interface DonationUserRepository extends JpaRepository<DonationUser,Long>, DonationCustomRepository {
     List<DonationUser> findByUserAndDonationStatusNotAndStatus(User user, DonationStatus donationStatus, Status status);
 
     Page<DonationUser> findByUserIdAndDonationStatusAndStatusOrderByCreatedAtDesc(Long userId,  DonationStatus donationStatus,Status status, Pageable pageable);
-
-
-    Page<DonationUser> findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtAsc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusNotAndStatusOrderByCreatedAtDesc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusNotAndStatusOrderByPriceDesc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusNotAndStatusOrderByPriceAsc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusAndStatusOrderByCreatedAtAsc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusAndStatusOrderByPriceDesc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusAndStatusOrderByPriceAsc(Long id, DonationStatus donationStatus, Status status, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtAsc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Status status, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByCreatedAtDesc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Status status, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceDesc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Status status, Pageable pageable);
-
-    Page<DonationUser> findByUserIdAndDonationStatusOrProject_UsagesContainingOrProject_ProjectNameContainingOrProject_ProjectExplanationContainingAndStatusOrderByPriceAsc(Long id, DonationStatus donationStatus, String content, String content1, String content2, Status status, Pageable pageable);
 
     Page<DonationUser> findByUserIdAndStatusAndDonationStatusNotOrderByCreatedAtDesc(Long userId, Status status, DonationStatus donationStatus, Pageable pageable);
 
@@ -116,6 +74,19 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
     Page<DonationUser> findByUserAndDonationStatusNotOrderByCreatedAtDesc(@Param("user") User user, @Param("donationStatus") DonationStatus donationStatus, Pageable pageable);
 
     List<DonationUser> findByUser(User user);
+
+    boolean existsByTid(String impUid);
+
+    @Query("SELECT new com.example.matchdomain.donation.dto.DonationExecutionDto(DU.donationStatus, DU.price, DU.executionPrice) " +
+            "FROM DonationUser DU WHERE DU.projectId = :projectId AND DU.donationStatus != 'EXECUTION_REFUND'")
+    List<DonationExecutionDto> findAllDtoByProjectId(@Param("projectId") Long projectId);
+
+    Page<DonationUser> findByUserOrderByIdAsc(User user, Pageable pageable);
+
+    @Query(value = "SELECT DU FROM DonationUser DU JOIN FETCH DU.user " +
+            "WHERE DU.projectId = :projectId AND DU.donationStatus IN :statuses ORDER BY DU.createdAt ASC",
+            countQuery = "SELECT count(DU) FROM DonationUser DU WHERE DU.projectId = :projectId AND DU.donationStatus IN :statuses")
+    Page<DonationUser> findByProjectIdAndDonationStatusInOrderByCreatedAtAsc(@Param("projectId") Long projectId, @Param("statuses") List<DonationStatus> donationStatuses, Pageable pageable);
 
 
     interface flameList {

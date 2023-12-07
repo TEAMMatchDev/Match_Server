@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import static com.example.matchdomain.user.exception.AdminLoginErrorCode.NOT_AUTHORITY_USER;
 import static com.example.matchdomain.user.exception.UserAuthErrorCode.NOT_EXIST_USER;
 import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_CORRECT_PASSWORD;
 

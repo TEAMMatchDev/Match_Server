@@ -43,6 +43,8 @@ public class QDonationHistory extends EntityPathBase<DonationHistory> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final StringPath item = createString("item");
+
     public final com.example.matchdomain.project.entity.QProject project;
 
     public final NumberPath<Long> projectId = createNumber("projectId", Long.class);
