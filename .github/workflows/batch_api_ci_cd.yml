@@ -57,6 +57,7 @@ jobs:
           portone.key: ${{ secrets.PORTONE_KEY }}
           portone.secret: ${{ secrets.PORTONE_SECRET }}
           portone.billmid: ${{ secrets.PROD_PORTONE_BILL_MID}}
+          private.aes.key: ${{ secrets.AES_PRIVATE_KEY }}
           apple.bundle.id: ${{ secrets.APPLE_BUNDLE_ID }}
           apple.team.id: ${{ secrets.APPLE_TEAM_ID }}
           aligo.sender-key: ${{ secrets.KAKAO_SENDER_KEY }}
