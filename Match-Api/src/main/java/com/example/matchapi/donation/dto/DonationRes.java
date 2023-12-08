@@ -397,6 +397,8 @@ public class DonationRes {
 
         private Long waitingSortingAmount;
 
+        private Long partialAmount;
+
         @Schema(description = "수입 금액")
         private int importedAmount;
     }

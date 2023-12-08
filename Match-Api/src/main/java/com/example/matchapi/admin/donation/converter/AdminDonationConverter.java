@@ -124,7 +124,8 @@ public class AdminDonationConverter {
                 .userName(result.getUser().getName())
                 .amount(result.getPrice())
                 .importedAmount((int) (result.getPrice()*0.1))
-                .waitingSortingAmount(result.getDonationStatus().equals(DonationStatus.PARTIAL_EXECUTION) ? result.getExecutionPrice() : (long) (result.getPrice() * 0.9))
+                .waitingSortingAmount(result.getDonationStatus().equals(DonationStatus.PARTIAL_EXECUTION) ? (long) (result.getPrice() * 0.9 - result.getExecutionPrice()) : (long) (result.getPrice() * 0.9))
+                .partialAmount(result.getExecutionPrice())
                 .build();
     }
 }
