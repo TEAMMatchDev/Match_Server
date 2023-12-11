@@ -65,7 +65,7 @@ public class ProjectService {
     private final DonationAdaptor donationAdaptor;
     private final MessageHelper messageHelper;
     private final AttentionAdaptor attentionAdaptor;
-    private final ProjectImageRepository projectImageRepository;
+    private final ProjectImgService projectImgService;
 
 
 
@@ -115,7 +115,7 @@ public class ProjectService {
 
         List<String> imgUrlList = s3UploadService.listUploadProjectFiles(project.getId(), multipartFiles);
 
-        saveImgList(project.getId(), url, imgUrlList);
+        projectImgService.saveImgList(project.getId(), url, imgUrlList);
 
         donationHistoryAdaptor.saveDonationHistory(projectConverter.convertToDonationHistory(project.getId(), HistoryStatus.START));
 
@@ -167,21 +167,6 @@ public class ProjectService {
         projectAdaptor.save(project);
     }
 
-    @Transactional
-    public void saveImgList(Long id, String url, List<String> imgUrlList) {
-        imgUrlList.add(url);
-        List<ProjectImage> projectImages = new ArrayList<>();
-
-        for (int i=1 ; i <= imgUrlList.size(); i++) {
-            if(i==imgUrlList.size()){
-                projectImages.add(projectConverter.postProjectImage(id,imgUrlList.get(i-1),REPRESENT,i));
-            }else {
-                projectImages.add(projectConverter.postProjectImage(id, imgUrlList.get(i-1),NORMAL, i));
-            }
-        }
-
-        projectImageRepository.saveAll(projectImages);
-    }
 
     @Transactional
     public ProjectRes.ProjectAdminDetail getProjectAdminDetail(Long projectId) {
@@ -212,7 +197,7 @@ public class ProjectService {
 
         projectImage.setUrl(imgUrl);
 
-        projectImageRepository.save(projectImage);
+        projectImgService.save(projectImage);
 
         return new ProjectRes.PatchProjectImg(projectImgId, projectImage.getUrl());
     }
@@ -251,7 +236,7 @@ public class ProjectService {
 
     public ProjectRes.ProjectAppDetail getProjectAppDetail(User user, Long projectId) {
         ProjectRepository.ProjectDetail projects = projectAdaptor.getProjectAppDetail(user.getId(), projectId);
-        List<ProjectImage> projectImages = projectImageRepository.findByProjectIdOrderBySequenceAsc(projectId);
+        List<ProjectImage> projectImages = projectImgService.findByProjectId(projectId);
 
         return projectConverter.convertToProjectAppDetail(projects, projectImages);
     }

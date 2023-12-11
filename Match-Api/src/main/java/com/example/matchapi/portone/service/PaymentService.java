@@ -62,7 +62,6 @@ public class PaymentService {
     private final UserAdaptor userAdaptor;
     private final AligoService aligoService;
     private final AligoConverter aligoConverter;
-    private final JwtService jwtService;
 
     private IamportClient iamportClient;
 
