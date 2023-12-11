@@ -179,7 +179,7 @@ public class UserConverter {
                 .build();
     }
 
-    public UserRes.UserAdminDetail convertToUserAdminDetail(UserRepository.UserList userDetail, List<OrderRes.UserBillCard> userCards) {
+    public UserRes.UserAdminDetail convertToUserAdminDetail(UserRepository.UserList userDetail) {
         return UserRes.UserAdminDetail
                 .builder()
                 .userId(userDetail.getUserId())
@@ -194,7 +194,6 @@ public class UserConverter {
                 .card(userDetail.getCard())
                 .status(userDetail.getStatus().getValue())
                 .createdAt(userDetail.getCreatedAt().toString())
-                //.userCards(userCards)
                 .build();
     }
 

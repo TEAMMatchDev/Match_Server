@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +44,9 @@ public class DonationController {
         donationService.refundDonation(user, donationId);
         return CommonResponse.onSuccess("기부금 환불 성공");
     }
+
+    @Value("${spring.config.activate.on-profile}")
+    private String profile;
 
     /*
     @GetMapping("/flame/filter")
@@ -187,7 +191,7 @@ public class DonationController {
             @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size
     ){
-        return CommonResponse.onSuccess(donationService.getBurningFlameList(user, page, size));
+        return CommonResponse.onSuccess(donationService.getBurningFlameList(profile,user, page, size));
     }
 
 

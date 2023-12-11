@@ -16,7 +16,6 @@ import com.example.matchdomain.project.adaptor.ProjectAdaptor;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -44,8 +43,7 @@ public class AdminDonationService {
     private final S3UploadService s3UploadService;
     private final ProjectAdaptor projectAdaptor;
     private final HistoryImageRepository historyImageRepository;
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Transactional
