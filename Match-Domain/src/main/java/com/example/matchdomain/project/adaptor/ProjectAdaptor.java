@@ -144,4 +144,5 @@ public class ProjectAdaptor {
     public List<Project> getRandom3Project() {
         return projectRepository.findRandomThreeProject(LocalDateTime.now());
     }
+
 }

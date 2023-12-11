@@ -172,4 +172,8 @@ public class DonationService {
     public Page<DonationUser> findByUserId(User user, int page, int size) {
         return donationAdaptor.findByUserForAdminPage(user, page, size);
     }
+
+    public List<RegularPayment> findByUser(User user) {
+        return regularPaymentAdaptor.findByUserPage(user);
+    }
 }

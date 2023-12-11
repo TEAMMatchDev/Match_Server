@@ -68,4 +68,8 @@ public class RegularPaymentAdaptor {
     public void saveAll(List<RegularPayment> regularPayments) {
         regularPaymentRepository.saveAll(regularPayments);
     }
+
+    public List<RegularPayment> findByUserPage(User user) {
+        return regularPaymentRepository.findByUser(user);
+    }
 }

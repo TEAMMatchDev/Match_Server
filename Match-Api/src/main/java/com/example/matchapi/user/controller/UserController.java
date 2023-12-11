@@ -2,13 +2,20 @@ package com.example.matchapi.user.controller;
 
 import com.example.matchapi.common.model.AlarmType;
 import com.example.matchapi.common.security.JwtService;
+import com.example.matchapi.donation.service.DonationService;
+import com.example.matchapi.project.converter.ProjectConverter;
+import com.example.matchapi.project.service.ProjectService;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchapi.user.dto.UserReq;
+import com.example.matchapi.user.service.RefreshTokenService;
+import com.example.matchapi.user.service.UserFcmService;
 import com.example.matchapi.user.service.UserService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.annotation.DisableSecurity;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
+import com.example.matchdomain.donation.entity.RegularPayment;
+import com.example.matchdomain.project.entity.enums.ProjectStatus;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.redis.repository.RefreshTokenRepository;
 import com.example.matchdomain.user.entity.enums.SocialType;
@@ -31,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 import static com.example.matchdomain.user.exception.DeleteUserErrorCode.APPLE_USER_NOT_API;
 import static com.example.matchdomain.user.exception.UserAuthErrorCode.INVALID_REFRESH_TOKEN;
@@ -43,19 +51,11 @@ import static com.example.matchdomain.user.exception.UserAuthErrorCode.INVALID_R
 public class UserController {
     private final UserService userService;
     private final JwtService jwtService;
-    private final RefreshTokenRepository refreshTokenRepository;
-
-    /*
-    @Deprecated
-    @Operation(summary= "02-01👤 마이페이지 전체 조회",description = "마이페이지 전체 조회입니다.")
-    @GetMapping("")
-    public CommonResponse<UserRes.MyPage> getMyPage(@Parameter(hidden = true)
-                                                        @AuthenticationPrincipal User user){
-        log.info("02-01 마이페이지 전체조회 userId : " + user.getId());
-        return CommonResponse.onSuccess(userService.getMyPage(user));
-    }
-
-     */
+    private final RefreshTokenService refreshTokenService;
+    private final UserFcmService userFcmService;
+    private final ProjectService projectService;
+    private final DonationService donationService;
+    private final ProjectConverter projectConverter;
 
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Deprecated
@@ -82,12 +82,9 @@ public class UserController {
     @Transactional
     public CommonResponse<String> logOut(@Parameter(hidden = true) @AuthenticationPrincipal User user,
                                          @Parameter(description = "디바이스 아이디") @RequestParam(value = "DEVICE_ID", required = true) String deviceId){
-        log.info("api = logout 02-03");
-
         Long userId = user.getId();
-
         jwtService.logOut(userId);
-        userService.deleteFcmToken(userId, deviceId);
+        userFcmService.deleteFcmToken(userId, deviceId);
         return CommonResponse.onSuccess("로그아웃 성공");
     }
 
@@ -97,10 +94,9 @@ public class UserController {
     public CommonResponse<UserRes.ReIssueToken> reIssueToken(
             @Parameter(description = "리프레쉬 토큰", required = true, in = ParameterIn.HEADER, name = "X-REFRESH-TOKEN", schema = @Schema(type = "string")) @RequestHeader("X-REFRESH-TOKEN") String refreshToken
     ){
-        log.info("reIssue-token : "+refreshToken);
-        log.info("api = reIssue-token 02-04");
         Long userId=jwtService.getUserIdByRefreshToken(refreshToken);
-        RefreshToken redisRefreshToken= refreshTokenRepository.findById(String.valueOf(userId)).orElseThrow(()-> new BadRequestException(INVALID_REFRESH_TOKEN));
+
+        RefreshToken redisRefreshToken= refreshTokenService.findRefreshToken(userId);
 
         if(!redisRefreshToken.getToken().equals(refreshToken)) throw new BadRequestException(INVALID_REFRESH_TOKEN);
 
@@ -114,7 +110,9 @@ public class UserController {
     public CommonResponse<UserRes.MyPage> getMyPage(@Parameter(hidden = true)
                                                     @AuthenticationPrincipal User user){
         log.info("02-01 마이페이지 전체조회 userId : " + user.getId());
-        return CommonResponse.onSuccess(userService.getMyPage(user));
+        Long projectAttentionCnt = projectService.getProjectAttentionCnt(user.getId());
+        List<RegularPayment> regularPayments = donationService.findByUser(user);
+        return CommonResponse.onSuccess(projectConverter.getMyPage(regularPayments, projectAttentionCnt, user.getNickname()));
     }
 
     @ApiErrorCodeExample(UserAuthErrorCode.class)
@@ -145,7 +143,7 @@ public class UserController {
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @RequestBody UserReq.FcmToken token
     ){
-        userService.saveFcmToken(user, token);
+        userFcmService.saveFcmToken(user, token);
         return CommonResponse.onSuccess("저장 성공");
     }
 

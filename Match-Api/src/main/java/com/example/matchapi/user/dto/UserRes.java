@@ -234,4 +234,13 @@ public class UserRes {
 
         private String donationStatusName;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserDelete {
+        private Long userId;
+    }
 }

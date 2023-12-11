@@ -16,6 +16,7 @@ import com.example.matchdomain.donation.adaptor.DonationHistoryAdaptor;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.entity.enums.RegularStatus;
+import com.example.matchdomain.project.adaptor.AttentionAdaptor;
 import com.example.matchdomain.project.adaptor.ProjectAdaptor;
 import com.example.matchdomain.project.adaptor.ProjectImgAdaptor;
 import com.example.matchdomain.project.dto.ProjectDto;
@@ -62,12 +63,12 @@ public class ProjectService {
     private final AuthHelper authHelper;
     private final ProjectCommentRepository projectCommentRepository;
     private final S3UploadService s3UploadService;
-    private final ProjectUserAttentionRepository projectUserAttentionRepository;
     private final DonationHistoryAdaptor donationHistoryAdaptor;
     private final CommentReportRepository commentReportRepository;
     private final ProjectImgAdaptor projectImgAdaptor;
     private final DonationAdaptor donationAdaptor;
     private final MessageHelper messageHelper;
+    private final AttentionAdaptor attentionAdaptor;
 
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(User user, int page, int size) {
         Long userId = 0L;
@@ -233,11 +234,11 @@ public class ProjectService {
 
     @Transactional
     public ProjectRes.ProjectLike patchProjectLike(User user, Long projectId) {
-        boolean checkProjectLike = projectUserAttentionRepository.existsById_userIdAndId_projectId(user.getId(), projectId);
+        boolean checkProjectLike = attentionAdaptor.existsAttention(user.getId(), projectId);
         if(checkProjectLike){
-            projectUserAttentionRepository.deleteById_userIdAndId_projectId(user.getId(), projectId);
+            attentionAdaptor.deleteProjectLike(user.getId(), projectId);
         }else{
-            projectUserAttentionRepository.save(ProjectUserAttention.builder().id(new ProjectUserAttentionPk(user.getId(), projectId)).build());
+            attentionAdaptor.save(ProjectUserAttention.builder().id(new ProjectUserAttentionPk(user.getId(), projectId)).build());
         }
 
         return new ProjectRes.ProjectLike(!checkProjectLike);
@@ -332,5 +333,9 @@ public class ProjectService {
     public List<DonationRes.Tutorial> getTutorialDonation() {
         List<Project> projects = projectAdaptor.getRandom3Project();
         return projectConverter.convertToTutorialDonation(projects);
+    }
+
+    public Long getProjectAttentionCnt(Long userId) {
+        return attentionAdaptor.getAttentionCnt(userId);
     }
 }
