@@ -20,7 +20,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AdminBannerService {
-    private final BannerRepository bannerRepository;
     private final BannerConverter bannerConverter;
     private final S3UploadService s3UploadService;
     private final BannerAdaptor bannerAdaptor;
@@ -31,7 +30,7 @@ public class AdminBannerService {
                                                    MultipartFile bannerImage,
                                                    BannerReq.BannerUpload bannerUploadDto) {
         String bannerImg = s3UploadService.uploadBannerImage(bannerImage);
-        bannerRepository.save(bannerConverter.convertToBannerUpload(bannerType, bannerImg, bannerUploadDto));
+        bannerAdaptor.save(bannerConverter.convertToBannerUpload(bannerType, bannerImg, bannerUploadDto));
         return cachingBannerList();
     }
 
@@ -40,5 +39,12 @@ public class AdminBannerService {
         List<Banner> banners = bannerAdaptor.getBannerList();
 
         return bannerConverter.convertToBannerList(banners);
+    }
+
+    @Transactional
+    public void deleteBanner(Long bannerId) {
+        Banner banner = bannerAdaptor.findById(bannerId);
+        s3UploadService.deleteFile(banner.getBannerImg());
+        bannerAdaptor.deleteById(bannerId);
     }
 }

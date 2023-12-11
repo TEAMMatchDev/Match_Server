@@ -36,4 +36,11 @@ public class AdminBannerController {
         System.out.println(bannerUploadDto.getContentsUrl());
         return CommonResponse.onSuccess(adminBannerService.uploadBanner(BannerType.EVENT, bannerImage, bannerUploadDto));
     }
+
+    @DeleteMapping("/{bannerId}")
+    @Operation(summary = "ADMIN-08-02 배너 삭제")
+    public CommonResponse<String> deleteBanner(@PathVariable Long bannerId){
+        adminBannerService.deleteBanner(bannerId);
+        return CommonResponse.onSuccess("삭제 성공");
+    }
 }

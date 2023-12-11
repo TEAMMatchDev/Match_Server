@@ -4,17 +4,17 @@ import com.example.matchapi.admin.event.dto.EventUploadReq;
 import com.example.matchapi.common.model.ContentsList;
 import com.example.matchapi.common.util.MessageHelper;
 import com.example.matchapi.event.converter.EventConverter;
-import com.example.matchapi.event.service.EventService;
-import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.constants.enums.Topic;
+import com.example.matchdomain.event.adaptor.EventAdaptor;
+import com.example.matchdomain.event.adaptor.EventContentAdaptor;
 import com.example.matchdomain.event.entity.Event;
 import com.example.matchdomain.event.entity.EventContent;
-import com.example.matchdomain.event.repository.EventContentRepository;
-import com.example.matchdomain.event.repository.EventRepository;
+import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,16 +25,17 @@ import static com.example.matchdomain.common.model.ContentsType.TEXT;
 @Service
 @RequiredArgsConstructor
 public class AdminEventService {
-    private final EventRepository eventRepository;
-    private final EventContentRepository eventContentRepository;
     private final EventConverter eventConverter;
-    private final EventService eventService;
     private final MessageHelper messageHelper;
-    @RedissonLock(LockName = "이벤트 업로드", key = "#eventUploadReq")
+    private final EventAdaptor eventAdaptor;
+    private final EventContentAdaptor eventContentAdaptor;
+    private final S3UploadService s3UploadService;
+
+    @Transactional
     @CacheEvict(value = "eventCache", allEntries = true, cacheManager = "ehcacheManager")
     public void uploadEventList(EventUploadReq eventUploadReq) {
 
-        Event event  = eventRepository.save(eventConverter.convertToEventUpload(eventUploadReq, eventUploadReq.getThumbnail()));
+        Event event  = eventAdaptor.save(eventConverter.convertToEventUpload(eventUploadReq, eventUploadReq.getThumbnail()));
 
         Long eventId = event.getId();
 
@@ -48,10 +49,22 @@ public class AdminEventService {
             }
         }
 
-        eventContentRepository.saveAll(eventContents);
+        eventContentAdaptor.saveAll(eventContents);
 
         messageHelper.helpFcmMessage(EVENT_UPLOAD_BODY, Topic.EVENT_UPLOAD, event.getId());
     }
 
 
+    @Transactional
+    @CacheEvict(value = "eventCache", allEntries = true, cacheManager = "ehcacheManager")
+    public void deleteEvent(Long eventId) {
+        Event event = eventAdaptor.findByEvent(eventId);
+        List<EventContent> eventContents = event.getEventContents();
+        for(EventContent eventContent : eventContents){
+            if(eventContent.getContentsType().equals(IMG)){
+                s3UploadService.deleteFile(eventContent.getContents());
+            }
+        }
+        eventAdaptor.deleteByEventId(eventId);
+    }
 }
