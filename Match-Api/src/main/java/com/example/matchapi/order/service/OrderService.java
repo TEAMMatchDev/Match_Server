@@ -38,6 +38,7 @@ import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import com.example.matchinfrastructure.pay.portone.service.PortOneService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -70,6 +71,8 @@ public class OrderService {
     private final AligoService aligoService;
     private final AligoConverter aligoConverter;
     private final CacheService cacheService;
+    @Value("${spring.config.activate.on-profile}")
+    private String profile;
 
     @Transactional
     public List<OrderRes.UserBillCard> getUserBillCard(Long userId) {
@@ -78,7 +81,7 @@ public class OrderService {
         return orderConverter.convertToUserCardLists(userCards);
     }
 
-    @RedissonLock(LockName = "카드-삭제", key = "#cardId")
+    @RedissonLock(LockName = "카드", key = "#cardId")
     public void deleteBillCard(Long cardId) {
         UserCard userCard = userCardAdaptor.findCardByCardId(cardId);
 
@@ -86,7 +89,7 @@ public class OrderService {
 
         cancelRegularPayment(regularPayments);
 
-        String accessToken = portOneAuthService.getToken();
+        String accessToken = portOneAuthService.getToken(profile);
 
         portOneFeignClient.deleteBillKey(accessToken, userCard.getBid());
 
@@ -102,7 +105,7 @@ public class OrderService {
     }
 
     @PaymentIntercept(key = "#orderCommand.orderId")
-    @RedissonLock(LockName = "빌키-단기-기부", key = "#orderCommand.userCard.id")
+    @RedissonLock(LockName = "프로젝트", key = "#orderCommand.project.id")
     public OrderRes.CompleteDonation paymentForOnetime(OrderCommand.OneTimeDonation orderCommand) {
         UserCard card = orderCommand.getUserCard();
         Project project = orderCommand.getProject();
@@ -130,7 +133,7 @@ public class OrderService {
     }
 
     @PaymentIntercept(key = "#orderCommand.orderId")
-    @RedissonLock(LockName = "정기-기부-신청", key = "#orderCommand.userCard.id")
+    @RedissonLock(LockName = "프로젝트", key = "#orderCommand.project.id")
     public OrderRes.CompleteDonation paymentForRegular(OrderCommand.RegularDonation orderCommand) {
         UserCard card = orderCommand.getUserCard();
         Project project = orderCommand.getProject();
@@ -165,7 +168,7 @@ public class OrderService {
 
         PortOnePrepareReq portOnePrepareReq = portOneConverter.convertToRequestPrepare(orderId, 1000);
 
-        portOneFeignClient.preparePayments(portOneAuthService.getToken(), portOnePrepareReq);
+        portOneFeignClient.preparePayments(portOneAuthService.getToken(profile), portOnePrepareReq);
 
         return orderId;
     }
@@ -200,7 +203,7 @@ public class OrderService {
 
     @RedissonLock(LockName = "유저-카드-등록", key = "#user.id")
     public PortOneBillResponse postCard(User user, OrderReq.RegistrationCard registrationCard) {
-        String accessToken = portOneAuthService.getToken();
+        String accessToken = portOneAuthService.getToken(profile);
         String cardNo = orderHelper.formatString(registrationCard.getCardNo(), 4);
         String expiry = "20" + registrationCard.getExpYear() + "-" + registrationCard.getExpMonth();
         PortOneResponse<PortOneBillResponse> portOneResponse = portOneFeignClient.getBillKey(
@@ -235,7 +238,7 @@ public class OrderService {
 
         PortOnePrepareReq portOnePrepareReq = portOneConverter.convertToRequestPrepare(orderId, amount);
 
-        portOneFeignClient.preparePayments(portOneAuthService.getToken(), portOnePrepareReq);
+        portOneFeignClient.preparePayments(portOneAuthService.getToken(profile), portOnePrepareReq);
 
         return orderId;
     }

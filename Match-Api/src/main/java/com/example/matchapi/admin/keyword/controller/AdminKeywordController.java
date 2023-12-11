@@ -34,4 +34,11 @@ public class AdminKeywordController {
 
         return CommonResponse.onSuccess(adminKeywordService.postKeyword(keyword));
     }
+
+    @DeleteMapping("/{keywordId}")
+    @Operation(summary = "07-03 ADMIN Keyword 삭제🔎")
+    public CommonResponse<String> deleteKeyword(@PathVariable Long keywordId){
+        adminKeywordService.deleteKeyword(keywordId);
+        return CommonResponse.onSuccess("삭제 성공");
+    }
 }

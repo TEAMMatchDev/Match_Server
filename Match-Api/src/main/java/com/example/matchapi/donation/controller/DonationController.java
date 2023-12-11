@@ -207,7 +207,7 @@ public class DonationController {
     @Operation(summary = "05-14 튜토리얼 기부 ", description = "튜토리얼 1원 기부 POST API 입니다.")
     @PostMapping("/tutorial")
     @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class})
-    @RedissonLock(LockName = "유저 튜토리얼 기부", key = "#user.id")
+    @RedissonLock(LockName = "프로젝트", key = "#tutorial.projectId")
     public CommonResponse<DonationRes.CompleteDonation> postTutorialDonation(
             @AuthenticationPrincipal User user,
             @RequestBody DonationReq.Tutorial tutorial){

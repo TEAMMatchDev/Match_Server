@@ -24,4 +24,12 @@ public class EventAdaptor {
     public Event findByEvent(Long eventId) {
         return eventRepository.findById(eventId).orElseThrow(() -> new BadRequestException(NOT_EXIST_EVENT));
     }
+
+    public Event save(Event event) {
+        return eventRepository.save(event);
+    }
+
+    public void deleteByEventId(Long eventId) {
+        eventRepository.deleteById(eventId);
+    }
 }

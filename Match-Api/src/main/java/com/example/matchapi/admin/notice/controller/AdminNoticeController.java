@@ -11,10 +11,7 @@ import com.example.matchdomain.notice.entity.NoticeContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -31,5 +28,12 @@ public class AdminNoticeController {
     public CommonResponse<String> uploadNoticeList(@Valid @RequestBody NoticeUploadReq noticeUploadReq){
         adminNoticeService.uploadNoticeList(mapper.toEntityNoticeContents(noticeUploadReq.getContentsList()), mapper.toEntityNotice(noticeUploadReq));
         return CommonResponse.onSuccess("업로드 성공");
+    }
+
+    @DeleteMapping("/{noticeId}")
+    @Operation(summary = "ADMIN-10-02 공지사항 삭제")
+    public CommonResponse<String> deleteNotice(@PathVariable Long noticeId){
+        adminNoticeService.deleteNotice(noticeId);
+        return CommonResponse.onSuccess("삭제 성공");
     }
 }

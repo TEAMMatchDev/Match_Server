@@ -18,4 +18,16 @@ public class BannerAdaptor {
     public List<Banner> getBannerList() {
         return bannerRepository.findAllByOrderByCreatedAtDesc();
     }
+
+    public Banner save(Banner banner) {
+        return bannerRepository.save(banner);
+    }
+
+    public Banner findById(Long bannerId) {
+        return bannerRepository.findById(bannerId).orElseThrow();
+    }
+
+    public void deleteById(Long bannerId) {
+        bannerRepository.deleteById(bannerId);
+    }
 }

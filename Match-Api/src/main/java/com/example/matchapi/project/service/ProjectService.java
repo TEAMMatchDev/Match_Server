@@ -5,6 +5,7 @@ import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.project.converter.ProjectConverter;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
+import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.constants.enums.FILTER;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchcommon.exception.BadRequestException;
@@ -139,7 +140,7 @@ public class ProjectService {
         return new PageResponse<>(projectAdminLists.isLast(), projectAdminLists.getTotalElements(), projectLists);
     }
 
-    @Transactional
+    @RedissonLock(LockName = "프로젝트", key = "#projectId")
     public void patchProjectStatus(ProjectStatus projectStatus, Long projectId) {
         Project project = projectAdaptor.findById(projectId);
 
