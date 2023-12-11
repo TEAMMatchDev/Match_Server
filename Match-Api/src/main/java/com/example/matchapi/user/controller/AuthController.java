@@ -90,7 +90,6 @@ public class AuthController {
     @DisableSecurity
     public CommonResponse<UserRes.Sms> checkSms(@RequestBody @Valid UserReq.Sms sms){
         log.info("01-04 비회원 문자인증 = " +sms.getPhone());
-        if(sms.getPhone().equals("01011111111")) return CommonResponse.onSuccess(new UserRes.Sms("111111"));
         String number = smsHelper.sendSms(sms.getPhone());
         return CommonResponse.onSuccess(new UserRes.Sms(number));
     }
@@ -109,7 +108,6 @@ public class AuthController {
     @PostMapping(value="/email")
     @DisableSecurity
     public CommonResponse<String> checkUserEmail(@RequestBody @Valid UserReq.UserEmail userEmail){
-        if(userEmail.getEmail().equals("test1234@gmail.com")) return CommonResponse.onSuccess("이메일 사용 가능");
         log.info("01-05-01 유저 회원가입 이메일 검증"+userEmail.getEmail());
         authService.checkUserEmail(userEmail);
         return CommonResponse.onSuccess("이메일 사용 가능");
@@ -121,7 +119,6 @@ public class AuthController {
     @DisableSecurity
     public CommonResponse<String> checkUserPhone(@RequestBody @Valid UserReq.UserPhone userPhone){
         log.info("01-05-01 유저 회원가입 전화번호 검증"+userPhone.getPhone());
-        if(userPhone.getPhone().equals("01011111111")) return  CommonResponse.onSuccess("핸드폰 사용가능");
         authService.checkUserPhone(userPhone);
         return CommonResponse.onSuccess("핸드폰 사용가능");
     }
@@ -141,7 +138,6 @@ public class AuthController {
     @GetMapping("/email")
     @DisableSecurity
     public CommonResponse<String> emailAuth(@RequestParam String email){
-        if(email.equals("test1234@gmail.com")) return CommonResponse.onSuccess("이메일 사용 가능");
         authService.sendEmailMessage(email);
         return CommonResponse.onSuccess("메일 전송 성공");
     }
@@ -151,8 +147,6 @@ public class AuthController {
     @ApiErrorCodeExample(CodeAuthErrorCode.class)
     @DisableSecurity
     public CommonResponse<String> checkEmailAuth(@RequestBody UserReq.UserEmailAuth email){
-        if(email.getEmail().equals("test1234@gmail.com"))return CommonResponse.onSuccess("메일 인증 성공");
-
         authService.checkUserEmailAuth(email);
         return CommonResponse.onSuccess("메일 인증 성공");
     }
@@ -172,8 +166,6 @@ public class AuthController {
     @ApiErrorCodeExample(CodeAuthErrorCode.class)
     @DisableSecurity
     public CommonResponse<String> checkEmailAuth(@RequestBody UserReq.UserPhoneAuth phone){
-        if(phone.getPhone().equals("01011111111")) return CommonResponse.onSuccess("핸드폰 인증 성공");
-
         authService.checkPhoneAuth(phone);
         return CommonResponse.onSuccess("핸드폰 인증 성공");
     }
@@ -200,7 +192,6 @@ public class AuthController {
     @ApiErrorCodeExample({UserSignUpErrorCode.class, SendEmailFindPassword.class})
     @DisableSecurity
     public CommonResponse<String> sendEmailPasswordFind(@RequestParam String email){
-        if(email.equals("test1234@gmail.com")) return CommonResponse.onSuccess("이메일 사용 가능");
         authService.sendEmailPasswordFind(email);
         return CommonResponse.onSuccess("메일 인증 성공");
     }
