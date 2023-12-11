@@ -15,6 +15,7 @@ import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +64,7 @@ public class AdminUserController {
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Operation(summary = "ADMIN-02-04 유저 불꽃이 생성기록 조회" ,description = "유저 불꽃이 기록 조회")
     public CommonResponse<PageResponse<List<UserRes.UserFlameListDto>>> getUserFlameList(@PathVariable Long userId,
-                                                                     @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") @Min(value = 0) int page,
+                                                                     @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
                                                                      @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size){
         User user = adminUserService.findByUserId(userId);
         Page<DonationUser> donationUsers = donationService.findByUserId(user, page, size);
@@ -79,4 +80,5 @@ public class AdminUserController {
         adminUserService.unActivateUser(user);
         return CommonResponse.onSuccess(new UserRes.UserDelete(userId));
     }
+
 }
