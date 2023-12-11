@@ -1,6 +1,6 @@
 package com.example.matchapi.order.service;
 
-import com.example.matchapi.common.security.JwtService;
+import com.example.matchcommon.listner.CacheService;
 import com.example.matchapi.donation.service.DonationHistoryService;
 import com.example.matchapi.order.converter.OrderConverter;
 import com.example.matchapi.order.dto.OrderCommand;
@@ -8,7 +8,6 @@ import com.example.matchapi.order.dto.OrderReq;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.order.helper.OrderHelper;
 import com.example.matchapi.portone.service.PaymentService;
-import com.example.matchapi.project.service.ProjectService;
 import com.example.matchapi.user.service.AligoService;
 import com.example.matchcommon.annotation.PaymentIntercept;
 import com.example.matchcommon.annotation.RedissonLock;
@@ -70,7 +69,7 @@ public class OrderService {
     private final PortOneService portOneService;
     private final AligoService aligoService;
     private final AligoConverter aligoConverter;
-    private final JwtService jwtService;
+    private final CacheService cacheService;
 
     @Transactional
     public List<OrderRes.UserBillCard> getUserBillCard(Long userId) {
@@ -123,7 +122,9 @@ public class OrderService {
 
         donationHistoryService.oneTimeDonationHistory(donationUser.getId());
 
-        aligoService.sendAlimTalk(AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), user.getName(), user.getPhoneNumber()));
+        //aligoService.sendAlimTalk(AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), user.getName(), user.getPhoneNumber()));
+
+        cacheService.evictCache(user.getId());
 
         return orderConverter.convertToCompleteDonation(user.getName(), project, oneTimeDonation.getAmount());
     }
@@ -150,6 +151,8 @@ public class OrderService {
         donationHistoryService.postRegularDonationHistory(regularPayment.getId(), donationUser.getId());
 
         aligoService.sendAlimTalk(AlimType.PAYMENT, aligoConverter.convertToAlimTalkPayment(donationUser.getId(), user.getName(), user.getPhoneNumber()));
+
+        cacheService.evictCache(user.getId());
 
         return orderConverter.convertToCompleteDonation(user.getName(), project, regularDonation.getAmount());
     }

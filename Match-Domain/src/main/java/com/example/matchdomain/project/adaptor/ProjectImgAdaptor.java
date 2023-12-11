@@ -29,4 +29,12 @@ public class ProjectImgAdaptor {
     public ProjectImage findById(Long projectImgId) {
         return  projectImageRepository.findById(projectImgId).orElseThrow(()-> new BadRequestException(PROJECT_IMAGE_NOT_EXIST));
     }
+
+    public void saveAll(List<ProjectImage> projectImages) {
+        projectImageRepository.saveAll(projectImages);
+    }
+
+    public ProjectImage save(ProjectImage projectImage) {
+        return projectImageRepository.save(projectImage);
+    }
 }

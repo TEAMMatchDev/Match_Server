@@ -324,8 +324,8 @@ public class DonationConverter {
                 .inherenceName(createInherenceDto.getInherenceName())
                 .inherenceNumber(createInherenceDto.getInherenceNumber())
                 .regularStatus(RegularStatus.ONE_TIME)
-                .flameImage(FlameImage.NORMAL_IMG.getImg())
-                .flameType(FlameType.NORMAL_FLAME)
+                .flameImage(FlameImage.TUTORIAL_IMG.getImg())
+                .flameType(FlameType.TUTORIAL_FLAME)
                 .build();
     }
 

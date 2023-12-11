@@ -25,7 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import javax.validation.constraints.Min;
 import java.util.List;
 
 import static com.example.matchdomain.common.model.Status.ACTIVE;
@@ -146,8 +145,8 @@ public class DonationService {
         return new PageResponse<>(regularPayments.isLast(), regularPayments.getTotalElements(), regularPaymentConverter.convertToMatchList(regularPayments.getContent()));
     }
 
-    @Cacheable(value = "flameCache", key = "{#user.id, #page, #size}", cacheManager = "ehcacheManager")
-    public PageResponse<List<DonationRes.BurningFlameDto>> getBurningFlameList(User user, int page, int size) {
+    @Cacheable(value = "flameCache", key = "{#profile, #user.id, #page, #size}", cacheManager = "redisCacheManager")
+    public PageResponse<List<DonationRes.BurningFlameDto>> getBurningFlameList(String profile, User user, int page, int size) {
         Page<DonationUser> donationUsers = donationAdaptor.findByUser(user, page, size);
         return new PageResponse<>(donationUsers.isLast(), donationUsers.getTotalElements(), regularPaymentConverter.convertToBurningFlameList(donationUsers.getContent()));
     }
@@ -171,5 +170,9 @@ public class DonationService {
 
     public Page<DonationUser> findByUserId(User user, int page, int size) {
         return donationAdaptor.findByUserForAdminPage(user, page, size);
+    }
+
+    public List<RegularPayment> findByUser(User user) {
+        return regularPaymentAdaptor.findByUserPage(user);
     }
 }

@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.List;
+
 public class UserRes {
     @Getter
     @Setter
@@ -179,8 +181,6 @@ public class UserRes {
         private String status;
 
         private String createdAt;
-
-        //private List<OrderRes.UserBillCard> userCards;
     }
 
     public static class EmailAuth {
@@ -234,4 +234,30 @@ public class UserRes {
 
         private String donationStatusName;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserDelete {
+        private Long userId;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserDonationInfo {
+        private int nowDonationCnt;
+
+        private int pastDonationCnt;
+
+        private int totalCnt;
+
+        private List<UserFlameListDto> flameLists;
+    }
+
+
 }
