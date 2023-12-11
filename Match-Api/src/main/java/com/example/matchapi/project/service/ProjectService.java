@@ -264,4 +264,10 @@ public class ProjectService {
     public Long getProjectAttentionCnt(Long userId) {
         return attentionAdaptor.getAttentionCnt(userId);
     }
+
+
+    public Project checkProjectExists(Long projectId, RegularStatus regularStatus) {
+        return projectAdaptor.checkRegularProjects(projectId, regularStatus);
+    }
+
 }

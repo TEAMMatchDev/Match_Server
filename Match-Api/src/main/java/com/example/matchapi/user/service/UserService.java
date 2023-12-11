@@ -54,7 +54,6 @@ public class UserService {
     }
 
     @Transactional
-    @CacheEvict(value = "userCache", key = "#user.id", cacheManager = "redisCacheManager")
     public void modifyUserProfile(User user, UserReq.ModifyProfile modifyProfile) {
         if(modifyProfile.getName() == null && modifyProfile.getMultipartFile()!=null){
             String beforeProfileImg = user.getProfileImgUrl();

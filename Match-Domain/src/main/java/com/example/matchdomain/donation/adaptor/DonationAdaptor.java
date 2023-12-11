@@ -11,6 +11,7 @@ import com.example.matchdomain.donation.repository.DonationUserRepository;
 import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
