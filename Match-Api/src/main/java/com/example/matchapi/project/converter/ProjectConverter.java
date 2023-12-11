@@ -295,13 +295,6 @@ public class ProjectConverter {
                 .build();
     }
 
-    public CommentReport convertToReportComment(Long commentId, ReportReason reportReason) {
-        return CommentReport
-                .builder()
-                .commentId(commentId)
-                .reportReason(reportReason)
-                .build();
-    }
 
     public List<ProjectRes.ProjectList> convertToProjectListWeb(List<ProjectRepository.ProjectList> projects) {
         List<ProjectRes.ProjectList> projectLists = new ArrayList<>();

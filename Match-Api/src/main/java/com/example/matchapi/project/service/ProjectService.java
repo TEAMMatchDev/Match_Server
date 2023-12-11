@@ -57,18 +57,17 @@ import static com.example.matchdomain.project.exception.ProjectGetErrorCode.PROJ
 @RequiredArgsConstructor
 public class ProjectService {
     private final ProjectAdaptor projectAdaptor;
-    private final ProjectRepository projectRepository;
     private final ProjectConverter projectConverter;
-    private final ProjectImageRepository projectImageRepository;
     private final AuthHelper authHelper;
-    private final ProjectCommentRepository projectCommentRepository;
     private final S3UploadService s3UploadService;
     private final DonationHistoryAdaptor donationHistoryAdaptor;
-    private final CommentReportRepository commentReportRepository;
     private final ProjectImgAdaptor projectImgAdaptor;
     private final DonationAdaptor donationAdaptor;
     private final MessageHelper messageHelper;
     private final AttentionAdaptor attentionAdaptor;
+    private final ProjectImageRepository projectImageRepository;
+
+
 
     public PageResponse<List<ProjectRes.ProjectList>> getProjectList(User user, int page, int size) {
         Long userId = 0L;
@@ -110,7 +109,7 @@ public class ProjectService {
 
     @Transactional
     public void postProject(ProjectReq.Project projects, MultipartFile presentFile, List<MultipartFile> multipartFiles) {
-        Project project = projectRepository.save(projectConverter.postProject(projects));
+        Project project = projectAdaptor.save(projectConverter.postProject(projects));
 
         String url = s3UploadService.uploadProjectPresentFile(project.getId() ,presentFile);
 
@@ -127,7 +126,7 @@ public class ProjectService {
     public PageResponse<List<ProjectRes.ProjectAdminList>> getProjectList(int page, int size) {
         Pageable pageable  = PageRequest.of(page,size);
 
-        Page<ProjectRepository.ProjectAdminList> projectAdminLists = projectRepository.getProjectAdminList(pageable);
+        Page<ProjectRepository.ProjectAdminList> projectAdminLists = projectAdaptor.getProjectAdminList(pageable);
 
         List<ProjectRes.ProjectAdminList> projectLists = new ArrayList<>();
 
@@ -148,7 +147,7 @@ public class ProjectService {
 
         if(projectStatus.equals(ProjectStatus.DEADLINE)) donationHistoryAdaptor.saveDonationHistory(projectConverter.convertToDonationHistory(projectId, HistoryStatus.FINISH));
 
-        projectRepository.save(project);
+        projectAdaptor.save(project);
     }
 
     public void deleteProject(Long projectId) {
@@ -156,7 +155,7 @@ public class ProjectService {
 
         project.setStatus(Status.INACTIVE);
 
-        projectRepository.save(project);
+        projectAdaptor.save(project);
     }
 
     @Transactional
@@ -165,7 +164,7 @@ public class ProjectService {
 
         project.modifyProject(modifyProject.getProjectName(), modifyProject.getUsages(), modifyProject.getDetail(), modifyProject.getRegularStatus(), modifyProject.getStartDate(), modifyProject.getEndDate(), modifyProject.getProjectKind(), modifyProject.getSearchKeyword());
 
-        projectRepository.save(project);
+        projectAdaptor.save(project);
     }
 
     @Transactional
@@ -223,7 +222,7 @@ public class ProjectService {
 
         project.setStatus(ACTIVE);
 
-        projectRepository.save(project);
+        projectAdaptor.save(project);
     }
 
     public PageResponse<List<ProjectRes.ProjectLists>> getProjectLists(User user, int page, int size, ProjectKind projectKind, String content, FILTER filter) {
@@ -251,71 +250,13 @@ public class ProjectService {
     }
 
     public ProjectRes.ProjectAppDetail getProjectAppDetail(User user, Long projectId) {
-        ProjectRepository.ProjectDetail projects = projectRepository.getProjectAppDetail(user.getId(), projectId);
+        ProjectRepository.ProjectDetail projects = projectAdaptor.getProjectAppDetail(user.getId(), projectId);
         List<ProjectImage> projectImages = projectImageRepository.findByProjectIdOrderBySequenceAsc(projectId);
 
         return projectConverter.convertToProjectAppDetail(projects, projectImages);
     }
 
-    public PageResponse<List<ProjectRes.ProjectLists>> projectList(User user, int page, int size, ProjectKind projectKind, String content) {
-        Pageable pageable = PageRequest.of(page, size);
-        List<ProjectRes.ProjectLists> project = new ArrayList<>();
 
-        Page<ProjectDto> projects = projectRepository.findProject(user, PROCEEDING, LocalDateTime.now(),
-                REPRESENT, ACTIVE, projectKind, content,  pageable);
-
-
-        projects.getContent().forEach(
-                result -> {
-                    project.add(projectConverter.convertToProjectToDto(result));
-                }
-        );
-
-        return new PageResponse<>(projects.isLast(), projects.getTotalElements(), project);
-    }
-
-
-    public ProjectRes.CommentList postComment(User user, Long projectId, ProjectReq.Comment comment) {
-        ProjectComment projectComment = projectCommentRepository.save(projectConverter.convertToComment(user.getId(), projectId, comment.getComment()));
-
-        return projectConverter.projectComment(user, projectComment);
-    }
-
-    public void reportComment(Long commentId, ReportReason reportReason) {
-        ProjectComment projectComment = projectCommentRepository.findByIdAndStatus(commentId, ACTIVE).orElseThrow(()-> new NotFoundException(COMMENT_NOT_EXIST));
-
-        commentReportRepository.save(projectConverter.convertToReportComment(commentId, reportReason));
-    }
-
-    public void deleteComment(User user, Long commentId) {
-        ProjectComment projectComment = projectCommentRepository.findByIdAndStatus(commentId, ACTIVE).orElseThrow(()-> new NotFoundException(COMMENT_NOT_EXIST));
-        if(!projectComment.getUserId().equals(user.getId())) throw new BadRequestException(COMMENT_DELETE_ERROR_CODE);
-        projectComment.setStatus(INACTIVE);
-        projectCommentRepository.save(projectComment);
-    }
-
-    public Project checkProjectExists(Long projectId, RegularStatus regularStatus) {
-        return projectAdaptor.checkRegularProjects(projectId, regularStatus);
-    }
-
-    public PageResponse<List<ProjectRes.CommentList>> getProjectComment(User user, Long projectId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-
-        Page<ProjectComment> projectComments = projectCommentRepository.findByProjectIdAndStatusOrderByCreatedAtAsc(projectId, ACTIVE,pageable);
-
-        List<ProjectRes.CommentList> commentLists = new ArrayList<>();
-        projectComments.getContent().forEach(
-                result-> {
-                    commentLists.add(
-                            projectConverter.projectComment(user, result)
-                    );
-                }
-        );
-
-
-        return new PageResponse<>(projectComments.isLast(), projectComments.getTotalElements(), commentLists);
-    }
 
     public PageResponse<List<ProjectRes.ProjectLists>> getLikeProjects(User user, int page, int size) {
         Page<ProjectRepository.ProjectList> projects = projectAdaptor.findLikeProjects(user, page, size);

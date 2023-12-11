@@ -145,4 +145,15 @@ public class ProjectAdaptor {
         return projectRepository.findRandomThreeProject(LocalDateTime.now());
     }
 
+    public Project save(Project project) {
+        return projectRepository.save(project);
+    }
+
+    public ProjectRepository.ProjectDetail getProjectAppDetail(Long id, Long projectId) {
+        return projectRepository.getProjectAppDetail(id, projectId);
+    }
+
+    public Page<ProjectRepository.ProjectAdminList> getProjectAdminList(Pageable pageable) {
+        return projectRepository.getProjectAdminList(pageable);
+    }
 }

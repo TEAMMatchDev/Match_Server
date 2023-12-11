@@ -25,12 +25,6 @@ public class NotificationService {
         return new PageResponse<>(notifications.isLast(), notifications.getTotalElements(), new NotificationRes.NotificationListInfo(notificationCount, notificationConverter.convertToNotificationList(notifications.getContent())));
     }
 
-    public void saveTestNotification(User user, FCMNotificationRequestDto fcmNotificationRequestDto) {
-        Notification notification = notificationConverter.convertToNotificationTest(user, fcmNotificationRequestDto);
-
-        notificationAdaptor.saveNotification(notification);
-    }
-
     public NotificationRes.NotificationDetail getNotificationDetail(Long notificationId) {
         Notification notification = notificationAdaptor.findNotification(notificationId);
         notificationAdaptor.readNotification(notification);
