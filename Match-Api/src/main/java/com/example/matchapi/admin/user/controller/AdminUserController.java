@@ -75,7 +75,8 @@ public class AdminUserController {
     @ApiErrorCodeExample({UserAuthErrorCode.class})
     @Operation(summary = "ADMIN-02-05👤 유저 삭제 API.",description = "유저 삭제 API 입니다.")
     public CommonResponse<UserRes.UserDelete> deleteUser(@PathVariable Long userId){
-        adminUserService.unActivateUser(userId);
+        User user = adminUserService.findByUserId(userId);
+        adminUserService.unActivateUser(user);
         return CommonResponse.onSuccess(new UserRes.UserDelete(userId));
     }
 }

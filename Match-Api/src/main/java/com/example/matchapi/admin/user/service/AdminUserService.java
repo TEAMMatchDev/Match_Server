@@ -1,7 +1,9 @@
 package com.example.matchapi.admin.user.service;
 
+import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.user.converter.UserConverter;
 import com.example.matchapi.user.dto.UserRes;
+import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
@@ -25,6 +27,7 @@ import static com.example.matchdomain.user.exception.UserAuthErrorCode.NOT_EXIST
 public class AdminUserService {
     private final UserAdaptor userAdaptor;
     private final UserConverter userConverter;
+    private final DonationService donationService;
 
     public UserRes.SignUpInfo getUserSignUpInfo() {
         LocalDate localDate = LocalDate.now();
@@ -61,6 +64,11 @@ public class AdminUserService {
         return userAdaptor.findByUserId(userId).orElseThrow(() -> new NotFoundException(NOT_EXIST_USER));
     }
 
-    public void unActivateUser(Long userId) {
+    @RedissonLock(LockName = "유저 탈퇴", key = "#user.id")
+    public void unActivateUser(User user) {
+        user.setStatus(Status.INACTIVE);
+        donationService.deleteRegularPayment(user);
+        userAdaptor.save(user);
     }
+
 }
