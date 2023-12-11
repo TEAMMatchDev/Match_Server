@@ -102,7 +102,7 @@ public class RedisConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
 
         Map<String, RedisCacheConfiguration> cacheConfiguration = new HashMap<>();
-        cacheConfiguration.put("flameCache", redisCacheConfiguration.entryTtl(Duration.ofSeconds(200L)));
+        cacheConfiguration.put("flameCache", redisCacheConfiguration.entryTtl(Duration.ofMinutes(10L)));
 
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)
