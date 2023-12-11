@@ -1,6 +1,5 @@
 package com.example.matchapi.portone.service;
 
-import com.example.matchapi.common.security.JwtService;
 import com.example.matchapi.donation.service.DonationHistoryService;
 import com.example.matchapi.order.converter.OrderConverter;
 import com.example.matchapi.order.dto.OrderRes;
@@ -36,6 +35,7 @@ import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -62,6 +62,8 @@ public class PaymentService {
     private final UserAdaptor userAdaptor;
     private final AligoService aligoService;
     private final AligoConverter aligoConverter;
+    @Value("${spring.config.activate.on-profile}")
+    private String profile;
 
     private IamportClient iamportClient;
 
@@ -125,7 +127,7 @@ public class PaymentService {
     }
 
     public PortOneResponse<PortOneBillPayResponse> payBillKey(UserCard card, Long amount, String projectName, String orderId) {
-        String accessToken = portOneAuthService.getToken();
+        String accessToken = portOneAuthService.getToken(profile);
 
         PortOneResponse<PortOneBillPayResponse> portOneResponse = portOneFeignClient.payWithBillKey(accessToken, portOneConverter.convertPayWithBillKey(card.getBid(), orderId, amount, projectName, card.getCustomerId()));
 

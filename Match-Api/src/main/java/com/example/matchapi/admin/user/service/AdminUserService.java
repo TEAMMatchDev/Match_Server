@@ -64,7 +64,7 @@ public class AdminUserService {
         return userAdaptor.findByUserId(userId).orElseThrow(() -> new NotFoundException(NOT_EXIST_USER));
     }
 
-    @RedissonLock(LockName = "유저 탈퇴", key = "#user.id")
+    @RedissonLock(LockName = "유저", key = "#user.id")
     public void unActivateUser(User user) {
         user.setStatus(Status.INACTIVE);
         donationService.deleteRegularPayment(user);

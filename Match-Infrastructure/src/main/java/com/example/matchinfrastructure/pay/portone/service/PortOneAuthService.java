@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,33 +18,33 @@ public class PortOneAuthService {
     private final PortOneFeignClient portOneFeignClient;
     private final PortOneProperties portOneProperties;
 
-    @Cacheable(value = "portOneTokenCache", key = "'all'")
-    public String getToken() {
-        String token =  fetchPortOneToken();
-        log.info("request : " + token);
-        return token;
-    }
 
-    public String fetchPortOneToken() {
+    @Cacheable(value = "portOneTokenCache", key = "#profile", cacheManager = "redisCacheManager")
+    public String getToken(String profile) {
         log.info("request token");
-        return getTokens();
+        return getTokens(profile);
     }
 
-    @CachePut(value = "portOneTokenCache", key = "'all'")
-    public String getTokens() {
-        PortOneResponse<PortOneAuth> portOneResponse = portOneFeignClient.getAccessToken(PortOneAuthReq.builder().imp_key(portOneProperties.getKey()).imp_secret(portOneProperties.getSecret()).build());
+    @CachePut(value = "portOneTokenCache", key = "#profile", cacheManager = "redisCacheManager")
+    public String getTokens(String profile) {
+        PortOneResponse<PortOneAuth> portOneResponse = portOneFeignClient.getAccessToken(
+                PortOneAuthReq.builder()
+                        .imp_key(portOneProperties.getKey())
+                        .imp_secret(portOneProperties.getSecret())
+                        .build());
         return portOneResponse.getResponse().getAccess_token();
     }
+
 
     public String getAuthToken() {
         PortOneResponse<PortOneAuth> portOneResponse = portOneFeignClient.getAccessToken(PortOneAuthReq.builder().imp_key(portOneProperties.getKey()).imp_secret(portOneProperties.getSecret()).build());
         return portOneResponse.getResponse().getAccess_token();
     }
-
+/*
     @Scheduled(fixedRate = 1200000)
     public void refreshAuthToken() {
        String refreshToken  = getTokens();
        log.info("refresh token {} ", refreshToken);
-    }
+    }*/
 }
 

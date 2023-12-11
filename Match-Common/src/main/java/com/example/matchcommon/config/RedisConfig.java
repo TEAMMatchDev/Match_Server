@@ -103,10 +103,12 @@ public class RedisConfig {
 
         Map<String, RedisCacheConfiguration> cacheConfiguration = new HashMap<>();
         cacheConfiguration.put("flameCache", redisCacheConfiguration.entryTtl(Duration.ofMinutes(10L)));
+        cacheConfiguration.put("portOneTokenCache", redisCacheConfiguration.entryTtl(Duration.ofMinutes(20L)));
 
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)
                 .cacheDefaults(redisCacheConfiguration)
+                .withInitialCacheConfigurations(cacheConfiguration)
                 .build();
     }
 }
