@@ -58,7 +58,7 @@ public class UserConverter {
                 .birth(authHelper.birthConversion(kakaoUserInfoDto.getBirthYear(), kakaoUserInfoDto.getBirthDay()))
                 .gender(authHelper.genderConversion(kakaoUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(userHelper.createRandomNickName())
+                .nickname(kakaoUserInfoDto.getName())
                 .serviceAlarm(ACTIVE)
                 .eventAlarm(ACTIVE)
                 .build();
@@ -87,7 +87,7 @@ public class UserConverter {
                 .birth(authHelper.birthConversion(naverUserInfoDto.getBirthyear(), naverUserInfoDto.getBirthday()))
                 .gender(authHelper.genderConversion(naverUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(userHelper.createRandomNickName())
+                .nickname(naverUserInfoDto.getName())
                 .serviceAlarm(ACTIVE)
                 .eventAlarm(ACTIVE)
                 .build();
@@ -105,7 +105,7 @@ public class UserConverter {
                 .birth(authHelper.birthConversionToLocalDate(signUpUser.getBirthDate()))
                 .gender(signUpUser.getGender())
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(userHelper.createRandomNickName())
+                .nickname(signUpUser.getName())
                 .serviceAlarm(ACTIVE)
                 .eventAlarm(ACTIVE)
                 .build();
@@ -243,7 +243,7 @@ public class UserConverter {
                 .socialId(appleSignUp.getSocialId())
                 .socialType(SocialType.APPLE)
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(userHelper.createRandomNickName())
+                .nickname(appleSignUp.getName())
                 .serviceAlarm(ACTIVE)
                 .eventAlarm(ACTIVE)
                 .gender(appleSignUp.getGender())
