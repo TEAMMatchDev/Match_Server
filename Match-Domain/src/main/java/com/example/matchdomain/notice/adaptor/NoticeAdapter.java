@@ -24,4 +24,12 @@ public class NoticeAdapter {
     public Notice findNoticeDetail(Long noticeId) {
         return noticeRepository.findById(noticeId).orElseThrow(() -> new BadRequestException(NOT_EXIST_NOTICE));
     }
+
+    public Notice save(Notice notice) {
+        return noticeRepository.save(notice);
+    }
+
+    public void delete(Notice notice) {
+        noticeRepository.deleteById(notice.getId());
+    }
 }
