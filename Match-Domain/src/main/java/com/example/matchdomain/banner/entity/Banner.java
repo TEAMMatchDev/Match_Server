@@ -1,5 +1,7 @@
 package com.example.matchdomain.banner.entity;
 
+import java.time.LocalDateTime;
+
 import com.example.matchdomain.banner.enums.BannerType;
 import com.example.matchdomain.common.model.BaseEntity;
 import com.example.matchdomain.event.entity.Event;
@@ -39,4 +41,8 @@ public class Banner extends BaseEntity {
     private String bannerImg;
 
     private String contentsUrl;
+
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
 }

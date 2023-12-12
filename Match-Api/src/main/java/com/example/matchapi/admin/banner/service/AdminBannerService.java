@@ -47,4 +47,8 @@ public class AdminBannerService {
         s3UploadService.deleteFile(banner.getBannerImg());
         bannerAdaptor.deleteById(bannerId);
     }
+
+    public void patchBanner(Long bannerId) {
+
+    }
 }
