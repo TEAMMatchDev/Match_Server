@@ -70,9 +70,8 @@ public class AdminUserService {
 
     @RedissonLock(LockName = "유저", key = "#user.id")
     public void unActivateUser(User user) {
-        user.setStatus(Status.INACTIVE);
+        updateUserInfo(user.getId(), users -> users.setStatus(Status.INACTIVE));
         donationService.deleteRegularPayment(user);
-        userAdaptor.save(user);
     }
 
     public void updateNickname(Long userId, String nickname) {
