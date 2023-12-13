@@ -105,6 +105,7 @@ public class RedisConfig {
         cacheConfiguration.put("flameCache", redisCacheConfiguration.entryTtl(Duration.ofMinutes(10L)));
         cacheConfiguration.put("regularInfo", redisCacheConfiguration.entryTtl(Duration.ofMinutes(3L)));
 
+
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)
                 .cacheDefaults(redisCacheConfiguration)

@@ -105,7 +105,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/payments/web-hook").permitAll()
                 .antMatchers("/payments/validate").permitAll()
                 .antMatchers("/payments/info").permitAll()
-                .antMatchers("/test").permitAll()
+                .antMatchers("/test/**").permitAll()
                 .and()
                 .apply(new JwtSecurityConfig(jwtService));
     }
