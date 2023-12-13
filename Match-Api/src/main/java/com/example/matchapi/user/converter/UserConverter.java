@@ -168,7 +168,7 @@ public class UserConverter {
                 .name(result.getName())
                 .birth(String.valueOf(result.getBirth()))
                 .socialType(result.getSocialType().getName())
-                .gender(result.getGender().getValue())
+                .gender(result.getGender() == null ? null : result.getGender().getValue())
                 .email(result.getEmail())
                 .phoneNumber(result.getPhoneNumber())
                 .donationCnt(result.getDonationCnt())
@@ -186,7 +186,7 @@ public class UserConverter {
                 .name(userDetail.getName())
                 .birth(String.valueOf(userDetail.getBirth()))
                 .socialType(userDetail.getSocialType().getName())
-                .gender(userDetail.getGender().getValue())
+                .gender(userDetail.getGender() == null ? null : userDetail.getGender().getValue())
                 .email(userDetail.getEmail())
                 .phoneNumber(userDetail.getPhoneNumber())
                 .donationCnt(userDetail.getDonationCnt())
@@ -194,6 +194,7 @@ public class UserConverter {
                 .card(userDetail.getCard())
                 .status(userDetail.getStatus().getValue())
                 .createdAt(userDetail.getCreatedAt().toString())
+            .nickname(userDetail.getNickname())
                 .build();
     }
 

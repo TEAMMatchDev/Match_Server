@@ -13,12 +13,15 @@ import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.enums.Gender;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
@@ -93,7 +96,7 @@ public class AdminUserController {
 
     @PatchMapping("/birth/{userId}")
     @Operation(summary = "ADMIN-02-07👤 유저 생일 수정 API.",description = "유저 생일 수정 API 입니다.")
-    public CommonResponse<String> updateBirth(@PathVariable Long userId, @RequestParam LocalDate birth){
+    public CommonResponse<String> updateBirth(@PathVariable Long userId,  @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam LocalDate birth){
         adminUserService.updateBirth(userId, birth);
         return CommonResponse.onSuccess("생일 수정 성공");
     }

@@ -183,6 +183,8 @@ public class UserRes {
         private String status;
 
         private String createdAt;
+
+        private String nickname;
     }
 
     public static class EmailAuth {
