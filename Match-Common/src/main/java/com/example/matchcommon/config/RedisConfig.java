@@ -103,7 +103,8 @@ public class RedisConfig {
 
         Map<String, RedisCacheConfiguration> cacheConfiguration = new HashMap<>();
         cacheConfiguration.put("flameCache", redisCacheConfiguration.entryTtl(Duration.ofMinutes(10L)));
-        cacheConfiguration.remove("portOneTokenCache"); // 또는 적절한 TTL로 설정 변경
+        cacheConfiguration.put("regularInfo", redisCacheConfiguration.entryTtl(Duration.ofMinutes(3L)));
+
 
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)

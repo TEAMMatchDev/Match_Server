@@ -33,11 +33,15 @@ public class QBanner extends EntityPathBase<Banner> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
+    public final DateTimePath<java.time.LocalDateTime> endDate = createDateTime("endDate", java.time.LocalDateTime.class);
+
     public final com.example.matchdomain.event.entity.QEvent event;
 
     public final NumberPath<Long> eventId = createNumber("eventId", Long.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final DateTimePath<java.time.LocalDateTime> startDate = createDateTime("startDate", java.time.LocalDateTime.class);
 
     //inherited
     public final EnumPath<com.example.matchdomain.common.model.Status> status = _super.status;

@@ -43,4 +43,13 @@ public class AdminBannerController {
         adminBannerService.deleteBanner(bannerId);
         return CommonResponse.onSuccess("삭제 성공");
     }
+
+    @PatchMapping("/{bannerId}")
+    @Operation(summary = "ADMIN-03 배너 수정")
+    public CommonResponse<String> patchBanner(
+        @PathVariable Long bannerId,
+        BannerReq.BannerPatchDto bannerPatchDto){
+        adminBannerService.patchBanner(bannerId);
+        return CommonResponse.onSuccess("수정 성공");
+    }
 }

@@ -7,13 +7,11 @@ import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.UserHelper;
 import com.example.matchcommon.annotation.Converter;
 import com.example.matchcommon.properties.AligoProperties;
-import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
 import com.example.matchdomain.user.entity.enums.AddressType;
 import com.example.matchdomain.user.entity.enums.AuthorityEnum;
-import com.example.matchdomain.user.entity.enums.Gender;
 import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.repository.UserRepository;
@@ -22,11 +20,11 @@ import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,12 +150,14 @@ public class UserConverter {
                 .phoneNumber(user.getPhoneNumber()).build();
     }
 
-    public UserRes.SignUpInfo convertToUserSignUpInfo(Long oneDayUser, Long weekUser, Long monthUser, Long totalUser) {
+    public UserRes.SignUpInfo convertToUserSignUpInfo(Long oneDayUser, Long weekUser, Long monthUser, Long totalUser,
+            Long deleteUser) {
         return UserRes.SignUpInfo.builder()
                 .totalUserCnt(totalUser)
                 .oneDayUserCnt(oneDayUser)
                 .weekUserCnt(weekUser)
                 .monthUserCnt(monthUser)
+                .deleteUserCnt(deleteUser)
                 .build();
     }
 

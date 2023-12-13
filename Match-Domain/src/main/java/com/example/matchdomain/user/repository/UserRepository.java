@@ -102,6 +102,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     boolean existsByEmailAndSocialTypeNotAndStatus(String email, SocialType socialType, Status status);
 
+    Long countByStatus(Status status);
+
     public interface UserList {
         Long getUserId();
         String getName();

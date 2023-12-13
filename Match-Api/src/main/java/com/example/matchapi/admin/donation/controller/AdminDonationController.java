@@ -39,6 +39,15 @@ public class AdminDonationController {
         return CommonResponse.onSuccess(info);
     }
 
+    @GetMapping("/regular")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    @Operation(summary = "ADMIN-05-01-01 정기 결제 현황 파악", description = "정기 결제 현황파악")
+    public CommonResponse<DonationRes.RegularInfoDto> getRegularInfo(){
+        return CommonResponse.onSuccess(adminDonationService.getRegularInfo());
+    }
+
+
+
     @GetMapping("/{donationId}")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Operation(summary = "ADMIN-05-02 기부금 상세조회 API", description = "기부금 상세조회 API")
@@ -91,4 +100,5 @@ public class AdminDonationController {
         Project project = projectService.findByProjectId(projectId);
         return CommonResponse.onSuccess(adminDonationService.getProjectDonationLists(project, page, size));
     }
+
 }

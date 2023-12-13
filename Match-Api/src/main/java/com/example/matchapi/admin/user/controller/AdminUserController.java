@@ -11,6 +11,7 @@ import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.user.entity.User;
+import com.example.matchdomain.user.entity.enums.Gender;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -81,4 +84,38 @@ public class AdminUserController {
         return CommonResponse.onSuccess(new UserRes.UserDelete(userId));
     }
 
+    @PatchMapping("/nickname/{userId}")
+    @Operation(summary = "ADMIN-02-06👤 유저 닉네임 수정 API.",description = "유저 닉네임 수정 API 입니다.")
+    public CommonResponse<String> updateNickname(@PathVariable Long userId, @RequestParam String nickname){
+        adminUserService.updateNickname(userId, nickname);
+        return CommonResponse.onSuccess("닉네임 수정 성공");
+    }
+
+    @PatchMapping("/birth/{userId}")
+    @Operation(summary = "ADMIN-02-07👤 유저 생일 수정 API.",description = "유저 생일 수정 API 입니다.")
+    public CommonResponse<String> updateBirth(@PathVariable Long userId, @RequestParam LocalDate birth){
+        adminUserService.updateBirth(userId, birth);
+        return CommonResponse.onSuccess("생일 수정 성공");
+    }
+
+    @PatchMapping("/phone/{userId}")
+    @Operation(summary = "ADMIN-02-08👤 유저 전화번호 수정 API.",description = "유저 전화번호 수정 API 입니다.")
+    public CommonResponse<String> updatePhone(@PathVariable Long userId, @RequestParam String phone){
+        adminUserService.updatePhone(userId, phone);
+        return CommonResponse.onSuccess("전화번호 수정 성공");
+    }
+
+    @PatchMapping("/email/{userId}")
+    @Operation(summary = "ADMIN-02-09 유저 이메일 수정 API" , description = "유저 이메일 수정 API")
+    public CommonResponse<String> updateEmail(@PathVariable Long userId, @RequestParam String email){
+        adminUserService.updateEmail(userId, email);
+        return CommonResponse.onSuccess("이메일 수정 성공");
+    }
+
+    @PatchMapping("/gender/{userId}")
+    @Operation(summary = "ADMIN-02-10 유저 성별 수정 API" , description = "유저 성별 수정 API")
+    public CommonResponse<String> updateGender(@PathVariable Long userId, @RequestParam Gender gender){
+        adminUserService.updateGender(userId, gender);
+        return CommonResponse.onSuccess("성별 수정 성공");
+    }
 }
