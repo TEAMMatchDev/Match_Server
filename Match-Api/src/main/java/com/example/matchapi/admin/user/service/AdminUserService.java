@@ -16,8 +16,8 @@ import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,33 +75,35 @@ public class AdminUserService {
         donationService.deleteRegularPayment(user);
     }
 
+    @Transactional
     public void updateNickname(Long userId, String nickname) {
         updateUserInfo(userId, user -> user.setNickname(nickname));
     }
 
+    @Transactional
     public void updatePhone(Long userId, String phone) {
         if (userAdaptor.existsPhoneNumber(phone)) {
             throw new ForbiddenException(USERS_EXISTS_PHONE);
         }
         updateUserInfo(userId, user -> user.setPhoneNumber(phone));
     }
-
+    @Transactional
     public void updateEmail(Long userId, String email) {
         if (userAdaptor.existsEmail(email)) {
             throw new ForbiddenException(USERS_EXISTS_EMAIL);
         }
         updateUserInfo(userId, user -> user.setEmail(email));
     }
-
+    @Transactional
     public void updateGender(Long userId, Gender gender) {
         updateUserInfo(userId, user -> user.setGender(gender));
     }
-
+    @Transactional
     public void updateBirth(Long userId, LocalDate birth) {
         updateUserInfo(userId, user -> user.setBirth(birth));
     }
 
-    private void updateUserInfo(Long userId, Consumer<User> updateFunction) {
+    public void updateUserInfo(Long userId, Consumer<User> updateFunction) {
         User user = findByUserId(userId);
         updateFunction.accept(user);
         userAdaptor.save(user);
