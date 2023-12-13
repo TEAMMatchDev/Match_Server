@@ -72,4 +72,8 @@ public class RegularPaymentAdaptor {
     public List<RegularPayment> findByUserPage(User user) {
         return regularPaymentRepository.findByUser(user);
     }
+
+    public List<RegularPayment> getRegularInfo() {
+        return regularPaymentRepository.findAllByOrderByCreatedAtAsc();
+    }
 }

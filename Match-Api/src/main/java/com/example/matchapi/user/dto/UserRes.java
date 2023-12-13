@@ -119,6 +119,8 @@ public class UserRes {
         private Long weekUserCnt;
 
         private Long monthUserCnt;
+
+        private Long deleteUserCnt;
     }
 
     @Getter

@@ -118,4 +118,8 @@ public class UserAdaptor {
     public UserRepository.UserList getUserDetail(Long userId) {
         return userRepository.getUserDetail(userId);
     }
+
+    public Long getDeleteUserCnt() {
+        return userRepository.countByStatus(Status.INACTIVE);
+    }
 }

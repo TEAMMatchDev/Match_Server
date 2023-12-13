@@ -128,4 +128,18 @@ public class AdminDonationConverter {
                 .partialAmount(result.getExecutionPrice())
                 .build();
     }
+
+	public DonationRes.RegularInfoDto convertToRegularInfoDto(Long beforeCnt, Long underCnt, Long successCnt, String successAmount, Long regularCnt, String totalAmount, Long beforeMonthRegularCnt, String beforeMonthRegularAmount) {
+        return DonationRes.RegularInfoDto
+            .builder()
+            .beforeCnt(beforeCnt)
+            .underCnt(underCnt)
+            .successCnt(successCnt)
+            .successAmount(successAmount)
+            .regularCnt(regularCnt)
+            .regularAmount(totalAmount)
+            .beforeMonthRegularCnt(beforeMonthRegularCnt)
+            .beforeMonthRegularAmount(beforeMonthRegularAmount)
+            .build();
+	}
 }

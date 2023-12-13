@@ -39,8 +39,9 @@ public class AdminUserService {
         Long oneDayUser = userAdaptor.getOneDayUserCnt(localDate);
         Long weekUser = userAdaptor.getWeekUserCnt(localDate);
         Long monthUser = userAdaptor.getMonthUserCnt(localDate);
+        Long deleteUser = userAdaptor.getDeleteUserCnt();
 
-        return userConverter.convertToUserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
+        return userConverter.convertToUserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser, deleteUser);
     }
 
     @Transactional
