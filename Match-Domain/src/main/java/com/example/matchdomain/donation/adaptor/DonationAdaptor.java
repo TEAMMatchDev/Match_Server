@@ -136,4 +136,8 @@ public class DonationAdaptor {
     public List<DonationUser> getRegularDonationLists() {
         return donationUserRepository.findAll();
     }
+
+    public List<DonationUser> findByUserId(Long userId) {
+        return donationUserRepository.findByUserIdAndDonationStatusNot(userId, EXECUTION_REFUND);
+    }
 }

@@ -238,4 +238,12 @@ public class AdminDonationService {
             Math.toIntExact(successAmount)), regularCnt, donationHelper.parsePriceComma(Math.toIntExact(totalAmount)), beforeMonthRegularCnt, donationHelper.parsePriceComma(
             Math.toIntExact(beforeMonthRegularAmount)));
     }
+
+    public Long countByUserId(Long userId) {
+        return paymentAdaptor.countByUserId(userId);
+    }
+
+    public List<DonationUser> findByUserId(Long userId) {
+        return donationAdaptor.findByUserId(userId);
+    }
 }

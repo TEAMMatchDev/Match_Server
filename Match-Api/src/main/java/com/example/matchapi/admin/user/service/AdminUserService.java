@@ -40,7 +40,7 @@ public class AdminUserService {
         Long weekUser = userAdaptor.getWeekUserCnt(localDate);
         Long monthUser = userAdaptor.getMonthUserCnt(localDate);
         Long deleteUser = userAdaptor.getDeleteUserCnt();
-
+        System.out.println(deleteUser);
         return userConverter.convertToUserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser, deleteUser);
     }
 
@@ -60,9 +60,9 @@ public class AdminUserService {
     }
 
     public UserRes.UserAdminDetail getUserAdminDetail(Long userId) {
-        UserRepository.UserList userDetail = userAdaptor.getUserDetail(userId);
-
-        return userConverter.convertToUserAdminDetail(userDetail);
+        //UserRepository.UserList userDetail = userAdaptor.getUserDetail(userId);
+        User user = findByUserId(userId);
+        return userConverter.convertToUserAdminDetail(user);
     }
 
     public User findByUserId(Long userId) {
