@@ -1,5 +1,6 @@
 package com.example.matchapi.user.converter;
 
+import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
@@ -38,6 +39,7 @@ public class UserConverter {
     private final UserHelper userHelper;
     private final PasswordEncoder passwordEncoder;
     private final AligoProperties aligoProperties;
+    private final DonationHelper donationHelper;
 
     public User convertToKakaoSignUpUser(KakaoUserInfoDto kakaoUserInfoDto, SocialType authType) {
         String profileImg = BASE_PROFILE;
@@ -179,19 +181,16 @@ public class UserConverter {
                 .build();
     }
 
-    public UserRes.UserAdminDetail convertToUserAdminDetail(UserRepository.UserList userDetail) {
+    public UserRes.UserAdminDetail convertToUserAdminDetail(User userDetail) {
         return UserRes.UserAdminDetail
                 .builder()
-                .userId(userDetail.getUserId())
+                .userId(userDetail.getId())
                 .name(userDetail.getName())
                 .birth(String.valueOf(userDetail.getBirth()))
                 .socialType(userDetail.getSocialType().getName())
                 .gender(userDetail.getGender() == null ? null : userDetail.getGender().getValue())
                 .email(userDetail.getEmail())
                 .phoneNumber(userDetail.getPhoneNumber())
-                .donationCnt(userDetail.getDonationCnt())
-                .totalAmount(userDetail.getTotalAmount())
-                .card(userDetail.getCard())
                 .status(userDetail.getStatus().getValue())
                 .createdAt(userDetail.getCreatedAt().toString())
             .nickname(userDetail.getNickname())
@@ -291,5 +290,16 @@ public class UserConverter {
                 .donationStatus(donationUser.getDonationStatus())
                 .donationStatusName(donationUser.getDonationStatus().getName())
                 .build();
+    }
+
+    public UserRes.DonationInfoDto convertToDonationInfoDto(Long regularCnt, List<DonationUser> donationUsers, boolean isCard) {
+        return UserRes.DonationInfoDto
+            .builder()
+            .regularCnt(regularCnt)
+            .isCard(isCard)
+            .totalCnt((long)donationUsers.size())
+            .totalAmount(donationHelper.parsePriceComma(
+                (int)donationUsers.stream().mapToLong(DonationUser::getPrice).sum()))
+            .build();
     }
 }

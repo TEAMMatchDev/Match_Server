@@ -1,5 +1,6 @@
 package com.example.matchapi.admin.user.controller;
 
+import com.example.matchapi.admin.donation.service.AdminDonationService;
 import com.example.matchapi.admin.user.service.AdminUserService;
 import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.user.converter.UserConverter;
@@ -10,6 +11,7 @@ import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.user.entity.User;
 import com.example.matchdomain.user.entity.enums.Gender;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
@@ -22,6 +24,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
@@ -37,6 +40,8 @@ public class AdminUserController {
     private final AdminUserService adminUserService;
     private final DonationService donationService;
     private final UserConverter userConverter;
+    private final AdminDonationService adminDonationService;
+
     @GetMapping("/info")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Operation(summary = "ADMIN-02-01👤 유저저 가입 현황파악 API.",description = "프로젝트 리스트 조회 API 입니다.")
@@ -121,4 +126,14 @@ public class AdminUserController {
         adminUserService.updateGender(userId, gender);
         return CommonResponse.onSuccess("성별 수정 성공");
     }
+
+    @GetMapping("/donations/{userId}")
+    @Operation(summary = "ADMIN-02-11 유저 기부 정보" , description = "유저 기부 정보")
+    public CommonResponse<UserRes.DonationInfoDto> getDonationInfo(@PathVariable Long userId){
+        Long regularCnt = adminDonationService.countByUserId(userId);
+        List<DonationUser> donationUsers = adminDonationService.findByUserId(userId);
+        boolean isCard = adminUserService.findByUserId(userId).getUserCard().size() > 0;
+        return CommonResponse.onSuccess(userConverter.convertToDonationInfoDto(regularCnt, donationUsers, isCard));
+    }
+
 }

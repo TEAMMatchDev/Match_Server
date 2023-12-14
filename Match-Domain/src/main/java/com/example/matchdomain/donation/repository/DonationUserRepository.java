@@ -90,6 +90,8 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
 
     List<DonationUser> findByRegularPaymentNotNull();
 
+    List<DonationUser> findByUserIdAndDonationStatusNot(Long userId, DonationStatus donationStatus);
+
     interface flameList {
         Long getRegularPayId();
 

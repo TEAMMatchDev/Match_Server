@@ -174,12 +174,6 @@ public class UserRes {
 
         private String email;
 
-        private boolean card;
-
-        private int donationCnt;
-
-        private int totalAmount;
-
         private String status;
 
         private String createdAt;
@@ -263,5 +257,18 @@ public class UserRes {
         private List<UserFlameListDto> flameLists;
     }
 
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DonationInfoDto {
+        private Long regularCnt;
 
+        private Long totalCnt;
+
+        private String totalAmount;
+
+        private boolean isCard;
+    }
 }
