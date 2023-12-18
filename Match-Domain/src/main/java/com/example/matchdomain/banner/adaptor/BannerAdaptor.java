@@ -1,6 +1,9 @@
 package com.example.matchdomain.banner.adaptor;
 
+import static com.example.matchdomain.banner.exception.BannerGerErrorCode.*;
+
 import com.example.matchcommon.annotation.Adaptor;
+import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchdomain.banner.entity.Banner;
 import com.example.matchdomain.banner.repository.BannerRepository;
 import com.example.matchdomain.keyword.entity.SearchKeyword;
@@ -29,7 +32,7 @@ public class BannerAdaptor {
     }
 
     public Banner findById(Long bannerId) {
-        return bannerRepository.findById(bannerId).orElseThrow();
+        return bannerRepository.findById(bannerId).orElseThrow(() -> new NotFoundException(NOT_EXISTS_BANNER));
     }
 
     public void deleteById(Long bannerId) {
