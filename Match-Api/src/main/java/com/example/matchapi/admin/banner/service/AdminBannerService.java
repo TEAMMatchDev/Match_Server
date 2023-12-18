@@ -3,6 +3,7 @@ package com.example.matchapi.admin.banner.service;
 import com.example.matchapi.banner.converter.BannerConverter;
 import com.example.matchapi.banner.dto.BannerReq;
 import com.example.matchapi.banner.dto.BannerRes;
+import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.banner.adaptor.BannerAdaptor;
 import com.example.matchdomain.banner.entity.Banner;
 import com.example.matchdomain.banner.enums.BannerType;
@@ -11,6 +12,7 @@ import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,5 +52,10 @@ public class AdminBannerService {
 
     public void patchBanner(Long bannerId) {
 
+    }
+
+    public PageResponse<List<BannerRes.BannerAdminListDto>> getBannerLists(int page, int size) {
+        Page<Banner> banners = bannerAdaptor.getBannerLists(page, size);
+        return new PageResponse<>(banners.isLast(), banners.getSize(), bannerConverter.convertToBannerLists(banners.getContent()));
     }
 }

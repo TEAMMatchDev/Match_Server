@@ -17,6 +17,8 @@ public class BannerReq {
 
         private String contentsUrl;
 
+        private String name;
+
         private LocalDateTime startDate;
 
         private LocalDateTime endDate;

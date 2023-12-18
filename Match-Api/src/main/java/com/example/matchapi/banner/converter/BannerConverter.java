@@ -18,6 +18,7 @@ public class BannerConverter {
                     .builder()
                     .bannerImg(bannerImg)
                     .bannerType(bannerType)
+                    .name(bannerUploadDto.getName())
                     .eventId(bannerUploadDto.getEventId())
                     .build();
         }
@@ -26,6 +27,7 @@ public class BannerConverter {
                     .builder()
                     .bannerImg(bannerImg)
                     .bannerType(bannerType)
+                    .name(bannerUploadDto.getName())
                     .contentsUrl(bannerUploadDto.getContentsUrl())
                     .build();
         }
@@ -53,5 +55,31 @@ public class BannerConverter {
                 .eventId(result.getEventId())
                 .contentsUrl(result.getContentsUrl())
                 .build();
+    }
+
+    public List<BannerRes.BannerAdminListDto> convertToBannerLists(List<Banner> content) {
+        List<BannerRes.BannerAdminListDto> bannerLists = new ArrayList<>();
+
+        content.forEach(
+                result ->
+                        bannerLists.add(
+                                convertToBannerListDto(result)
+                        )
+        );
+
+        return bannerLists;
+    }
+
+    private BannerRes.BannerAdminListDto convertToBannerListDto(Banner result) {
+        return BannerRes.BannerAdminListDto
+            .builder()
+            .bannerId(result.getId())
+            .bannerType(result.getBannerType())
+            .eventId(result.getEventId())
+            .name(result.getName())
+            .bannerImg(result.getBannerImg())
+            .startDate(result.getStartDate())
+            .endDate(result.getEndDate())
+            .build();
     }
 }
