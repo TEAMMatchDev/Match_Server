@@ -6,6 +6,9 @@ import com.example.matchdomain.banner.repository.BannerRepository;
 import com.example.matchdomain.keyword.entity.SearchKeyword;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,4 +35,10 @@ public class BannerAdaptor {
     public void deleteById(Long bannerId) {
         bannerRepository.deleteById(bannerId);
     }
+
+	public Page<Banner> getBannerLists(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return bannerRepository.findByOrderByCreatedAtDesc(pageable);
+
+	}
 }

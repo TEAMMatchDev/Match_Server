@@ -31,6 +31,8 @@ public class Banner extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private BannerType bannerType;
 
+    private String name;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eventId",nullable = false, insertable=false, updatable=false)
     private Event event;
