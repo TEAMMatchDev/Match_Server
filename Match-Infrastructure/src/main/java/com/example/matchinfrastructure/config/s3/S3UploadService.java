@@ -26,6 +26,7 @@ import static com.example.matchcommon.exception.errorcode.FileUploadException.*;
 @RequiredArgsConstructor
 @Slf4j
 public class S3UploadService {
+    private static final String CLOUD_FRONT_DOMAIN_NAME = "https://d331gpen6ndprr.cloudfront.net";
 
     private final AmazonS3 amazonS3;
     private final AwsS3Properties awsS3Properties;
@@ -99,7 +100,7 @@ public class S3UploadService {
 
             try (InputStream inputStream = file.getInputStream()) {
                 amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
-                imgUrlList.add(amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString());
+                imgUrlList.add(getImageUrl(fileName));
             } catch (IOException e) {
                 log.info("파일 업로드 실패 프로젝트 ID : " + historyId);
                 throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
@@ -136,12 +137,12 @@ public class S3UploadService {
             log.info("파일 업로드 실패 프로젝트 ID : " + projectId);
             throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
         }
-        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
+        return getImageUrl(fileName);
     }
 
     public void deleteFile(String fileName){
-        int index=fileName.indexOf(awsS3Properties.getS3().getBaseUrl());
-        String fileRoute=fileName.substring(index+awsS3Properties.getS3().getBaseUrl().length()+1);
+        int index=fileName.indexOf(CLOUD_FRONT_DOMAIN_NAME);
+        String fileRoute=fileName.substring(index+CLOUD_FRONT_DOMAIN_NAME.length()+1);
         try {
             boolean isObjectExist = amazonS3.doesObjectExist(awsS3Properties.getS3().getBucket(), fileRoute);
             if (isObjectExist) {
@@ -165,7 +166,7 @@ public class S3UploadService {
             log.info("파일 업로드 실패 프로젝트 ID : " + userId);
             throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
         }
-        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
+        return getImageUrl(fileName);
     }
 
     public String uploadBannerImage(MultipartFile bannerImage) {
@@ -179,7 +180,7 @@ public class S3UploadService {
         } catch (IOException e) {
             throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
         }
-        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
+        return getImageUrl(fileName);
     }
 
     private String getForBannerFileName(String fileExtension) {
@@ -196,7 +197,7 @@ public class S3UploadService {
 
         amazonS3.putObject(new PutObjectRequest(awsS3Properties.getS3().getBucket(),s3FileName,new ByteArrayInputStream(thumbnailBytes),metadata));
 
-        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(),s3FileName).toString();
+        return getImageUrl(s3FileName);
     }
 
 
@@ -218,12 +219,16 @@ public class S3UploadService {
         } catch (IOException e) {
             throw new ForbiddenException(IMAGE_UPLOAD_ERROR);
         }
-        return amazonS3.getUrl(awsS3Properties.getS3().getBucket(), fileName).toString();
+        return getImageUrl(fileName);
     }
 
     private String getForOneFileName(String dirName, String fileExtension) {
         return  dirName+"/"
                 + UUID.randomUUID()
                 + fileExtension;
+    }
+
+    private String getImageUrl(String fileName){
+        return CLOUD_FRONT_DOMAIN_NAME + "/" + fileName;
     }
 }
