@@ -142,7 +142,6 @@ public class S3UploadService {
     public void deleteFile(String fileName){
         int index=fileName.indexOf(awsS3Properties.getS3().getBaseUrl());
         String fileRoute=fileName.substring(index+awsS3Properties.getS3().getBaseUrl().length()+1);
-        System.out.println("deletefilename : "+fileRoute);
         try {
             boolean isObjectExist = amazonS3.doesObjectExist(awsS3Properties.getS3().getBucket(), fileRoute);
             if (isObjectExist) {

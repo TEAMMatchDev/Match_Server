@@ -47,4 +47,11 @@ public class Banner extends BaseEntity {
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
+
+    public void updateBanner(String name, LocalDateTime startDate, LocalDateTime endDate, String bannerImg) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.bannerImg = bannerImg;
+    }
 }

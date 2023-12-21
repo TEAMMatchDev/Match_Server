@@ -30,9 +30,8 @@ public class AdminBannerController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "ADMIN-08-01 배너 업로드")
     public CommonResponse<List<BannerRes.BannerList>> uploadBanner(
-            @RequestPart BannerType bannerType,
             @RequestPart MultipartFile bannerImage,
-            @RequestPart BannerReq.BannerUpload bannerUploadDto
+            @RequestPart("bannerUploadDto") BannerReq.BannerUpload bannerUploadDto
             ){
         return CommonResponse.onSuccess(adminBannerService.uploadBanner(BannerType.EVENT, bannerImage, bannerUploadDto));
     }
@@ -58,8 +57,9 @@ public class AdminBannerController {
     @Operation(summary = "ADMIN-08-04 배너 수정")
     public CommonResponse<String> patchBanner(
         @PathVariable Long bannerId,
-        BannerReq.BannerPatchDto bannerPatchDto){
-        adminBannerService.patchBanner(bannerId);
+        @RequestPart(value = "bannerImage", required = false) MultipartFile bannerImage,
+        @RequestPart("bannerPatchDto") BannerReq.BannerPatchDto bannerPatchDto){
+        adminBannerService.patchBanner(bannerId, bannerPatchDto, bannerImage);
         return CommonResponse.onSuccess("수정 성공");
     }
 }

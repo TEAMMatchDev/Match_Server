@@ -29,12 +29,15 @@ public class BannerReq {
     @Setter
     @Builder
     @AllArgsConstructor
+    @ToString
     @NoArgsConstructor
 	public static class BannerPatchDto {
+        private String name;
+
         private LocalDateTime startDate;
 
         private LocalDateTime endDate;
 
-        private String deleteImgUrl;
+        private boolean isEditImage;
 	}
 }
