@@ -34,6 +34,8 @@ public class BannerReq {
 	public static class BannerPatchDto {
         private String name;
 
+        private String contentsUrl;
+
         private LocalDateTime startDate;
 
         private LocalDateTime endDate;
