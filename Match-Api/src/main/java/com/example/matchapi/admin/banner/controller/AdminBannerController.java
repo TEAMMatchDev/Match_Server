@@ -33,7 +33,7 @@ public class AdminBannerController {
             @RequestPart MultipartFile bannerImage,
             @RequestPart("bannerUploadDto") BannerReq.BannerUpload bannerUploadDto
             ){
-        return CommonResponse.onSuccess(adminBannerService.uploadBanner(BannerType.EVENT, bannerImage, bannerUploadDto));
+        return CommonResponse.onSuccess(adminBannerService.uploadBanner(BannerType.CONTENTS, bannerImage, bannerUploadDto));
     }
 
     @GetMapping("")

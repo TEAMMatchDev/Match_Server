@@ -55,9 +55,10 @@ public class AdminBannerService {
         if(bannerPatchDto.isEditImage()){
             s3UploadService.deleteFile(banner.getBannerImg());
             String imgUrl = s3UploadService.uploadBannerImage(bannerImage);
-            banner.updateBanner(bannerPatchDto.getName(), banner.getStartDate(), banner.getEndDate(), imgUrl);
+            System.out.println(imgUrl);
+            banner.updateBanner(bannerPatchDto.getName(), banner.getStartDate(), banner.getEndDate(), imgUrl, bannerPatchDto.getContentsUrl());
         }else{
-            banner.updateBanner(bannerPatchDto.getName(), banner.getStartDate(), banner.getEndDate(), banner.getBannerImg());
+            banner.updateBanner(bannerPatchDto.getName(), banner.getStartDate(), banner.getEndDate(), banner.getBannerImg(),  bannerPatchDto.getContentsUrl());
         }
         bannerAdaptor.save(banner);
     }
