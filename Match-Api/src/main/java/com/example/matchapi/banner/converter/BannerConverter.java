@@ -20,14 +20,19 @@ public class BannerConverter {
                     .bannerType(bannerType)
                     .name(bannerUploadDto.getName())
                     .eventId(bannerUploadDto.getEventId())
+                    .startDate(bannerUploadDto.getStartDate())
+                    .endDate(bannerUploadDto.getEndDate())
+                    .contentsUrl(bannerUploadDto.getContentsUrl())
                     .build();
         }
         else{
-            return Banner
-                    .builder()
+            return Banner.builder()
                     .bannerImg(bannerImg)
                     .bannerType(bannerType)
                     .name(bannerUploadDto.getName())
+                    .contentsUrl(bannerUploadDto.getContentsUrl())
+                    .startDate(bannerUploadDto.getStartDate())
+                    .endDate(bannerUploadDto.getEndDate())
                     .contentsUrl(bannerUploadDto.getContentsUrl())
                     .build();
         }
@@ -77,6 +82,7 @@ public class BannerConverter {
             .bannerType(result.getBannerType())
             .eventId(result.getEventId())
             .name(result.getName())
+            .contentsUrl(result.getContentsUrl())
             .bannerImg(result.getBannerImg())
             .startDate(result.getStartDate())
             .endDate(result.getEndDate())

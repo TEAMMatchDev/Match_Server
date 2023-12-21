@@ -7,7 +7,6 @@ import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.banner.adaptor.BannerAdaptor;
 import com.example.matchdomain.banner.entity.Banner;
 import com.example.matchdomain.banner.enums.BannerType;
-import com.example.matchdomain.banner.repository.BannerRepository;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -50,8 +49,17 @@ public class AdminBannerService {
         bannerAdaptor.deleteById(bannerId);
     }
 
-    public void patchBanner(Long bannerId) {
-
+    @Transactional
+    public void patchBanner(Long bannerId, BannerReq.BannerPatchDto bannerPatchDto, MultipartFile bannerImage) {
+        Banner banner = bannerAdaptor.findById(bannerId);
+        if(bannerPatchDto.isEditImage()){
+            s3UploadService.deleteFile(banner.getBannerImg());
+            String imgUrl = s3UploadService.uploadBannerImage(bannerImage);
+            banner.updateBanner(bannerPatchDto.getName(), banner.getStartDate(), banner.getEndDate(), imgUrl);
+        }else{
+            banner.updateBanner(bannerPatchDto.getName(), banner.getStartDate(), banner.getEndDate(), banner.getBannerImg());
+        }
+        bannerAdaptor.save(banner);
     }
 
     public PageResponse<List<BannerRes.BannerAdminListDto>> getBannerLists(int page, int size) {

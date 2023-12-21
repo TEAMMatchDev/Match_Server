@@ -40,6 +40,8 @@ public class BannerRes {
 
         private String name;
 
+        private String contentsUrl;
+
         private String bannerImg;
 
         private Long eventId;
