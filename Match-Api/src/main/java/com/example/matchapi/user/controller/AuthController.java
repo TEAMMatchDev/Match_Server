@@ -161,7 +161,7 @@ public class AuthController {
         return CommonResponse.onSuccess("문자 전송 성공");
     }
 
-    @Operation(summary="01-10🔑 유저 전화번호 인증번호 확인 API", description= "전화번호 인증번호 확인 API 입니다.")
+    @Operation(summary="01-10🔑 유저 전화번호전화번호 인증번호 확인 API", description= "전화번호 인증번호 확인 API 입니다.")
     @PostMapping("/check/phone")
     @ApiErrorCodeExample(CodeAuthErrorCode.class)
     @DisableSecurity

@@ -17,18 +17,6 @@
         <persistence strategy="localTempSwap" />
     </cache>
 
-    <cache name="portOneTokenCache"
-           maxEntriesLocalHeap="100"
-           maxEntriesLocalDisk="100"
-           eternal="false"
-           diskSpoolBufferSizeMB="5"
-           timeToIdleSeconds="900"
-           timeToLiveSeconds="900"
-           memoryStoreEvictionPolicy="LFU"
-           transactionalMode="off">
-        <persistence strategy="localTempSwap" />
-    </cache>
-
     <cache name="bannerCache"
            maxEntriesLocalHeap="100"
            maxEntriesLocalDisk="100"
@@ -61,18 +49,6 @@
            timeToIdleSeconds="900"
            timeToLiveSeconds="900"
            memoryStoreEvictionPolicy="LFU"
-           transactionalMode="off">
-        <persistence strategy="localTempSwap" />
-    </cache>
-
-    <cache name="flameCache"
-           maxEntriesLocalHeap="100"
-           maxEntriesLocalDisk="100"
-           eternal="false"
-           diskSpoolBufferSizeMB="10"
-           timeToIdleSeconds="30"
-           timeToLiveSeconds="30"
-           memoryStoreEvictionPolicy="LRU"
            transactionalMode="off">
         <persistence strategy="localTempSwap" />
     </cache>

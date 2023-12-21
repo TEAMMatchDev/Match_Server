@@ -1,5 +1,7 @@
 package com.example.matchapi.banner.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.*;
 
 public class BannerReq {
@@ -14,5 +16,28 @@ public class BannerReq {
         private Long eventId;
 
         private String contentsUrl;
+
+        private String name;
+
+        private LocalDateTime startDate;
+
+        private LocalDateTime endDate;
     }
+
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @ToString
+    @NoArgsConstructor
+	public static class BannerPatchDto {
+        private String name;
+
+        private LocalDateTime startDate;
+
+        private LocalDateTime endDate;
+
+        private boolean isEditImage;
+	}
 }

@@ -16,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.PROCEEDING;
+import static com.example.matchdomain.donation.entity.enums.RegularPayStatus.*;
 import static com.example.matchdomain.donation.exception.CancelRegularPayErrorCode.REGULAR_PAY_NOT_EXIST;
 import static com.example.matchdomain.donation.exception.GetRegularErrorCode.REGULAR_NOT_EXIST;
 
@@ -68,4 +68,16 @@ public class RegularPaymentAdaptor {
     public void saveAll(List<RegularPayment> regularPayments) {
         regularPaymentRepository.saveAll(regularPayments);
     }
+
+    public List<RegularPayment> findByUserPage(User user) {
+        return regularPaymentRepository.findByUser(user);
+    }
+
+    public List<RegularPayment> getRegularInfo() {
+        return regularPaymentRepository.findAllByOrderByCreatedAtAsc();
+    }
+
+	public Long countByUserId(Long userId) {
+        return regularPaymentRepository.countByUserIdAndRegularPayStatusNot(userId, USER_CANCEL);
+	}
 }

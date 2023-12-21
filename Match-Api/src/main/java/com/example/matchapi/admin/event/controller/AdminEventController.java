@@ -28,4 +28,12 @@ public class AdminEventController {
         return CommonResponse.onSuccess("업로드 성공");
     }
 
+    @DeleteMapping("/{eventId}")
+    @Operation(summary = "ADMIN-09-02 이벤트 삭제")
+    public CommonResponse<String> deleteEvent(@PathVariable Long eventId){
+        adminEventService.deleteEvent(eventId);
+        return CommonResponse.onSuccess("삭제 성공");
+    }
+
+    
 }

@@ -4,6 +4,7 @@ import com.example.matchapi.common.aop.CheckIdExist;
 import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
+import com.example.matchapi.project.service.CommentService;
 import com.example.matchcommon.constants.enums.FILTER;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
@@ -38,6 +39,7 @@ import java.util.List;
 public class ProjectController {
     private final ProjectService projectService;
     private final DonationService donationService;
+    private final CommentService commentService;
     @Operation(summary = "03-01💻 프로젝트 리스트 조회 API. #Web version",description = "프로젝트 리스트 조회 API 입니다.")
     @GetMapping("")
     public CommonResponse<PageResponse<List<ProjectRes.ProjectList>>> getProjectList(
@@ -81,7 +83,7 @@ public class ProjectController {
             @Parameter(description = "프로젝트 id")  @PathVariable("projectId") Long projectId
     ){
         log.info("03-04 프로젝트 댓글 조회 projectId : "+ projectId);
-        return CommonResponse.onSuccess(projectService.getProjectComment(user, projectId, page, size));
+        return CommonResponse.onSuccess(commentService.getProjectComment(user, projectId, page, size));
     }
 
     @Operation(summary = "03-05💻 프로젝트 리스트 조회 API #FRAME_프로젝트 리스트 조회.",description = "프로젝트 리스트 조회 API 입니다.")
@@ -152,7 +154,7 @@ public class ProjectController {
     public CommonResponse<ProjectRes.CommentList> postComment(@Parameter(hidden = true) @AuthenticationPrincipal User user,
                                               @Parameter(description = "프로젝트 id")  @PathVariable("projectId") Long projectId,
                                               @Valid  @RequestBody ProjectReq.Comment comment){
-        return CommonResponse.onSuccess(projectService.postComment(user, projectId, comment));
+        return CommonResponse.onSuccess(commentService.postComment(user, projectId, comment));
     }
 
     @Operation(summary = "03-11💻 후원 응원 신고하기 #FRAME_후원 상세조회", description = "후원 응원 신고하기 기능입니다")
@@ -160,7 +162,7 @@ public class ProjectController {
     @ApiErrorCodeExample({UserAuthErrorCode.class, CommentGetErrorCode.class})
     public CommonResponse<String> reportComment(@PathVariable Long commentId,
                                                 @RequestParam("reportReason")ReportReason reportReason){
-        projectService.reportComment(commentId,reportReason);
+        commentService.reportComment(commentId,reportReason);
         return CommonResponse.onSuccess("신고 성공");
     }
 
@@ -170,7 +172,7 @@ public class ProjectController {
     public CommonResponse<String> deleteComment(
             @Parameter(hidden = true) @AuthenticationPrincipal User user,
             @PathVariable Long commentId){
-        projectService.deleteComment(user, commentId);
+        commentService.deleteComment(user, commentId);
         return CommonResponse.onSuccess("삭제 성공");
     }
 

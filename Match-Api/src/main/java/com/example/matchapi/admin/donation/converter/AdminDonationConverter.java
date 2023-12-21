@@ -124,7 +124,22 @@ public class AdminDonationConverter {
                 .userName(result.getUser().getName())
                 .amount(result.getPrice())
                 .importedAmount((int) (result.getPrice()*0.1))
-                .waitingSortingAmount(result.getDonationStatus().equals(DonationStatus.PARTIAL_EXECUTION) ? result.getExecutionPrice() : (long) (result.getPrice() * 0.9))
+                .waitingSortingAmount(result.getDonationStatus().equals(DonationStatus.PARTIAL_EXECUTION) ? (long) (result.getPrice() * 0.9 - result.getExecutionPrice()) : (long) (result.getPrice() * 0.9))
+                .partialAmount(result.getExecutionPrice())
                 .build();
     }
+
+	public DonationRes.RegularInfoDto convertToRegularInfoDto(Long beforeCnt, Long underCnt, Long successCnt, String successAmount, Long regularCnt, String totalAmount, Long beforeMonthRegularCnt, String beforeMonthRegularAmount) {
+        return DonationRes.RegularInfoDto
+            .builder()
+            .beforeCnt(beforeCnt)
+            .underCnt(underCnt)
+            .successCnt(successCnt)
+            .successAmount(successAmount)
+            .regularCnt(regularCnt)
+            .regularAmount(totalAmount)
+            .beforeMonthRegularCnt(beforeMonthRegularCnt)
+            .beforeMonthRegularAmount(beforeMonthRegularAmount)
+            .build();
+	}
 }

@@ -77,6 +77,8 @@ public class DonationRes {
         private String weekDonation;
 
         private String monthDonation;
+
+        private String totalDonation;
     }
 
     @Getter
@@ -397,7 +399,32 @@ public class DonationRes {
 
         private Long waitingSortingAmount;
 
+        private Long partialAmount;
+
         @Schema(description = "수입 금액")
         private int importedAmount;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RegularInfoDto {
+        private Long beforeCnt;
+
+        private Long underCnt;
+
+        private Long successCnt;
+
+        private String successAmount;
+
+        private Long regularCnt;
+
+        private String regularAmount;
+
+        private Long beforeMonthRegularCnt;
+
+        private String beforeMonthRegularAmount;
     }
 }
