@@ -6,6 +6,7 @@ import com.example.matchbatch.helper.TimeUtils;
 import com.example.matchbatch.model.CalculateMonthLastDateDto;
 import com.example.matchbatch.model.PaymentCntDto;
 import com.example.matchcommon.annotation.RedissonLock;
+import com.example.matchcommon.exception.BaseException;
 import com.example.matchdomain.donation.adaptor.RegularPaymentAdaptor;
 import com.example.matchdomain.donation.adaptor.RequestFailedHistoryAdapter;
 import com.example.matchdomain.donation.entity.*;
@@ -26,6 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.matchcommon.constants.MatchStatic.*;
+import static org.springframework.http.HttpStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -111,7 +113,7 @@ public class OrderService {
         String orderId = orderHelper.createRandomOrderId();
 
         PortOneResponse<PortOneBillPayResponse> portOneResponse = attemptPayment(payment, accessToken, orderId);
-        if(portOneResponse.getCode()!=0){
+        if(portOneResponse.getCode()!=0 || portOneResponse.getResponse().getFail_reason()!=null){
             handlePaymentFailure(payment, portOneResponse.getMessage(), type);
             return true;
         }
