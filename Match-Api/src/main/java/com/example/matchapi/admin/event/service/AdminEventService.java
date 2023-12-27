@@ -4,7 +4,9 @@ import com.example.matchapi.admin.event.dto.EventUploadReq;
 import com.example.matchapi.common.model.ContentsList;
 import com.example.matchapi.common.util.MessageHelper;
 import com.example.matchapi.event.converter.EventConverter;
+import com.example.matchapi.event.dto.EventRes;
 import com.example.matchcommon.constants.enums.Topic;
+import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.event.adaptor.EventAdaptor;
 import com.example.matchdomain.event.adaptor.EventContentAdaptor;
 import com.example.matchdomain.event.entity.Event;
@@ -12,7 +14,9 @@ import com.example.matchdomain.event.entity.EventContent;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -33,9 +37,10 @@ public class AdminEventService {
 
     @Transactional
     @CacheEvict(value = "eventCache", allEntries = true, cacheManager = "ehcacheManager")
-    public void uploadEventList(EventUploadReq eventUploadReq) {
+    public void uploadEventList(MultipartFile thumbnail, EventUploadReq eventUploadReq) {
 
-        Event event  = eventAdaptor.save(eventConverter.convertToEventUpload(eventUploadReq, eventUploadReq.getThumbnail()));
+        String thumbnailUrl = s3UploadService.uploadOneImg("event", thumbnail);
+        Event event  = eventAdaptor.save(eventConverter.convertToEventUpload(eventUploadReq, thumbnailUrl));
 
         Long eventId = event.getId();
 
@@ -66,5 +71,10 @@ public class AdminEventService {
             }
         }
         eventAdaptor.deleteByEventId(eventId);
+    }
+
+    public PageResponse<List<EventRes.EventList>> getEventList(int page, int size) {
+        Page<Event> events = eventAdaptor.findEvent(page, size);
+        return new PageResponse<>(events.isLast(), events.getTotalPages(), eventConverter.convertToEventList(events.getContent()));
     }
 }

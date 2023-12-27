@@ -22,6 +22,7 @@ import javax.persistence.*;
 @DynamicUpdate
 @BatchSize(size = 100)
 @DynamicInsert
+@ToString
 public class Banner extends BaseEntity {
     @Id
     @Column(name = "id")

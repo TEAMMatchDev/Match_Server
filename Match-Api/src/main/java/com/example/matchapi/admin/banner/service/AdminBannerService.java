@@ -52,13 +52,15 @@ public class AdminBannerService {
     @Transactional
     public void patchBanner(Long bannerId, BannerReq.BannerPatchDto bannerPatchDto, MultipartFile bannerImage) {
         Banner banner = bannerAdaptor.findById(bannerId);
+        System.out.println(bannerPatchDto.getEndDate());
+        System.out.println(bannerPatchDto.getStartDate());
         if(bannerPatchDto.isEditImage()){
             s3UploadService.deleteFile(banner.getBannerImg());
             String imgUrl = s3UploadService.uploadBannerImage(bannerImage);
             System.out.println(imgUrl);
-            banner.updateBanner(bannerPatchDto.getName(), banner.getStartDate(), banner.getEndDate(), imgUrl, bannerPatchDto.getContentsUrl());
+            banner.updateBanner(bannerPatchDto.getName(), bannerPatchDto.getStartDate(), bannerPatchDto.getEndDate(), imgUrl, bannerPatchDto.getContentsUrl());
         }else{
-            banner.updateBanner(bannerPatchDto.getName(), banner.getStartDate(), banner.getEndDate(), banner.getBannerImg(),  bannerPatchDto.getContentsUrl());
+            banner.updateBanner(bannerPatchDto.getName(), bannerPatchDto.getStartDate(), bannerPatchDto.getEndDate(), banner.getBannerImg(),  bannerPatchDto.getContentsUrl());
         }
         bannerAdaptor.save(banner);
     }
