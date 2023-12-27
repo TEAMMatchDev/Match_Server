@@ -54,7 +54,6 @@ public class EventRes {
 
         private String smallTitle;
 
-
         @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate startDate;
 

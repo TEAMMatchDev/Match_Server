@@ -82,8 +82,8 @@ public class EventConverter {
                 .eventType(eventUploadReq.getEventType())
                 .smallTitle(eventUploadReq.getSmallTitle())
                 .thumbnail(thumbnail)
-                .eventStartDate(eventUploadReq.getEventStartDate())
-                .eventEndDate(eventUploadReq.getEventEndDate())
+                .eventStartDate(eventUploadReq.getStartDate())
+                .eventEndDate(eventUploadReq.getEndDate())
                 .build();
     }
 

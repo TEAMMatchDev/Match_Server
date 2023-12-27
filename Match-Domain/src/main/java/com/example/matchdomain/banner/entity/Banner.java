@@ -22,6 +22,7 @@ import javax.persistence.*;
 @DynamicUpdate
 @BatchSize(size = 100)
 @DynamicInsert
+@ToString
 public class Banner extends BaseEntity {
     @Id
     @Column(name = "id")
@@ -48,10 +49,12 @@ public class Banner extends BaseEntity {
 
     private LocalDateTime endDate;
 
-    public void updateBanner(String name, LocalDateTime startDate, LocalDateTime endDate, String bannerImg) {
+    public void updateBanner(String name, LocalDateTime startDate, LocalDateTime endDate, String bannerImg,
+        String contentsUrl) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.bannerImg = bannerImg;
+        this.contentsUrl = contentsUrl;
     }
 }
