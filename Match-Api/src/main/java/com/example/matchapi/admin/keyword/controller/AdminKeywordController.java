@@ -23,7 +23,7 @@ public class AdminKeywordController {
     @GetMapping("")
     @Operation(summary = "07-01 ADMIN Keyword 추천 조회🔎")
     public CommonResponse<List<KeywordRes.KeywordList>> getKeywordList(){
-        return CommonResponse.onSuccess(keywordService.getKeywordList());
+        return CommonResponse.onSuccess(adminKeywordService.getKeywordList());
     }
 
     @PostMapping("")
@@ -40,5 +40,13 @@ public class AdminKeywordController {
     public CommonResponse<String> deleteKeyword(@PathVariable Long keywordId){
         adminKeywordService.deleteKeyword(keywordId);
         return CommonResponse.onSuccess("삭제 성공");
+    }
+
+    @PatchMapping("/{keywordId}")
+    @Operation(summary = "07-04 ADMIN Keyword 수정🔎")
+    public CommonResponse<String> patchKeyword(@PathVariable Long keywordId,
+        @RequestParam("keyword") String keyword){
+        adminKeywordService.patchKeyword(keywordId,keyword);
+        return CommonResponse.onSuccess("수정 성공");
     }
 }

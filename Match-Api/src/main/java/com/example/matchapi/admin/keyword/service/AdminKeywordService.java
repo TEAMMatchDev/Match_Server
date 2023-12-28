@@ -4,6 +4,7 @@ import com.example.matchapi.admin.keyword.converter.AdminKeywordConverter;
 import com.example.matchapi.admin.keyword.dto.AdminKeywordReq;
 import com.example.matchapi.keword.converter.KeywordConverter;
 import com.example.matchapi.keword.dto.KeywordRes;
+import com.example.matchdomain.keyword.adaptor.KeywordAdaptor;
 import com.example.matchdomain.keyword.entity.SearchKeyword;
 import com.example.matchdomain.keyword.repository.SearchKeywordRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class AdminKeywordService {
     private final SearchKeywordRepository searchKeywordRepository;
     private final KeywordConverter keywordConverter;
     private final AdminKeywordConverter adminKeywordConverter;
+    private final KeywordAdaptor keywordAdaptor;
 
     @Transactional
     @CachePut(cacheNames = "keywordList", key = "'all'", cacheManager = "ehcacheManager")
@@ -44,5 +46,22 @@ public class AdminKeywordService {
     @CacheEvict(cacheNames = "keywordList", cacheManager = "ehcacheManager")
     public void deleteKeyword(Long keywordId) {
         searchKeywordRepository.deleteById(keywordId);
+    }
+
+    @CacheEvict(cacheNames = "keywordList", key = "'all'",cacheManager = "ehcacheManager")
+    @Transactional
+    public void patchKeyword(Long keywordId, String keyword) {
+        SearchKeyword searchKeyword = keywordAdaptor.findByKeywordId(keywordId);
+        searchKeyword.setKeyword(keyword);
+        keywordAdaptor.save(searchKeyword);
+	}
+
+    public List<KeywordRes.KeywordList> getKeywordList() {
+        List<SearchKeyword> searchKeywords = searchKeywordRepository.findAllByOrderByPriorityAsc();
+        List<KeywordRes.KeywordList> keywordLists = new ArrayList<>();
+        searchKeywords.forEach(
+                result -> keywordLists.add(keywordConverter.convertToKeywordList(result))
+        );
+        return keywordLists;
     }
 }
