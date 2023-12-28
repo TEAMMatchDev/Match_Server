@@ -34,6 +34,7 @@ public class EventConverter {
                 .title(result.getTitle())
                 .thumbnail(result.getThumbnail())
                 .smallTitle(result.getSmallTitle())
+                .eventType(result.getEventType())
                 .eventStatus(timeHelper.checkFinishStatus(result.getEventEndDate()))
                 .startDate(result.getEventStartDate())
                 .endDate(result.getEventEndDate())
@@ -82,8 +83,8 @@ public class EventConverter {
                 .eventType(eventUploadReq.getEventType())
                 .smallTitle(eventUploadReq.getSmallTitle())
                 .thumbnail(thumbnail)
-                .eventStartDate(eventUploadReq.getEventStartDate())
-                .eventEndDate(eventUploadReq.getEventEndDate())
+                .eventStartDate(eventUploadReq.getStartDate())
+                .eventEndDate(eventUploadReq.getEndDate())
                 .build();
     }
 

@@ -16,11 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ImageController {
     private final S3UploadService s3UploadService;
-    @PostMapping(value = "",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CommonResponse<String> imgUpload(
-            @ModelAttribute UploadFolder uploadFolder,
-            @ModelAttribute MultipartFile imgFile){
+            @RequestParam("uploadFolder") UploadFolder uploadFolder,
+            @RequestPart("imgFile") MultipartFile imgFile){
         String url = s3UploadService.uploadOneImg(uploadFolder.getFolder(), imgFile);
         return CommonResponse.onSuccess(url);
     }

@@ -40,4 +40,9 @@ public class AdminKeywordService {
         );
         return keywordLists;
     }
+
+    @CacheEvict(cacheNames = "keywordList", cacheManager = "ehcacheManager")
+    public void deleteKeyword(Long keywordId) {
+        searchKeywordRepository.deleteById(keywordId);
+    }
 }

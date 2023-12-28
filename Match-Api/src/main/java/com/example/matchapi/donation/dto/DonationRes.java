@@ -4,11 +4,13 @@ import com.example.matchdomain.donation.entity.enums.DonationStatus;
 import com.example.matchdomain.donation.entity.enums.HistoryStatus;
 import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
 import com.example.matchdomain.project.entity.enums.ProjectKind;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class DonationRes {
@@ -75,6 +77,8 @@ public class DonationRes {
         private String weekDonation;
 
         private String monthDonation;
+
+        private String totalDonation;
     }
 
     @Getter
@@ -370,5 +374,57 @@ public class DonationRes {
 
         @Schema(description = "랜덤 불꽃이 메세지")
         private String randomMessage;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProjectDonationDto {
+        private Long donationId;
+
+        @JsonFormat(pattern = "yyyy.MM.dd.HH:mm")
+        private LocalDateTime donationDate;
+
+        private DonationStatus donationStatus;
+
+        private String donationStatusName;
+
+        private Long userId;
+
+        private String userName;
+
+        private Long amount;
+
+        private Long waitingSortingAmount;
+
+        private Long partialAmount;
+
+        @Schema(description = "수입 금액")
+        private int importedAmount;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RegularInfoDto {
+        private Long beforeCnt;
+
+        private Long underCnt;
+
+        private Long successCnt;
+
+        private String successAmount;
+
+        private Long regularCnt;
+
+        private String regularAmount;
+
+        private Long beforeMonthRegularCnt;
+
+        private String beforeMonthRegularAmount;
     }
 }

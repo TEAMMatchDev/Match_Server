@@ -1,19 +1,19 @@
 package com.example.matchapi.common;
 
+import com.example.matchapi.common.security.JwtService;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchinfrastructure.aligo.service.AligoInfraService;
 import com.example.matchinfrastructure.match_aligo.dto.AlimTalkDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Profile;
+import org.springframework.web.bind.annotation.*;
 
 import static com.example.matchinfrastructure.aligo.dto.AlimType.EXECUTION;
 import static com.example.matchinfrastructure.aligo.dto.AlimType.PAYMENT;
 
 @RestController
 @RequiredArgsConstructor
+@Profile("localDev")
 @RequestMapping("/test")
 public class TestController {
     private final AligoInfraService aligoInfraService;

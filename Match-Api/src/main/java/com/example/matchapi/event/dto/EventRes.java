@@ -1,6 +1,7 @@
 package com.example.matchapi.event.dto;
 
 import com.example.matchdomain.common.model.ContentsType;
+import com.example.matchdomain.event.enums.EventType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,6 +26,8 @@ public class EventRes {
         private String smallTitle;
 
         private String eventStatus;
+
+        private EventType eventType;
 
         @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate startDate;
@@ -53,7 +56,6 @@ public class EventRes {
         private String title;
 
         private String smallTitle;
-
 
         @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate startDate;

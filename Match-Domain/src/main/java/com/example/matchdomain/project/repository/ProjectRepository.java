@@ -310,7 +310,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, Project
             "    count(RP.id)'totalDonationCnt',\n" +
             "    GROUP_CONCAT(U.profileImgUrl SEPARATOR ',') AS 'imgUrlList'\n" +
             "FROM Project P\n" +
-            "         LEFT JOIN RegularPayment RP ON P.id = RP.projectId\n" +
+            "         LEFT JOIN RegularPayment RP ON P.id = RP.projectId and RP.regularPayStatus = 'PROCEEDING'\n" +
             "         LEFT JOIN User U ON RP.userId = U.id\n" +
             "WHERE P.id = :projectId \n" +
             "GROUP BY P.id ", nativeQuery = true)

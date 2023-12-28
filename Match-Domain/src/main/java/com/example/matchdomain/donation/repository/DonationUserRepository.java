@@ -83,6 +83,14 @@ public interface DonationUserRepository extends JpaRepository<DonationUser,Long>
 
     Page<DonationUser> findByUserOrderByIdAsc(User user, Pageable pageable);
 
+    @Query(value = "SELECT DU FROM DonationUser DU JOIN FETCH DU.user " +
+            "WHERE DU.projectId = :projectId AND DU.donationStatus IN :statuses ORDER BY DU.createdAt ASC",
+            countQuery = "SELECT count(DU) FROM DonationUser DU WHERE DU.projectId = :projectId AND DU.donationStatus IN :statuses")
+    Page<DonationUser> findByProjectIdAndDonationStatusInOrderByCreatedAtAsc(@Param("projectId") Long projectId, @Param("statuses") List<DonationStatus> donationStatuses, Pageable pageable);
+
+    List<DonationUser> findByRegularPaymentNotNull();
+
+    List<DonationUser> findByUserIdAndDonationStatusNot(Long userId, DonationStatus donationStatus);
 
     interface flameList {
         Long getRegularPayId();

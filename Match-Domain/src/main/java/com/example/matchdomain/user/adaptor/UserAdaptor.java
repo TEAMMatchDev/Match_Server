@@ -9,14 +9,24 @@ import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
+import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
 import static com.example.matchdomain.user.entity.enums.Alarm.ACTIVE;
 import static com.example.matchdomain.user.entity.enums.SocialType.APPLE;
 import static com.example.matchdomain.user.entity.enums.SocialType.NORMAL;
 import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_EXIST_USER;
+
+import javax.transaction.Transactional;
 
 @Adaptor
 @RequiredArgsConstructor
@@ -68,5 +78,50 @@ public class UserAdaptor {
 
     public User findByUsernameAndStatus(String username){
         return userRepository.findByUsernameAndStatus(username, Status.ACTIVE).orElseThrow(() -> new UnauthorizedException(UserAuthErrorCode.NOT_EXIST_USER));
+    }
+
+    public Long getTotalUserCnt(){
+        return userRepository.countBy();
+    }
+
+    public Long getOneDayUserCnt(LocalDate localDate){
+        return userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate+FIRST_TIME), LocalDateTime.parse(localDate+LAST_TIME));
+    }
+
+    public Long getWeekUserCnt(LocalDate localDate) {
+        return userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.minusWeeks(1)+FIRST_TIME) , LocalDateTime.parse(localDate+LAST_TIME));
+    }
+
+    public Long getMonthUserCnt(LocalDate localDate) {
+        return userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME), LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME));
+    }
+
+    public Page<UserRepository.UserList> getUserList(int page, int size, Status status, String content) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<UserRepository.UserList> userList = null;
+
+        if(status == null && content ==null) {
+            userList = userRepository.getUserList(pageable);
+        }
+        else if (status !=null && content ==null){
+            userList = userRepository.getUserListByStatus(pageable, status.getValue());
+        }
+        else if(status!=null){
+            userList = userRepository.getUserListByStatusAndName(pageable, status.getValue(),content);
+        }
+        else{
+            userList = userRepository.getUserListByName(pageable, content);
+        }
+
+        return userList;
+    }
+
+    public UserRepository.UserList getUserDetail(Long userId) {
+        return userRepository.getUserDetail(userId);
+    }
+
+    public Long getDeleteUserCnt() {
+        return userRepository.countByStatus(Status.INACTIVE);
     }
 }

@@ -35,10 +35,6 @@ public class CommonResponse<T> {
         this.code = null;
     }
 
-    // 요청에 성공한 경우11
-
-
-
 
     public static <T> CommonResponse<T> onSuccess(T data) {
         return new CommonResponse<>(true, "요청에 성공하였습니다.","1000", data);

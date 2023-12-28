@@ -4,10 +4,12 @@ import com.example.matchapi.admin.donation.service.AdminDonationService;
 import com.example.matchapi.donation.dto.DonationReq;
 import com.example.matchapi.donation.dto.DonationRes;
 import com.example.matchapi.donation.service.DonationService;
+import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,6 +30,7 @@ import java.util.List;
 @Slf4j
 public class AdminDonationController {
     private final AdminDonationService adminDonationService;
+    private final ProjectService projectService;
     @GetMapping("")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Operation(summary = "ADMIN-05-01💸 기부금 현황파악 API.",description = "기부금 현황파악 API 입니다.")
@@ -35,6 +38,15 @@ public class AdminDonationController {
         DonationRes.DonationInfo info = adminDonationService.getDonationInfo();
         return CommonResponse.onSuccess(info);
     }
+
+    @GetMapping("/regular")
+    @ApiErrorCodeExample(UserAuthErrorCode.class)
+    @Operation(summary = "ADMIN-05-01-01 정기 결제 현황 파악", description = "정기 결제 현황파악")
+    public CommonResponse<DonationRes.RegularInfoDto> getRegularInfo(){
+        return CommonResponse.onSuccess(adminDonationService.getRegularInfo());
+    }
+
+
 
     @GetMapping("/{donationId}")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
@@ -77,4 +89,16 @@ public class AdminDonationController {
     ){
         return CommonResponse.onSuccess(adminDonationService.getProjectDonationStatus(page, size));
     }
+
+    @GetMapping("/execution/{projectId}")
+    @Operation(summary = "기부금 리스트 확인")
+    public CommonResponse<PageResponse<List<DonationRes.ProjectDonationDto>>> getProjectDonationLists(
+            @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "5") int size,
+            @PathVariable("projectId") Long projectId
+    ){
+        Project project = projectService.findByProjectId(projectId);
+        return CommonResponse.onSuccess(adminDonationService.getProjectDonationLists(project, page, size));
+    }
+
 }

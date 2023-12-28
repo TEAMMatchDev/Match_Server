@@ -1,5 +1,6 @@
 package com.example.matchapi.user.converter;
 
+import com.example.matchapi.donation.helper.DonationHelper;
 import com.example.matchapi.order.dto.OrderRes;
 import com.example.matchapi.user.dto.UserReq;
 import com.example.matchapi.user.dto.UserRes;
@@ -7,13 +8,11 @@ import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchapi.user.helper.UserHelper;
 import com.example.matchcommon.annotation.Converter;
 import com.example.matchcommon.properties.AligoProperties;
-import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.redis.entity.RefreshToken;
 import com.example.matchdomain.user.entity.*;
 import com.example.matchdomain.user.entity.enums.AddressType;
 import com.example.matchdomain.user.entity.enums.AuthorityEnum;
-import com.example.matchdomain.user.entity.enums.Gender;
 import com.example.matchdomain.user.entity.enums.SocialType;
 import com.example.matchdomain.user.entity.pk.UserFcmPk;
 import com.example.matchdomain.user.repository.UserRepository;
@@ -22,11 +21,11 @@ import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserAddressDto;
 import com.example.matchinfrastructure.oauth.kakao.dto.KakaoUserInfoDto;
 import com.example.matchinfrastructure.oauth.naver.dto.NaverUserInfoDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +39,7 @@ public class UserConverter {
     private final UserHelper userHelper;
     private final PasswordEncoder passwordEncoder;
     private final AligoProperties aligoProperties;
+    private final DonationHelper donationHelper;
 
     public User convertToKakaoSignUpUser(KakaoUserInfoDto kakaoUserInfoDto, SocialType authType) {
         String profileImg = BASE_PROFILE;
@@ -58,7 +58,7 @@ public class UserConverter {
                 .birth(authHelper.birthConversion(kakaoUserInfoDto.getBirthYear(), kakaoUserInfoDto.getBirthDay()))
                 .gender(authHelper.genderConversion(kakaoUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(userHelper.createRandomNickName())
+                .nickname(kakaoUserInfoDto.getName())
                 .serviceAlarm(ACTIVE)
                 .eventAlarm(ACTIVE)
                 .build();
@@ -87,7 +87,7 @@ public class UserConverter {
                 .birth(authHelper.birthConversion(naverUserInfoDto.getBirthyear(), naverUserInfoDto.getBirthday()))
                 .gender(authHelper.genderConversion(naverUserInfoDto.getGender()))
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(userHelper.createRandomNickName())
+                .nickname(naverUserInfoDto.getName())
                 .serviceAlarm(ACTIVE)
                 .eventAlarm(ACTIVE)
                 .build();
@@ -105,7 +105,7 @@ public class UserConverter {
                 .birth(authHelper.birthConversionToLocalDate(signUpUser.getBirthDate()))
                 .gender(signUpUser.getGender())
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(userHelper.createRandomNickName())
+                .nickname(signUpUser.getName())
                 .serviceAlarm(ACTIVE)
                 .eventAlarm(ACTIVE)
                 .build();
@@ -152,12 +152,14 @@ public class UserConverter {
                 .phoneNumber(user.getPhoneNumber()).build();
     }
 
-    public UserRes.SignUpInfo convertToUserSignUpInfo(Long oneDayUser, Long weekUser, Long monthUser, Long totalUser) {
+    public UserRes.SignUpInfo convertToUserSignUpInfo(Long oneDayUser, Long weekUser, Long monthUser, Long totalUser,
+            Long deleteUser) {
         return UserRes.SignUpInfo.builder()
                 .totalUserCnt(totalUser)
                 .oneDayUserCnt(oneDayUser)
                 .weekUserCnt(weekUser)
                 .monthUserCnt(monthUser)
+                .deleteUserCnt(deleteUser)
                 .build();
     }
 
@@ -168,7 +170,7 @@ public class UserConverter {
                 .name(result.getName())
                 .birth(String.valueOf(result.getBirth()))
                 .socialType(result.getSocialType().getName())
-                .gender(result.getGender().getValue())
+                .gender(result.getGender() == null ? null : result.getGender().getValue())
                 .email(result.getEmail())
                 .phoneNumber(result.getPhoneNumber())
                 .donationCnt(result.getDonationCnt())
@@ -179,22 +181,19 @@ public class UserConverter {
                 .build();
     }
 
-    public UserRes.UserAdminDetail convertToUserAdminDetail(UserRepository.UserList userDetail, List<OrderRes.UserBillCard> userCards) {
+    public UserRes.UserAdminDetail convertToUserAdminDetail(User userDetail) {
         return UserRes.UserAdminDetail
                 .builder()
-                .userId(userDetail.getUserId())
+                .userId(userDetail.getId())
                 .name(userDetail.getName())
                 .birth(String.valueOf(userDetail.getBirth()))
                 .socialType(userDetail.getSocialType().getName())
-                .gender(userDetail.getGender().getValue())
+                .gender(userDetail.getGender() == null ? null : userDetail.getGender().getValue())
                 .email(userDetail.getEmail())
                 .phoneNumber(userDetail.getPhoneNumber())
-                .donationCnt(userDetail.getDonationCnt())
-                .totalAmount(userDetail.getTotalAmount())
-                .card(userDetail.getCard())
                 .status(userDetail.getStatus().getValue())
                 .createdAt(userDetail.getCreatedAt().toString())
-                //.userCards(userCards)
+            .nickname(userDetail.getNickname())
                 .build();
     }
 
@@ -243,7 +242,7 @@ public class UserConverter {
                 .socialId(appleSignUp.getSocialId())
                 .socialType(SocialType.APPLE)
                 .role(AuthorityEnum.ROLE_USER.getValue())
-                .nickname(userHelper.createRandomNickName())
+                .nickname(appleSignUp.getName())
                 .serviceAlarm(ACTIVE)
                 .eventAlarm(ACTIVE)
                 .gender(appleSignUp.getGender())
@@ -291,5 +290,16 @@ public class UserConverter {
                 .donationStatus(donationUser.getDonationStatus())
                 .donationStatusName(donationUser.getDonationStatus().getName())
                 .build();
+    }
+
+    public UserRes.DonationInfoDto convertToDonationInfoDto(Long regularCnt, List<DonationUser> donationUsers, boolean isCard) {
+        return UserRes.DonationInfoDto
+            .builder()
+            .regularCnt(regularCnt)
+            .isCard(isCard)
+            .totalCnt((long)donationUsers.size())
+            .totalAmount(donationHelper.parsePriceComma(
+                (int)donationUsers.stream().mapToLong(DonationUser::getPrice).sum()))
+            .build();
     }
 }

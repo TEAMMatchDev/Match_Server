@@ -1,15 +1,16 @@
 package com.example.matchcommon.reponse;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 
 @Getter
 @AllArgsConstructor
+@Setter
 @ToString
 @Schema(description = "페이징 처리 응답")
 public class PageResponse<T> implements Serializable {
@@ -19,4 +20,11 @@ public class PageResponse<T> implements Serializable {
     private final long totalCnt;
     @Schema(description = "요소", required = true)
     private final T contents;
+
+    @JsonCreator
+    public PageResponse(){
+        this.isLast = null;
+        this.totalCnt = 0;
+        this.contents = null;
+    }
 }

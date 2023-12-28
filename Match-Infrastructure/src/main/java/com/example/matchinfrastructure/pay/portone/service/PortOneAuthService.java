@@ -7,10 +7,16 @@ import com.example.matchinfrastructure.pay.portone.dto.req.PortOneAuthReq;
 import com.example.matchinfrastructure.pay.portone.client.PortOneFeignClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
 
 @Service
 @Slf4j
@@ -18,34 +24,42 @@ import org.springframework.stereotype.Service;
 public class PortOneAuthService {
     private final PortOneFeignClient portOneFeignClient;
     private final PortOneProperties portOneProperties;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    @Cacheable(value = "portOneTokenCache", key = "'all'")
-    public String getToken() {
-        String token =  fetchPortOneToken();
-        log.info("request : " + token);
-        return token;
-    }
 
-    public String fetchPortOneToken() {
+    public String getToken(String profile) {
         log.info("request token");
-        return getTokens();
+        String cachedToken = stringRedisTemplate.opsForValue().get("portOneTokenCache::" + profile);
+        if (cachedToken != null) {
+            return cachedToken;
+        }
+
+        return requestNewToken(profile);
     }
 
-    @CachePut(value = "portOneTokenCache", key = "'all'")
-    public String getTokens() {
-        PortOneResponse<PortOneAuth> portOneResponse = portOneFeignClient.getAccessToken(PortOneAuthReq.builder().imp_key(portOneProperties.getKey()).imp_secret(portOneProperties.getSecret()).build());
+    public String requestNewToken(String profile) {
+        PortOneResponse<PortOneAuth> portOneResponse = getPortOneToken();
+
+        long ttl = portOneResponse.getResponse().getExpired_at()-portOneResponse.getResponse().getNow();
+
+        log.info("token ttl : " + ttl);
+
+        String newToken = portOneResponse.getResponse().getAccess_token();
+
+        stringRedisTemplate.opsForValue().set("portOneTokenCache::" + profile, newToken, Duration.ofSeconds(ttl));
+
         return portOneResponse.getResponse().getAccess_token();
     }
+
 
     public String getAuthToken() {
-        PortOneResponse<PortOneAuth> portOneResponse = portOneFeignClient.getAccessToken(PortOneAuthReq.builder().imp_key(portOneProperties.getKey()).imp_secret(portOneProperties.getSecret()).build());
-        return portOneResponse.getResponse().getAccess_token();
+        return getPortOneToken().getResponse().getAccess_token();
     }
 
-    @Scheduled(fixedRate = 1750000) // 30분마다 실행
-    public void refreshAuthToken() {
-       String refreshToken  = getTokens();
-       log.info("refresh token {} ", refreshToken);
+
+    private PortOneResponse<PortOneAuth> getPortOneToken() {
+        return portOneFeignClient.getAccessToken(PortOneAuthReq.builder().imp_key(portOneProperties.getKey()).imp_secret(portOneProperties.getSecret()).build());
     }
+
 }
 
