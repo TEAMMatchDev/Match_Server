@@ -34,6 +34,7 @@ public class EventConverter {
                 .title(result.getTitle())
                 .thumbnail(result.getThumbnail())
                 .smallTitle(result.getSmallTitle())
+                .eventType(result.getEventType())
                 .eventStatus(timeHelper.checkFinishStatus(result.getEventEndDate()))
                 .startDate(result.getEventStartDate())
                 .endDate(result.getEventEndDate())
