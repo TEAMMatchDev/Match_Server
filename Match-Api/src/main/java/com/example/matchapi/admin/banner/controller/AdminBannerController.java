@@ -31,7 +31,7 @@ public class AdminBannerController {
     @Operation(summary = "ADMIN-08-01 배너 업로드")
     public CommonResponse<List<BannerRes.BannerList>> uploadBanner(
             @RequestPart MultipartFile bannerImage,
-            @RequestPart("bannerUploadDto") BannerReq.BannerUpload bannerUploadDto
+            @Parameter(name = "bannerUploadDto", required = true) @RequestPart(value = "bannerUploadDto", required = true) BannerReq.BannerUpload bannerUploadDto
             ){
         return CommonResponse.onSuccess(adminBannerService.uploadBanner(BannerType.CONTENTS, bannerImage, bannerUploadDto));
     }

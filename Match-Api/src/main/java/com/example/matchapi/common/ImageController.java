@@ -23,4 +23,5 @@ public class ImageController {
         String url = s3UploadService.uploadOneImg(uploadFolder.getFolder(), imgFile);
         return CommonResponse.onSuccess(url);
     }
+
 }
