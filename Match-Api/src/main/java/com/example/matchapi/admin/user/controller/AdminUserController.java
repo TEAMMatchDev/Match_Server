@@ -1,5 +1,6 @@
 package com.example.matchapi.admin.user.controller;
 
+import com.example.matchapi.admin.donation.service.AdminDonationService;
 import com.example.matchapi.admin.user.service.AdminUserService;
 import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.user.converter.UserConverter;
@@ -10,17 +11,25 @@ import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.entity.DonationUser;
+import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.user.entity.User;
+import com.example.matchdomain.user.entity.enums.Gender;
 import com.example.matchdomain.user.exception.UserAuthErrorCode;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -31,6 +40,8 @@ public class AdminUserController {
     private final AdminUserService adminUserService;
     private final DonationService donationService;
     private final UserConverter userConverter;
+    private final AdminDonationService adminDonationService;
+
     @GetMapping("/info")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Operation(summary = "ADMIN-02-01👤 유저저 가입 현황파악 API.",description = "프로젝트 리스트 조회 API 입니다.")
@@ -79,6 +90,50 @@ public class AdminUserController {
         User user = adminUserService.findByUserId(userId);
         adminUserService.unActivateUser(user);
         return CommonResponse.onSuccess(new UserRes.UserDelete(userId));
+    }
+
+    @PatchMapping("/nickname/{userId}")
+    @Operation(summary = "ADMIN-02-06👤 유저 닉네임 수정 API.",description = "유저 닉네임 수정 API 입니다.")
+    public CommonResponse<String> updateNickname(@PathVariable Long userId, @RequestParam String nickname){
+        adminUserService.updateNickname(userId, nickname);
+        return CommonResponse.onSuccess("닉네임 수정 성공");
+    }
+
+    @PatchMapping("/birth/{userId}")
+    @Operation(summary = "ADMIN-02-07👤 유저 생일 수정 API.",description = "유저 생일 수정 API 입니다.")
+    public CommonResponse<String> updateBirth(@PathVariable Long userId,  @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam LocalDate birth){
+        adminUserService.updateBirth(userId, birth);
+        return CommonResponse.onSuccess("생일 수정 성공");
+    }
+
+    @PatchMapping("/phone/{userId}")
+    @Operation(summary = "ADMIN-02-08👤 유저 전화번호 수정 API.",description = "유저 전화번호 수정 API 입니다.")
+    public CommonResponse<String> updatePhone(@PathVariable Long userId, @RequestParam String phone){
+        adminUserService.updatePhone(userId, phone);
+        return CommonResponse.onSuccess("전화번호 수정 성공");
+    }
+
+    @PatchMapping("/email/{userId}")
+    @Operation(summary = "ADMIN-02-09 유저 이메일 수정 API" , description = "유저 이메일 수정 API")
+    public CommonResponse<String> updateEmail(@PathVariable Long userId, @RequestParam String email){
+        adminUserService.updateEmail(userId, email);
+        return CommonResponse.onSuccess("이메일 수정 성공");
+    }
+
+    @PatchMapping("/gender/{userId}")
+    @Operation(summary = "ADMIN-02-10 유저 성별 수정 API" , description = "유저 성별 수정 API")
+    public CommonResponse<String> updateGender(@PathVariable Long userId, @RequestParam Gender gender){
+        adminUserService.updateGender(userId, gender);
+        return CommonResponse.onSuccess("성별 수정 성공");
+    }
+
+    @GetMapping("/donations/{userId}")
+    @Operation(summary = "ADMIN-02-11 유저 기부 정보" , description = "유저 기부 정보")
+    public CommonResponse<UserRes.DonationInfoDto> getDonationInfo(@PathVariable Long userId){
+        Long regularCnt = adminDonationService.countByUserId(userId);
+        List<DonationUser> donationUsers = adminDonationService.findByUserId(userId);
+        boolean isCard = adminUserService.findByUserId(userId).getUserCard().size() > 0;
+        return CommonResponse.onSuccess(userConverter.convertToDonationInfoDto(regularCnt, donationUsers, isCard));
     }
 
 }

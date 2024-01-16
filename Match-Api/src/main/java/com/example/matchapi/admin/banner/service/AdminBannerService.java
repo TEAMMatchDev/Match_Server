@@ -3,14 +3,15 @@ package com.example.matchapi.admin.banner.service;
 import com.example.matchapi.banner.converter.BannerConverter;
 import com.example.matchapi.banner.dto.BannerReq;
 import com.example.matchapi.banner.dto.BannerRes;
+import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.banner.adaptor.BannerAdaptor;
 import com.example.matchdomain.banner.entity.Banner;
 import com.example.matchdomain.banner.enums.BannerType;
-import com.example.matchdomain.banner.repository.BannerRepository;
 import com.example.matchinfrastructure.config.s3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,5 +47,26 @@ public class AdminBannerService {
         Banner banner = bannerAdaptor.findById(bannerId);
         s3UploadService.deleteFile(banner.getBannerImg());
         bannerAdaptor.deleteById(bannerId);
+    }
+
+    @Transactional
+    public void patchBanner(Long bannerId, BannerReq.BannerPatchDto bannerPatchDto, MultipartFile bannerImage) {
+        Banner banner = bannerAdaptor.findById(bannerId);
+        System.out.println(bannerPatchDto.getEndDate());
+        System.out.println(bannerPatchDto.getStartDate());
+        if(bannerPatchDto.isEditImage()){
+            s3UploadService.deleteFile(banner.getBannerImg());
+            String imgUrl = s3UploadService.uploadBannerImage(bannerImage);
+            System.out.println(imgUrl);
+            banner.updateBanner(bannerPatchDto.getName(), bannerPatchDto.getStartDate(), bannerPatchDto.getEndDate(), imgUrl, bannerPatchDto.getContentsUrl());
+        }else{
+            banner.updateBanner(bannerPatchDto.getName(), bannerPatchDto.getStartDate(), bannerPatchDto.getEndDate(), banner.getBannerImg(),  bannerPatchDto.getContentsUrl());
+        }
+        bannerAdaptor.save(banner);
+    }
+
+    public PageResponse<List<BannerRes.BannerAdminListDto>> getBannerLists(int page, int size) {
+        Page<Banner> banners = bannerAdaptor.getBannerLists(page, size);
+        return new PageResponse<>(banners.isLast(), banners.getSize(), bannerConverter.convertToBannerLists(banners.getContent()));
     }
 }

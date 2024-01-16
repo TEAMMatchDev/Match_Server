@@ -116,6 +116,8 @@ public class OrderService {
 
         PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, oneTimeDonation.getAmount(), project.getProjectName(), orderCommand.getOrderId());
 
+        if(portOneResponse.getResponse().getFail_reason()!=null) throw new BaseException(BAD_REQUEST, false, "PORT_ONE_BILL_AUTH_001", portOneResponse.getResponse().getFail_reason());
+
         OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
 
         DonationUser donationUser = donationUserRepository.save(
@@ -142,6 +144,8 @@ public class OrderService {
         OrderReq.RegularDonation regularDonation = orderCommand.getRegularDonation();
 
         PortOneResponse<PortOneBillPayResponse> portOneResponse = paymentService.payBillKey(card, regularDonation.getAmount(), project.getProjectName(), orderCommand.getOrderId());
+
+        if(portOneResponse.getResponse().getFail_reason()!=null) throw new BaseException(BAD_REQUEST, false, "PORT_ONE_BILL_AUTH_001", portOneResponse.getResponse().getFail_reason());
 
         OrderRes.CreateInherenceDto createInherenceDto = orderHelper.createInherence(user);
 

@@ -16,18 +16,17 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class EventUploadReq {
     private String title;
 
     private String smallTitle;
 
-    private String thumbnail;
-
     private EventType eventType;
 
-    private LocalDate eventStartDate;
+    private LocalDate startDate;
 
-    private LocalDate eventEndDate;
+    private LocalDate endDate;
 
     private List<ContentsList> contentsList;
 

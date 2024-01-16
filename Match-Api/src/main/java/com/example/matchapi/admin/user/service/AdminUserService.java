@@ -4,23 +4,27 @@ import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.user.converter.UserConverter;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.RedissonLock;
+import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchcommon.exception.ForbiddenException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.user.adaptor.UserAdaptor;
 import com.example.matchdomain.user.entity.User;
+import com.example.matchdomain.user.entity.enums.Gender;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.example.matchdomain.user.exception.UserAuthErrorCode.NOT_EXIST_USER;
-
+import static com.example.matchdomain.user.exception.UserNormalSignUpErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,8 +39,9 @@ public class AdminUserService {
         Long oneDayUser = userAdaptor.getOneDayUserCnt(localDate);
         Long weekUser = userAdaptor.getWeekUserCnt(localDate);
         Long monthUser = userAdaptor.getMonthUserCnt(localDate);
-
-        return userConverter.convertToUserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser);
+        Long deleteUser = userAdaptor.getDeleteUserCnt();
+        System.out.println(deleteUser);
+        return userConverter.convertToUserSignUpInfo(oneDayUser,weekUser,monthUser,totalUser, deleteUser);
     }
 
     @Transactional
@@ -55,9 +60,9 @@ public class AdminUserService {
     }
 
     public UserRes.UserAdminDetail getUserAdminDetail(Long userId) {
-        UserRepository.UserList userDetail = userAdaptor.getUserDetail(userId);
-
-        return userConverter.convertToUserAdminDetail(userDetail);
+        //UserRepository.UserList userDetail = userAdaptor.getUserDetail(userId);
+        User user = findByUserId(userId);
+        return userConverter.convertToUserAdminDetail(user);
     }
 
     public User findByUserId(Long userId) {
@@ -66,9 +71,41 @@ public class AdminUserService {
 
     @RedissonLock(LockName = "유저", key = "#user.id")
     public void unActivateUser(User user) {
-        user.setStatus(Status.INACTIVE);
+        updateUserInfo(user.getId(), users -> users.setStatus(Status.INACTIVE));
         donationService.deleteRegularPayment(user);
-        userAdaptor.save(user);
     }
 
+    @Transactional
+    public void updateNickname(Long userId, String nickname) {
+        updateUserInfo(userId, user -> user.setNickname(nickname));
+    }
+
+    @Transactional
+    public void updatePhone(Long userId, String phone) {
+        if (userAdaptor.existsPhoneNumber(phone)) {
+            throw new ForbiddenException(USERS_EXISTS_PHONE);
+        }
+        updateUserInfo(userId, user -> user.setPhoneNumber(phone));
+    }
+    @Transactional
+    public void updateEmail(Long userId, String email) {
+        if (userAdaptor.existsEmail(email)) {
+            throw new ForbiddenException(USERS_EXISTS_EMAIL);
+        }
+        updateUserInfo(userId, user -> user.setEmail(email));
+    }
+    @Transactional
+    public void updateGender(Long userId, Gender gender) {
+        updateUserInfo(userId, user -> user.setGender(gender));
+    }
+    @Transactional
+    public void updateBirth(Long userId, LocalDate birth) {
+        updateUserInfo(userId, user -> user.setBirth(birth));
+    }
+
+    public void updateUserInfo(Long userId, Consumer<User> updateFunction) {
+        User user = findByUserId(userId);
+        updateFunction.accept(user);
+        userAdaptor.save(user);
+    }
 }

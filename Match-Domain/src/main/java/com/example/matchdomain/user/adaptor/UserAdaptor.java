@@ -26,6 +26,8 @@ import static com.example.matchdomain.user.entity.enums.SocialType.APPLE;
 import static com.example.matchdomain.user.entity.enums.SocialType.NORMAL;
 import static com.example.matchdomain.user.exception.UserLoginErrorCode.NOT_EXIST_USER;
 
+import javax.transaction.Transactional;
+
 @Adaptor
 @RequiredArgsConstructor
 public class UserAdaptor {
@@ -117,5 +119,9 @@ public class UserAdaptor {
 
     public UserRepository.UserList getUserDetail(Long userId) {
         return userRepository.getUserDetail(userId);
+    }
+
+    public Long getDeleteUserCnt() {
+        return userRepository.countByStatus(Status.INACTIVE);
     }
 }

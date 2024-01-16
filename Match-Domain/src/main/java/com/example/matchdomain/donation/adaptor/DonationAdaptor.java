@@ -132,4 +132,12 @@ public class DonationAdaptor {
         return donationUserRepository.findByProjectIdAndDonationStatusInOrderByCreatedAtAsc(projectId, in, pageable);
 
     }
+
+    public List<DonationUser> getRegularDonationLists() {
+        return donationUserRepository.findAll();
+    }
+
+    public List<DonationUser> findByUserId(Long userId) {
+        return donationUserRepository.findByUserIdAndDonationStatusNot(userId, EXECUTION_REFUND);
+    }
 }

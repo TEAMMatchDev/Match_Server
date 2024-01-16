@@ -119,6 +119,8 @@ public class UserRes {
         private Long weekUserCnt;
 
         private Long monthUserCnt;
+
+        private Long deleteUserCnt;
     }
 
     @Getter
@@ -172,15 +174,11 @@ public class UserRes {
 
         private String email;
 
-        private boolean card;
-
-        private int donationCnt;
-
-        private int totalAmount;
-
         private String status;
 
         private String createdAt;
+
+        private String nickname;
     }
 
     public static class EmailAuth {
@@ -259,5 +257,18 @@ public class UserRes {
         private List<UserFlameListDto> flameLists;
     }
 
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DonationInfoDto {
+        private Long regularCnt;
 
+        private Long totalCnt;
+
+        private String totalAmount;
+
+        private boolean isCard;
+    }
 }
