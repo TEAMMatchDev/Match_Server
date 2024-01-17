@@ -79,6 +79,8 @@ public class DonationRes {
         private String monthDonation;
 
         private String totalDonation;
+
+        private String beforeMonthDonation;
     }
 
     @Getter

@@ -63,6 +63,7 @@ public class AdminDonationService {
         int weekendDonationAmount = 0;
         int monthlyDonationAmount = 0;
         int totalDonationAmount = 0;
+        int beforeMonthRegularAmount = 0;
         for (DonationUser donationUser : donationUsers) {
             if(donationUser.getCreatedAt().isAfter(LocalDateTime.parse(localDate+FIRST_TIME))&&donationUser.getCreatedAt().isBefore(LocalDateTime.parse(localDate+LAST_TIME))){
                 oneDayDonationAmount += donationUser.getPrice();
@@ -73,10 +74,13 @@ public class AdminDonationService {
             if(donationUser.getCreatedAt().isAfter(LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME))&&donationUser.getCreatedAt().isBefore( LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME))){
                 monthlyDonationAmount += donationUser.getPrice();
             }
+            if(donationUser.getCreatedAt().isAfter(LocalDateTime.parse(localDate.minusMonths(1)+FIRST_TIME))&&donationUser.getCreatedAt().isBefore(LocalDateTime.parse(localDate+LAST_TIME))){
+                beforeMonthRegularAmount += donationUser.getPrice();
+            }
             totalDonationAmount += donationUser.getPrice();
         }
 
-        return new DonationRes.DonationInfo(donationHelper.parsePriceComma(oneDayDonationAmount),donationHelper.parsePriceComma(weekendDonationAmount),donationHelper.parsePriceComma(monthlyDonationAmount), donationHelper.parsePriceComma(totalDonationAmount));
+        return new DonationRes.DonationInfo(donationHelper.parsePriceComma(oneDayDonationAmount),donationHelper.parsePriceComma(weekendDonationAmount),donationHelper.parsePriceComma(monthlyDonationAmount), donationHelper.parsePriceComma(totalDonationAmount), donationHelper.parsePriceComma(beforeMonthRegularAmount));
     }
 
     public DonationRes.DonationDetail getDonationDetail(Long donationId) {
