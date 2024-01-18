@@ -429,4 +429,17 @@ public class DonationRes {
 
         private String beforeMonthRegularAmount;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RegularInfoV2Dto {
+        private Long thisMonthRegularCnt;
+
+        private Long thisMonthOneTimeCnt;
+
+        private Long thisMonthStartCnt;
+    }
 }

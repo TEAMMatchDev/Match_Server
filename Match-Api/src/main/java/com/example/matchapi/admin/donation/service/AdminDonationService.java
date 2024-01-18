@@ -14,6 +14,7 @@ import com.example.matchdomain.donation.entity.DonationUser;
 import com.example.matchdomain.donation.entity.HistoryImage;
 import com.example.matchdomain.donation.entity.RegularPayment;
 import com.example.matchdomain.donation.entity.enums.RegularPayStatus;
+import com.example.matchdomain.donation.entity.enums.RegularStatus;
 import com.example.matchdomain.donation.repository.HistoryImageRepository;
 import com.example.matchdomain.project.adaptor.ProjectAdaptor;
 import com.example.matchdomain.project.entity.Project;
@@ -35,8 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.matchcommon.constants.MatchStatic.FIRST_TIME;
-import static com.example.matchcommon.constants.MatchStatic.LAST_TIME;
+import static com.example.matchcommon.constants.MatchStatic.*;
 import static com.example.matchdomain.donation.entity.enums.DonationStatus.*;
 
 @Service
@@ -249,5 +249,27 @@ public class AdminDonationService {
 
     public List<DonationUser> findByUserId(Long userId) {
         return donationAdaptor.findByUserId(userId);
+    }
+
+    public DonationRes.RegularInfoV2Dto getRegularInfoV2() {
+        List<DonationUser> donationUsers = donationAdaptor.getRegularDonationLists();
+        List<RegularPayment> regularPayments = paymentAdaptor.getRegularInfo();
+
+        Long thisMonthRegularCnt = 0L, thisMonthOneTimeCnt = 0L, thisMonthStartCnt = 0L;
+        LocalDate now = LocalDate.now();
+        for (DonationUser donationUser : donationUsers){
+            if(now.getMonthValue() == donationUser.getCreatedAt().getMonthValue() && now.getYear() == donationUser.getCreatedAt().getYear()){
+                if(donationUser.getRegularStatus().equals(RegularStatus.REGULAR)) thisMonthRegularCnt++;
+                else thisMonthOneTimeCnt++;
+            }
+        }
+
+        for (RegularPayment regularPayment : regularPayments){
+            if(now.getMonthValue() == regularPayment.getCreatedAt().getMonthValue() && now.getYear() == regularPayment.getCreatedAt().getYear()){
+                thisMonthStartCnt++;
+            }
+        }
+
+        return adminDonationConverter.convertToRegularInfoV2Dto(thisMonthRegularCnt, thisMonthOneTimeCnt, thisMonthStartCnt);
     }
 }

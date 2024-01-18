@@ -47,7 +47,6 @@ public class AdminDonationController {
     }
 
 
-
     @GetMapping("/{donationId}")
     @ApiErrorCodeExample(UserAuthErrorCode.class)
     @Operation(summary = "ADMIN-05-02 기부금 상세조회 API", description = "기부금 상세조회 API")

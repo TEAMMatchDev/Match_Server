@@ -142,4 +142,13 @@ public class AdminDonationConverter {
             .beforeMonthRegularAmount(beforeMonthRegularAmount)
             .build();
 	}
+
+    public DonationRes.RegularInfoV2Dto convertToRegularInfoV2Dto(Long thisMonthRegularCnt, Long thisMonthOneTimeCnt, Long thisMonthStartCnt) {
+        return DonationRes.RegularInfoV2Dto
+                .builder()
+                .thisMonthRegularCnt(thisMonthRegularCnt)
+                .thisMonthOneTimeCnt(thisMonthOneTimeCnt)
+                .thisMonthStartCnt(thisMonthStartCnt)
+                .build();
+    }
 }
