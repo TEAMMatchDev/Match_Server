@@ -72,12 +72,25 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi adminApiDocs(){
         String[] paths = { "/admin/**" };
+        String[] excludesPath = {"/admin/v2/**"};
+
 
         return GroupedOpenApi.builder()
                 .group("Docs for ADMIN API")
                 .pathsToMatch(paths)
                 .addOperationCustomizer(customize())
                 .build();
+    }
+
+    @Bean
+    public GroupedOpenApi adminV2ApiDocs(){
+        String[] paths = { "/admin/v2/**" };
+
+        return GroupedOpenApi.builder()
+            .group("Docs for ADMIN V2 API")
+            .pathsToMatch(paths)
+            .addOperationCustomizer(customize())
+            .build();
     }
 
     @Bean
