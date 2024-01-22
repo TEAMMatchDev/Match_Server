@@ -5,11 +5,14 @@ import com.example.matchapi.admin.notice.dto.NoticeUploadReq;
 import com.example.matchapi.admin.notice.mapper.AdminNoticeMapper;
 import com.example.matchapi.admin.notice.service.AdminNoticeService;
 import com.example.matchapi.common.model.ContentsList;
+import com.example.matchapi.notice.dto.NoticeRes;
 import com.example.matchcommon.reponse.CommonResponse;
+import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.notice.entity.Notice;
 import com.example.matchdomain.notice.entity.NoticeContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +31,14 @@ public class AdminNoticeController {
     public CommonResponse<String> uploadNoticeList(@Valid @RequestBody NoticeUploadReq noticeUploadReq){
         adminNoticeService.uploadNoticeList(mapper.toEntityNoticeContents(noticeUploadReq.getContentsList()), mapper.toEntityNotice(noticeUploadReq));
         return CommonResponse.onSuccess("업로드 성공");
+    }
+
+    @GetMapping("")
+    @Operation(summary = "ADMIN-10-02 공지사항 조회")
+    public CommonResponse<PageResponse<List<NoticeRes.NoticeList>>> getNoticeList(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size){
+        return CommonResponse.onSuccess(adminNoticeService.getNoticeList(page,size));
     }
 
     @DeleteMapping("/{noticeId}")

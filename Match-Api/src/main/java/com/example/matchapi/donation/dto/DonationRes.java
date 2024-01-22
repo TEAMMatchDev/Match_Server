@@ -79,6 +79,8 @@ public class DonationRes {
         private String monthDonation;
 
         private String totalDonation;
+
+        private String beforeMonthDonation;
     }
 
     @Getter
@@ -426,5 +428,18 @@ public class DonationRes {
         private Long beforeMonthRegularCnt;
 
         private String beforeMonthRegularAmount;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RegularInfoV2Dto {
+        private Long thisMonthRegularCnt;
+
+        private Long thisMonthOneTimeCnt;
+
+        private Long thisMonthStartCnt;
     }
 }

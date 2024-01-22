@@ -169,6 +169,7 @@ public class UserConverter {
                 .userId(result.getUserId())
                 .name(result.getName())
                 .birth(String.valueOf(result.getBirth()))
+                .nickname(result.getNickname())
                 .socialType(result.getSocialType().getName())
                 .gender(result.getGender() == null ? null : result.getGender().getValue())
                 .email(result.getEmail())

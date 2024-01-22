@@ -47,6 +47,8 @@ subprojects{
 
         implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
+        implementation 'commons-io:commons-io:2.11.0' // 또는 최신 버전
+
 
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'

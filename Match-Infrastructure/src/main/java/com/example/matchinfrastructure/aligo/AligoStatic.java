@@ -3,8 +3,8 @@ package com.example.matchinfrastructure.aligo;
 public class AligoStatic {
     public static final String PAYMENT_TEMPLATE = "TQ_1760";
     public static final String EXECUTION_TEMPLATE = "TQ_1761";
-    public static final String AOS_DEEP_LINK = "https://teammatch.page.link/flame?id=";
-    public static final String IOS_DEEP_LINK = "https://teammatch.page.link/flame?id=";
+    public static final String AOS_DEEP_LINK = "https://teammatch.page.link/flame/";
+    public static final String IOS_DEEP_LINK = "https://teammatch.page.link/flame/";
     public static final String APP_LINK = "AL";
     public static final String APP_LINK_NAME = "앱링크";
     public static final String PAYMENT_BUTTON_NAME = "내 불꽃이 보러 가기";

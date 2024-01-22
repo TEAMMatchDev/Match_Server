@@ -106,6 +106,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/payments/validate").permitAll()
                 .antMatchers("/payments/info").permitAll()
                 .antMatchers("/test/**").permitAll()
+                .antMatchers("/actuator").permitAll()
                 .and()
                 .apply(new JwtSecurityConfig(jwtService));
     }
