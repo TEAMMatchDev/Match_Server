@@ -133,6 +133,8 @@ public class UserRes {
 
         private String name;
 
+        private String nickname;
+
         private String birth;
 
         private String socialType;
