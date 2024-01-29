@@ -43,7 +43,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     Long countBy();
 
-    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email," +
+    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email,nickname," +
             "If((select exists (select * from UserCard UC where UC.userId=U.id)),'true','false')'card'," +
             "(select count(*) from DonationUser DU where DU.userId = U.id)'donationCnt'," +
             "COALESCE((SELECT SUM(DU.price) FROM DonationUser DU WHERE DU.userId = U.id), 0) AS totalAmount,U.status, U.createdAt " +
@@ -66,7 +66,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
             "FROM User U where U.status = :value and name LIKE concat('%',:content,'%') order by createdAt desc" ,nativeQuery = true, countQuery = "select count(*) from User where status = :value  and name LIKE concat('%',:content,'%')")
     Page<UserList> getUserListByStatusAndName(Pageable pageable,@Param("value") String value,@Param("content") String content);
 
-    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email," +
+    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email,nickname," +
             "If((select exists (select * from UserCard UC where UC.userId=U.id)),'true','false')'card'," +
             "(select count(*) from DonationUser DU where DU.userId = U.id)'donationCnt'," +
             "COALESCE((SELECT SUM(DU.price) FROM DonationUser DU WHERE DU.userId = U.id), 0) AS totalAmount,U.status, U.createdAt " +
@@ -104,33 +104,33 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     Long countByStatus(Status status);
 
-    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email," +
+    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email,nickname," +
         "If((select exists (select * from UserCard UC where UC.userId=U.id)),'true','false')'card'," +
         "(select count(*) from DonationUser DU where DU.userId = U.id)'donationCnt'," +
         "COALESCE((SELECT SUM(DU.price) FROM DonationUser DU WHERE DU.userId = U.id), 0) AS totalAmount,U.status, U.createdAt " +
         "FROM User U where email LIKE concat('%',:content,'%') order by createdAt desc" ,nativeQuery = true, countQuery = "select count(*) from User where email LIKE concat('%',:content,'%')")
-	Page<UserList> getUserListByEmail(Pageable pageable, String content);
+	Page<UserList> getUserListByEmail(Pageable pageable,@Param("content") String content);
 
-    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email," +
+    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email, nickname, " +
         "If((select exists (select * from UserCard UC where UC.userId=U.id)),'true','false')'card'," +
         "(select count(*) from DonationUser DU where DU.userId = U.id)'donationCnt'," +
         "COALESCE((SELECT SUM(DU.price) FROM DonationUser DU WHERE DU.userId = U.id), 0) AS totalAmount,U.status, U.createdAt " +
         "FROM User U where phoneNumber LIKE concat('%',:content,'%') order by createdAt desc" ,nativeQuery = true, countQuery = "select count(*) from User where phoneNumber LIKE concat('%',:content,'%')")
-    Page<UserList> getUserListByPhone(Pageable pageable, String content);
+    Page<UserList> getUserListByPhone(Pageable pageable,@Param("content") String content);
 
-    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email," +
+    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email,nickname," +
         "If((select exists (select * from UserCard UC where UC.userId=U.id)),'true','false')'card'," +
         "(select count(*) from DonationUser DU where DU.userId = U.id)'donationCnt'," +
         "COALESCE((SELECT SUM(DU.price) FROM DonationUser DU WHERE DU.userId = U.id), 0) AS totalAmount,U.status, U.createdAt " +
         "FROM User U where nickname LIKE concat('%',:content,'%') order by createdAt desc" ,nativeQuery = true, countQuery = "select count(*) from User where nickname LIKE concat('%',:content,'%')")
-    Page<UserList> getUserListByNickname(Pageable pageable, String content);
+    Page<UserList> getUserListByNickname(Pageable pageable,@Param("content") String content);
 
-    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email," +
+    @Query(value = "SELECT U.id 'userId', name, birth, socialType, gender, phoneNumber,email,nickname," +
         "If((select exists (select * from UserCard UC where UC.userId=U.id)),'true','false')'card'," +
         "(select count(*) from DonationUser DU where DU.userId = U.id)'donationCnt'," +
         "COALESCE((SELECT SUM(DU.price) FROM DonationUser DU WHERE DU.userId = U.id), 0) AS totalAmount,U.status, U.createdAt " +
         "FROM User U where U.id LIKE concat('%',:content,'%') order by createdAt desc" ,nativeQuery = true, countQuery = "select count(*) from User where id LIKE concat('%',:content,'%')")
-    Page<UserList> getUserListById(Pageable pageable, String content);
+    Page<UserList> getUserListById(Pageable pageable,@Param("content") String content);
 
     public interface UserList {
         Long getUserId();
