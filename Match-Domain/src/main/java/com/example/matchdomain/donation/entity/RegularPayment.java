@@ -70,5 +70,4 @@ public class RegularPayment extends BaseEntity {
     @JoinColumn(name = "regularPaymentId")
     @BatchSize(size = 100)
     private List<DonationUser> donationUser = new ArrayList<>();
-
 }
