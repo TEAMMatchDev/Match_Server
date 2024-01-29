@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -124,4 +125,29 @@ public class UserAdaptor {
     public Long getDeleteUserCnt() {
         return userRepository.countByStatus(Status.INACTIVE);
     }
+
+    public Page<UserRepository.UserList> getUserAllList(Pageable pageable) {
+        return userRepository.getUserList(pageable);
+    }
+
+    public Page<UserRepository.UserList> getUserListByEmail(Pageable pageable, String content) {
+        return userRepository.getUserListByEmail(pageable, content);
+    }
+
+    public Page<UserRepository.UserList> getUserListByPhone(Pageable pageable, String content) {
+        return userRepository.getUserListByPhone(pageable, content);
+    }
+
+    public Page<UserRepository.UserList> getUserListByName(Pageable pageable, String content) {
+        return userRepository.getUserListByName(pageable, content);
+    }
+
+    public Page<UserRepository.UserList> getUserListByNickname(Pageable pageable, String content) {
+        return userRepository.getUserListByNickname(pageable, content);
+    }
+
+    public Page<UserRepository.UserList> getUserListById(Pageable pageable, String content) {
+        return userRepository.getUserListById(pageable, content);
+    }
+
 }

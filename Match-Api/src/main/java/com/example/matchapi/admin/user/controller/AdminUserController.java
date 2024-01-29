@@ -1,6 +1,7 @@
 package com.example.matchapi.admin.user.controller;
 
 import com.example.matchapi.admin.donation.service.AdminDonationService;
+import com.example.matchapi.admin.user.enums.UserFilter;
 import com.example.matchapi.admin.user.service.AdminUserService;
 import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.user.converter.UserConverter;
@@ -56,11 +57,10 @@ public class AdminUserController {
     public CommonResponse<PageResponse<List<UserRes.UserList>>> getUserList(
             @Parameter(description = "페이지", example = "0") @RequestParam(required = false, defaultValue = "0") @Min(value = 0) int page,
             @Parameter(description = "페이지 사이즈", example = "10") @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(required = false) Status status,
-            @RequestParam(required = false) String content
+            @RequestParam(required = false) String content,
+            @RequestParam(required = false) UserFilter filter
             ){
-        PageResponse<List<UserRes.UserList>> userList = adminUserService.getUserList(page, size, status, content);
-        return CommonResponse.onSuccess(userList);
+        return CommonResponse.onSuccess(adminUserService.getUserList(page, size, content, filter));
     }
 
     @GetMapping("/{userId}")

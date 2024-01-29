@@ -1,10 +1,12 @@
 package com.example.matchapi.admin.user.service;
 
+import com.example.matchapi.admin.user.enums.UserFilter;
+import com.example.matchapi.admin.user.service.context.UserContext;
+import com.example.matchapi.admin.user.service.context.UserContextFactory;
 import com.example.matchapi.donation.service.DonationService;
 import com.example.matchapi.user.converter.UserConverter;
 import com.example.matchapi.user.dto.UserRes;
 import com.example.matchcommon.annotation.RedissonLock;
-import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchcommon.exception.ForbiddenException;
 import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
@@ -15,6 +17,8 @@ import com.example.matchdomain.user.entity.enums.Gender;
 import com.example.matchdomain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +36,8 @@ public class AdminUserService {
     private final UserAdaptor userAdaptor;
     private final UserConverter userConverter;
     private final DonationService donationService;
+    private final UserContextFactory userContextFactory;
+
 
     public UserRes.SignUpInfo getUserSignUpInfo() {
         LocalDate localDate = LocalDate.now();
@@ -45,8 +51,12 @@ public class AdminUserService {
     }
 
     @Transactional
-    public PageResponse<List<UserRes.UserList>> getUserList(int page, int size, Status status, String content) {
-        Page<UserRepository.UserList> userList = userAdaptor.getUserList(page, size, status, content);
+    public PageResponse<List<UserRes.UserList>> getUserList(int page, int size, String content,
+        UserFilter filter) {
+
+        UserContext userContext = userContextFactory.getContextByFilter(filter);
+
+        Page<UserRepository.UserList> userList = userContext.getUserList(PageRequest.of(page, size), content);
 
         List<UserRes.UserList> userLists = new ArrayList<>();
 
