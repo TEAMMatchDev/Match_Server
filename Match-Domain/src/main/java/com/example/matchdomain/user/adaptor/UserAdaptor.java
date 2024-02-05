@@ -97,27 +97,6 @@ public class UserAdaptor {
         return userRepository.countByCreatedAtGreaterThanAndCreatedAtLessThan(LocalDateTime.parse(localDate.with(TemporalAdjusters.firstDayOfMonth())+FIRST_TIME), LocalDateTime.parse(localDate.with(TemporalAdjusters.lastDayOfMonth())+LAST_TIME));
     }
 
-    public Page<UserRepository.UserList> getUserList(int page, int size, Status status, String content) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        Page<UserRepository.UserList> userList = null;
-
-        if(status == null && content ==null) {
-            userList = userRepository.getUserList(pageable);
-        }
-        else if (status !=null && content ==null){
-            userList = userRepository.getUserListByStatus(pageable, status.getValue());
-        }
-        else if(status!=null){
-            userList = userRepository.getUserListByStatusAndName(pageable, status.getValue(),content);
-        }
-        else{
-            userList = userRepository.getUserListByName(pageable, content);
-        }
-
-        return userList;
-    }
-
     public UserRepository.UserList getUserDetail(Long userId) {
         return userRepository.getUserDetail(userId);
     }

@@ -151,6 +151,7 @@ public class ProjectService {
         projectAdaptor.save(project);
     }
 
+    @Transactional
     public void deleteProject(Long projectId) {
         Project project = projectAdaptor.findById(projectId);
 

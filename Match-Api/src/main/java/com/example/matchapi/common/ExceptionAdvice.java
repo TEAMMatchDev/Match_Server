@@ -101,7 +101,7 @@ public class ExceptionAdvice {
         else{
             discordService.sendUnKnownMessage(user.getUsername(), exception, request);
         }
-
+        log.error("INTERNAL_SERVER_ERROR", exception);
         return new ResponseEntity<>(CommonResponse.onFailure("500", exception.getMessage(), null), null,
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
