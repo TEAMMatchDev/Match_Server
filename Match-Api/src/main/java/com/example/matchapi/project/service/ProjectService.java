@@ -204,6 +204,7 @@ public class ProjectService {
         return new ProjectRes.PatchProjectImg(projectImgId, projectImage.getUrl());
     }
 
+    @Transactional
     public void patchProjectActive(Long projectId) {
         Project project = projectAdaptor.findById(projectId);
 
