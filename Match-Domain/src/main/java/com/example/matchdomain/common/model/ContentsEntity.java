@@ -34,4 +34,8 @@ public abstract class ContentsEntity {
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
+
+    public void updateContents(String contents) {
+        this.contents = contents;
+    }
 }

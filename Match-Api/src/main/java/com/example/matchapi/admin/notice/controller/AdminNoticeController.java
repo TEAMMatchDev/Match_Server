@@ -1,6 +1,7 @@
 package com.example.matchapi.admin.notice.controller;
 
 import com.example.matchapi.admin.event.dto.EventUploadReq;
+import com.example.matchapi.admin.notice.dto.NoticeUpdateReq;
 import com.example.matchapi.admin.notice.dto.NoticeUploadReq;
 import com.example.matchapi.admin.notice.mapper.AdminNoticeMapper;
 import com.example.matchapi.admin.notice.service.AdminNoticeService;
@@ -46,5 +47,12 @@ public class AdminNoticeController {
     public CommonResponse<String> deleteNotice(@PathVariable Long noticeId){
         adminNoticeService.deleteNotice(noticeId);
         return CommonResponse.onSuccess("삭제 성공");
+    }
+
+    @PatchMapping("/{noticeId}")
+    @Operation(summary = "ADMIN-10-03 공지사항 수정")
+    public CommonResponse<String> updateNotice(@PathVariable Long noticeId, @Valid @RequestBody NoticeUpdateReq noticeUploadReq){
+        adminNoticeService.updateNotice(noticeId, noticeUploadReq);
+        return CommonResponse.onSuccess("수정 성공");
     }
 }

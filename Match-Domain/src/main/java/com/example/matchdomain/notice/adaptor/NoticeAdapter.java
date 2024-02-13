@@ -3,6 +3,7 @@ package com.example.matchdomain.notice.adaptor;
 import com.example.matchcommon.annotation.Adaptor;
 import com.example.matchcommon.exception.BadRequestException;
 import com.example.matchdomain.notice.entity.Notice;
+import com.example.matchdomain.notice.repository.NoticeContentRepository;
 import com.example.matchdomain.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import static com.example.matchdomain.notice.exception.GetNoticeErrorCode.NOT_EXIST_NOTICE;
+
+import java.util.List;
 
 @Adaptor
 @RequiredArgsConstructor
@@ -32,4 +35,5 @@ public class NoticeAdapter {
     public void delete(Notice notice) {
         noticeRepository.deleteById(notice.getId());
     }
+
 }
