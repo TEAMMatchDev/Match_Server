@@ -10,7 +10,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-01-17T19:31:30+0900",
+    date = "2024-02-13T15:15:37+0900",
     comments = "version: 1.5.3.Final, compiler: javac, environment: Java 11.0.19 (Oracle Corporation)"
 )
 public class AdminNoticeMapperImpl implements AdminNoticeMapper {
@@ -41,6 +41,23 @@ public class AdminNoticeMapperImpl implements AdminNoticeMapper {
         notice.title( noticeUploadReq.getTitle() );
 
         return notice.build();
+    }
+
+    @Override
+    public NoticeContent toEntityNoticeContent(ContentsList contentsList, Long noticeId) {
+        if ( contentsList == null && noticeId == null ) {
+            return null;
+        }
+
+        NoticeContent.NoticeContentBuilder<?, ?> noticeContent = NoticeContent.builder();
+
+        if ( contentsList != null ) {
+            noticeContent.contentsType( contentsList.getContentsType() );
+            noticeContent.contents( contentsList.getContents() );
+        }
+        noticeContent.noticeId( noticeId );
+
+        return noticeContent.build();
     }
 
     protected NoticeContent contentsListToNoticeContent(ContentsList contentsList) {
