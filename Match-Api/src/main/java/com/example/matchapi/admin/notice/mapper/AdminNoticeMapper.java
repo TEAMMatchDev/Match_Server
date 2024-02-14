@@ -16,4 +16,6 @@ public interface AdminNoticeMapper {
     List<NoticeContent> toEntityNoticeContents(List<ContentsList> contentsList);
 
     Notice toEntityNotice(NoticeUploadReq noticeUploadReq);
+
+    NoticeContent toEntityNoticeContent(ContentsList contentsList, Long noticeId);
 }
