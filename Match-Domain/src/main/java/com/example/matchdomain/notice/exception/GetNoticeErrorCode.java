@@ -16,7 +16,7 @@ public enum GetNoticeErrorCode implements BaseErrorCode {
 
     @ExplainError("해당 공지사항이 존재하지 않습니다.")
     NOT_EXIST_NOTICE(HttpStatus.BAD_REQUEST,false,"NOTICE_001","해당 공지사항이 존재하지 않습니다..")
-    ,NOT_EXIST_NOTICE_CONTENT(HttpStatus.BAD_REQUEST,false,"NOTICE_002","해당 공지사항의 컨텐츠가 존재하지 않습니다.");
+    ,NOT_EXIST_CONTENT(HttpStatus.BAD_REQUEST,false,"NOTICE_002","해당 공지사항의 컨텐츠가 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final boolean isSuccess;

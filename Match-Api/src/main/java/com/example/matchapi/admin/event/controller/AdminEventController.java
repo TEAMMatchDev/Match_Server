@@ -1,5 +1,6 @@
 package com.example.matchapi.admin.event.controller;
 
+import com.example.matchapi.admin.event.dto.EventUpdateReq;
 import com.example.matchapi.admin.event.dto.EventUploadReq;
 import com.example.matchapi.admin.event.service.AdminEventService;
 import com.example.matchapi.event.dto.EventRes;
@@ -47,6 +48,13 @@ public class AdminEventController {
     public CommonResponse<String> deleteEvent(@PathVariable Long eventId){
         adminEventService.deleteEvent(eventId);
         return CommonResponse.onSuccess("삭제 성공");
+    }
+
+    @PatchMapping("/{eventId}")
+    @Operation(summary = "ADMIN-09-04 이벤트 수정")
+    public CommonResponse<String> updateEvent(@PathVariable Long eventId, @RequestBody EventUpdateReq eventUpdateReq){
+        adminEventService.updateEvent(eventId, eventUpdateReq);
+        return CommonResponse.onSuccess("수정 성공");
     }
 
     

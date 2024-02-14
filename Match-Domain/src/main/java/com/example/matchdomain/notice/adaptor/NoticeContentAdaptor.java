@@ -25,7 +25,7 @@ public class NoticeContentAdaptor {
 
     public NoticeContent findById(Long contentId) {
         return contentRepository.findById(contentId).orElseThrow(()->
-                new BadRequestException(NOT_EXIST_NOTICE_CONTENT));
+                new BadRequestException(NOT_EXIST_CONTENT));
     }
 
     public NoticeContent save(NoticeContent content) {

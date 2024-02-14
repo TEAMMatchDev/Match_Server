@@ -62,6 +62,7 @@ public class AdminNoticeService {
 	public void updateNotice(Long noticeId, NoticeUpdateReq noticeUploadReq) {
         Notice notice = noticeAdapter.findNoticeDetail(noticeId);
         notice.updateNotice(noticeUploadReq.getTitle(), noticeUploadReq.getNoticeType());
+        noticeAdapter.save(notice);
         updateNoticeContent(noticeUploadReq, noticeId);
     }
 

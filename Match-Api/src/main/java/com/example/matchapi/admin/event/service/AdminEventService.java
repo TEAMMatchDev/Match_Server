@@ -1,5 +1,6 @@
 package com.example.matchapi.admin.event.service;
 
+import com.example.matchapi.admin.event.dto.EventUpdateReq;
 import com.example.matchapi.admin.event.dto.EventUploadReq;
 import com.example.matchapi.common.model.ContentsList;
 import com.example.matchapi.common.util.MessageHelper;
@@ -28,6 +29,7 @@ import static com.example.matchdomain.common.model.ContentsType.TEXT;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AdminEventService {
     private final EventConverter eventConverter;
     private final MessageHelper messageHelper;
@@ -76,5 +78,32 @@ public class AdminEventService {
     public PageResponse<List<EventRes.EventList>> getEventList(int page, int size) {
         Page<Event> events = eventAdaptor.findEvent(page, size);
         return new PageResponse<>(events.isLast(), events.getTotalPages(), eventConverter.convertToEventList(events.getContent()));
+    }
+
+	public void updateEvent(Long eventId, EventUpdateReq eventUpdateReq) {
+        Event event = eventAdaptor.findByEvent(eventId);
+        event.updateEvent(eventUpdateReq.getTitle(), eventUpdateReq.getSmallTitle(), eventUpdateReq.getEventType(), eventUpdateReq.getStartDate(), eventUpdateReq.getEndDate());
+        eventAdaptor.save(event);
+        updateEventContent(eventUpdateReq, eventId);
+	}
+
+    private void updateEventContent(EventUpdateReq eventUpdateReq, Long eventId) {
+        if(eventUpdateReq.getDeleteContentsList() != null){
+            eventContentAdaptor.deleteEventContent(eventUpdateReq.getDeleteContentsList());
+        }
+        if(eventUpdateReq.getContentsList() != null){
+            List<EventContent> eventContents = new ArrayList<>();
+            for(ContentsList contentsList : eventUpdateReq.getContentsList()){
+                eventContents.add(eventConverter.convertToEventContents(eventId, contentsList.getContents(), contentsList.getContentsType()));
+            }
+            eventContentAdaptor.saveAll(eventContents);
+        }
+        if(eventUpdateReq.getEventContents() != null){
+            for(EventUpdateReq.EventContent eventContent : eventUpdateReq.getEventContents()){
+                EventContent content = eventContentAdaptor.findById(eventContent.getContentId());
+                content.updateContents(eventContent.getContents());
+                eventContentAdaptor.save(content);
+            }
+        }
     }
 }

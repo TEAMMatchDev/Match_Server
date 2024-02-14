@@ -48,4 +48,12 @@ public class Event extends BaseEntity {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate eventEndDate;
+
+	public void updateEvent(String title, String smallTitle, EventType eventType, LocalDate startDate, LocalDate endDate) {
+        this.title = title;
+        this.smallTitle = smallTitle;
+        this.eventType = eventType;
+        this.eventStartDate = startDate;
+        this.eventEndDate = endDate;
+	}
 }
