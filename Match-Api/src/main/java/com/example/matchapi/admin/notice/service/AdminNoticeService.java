@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ import static com.example.matchdomain.common.model.ContentsType.IMG;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AdminNoticeService {
     private final NoticeContentAdaptor noticeContentAdaptor;
     private final NoticeAdapter noticeAdapter;
