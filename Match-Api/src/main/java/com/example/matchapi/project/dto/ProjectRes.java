@@ -169,6 +169,8 @@ public class ProjectRes {
 
         private int regularDonationCnt;
 
+        private String thumbnail;
+
         private List<ProjectImgList> projectImgLists;
     }
     @Getter

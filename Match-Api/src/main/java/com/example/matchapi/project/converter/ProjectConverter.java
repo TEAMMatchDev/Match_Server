@@ -116,15 +116,16 @@ public class ProjectConverter {
 
     public ProjectRes.ProjectAdminDetail convertToProjectAdminDetail(ProjectRepository.ProjectAdminDetail result, List<ProjectImage> projectImages) {
         List<ProjectRes.ProjectImgList> projectImgLists = new ArrayList<>();
-        projectImages.forEach(
-                results -> projectImgLists.add(
-                        new ProjectRes.ProjectImgList(
-                                results.getId(),
-                                results.getUrl(),
-                                results.getSequence()
-                        )
-                )
-        );
+
+        String thumbnail = "";
+        for (ProjectImage projectImage : projectImages) {
+            if(projectImage.getImageRepresentStatus() == ImageRepresentStatus.NORMAL) {
+                projectImgLists.add(convertToProjectImages(projectImage));
+            }
+            if(projectImage.getImageRepresentStatus() == ImageRepresentStatus.REPRESENT) {
+                thumbnail = projectImage.getUrl();
+            }
+        }
 
 
         return ProjectRes.ProjectAdminDetail
@@ -143,6 +144,7 @@ public class ProjectConverter {
                 .searchKeyword(result.getSearchKeyword())
                 .totalDonationCnt(result.getTotalDonationCnt())
                 .projectImgLists(projectImgLists)
+                .thumbnail(thumbnail)
                 .build();
     }
 
