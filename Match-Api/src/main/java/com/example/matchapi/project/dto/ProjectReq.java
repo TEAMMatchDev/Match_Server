@@ -11,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ProjectReq {
     @Getter
@@ -75,7 +76,11 @@ public class ProjectReq {
         private LocalDateTime endDate;
         @Enum(message = "DOG, CHILDREN,YOUTH,WOMEN, ELDER, DISABLED, SOCIAL, EARTH, NEIGHBOR, ANIMAL, ENVIRONMENT 중 입력해주세요")
         private ProjectKind projectKind;
+        @Schema(description = "추천 검색어", required = false)
         private String searchKeyword;
+        @Schema(description = "삭제할 이미지 리스트", required = false)
+        private List<Long> deleteImageList;
+
     }
     @Getter
     @Setter

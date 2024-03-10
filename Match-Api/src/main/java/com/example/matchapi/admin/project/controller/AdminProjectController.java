@@ -17,6 +17,7 @@ import com.example.matchdomain.user.exception.UserAuthErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -111,11 +112,14 @@ public class AdminProjectController {
     @PatchMapping("/{projectId}")
     @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
     public CommonResponse<String> patchProject(@PathVariable Long projectId,
-                                               @RequestPart ProjectReq.ModifyProject modifyProject){
-        projectService.patchProject(projectId, modifyProject);
+        @RequestPart ProjectReq.ModifyProject modifyProject,
+        @Schema(description = "대표 이미지 파일 변경될 경우") @RequestPart(value = "presentFile", required = false) MultipartFile presentFile,
+        @Schema(description = "이미지 리스트 추가될 경우")@RequestPart(value = "multipartFiles", required = false) List<MultipartFile> multipartFiles){
+        projectService.patchProject(projectId, modifyProject, presentFile, multipartFiles);
         return CommonResponse.onSuccess("수정 성공");
     }
 
+    /*
     @Operation(summary = "ADMIN-03-07💻 프로젝트 이미지 수정", description = "프로젝트 이미지 수정 API")
     @PatchMapping(value = "/img/{projectId}/{projectImgId}", consumes = {"multipart/form-data"}, produces = "application/json")
     @ApiErrorCodeExample({UserAuthErrorCode.class, PatchProjectImageErrorCode.class, FileUploadException.class})
@@ -125,6 +129,7 @@ public class AdminProjectController {
         ProjectRes.PatchProjectImg patchProjectImg = projectService.modifyProjectImg(projectId, projectImgId, multipartFile);
         return CommonResponse.onSuccess(patchProjectImg);
     }
+     */
 
 
 }

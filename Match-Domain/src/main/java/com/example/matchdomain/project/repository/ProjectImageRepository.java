@@ -18,4 +18,8 @@ public interface ProjectImageRepository extends JpaRepository<ProjectImage, Long
     List<ProjectImage> findByProjectIdAndImageRepresentStatusAndProject_StatusOrderBySequenceAsc(@Param("projectId") Long projectId, @Param("imageRepresentStatus") ImageRepresentStatus imageRepresentStatus,@Param("status") Status status);
 
     List<ProjectImage> findByProjectIdOrderBySequenceAsc(Long projectId);
+
+	void deleteAllByIdIn(List<Long> deleteImageList);
+
+	void deleteByIdAndImageRepresentStatus(Long id, ImageRepresentStatus imageRepresentStatus);
 }

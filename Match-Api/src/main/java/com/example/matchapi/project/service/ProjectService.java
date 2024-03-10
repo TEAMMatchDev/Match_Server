@@ -9,7 +9,6 @@ import com.example.matchcommon.annotation.RedissonLock;
 import com.example.matchcommon.constants.enums.FILTER;
 import com.example.matchapi.user.helper.AuthHelper;
 import com.example.matchcommon.exception.BadRequestException;
-import com.example.matchcommon.exception.NotFoundException;
 import com.example.matchcommon.reponse.PageResponse;
 import com.example.matchdomain.common.model.Status;
 import com.example.matchdomain.donation.adaptor.DonationAdaptor;
@@ -20,11 +19,9 @@ import com.example.matchdomain.donation.entity.enums.RegularStatus;
 import com.example.matchdomain.project.adaptor.AttentionAdaptor;
 import com.example.matchdomain.project.adaptor.ProjectAdaptor;
 import com.example.matchdomain.project.adaptor.ProjectImgAdaptor;
-import com.example.matchdomain.project.dto.ProjectDto;
 import com.example.matchdomain.project.entity.*;
 import com.example.matchdomain.project.entity.enums.ProjectKind;
 import com.example.matchdomain.project.entity.enums.ProjectStatus;
-import com.example.matchdomain.project.entity.enums.ReportReason;
 import com.example.matchdomain.project.entity.pk.ProjectUserAttentionPk;
 import com.example.matchdomain.project.repository.*;
 import com.example.matchdomain.user.entity.User;
@@ -38,18 +35,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.matchcommon.constants.MatchAlertStatic.PROJECT_UPLOAD_BODY;
 import static com.example.matchdomain.common.model.Status.ACTIVE;
-import static com.example.matchdomain.common.model.Status.INACTIVE;
-import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.NORMAL;
-import static com.example.matchdomain.project.entity.enums.ImageRepresentStatus.REPRESENT;
-import static com.example.matchdomain.project.entity.enums.ProjectStatus.PROCEEDING;
-import static com.example.matchdomain.project.exception.CommentDeleteErrorCode.COMMENT_DELETE_ERROR_CODE;
-import static com.example.matchdomain.project.exception.CommentGetErrorCode.COMMENT_NOT_EXIST;
 import static com.example.matchdomain.project.exception.PatchProjectImageErrorCode.PROJECT_NOT_CORRECT_IMAGE;
 import static com.example.matchdomain.project.exception.ProjectGetErrorCode.PROJECT_NOT_EXIST;
 
@@ -161,10 +152,13 @@ public class ProjectService {
     }
 
     @Transactional
-    public void patchProject(Long projectId, ProjectReq.ModifyProject modifyProject) {
+    public void patchProject(Long projectId, ProjectReq.ModifyProject modifyProject, MultipartFile presentFile,
+		List<MultipartFile> multipartFiles) {
         Project project = projectAdaptor.findById(projectId);
 
         project.modifyProject(modifyProject.getProjectName(), modifyProject.getUsages(), modifyProject.getDetail(), modifyProject.getRegularStatus(), modifyProject.getStartDate(), modifyProject.getEndDate(), modifyProject.getProjectKind(), modifyProject.getSearchKeyword());
+
+        projectImgService.updateImageLists(project, modifyProject.getDeleteImageList(), presentFile, multipartFiles);
 
         projectAdaptor.save(project);
     }

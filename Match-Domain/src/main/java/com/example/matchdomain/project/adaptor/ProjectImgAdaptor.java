@@ -37,4 +37,16 @@ public class ProjectImgAdaptor {
     public ProjectImage save(ProjectImage projectImage) {
         return projectImageRepository.save(projectImage);
     }
+
+	public void deleteImgList(List<Long> deleteImageList) {
+        projectImageRepository.deleteAllByIdIn(deleteImageList);
+	}
+
+    public List<ProjectImage> findByIdIn(List<Long> deleteImageList) {
+        return projectImageRepository.findAllById(deleteImageList);
+    }
+
+    public void deletePresentImg(Long id) {
+        projectImageRepository.deleteByIdAndImageRepresentStatus(id, ImageRepresentStatus.REPRESENT);
+    }
 }
