@@ -109,7 +109,7 @@ public class AdminProjectController {
     }
 
     @Operation(summary = "ADMIN-03-06💻 프로젝트 글 수정.",description = "프로젝트 글 수정 API 입니다.")
-    @PatchMapping("/{projectId}")
+    @PatchMapping(value = "/{projectId}", consumes = {"multipart/form-data"}, produces = "application/json")
     @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
     public CommonResponse<String> patchProject(@PathVariable Long projectId,
         @RequestPart ProjectReq.ModifyProject modifyProject,
