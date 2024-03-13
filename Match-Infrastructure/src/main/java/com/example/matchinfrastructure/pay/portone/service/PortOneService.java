@@ -1,5 +1,7 @@
 package com.example.matchinfrastructure.pay.portone.service;
 
+import static com.example.matchcommon.constants.MatchStatic.*;
+
 import com.example.matchcommon.properties.PortOneProperties;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;

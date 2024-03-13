@@ -109,27 +109,15 @@ public class AdminProjectController {
     }
 
     @Operation(summary = "ADMIN-03-06💻 프로젝트 글 수정.",description = "프로젝트 글 수정 API 입니다.")
-    @PatchMapping(value = "/{projectId}", consumes = {"multipart/form-data"}, produces = "application/json")
+    @RequestMapping(value = "/modify/{projectId}", consumes = {"multipart/form-data"}, method = RequestMethod.POST)
     @ApiErrorCodeExample({UserAuthErrorCode.class, ProjectGetErrorCode.class})
     public CommonResponse<String> patchProject(@PathVariable Long projectId,
         @RequestPart ProjectReq.ModifyProject modifyProject,
-        @Schema(description = "대표 이미지 파일 변경될 경우") @RequestPart(value = "presentFile", required = false) MultipartFile presentFile,
-        @Schema(description = "이미지 리스트 추가될 경우")@RequestPart(value = "multipartFiles", required = false) List<MultipartFile> multipartFiles){
+        @RequestPart(value = "presentFile", required = false) MultipartFile presentFile,
+        @RequestPart(value = "multipartFiles", required = false) List<MultipartFile> multipartFiles){
         projectService.patchProject(projectId, modifyProject, presentFile, multipartFiles);
         return CommonResponse.onSuccess("수정 성공");
     }
-
-    /*
-    @Operation(summary = "ADMIN-03-07💻 프로젝트 이미지 수정", description = "프로젝트 이미지 수정 API")
-    @PatchMapping(value = "/img/{projectId}/{projectImgId}", consumes = {"multipart/form-data"}, produces = "application/json")
-    @ApiErrorCodeExample({UserAuthErrorCode.class, PatchProjectImageErrorCode.class, FileUploadException.class})
-    public CommonResponse<ProjectRes.PatchProjectImg> modifyProjectImg(@PathVariable Long projectId, @PathVariable Long projectImgId,
-                                                                       @RequestPart("img") MultipartFile multipartFile){
-        if(multipartFile.isEmpty()) throw new BadRequestException(FILE_UPLOAD_NOT_EMPTY);
-        ProjectRes.PatchProjectImg patchProjectImg = projectService.modifyProjectImg(projectId, projectImgId, multipartFile);
-        return CommonResponse.onSuccess(patchProjectImg);
-    }
-     */
 
 
 }

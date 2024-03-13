@@ -74,8 +74,6 @@ public class ProjectReq {
         @NotNull(message = "기부 프로젝트 종류 날자를 입력해주세요")
         @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime endDate;
-        @Enum(message = "DOG, CHILDREN,YOUTH,WOMEN, ELDER, DISABLED, SOCIAL, EARTH, NEIGHBOR, ANIMAL, ENVIRONMENT 중 입력해주세요")
-        private ProjectKind projectKind;
         @Schema(description = "추천 검색어", required = false)
         private String searchKeyword;
         @Schema(description = "삭제할 이미지 리스트", required = false)

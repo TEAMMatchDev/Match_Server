@@ -156,7 +156,7 @@ public class ProjectService {
 		List<MultipartFile> multipartFiles) {
         Project project = projectAdaptor.findById(projectId);
 
-        project.modifyProject(modifyProject.getProjectName(), modifyProject.getUsages(), modifyProject.getDetail(), modifyProject.getRegularStatus(), modifyProject.getStartDate(), modifyProject.getEndDate(), modifyProject.getProjectKind(), modifyProject.getSearchKeyword());
+        project.modifyProject(modifyProject.getProjectName(), modifyProject.getUsages(), modifyProject.getDetail(), modifyProject.getRegularStatus(), modifyProject.getStartDate(), modifyProject.getEndDate(), modifyProject.getSearchKeyword());
 
         projectImgService.updateImageLists(project, modifyProject.getDeleteImageList(), presentFile, multipartFiles);
 
