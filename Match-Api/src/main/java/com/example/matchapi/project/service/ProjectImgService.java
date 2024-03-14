@@ -55,10 +55,12 @@ public class ProjectImgService {
             }
             projectImgAdaptor.deleteImgList(deleteImageList);
         }
+
         if(presentFile != null){
-            String presentUrl = s3UploadService.uploadProjectPresentFile(project.getId(), presentFile);
-            projectImgAdaptor.deletePresentImg(project.getId());
-            projectImgAdaptor.save(projectConverter.postProjectImage(project.getId(), presentUrl, REPRESENT, 0));
+            ProjectImage projectImage = projectImgAdaptor.getRepresentImage(project.getId(), REPRESENT);
+            s3UploadService.deleteFile(projectImage.getUrl());
+            projectImage.setUrl(s3UploadService.uploadProjectPresentFile(project.getId(), presentFile));
+            projectImgAdaptor.save(projectImage);
         }
         if(multipartFiles != null){
             List<String> imgUrlList = s3UploadService.listUploadProjectFiles(project.getId(), multipartFiles);

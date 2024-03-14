@@ -2,10 +2,11 @@ package com.example.matchdomain.project.adaptor;
 
 import com.example.matchcommon.annotation.Adaptor;
 import com.example.matchcommon.exception.BadRequestException;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.entity.ProjectImage;
 import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import com.example.matchdomain.project.repository.ProjectImageRepository;
-import com.example.matchdomain.user.entity.User;
+
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -39,14 +40,24 @@ public class ProjectImgAdaptor {
     }
 
 	public void deleteImgList(List<Long> deleteImageList) {
-        projectImageRepository.deleteAllByIdIn(deleteImageList);
+        System.out.println("삭");
+        projectImageRepository.deleteAllByIdInBatch(deleteImageList);
 	}
 
     public List<ProjectImage> findByIdIn(List<Long> deleteImageList) {
         return projectImageRepository.findAllById(deleteImageList);
     }
 
-    public void deletePresentImg(Long id) {
-        projectImageRepository.deleteByIdAndImageRepresentStatus(id, ImageRepresentStatus.REPRESENT);
+    public void deletePresentImg(Project project) {
+        System.out.println("대표 이미지 삭제");
+        projectImageRepository.deleteAllByProjectAndImageRepresentStatus(project, ImageRepresentStatus.REPRESENT);
+    }
+
+    public void deleteById(ProjectImage projectImage) {
+        projectImageRepository.delete(projectImage);
+    }
+
+    public ProjectImage getRepresentImage(Long id, ImageRepresentStatus imageRepresentStatus) {
+        return projectImageRepository.findByProjectIdAndImageRepresentStatus(id, imageRepresentStatus);
     }
 }

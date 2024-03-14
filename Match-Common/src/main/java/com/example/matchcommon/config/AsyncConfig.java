@@ -76,6 +76,17 @@ public class AsyncConfig extends AsyncConfigurerSupport {
         return executor;
     }
 
+    @Bean(name = "delete-image")
+    public Executor deleteImage() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5); // 기본적으로 실행 대기 중인 Thread 개수
+        executor.setMaxPoolSize(10); // 동시에 동작하는 최대 Thread 개수
+        executor.setQueueCapacity(1000); // CorePool이 초과될때 Queue에 저장했다가 꺼내서 실행된다. (500개까지 저장함)
+        executor.setThreadNamePrefix("delete-image-thread"); // Spring에서 생성하는 Thread 이름의 접두사
+        executor.initialize();
+        return executor;
+    }
+
     @Bean(name = "event-listener")
     public Executor eventListener() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

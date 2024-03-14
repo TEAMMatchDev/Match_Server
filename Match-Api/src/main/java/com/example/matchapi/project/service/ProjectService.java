@@ -151,15 +151,8 @@ public class ProjectService {
         projectAdaptor.save(project);
     }
 
-    @Transactional
-    public void patchProject(Long projectId, ProjectReq.ModifyProject modifyProject, MultipartFile presentFile,
-		List<MultipartFile> multipartFiles) {
-        Project project = projectAdaptor.findById(projectId);
-
+    public void patchProject(Project project, ProjectReq.ModifyProject modifyProject) {
         project.modifyProject(modifyProject.getProjectName(), modifyProject.getUsages(), modifyProject.getDetail(), modifyProject.getRegularStatus(), modifyProject.getStartDate(), modifyProject.getEndDate(), modifyProject.getSearchKeyword());
-
-        projectImgService.updateImageLists(project, modifyProject.getDeleteImageList(), presentFile, multipartFiles);
-
         projectAdaptor.save(project);
     }
 
@@ -249,6 +242,7 @@ public class ProjectService {
         return projectAdaptor.findByProject(projectId);
     }
 
+    @Transactional
     public Project findByProjectId(Long projectId) {
         return projectAdaptor.findById(projectId);
     }

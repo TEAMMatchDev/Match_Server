@@ -9,6 +9,8 @@ import com.example.matchcommon.exception.InternalServerException;
 import com.example.matchcommon.properties.AwsS3Properties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -140,6 +142,7 @@ public class S3UploadService {
         return getImageUrl(fileName);
     }
 
+    @Async("delete-image")
     public void deleteFile(String fileName){
         int index=fileName.indexOf(CLOUD_FRONT_DOMAIN_NAME);
         String fileRoute=fileName.substring(index+CLOUD_FRONT_DOMAIN_NAME.length()+1);

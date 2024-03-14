@@ -2,6 +2,7 @@ package com.example.matchapi.admin.project.controller;
 
 import com.example.matchapi.project.dto.ProjectReq;
 import com.example.matchapi.project.dto.ProjectRes;
+import com.example.matchapi.project.service.ProjectImgService;
 import com.example.matchapi.project.service.ProjectService;
 import com.example.matchcommon.annotation.ApiErrorCodeExample;
 import com.example.matchcommon.annotation.Enum;
@@ -10,6 +11,7 @@ import com.example.matchcommon.exception.errorcode.FileUploadException;
 import com.example.matchcommon.exception.errorcode.RequestErrorCode;
 import com.example.matchcommon.reponse.CommonResponse;
 import com.example.matchcommon.reponse.PageResponse;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.entity.enums.ProjectStatus;
 import com.example.matchdomain.project.exception.PatchProjectImageErrorCode;
 import com.example.matchdomain.project.exception.ProjectGetErrorCode;
@@ -24,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
@@ -36,6 +39,7 @@ import static com.example.matchcommon.exception.errorcode.FileUploadException.FI
 @Tag(name = "ADMIN-03-Project💻 관리자 프로젝트 관련 API 입니다.", description = "프로젝트 관리 API 입니다.")
 public class AdminProjectController {
     private final ProjectService projectService;
+    private final ProjectImgService projectImgService;
     @Operation(summary = "ADMIN-03-01💻 프로젝트 리스트 업로드 API.",description = "프로젝트 업로드 API 입니다.")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiErrorCodeExample({UserAuthErrorCode.class, RequestErrorCode.class, FileUploadException.class})
@@ -115,7 +119,10 @@ public class AdminProjectController {
         @RequestPart ProjectReq.ModifyProject modifyProject,
         @RequestPart(value = "presentFile", required = false) MultipartFile presentFile,
         @RequestPart(value = "multipartFiles", required = false) List<MultipartFile> multipartFiles){
-        projectService.patchProject(projectId, modifyProject, presentFile, multipartFiles);
+        Project project = projectService.findByProjectId(projectId);
+        projectService.patchProject(project, modifyProject);
+        projectImgService.updateImageLists(project, modifyProject.getDeleteImageList(), presentFile, multipartFiles);
+
         return CommonResponse.onSuccess("수정 성공");
     }
 

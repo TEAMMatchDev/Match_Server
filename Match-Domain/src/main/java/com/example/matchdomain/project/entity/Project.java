@@ -72,7 +72,6 @@ public class Project extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "projectId")
-    @Fetch(FetchMode.JOIN)
     private List<ProjectImage> projectImage = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

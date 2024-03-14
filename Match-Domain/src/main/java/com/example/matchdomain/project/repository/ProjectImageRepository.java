@@ -1,6 +1,7 @@
 package com.example.matchdomain.project.repository;
 
 import com.example.matchdomain.common.model.Status;
+import com.example.matchdomain.project.entity.Project;
 import com.example.matchdomain.project.entity.enums.ImageRepresentStatus;
 import com.example.matchdomain.project.entity.ProjectImage;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,7 +20,7 @@ public interface ProjectImageRepository extends JpaRepository<ProjectImage, Long
 
     List<ProjectImage> findByProjectIdOrderBySequenceAsc(Long projectId);
 
-	void deleteAllByIdIn(List<Long> deleteImageList);
+	void deleteAllByProjectAndImageRepresentStatus(Project project, ImageRepresentStatus imageRepresentStatus);
 
-	void deleteByIdAndImageRepresentStatus(Long id, ImageRepresentStatus imageRepresentStatus);
+	ProjectImage findByProjectIdAndImageRepresentStatus(Long id, ImageRepresentStatus imageRepresentStatus);
 }
