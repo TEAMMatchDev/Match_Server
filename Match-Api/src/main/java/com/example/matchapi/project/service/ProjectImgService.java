@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,15 +23,15 @@ public class ProjectImgService {
     private final ProjectConverter projectConverter;
     private final S3UploadService s3UploadService;
 
-    public void saveImgList(Long id, String url, List<String> imgUrlList) {
+    public void saveImgList(Long projectId, String url, List<String> imgUrlList) {
         imgUrlList.add(url);
         List<ProjectImage> projectImages = new ArrayList<>();
 
         for (int i=1 ; i <= imgUrlList.size(); i++) {
             if(i==imgUrlList.size()){
-                projectImages.add(projectConverter.postProjectImage(id,imgUrlList.get(i-1),REPRESENT,i));
+                projectImages.add(projectConverter.postProjectImage(projectId,imgUrlList.get(i-1),REPRESENT,i));
             }else {
-                projectImages.add(projectConverter.postProjectImage(id, imgUrlList.get(i-1),NORMAL, i));
+                projectImages.add(projectConverter.postProjectImage(projectId, imgUrlList.get(i-1),NORMAL, i));
             }
         }
 
@@ -48,10 +47,12 @@ public class ProjectImgService {
     }
 
     public void updateImageLists(Project project, List<Long> deleteImageList, MultipartFile presentFile, List<MultipartFile> multipartFiles) {
+        List<ProjectImage> projectsImage = project.getProjectImage();
         if(deleteImageList != null){
-            List<ProjectImage> images = projectImgAdaptor.findByIdIn(deleteImageList);
-            for (ProjectImage image : images) {
-                s3UploadService.deleteFile(image.getUrl());
+            for (ProjectImage projectImage : projectsImage) {
+                if(deleteImageList.contains(projectImage.getId())){
+                    s3UploadService.deleteFile(projectImage.getUrl());
+                }
             }
             projectImgAdaptor.deleteImgList(deleteImageList);
         }
@@ -64,7 +65,18 @@ public class ProjectImgService {
         }
         if(multipartFiles != null){
             List<String> imgUrlList = s3UploadService.listUploadProjectFiles(project.getId(), multipartFiles);
-            saveImgList(project.getId(), imgUrlList.get(0), imgUrlList);
+            patchImageLists(project.getId(), imgUrlList.get(0), imgUrlList, projectsImage.size()-deleteImageList.size());
         }
+    }
+
+    public void patchImageLists(Long projectId, String url, List<String> imgUrlList, int size) {
+        imgUrlList.add(url);
+        List<ProjectImage> projectImages = new ArrayList<>();
+
+        for (int i=size ; i <= imgUrlList.size(); size++) {
+                projectImages.add(projectConverter.postProjectImage(projectId,imgUrlList.get(i-1),REPRESENT,i));
+        }
+
+        projectImgAdaptor.saveAll(projectImages);
     }
 }
