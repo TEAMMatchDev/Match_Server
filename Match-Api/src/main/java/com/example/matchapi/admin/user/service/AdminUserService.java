@@ -80,6 +80,7 @@ public class AdminUserService {
     }
 
     @RedissonLock(LockName = "유저", key = "#user.id")
+    @Transactional
     public void unActivateUser(User user) {
         updateUserInfo(user.getId(), users -> users.setStatus(Status.INACTIVE));
         donationService.deleteRegularPayment(user);
