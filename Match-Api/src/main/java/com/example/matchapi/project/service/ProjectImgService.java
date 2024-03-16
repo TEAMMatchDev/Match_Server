@@ -29,9 +29,9 @@ public class ProjectImgService {
 
         for (int i=1 ; i <= imgUrlList.size(); i++) {
             if(i==imgUrlList.size()){
-                projectImages.add(projectConverter.postProjectImage(projectId,imgUrlList.get(i-1),REPRESENT,i));
+                projectImages.add(projectConverter.toProductImage(projectId,imgUrlList.get(i-1),REPRESENT,i));
             }else {
-                projectImages.add(projectConverter.postProjectImage(projectId, imgUrlList.get(i-1),NORMAL, i));
+                projectImages.add(projectConverter.toProductImage(projectId, imgUrlList.get(i-1),NORMAL, i));
             }
         }
 
@@ -65,16 +65,16 @@ public class ProjectImgService {
         }
         if(multipartFiles != null){
             List<String> imgUrlList = s3UploadService.listUploadProjectFiles(project.getId(), multipartFiles);
-            patchImageLists(project.getId(), imgUrlList.get(0), imgUrlList, projectsImage.size()-deleteImageList.size());
+            patchImageLists(project.getId(), imgUrlList, projectsImage.size()- (deleteImageList != null ?
+                deleteImageList.size() : 0));
         }
     }
 
-    public void patchImageLists(Long projectId, String url, List<String> imgUrlList, int size) {
-        imgUrlList.add(url);
+    public void patchImageLists(Long projectId, List<String> imgUrlList, int size) {
         List<ProjectImage> projectImages = new ArrayList<>();
 
-        for (int i=size ; i <= imgUrlList.size(); size++) {
-                projectImages.add(projectConverter.postProjectImage(projectId,imgUrlList.get(i-1),REPRESENT,i));
+        for (int i=1 ; i <= imgUrlList.size(); i++) {
+            projectImages.add(projectConverter.toProductImage(projectId,imgUrlList.get(i-1),NORMAL,size+i));
         }
 
         projectImgAdaptor.saveAll(projectImages);

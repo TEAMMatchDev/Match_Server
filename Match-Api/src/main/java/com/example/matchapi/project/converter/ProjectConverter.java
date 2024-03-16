@@ -92,7 +92,7 @@ public class ProjectConverter {
                 .build();
     }
 
-    public ProjectImage postProjectImage(Long id, String imgUrl, ImageRepresentStatus imageRepresentStatus, int sequence) {
+    public ProjectImage toProductImage(Long id, String imgUrl, ImageRepresentStatus imageRepresentStatus, int sequence) {
         return ProjectImage.builder()
                 .projectId(id)
                 .url(imgUrl)

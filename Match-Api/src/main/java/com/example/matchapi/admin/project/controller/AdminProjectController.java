@@ -122,7 +122,6 @@ public class AdminProjectController {
         Project project = projectService.findByProjectId(projectId);
         projectService.patchProject(project, modifyProject);
         projectImgService.updateImageLists(project, modifyProject.getDeleteImageList(), presentFile, multipartFiles);
-
         return CommonResponse.onSuccess("수정 성공");
     }
 
